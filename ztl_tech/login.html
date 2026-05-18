@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZTL Tech | Admin Login</title>
+    <meta name="description" content="Secure administrator login for the ZTL Tech control hub.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html#home">Home</a>
+            <a href="index.html#products">Products</a>
+            <a href="index.html#contact">Contact</a>
+        </div>
+    </nav>
+
+    <main class="auth-shell">
+        <section class="auth-panel animate visible" aria-labelledby="login-title">
+            <div class="auth-header">
+                <div class="auth-kicker">Admin Access</div>
+                <h1 id="login-title">Sign in to the control hub</h1>
+                <p>Use your ZTL Tech administrator credentials to continue.</p>
+            </div>
+
+            <form class="auth-form" id="login-form" novalidate>
+                <div class="form-error" id="login-error" role="alert" aria-live="polite"></div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" autocomplete="username" placeholder="admin@local.dev" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter password" required>
+                </div>
+
+                <button type="submit" class="btn-primary" id="login-button">
+                    <span id="login-button-text">Login</span>
+                </button>
+            </form>
+
+            <div class="auth-meta">
+                <a href="index.html">Return to ZTL Tech</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorBox = document.getElementById('login-error');
+        const loginButton = document.getElementById('login-button');
+        const loginButtonText = document.getElementById('login-button-text');
+        const LOGIN_ENDPOINT = 'http://localhost:3000/api/auth/login';
+
+        function setError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.add('visible');
+        }
+
+        function clearError() {
+            errorBox.textContent = '';
+            errorBox.classList.remove('visible');
+        }
+
+        function setLoading(isLoading) {
+            loginButton.disabled = isLoading;
+            emailInput.disabled = isLoading;
+            passwordInput.disabled = isLoading;
+            loginButtonText.textContent = isLoading ? 'Authenticating...' : 'Login';
+        }
+
+        function getBackendMessage(payload) {
+            if (!payload || typeof payload !== 'object') {
+                return 'Login failed. Please check your credentials.';
+            }
+
+            return payload.message ||
+                payload.error ||
+                (payload.data && payload.data.message) ||
+                'Login failed. Please check your credentials.';
+        }
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearError();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                setError('Email and password are required.');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(LOGIN_ENDPOINT, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                let payload = null;
+                try {
+                    payload = await response.json();
+                } catch (parseError) {
+                    payload = null;
+                }
+
+                if (!response.ok || !payload || payload.success !== true) {
+                    setError(getBackendMessage(payload));
+                    return;
+                }
+
+                window.location.href = './super_admin.html';
+            } catch (error) {
+                setError('Unable to connect to the authentication server. Confirm the backend is running on http://localhost:3000.');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>
