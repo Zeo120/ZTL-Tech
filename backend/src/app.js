@@ -1,5 +1,7 @@
 const express = require('express');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
+
 const { env } = require('./config/env');
 const { securityHeaders } = require('./middleware/securityHeaders');
 const { notFound } = require('./middleware/notFound');
@@ -15,8 +17,18 @@ function createApp() {
   app.set('trust proxy', env.trustProxy);
 
   app.use(securityHeaders);
+
+  app.use(cors({
+    origin: true,
+    credentials: true
+  }));
+
   app.use(express.json({ limit: '64kb' }));
-  app.use(express.urlencoded({ extended: false, limit: '32kb' }));
+  app.use(express.urlencoded({
+    extended: false,
+    limit: '32kb'
+  }));
+
   app.use(cookieParser());
 
   app.use('/api/health', healthRoutes);
@@ -28,5 +40,4 @@ function createApp() {
 
   return app;
 }
-
 module.exports = { createApp };
