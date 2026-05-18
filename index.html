@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZTL Tech | Engineering the Future</title>
-    <meta name="description" content="ZTL Tech provides cutting-edge technology solutions for the modern enterprise. Engineering the future with AI and Scalable Infrastructure.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta http-equiv="refresh" content="0; url=ztl_tech/index.html">
+    <title>ZTL Tech | Redirecting...</title>
+    <script>
+        window.location.href = "ztl_tech/index.html";
+    </script>
+</head>
+<body style="background: #000000; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+    <p style="color: #ffffff; font-size: 1.2rem; letter-spacing: 2px;">REDIRECTING TO ZTL TECH...</p>
+</body>
+</html>
+amily=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -28,15 +33,39 @@
         </div>
         <div class="nav-links">
             <a href="#home">Home</a>
-            <a href="#products">Products</a>
+            <div class="nav-item-dropdown">
+                <a href="#products" class="dropdown-trigger">Products <span class="dropdown-arrow">▼</span></a>
+                <div class="dropdown-menu">
+                    <a href="paradigm.html">
+                        <span class="dropdown-title">Paradigm</span>
+                        <span class="dropdown-desc">Custom Software Design</span>
+                    </a>
+                    <a href="#products">
+                        <span class="dropdown-title">Systems Design</span>
+                        <span class="dropdown-desc">PHASR</span>
+                    </a>
+                </div>
+            </div>
             <a href="#contact">Contact</a>
         </div>
     </nav>
 
     <div class="nav-menu">
-        <a href="#home">Home</a>
-        <a href="#products">Products</a>
-        <a href="#contact">Contact</a>
+        <a href="#home" class="mobile-main-link">Home</a>
+        <div class="mobile-dropdown">
+            <div class="mobile-dropdown-trigger">Products <span class="mobile-arrow">▼</span></div>
+            <div class="mobile-dropdown-menu">
+                <a href="paradigm.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Paradigm</span>
+                    <span class="mobile-sublink-desc">Custom Software Design</span>
+                </a>
+                <a href="#products" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Systems Design</span>
+                    <span class="mobile-sublink-desc">PHASR</span>
+                </a>
+            </div>
+        </div>
+        <a href="#contact" class="mobile-main-link">Contact</a>
     </div>
 
     <main>
@@ -209,7 +238,9 @@
         // Hamburger Menu Interactive Logic
         const hamburger = document.querySelector('.hamburger');
         const navMenu = document.querySelector('.nav-menu');
-        const mobileLinks = document.querySelectorAll('.nav-menu a');
+        const mobileLinks = document.querySelectorAll('.mobile-main-link, .mobile-sublink');
+        const mobileDropdown = document.querySelector('.mobile-dropdown');
+        const mobileTrigger = document.querySelector('.mobile-dropdown-trigger');
 
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
@@ -217,13 +248,25 @@
             document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
         });
 
+        // Close hamburger menu when a regular link or sublink is clicked
         mobileLinks.forEach(link => {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
                 document.body.style.overflow = '';
+                if (mobileDropdown) {
+                    mobileDropdown.classList.remove('active'); // Collapse dropdown
+                }
             });
         });
+
+        // Toggle mobile products dropdown menu
+        if (mobileTrigger && mobileDropdown) {
+            mobileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileDropdown.classList.toggle('active');
+            });
+        }
 
         // Intersection Observer for Smooth Scroll Animations
         const observerOptions = {
@@ -244,5 +287,4 @@
         });
     </script>
 </body>
-</html>
 </html>
