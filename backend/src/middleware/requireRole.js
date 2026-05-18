@@ -4,15 +4,21 @@ const { findUserAuthState } = require('../services/user.service');
 const ROLE_RANK = {
   user: 1,
   admin: 2,
-  'super-admin': 3
+  'super-admin': 3,
+  super_admin: 3
 };
 
-function requireRole(...allowedRoles) {
-  const allowed = new Set(allowedRoles);
+function roleMatches(actualRole, expectedRole) {
+  return ROLE_RANK[actualRole] === ROLE_RANK[expectedRole]
+    && ROLE_RANK[actualRole] === ROLE_RANK['super-admin'];
+}
 
+function requireRole(...allowedRoles) {
   return function roleMiddleware(req, res, next) {
     const role = req.auth && req.auth.role;
-    if (!role || !allowed.has(role)) {
+    const allowed = allowedRoles.some((allowedRole) => allowedRole === role || roleMatches(role, allowedRole));
+
+    if (!role || !allowed) {
       return fail(res, 403, 'Insufficient permissions');
     }
     return next();

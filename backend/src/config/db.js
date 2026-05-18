@@ -7,13 +7,18 @@ let pool;
 async function getDbPool() {
   if (pool) return pool;
 
+  const options = {
+    ...env.sql.options,
+    ...(env.sql.instanceName ? { instanceName: env.sql.instanceName } : {})
+  };
+
   pool = await sql.connect({
     server: env.sql.server,
-    port: env.sql.port,
+    ...(env.sql.instanceName ? {} : { port: env.sql.port }),
     database: env.sql.database,
     ...(env.sql.user ? { user: env.sql.user } : {}),
     ...(env.sql.password ? { password: env.sql.password } : {}),
-    options: env.sql.options,
+    options,
     pool: {
       max: 10,
       min: 0,

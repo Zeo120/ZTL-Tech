@@ -8,7 +8,15 @@ const { validateLoginBody } = require('../utils/validators');
 const { writeAuditEvent } = require('./audit.service');
 const { createSession } = require('./session.service');
 
-const VALID_ROLES = new Set(['super-admin', 'admin', 'user']);
+const VALID_ROLES = new Set(['super-admin', 'super_admin', 'admin', 'user']);
+
+async function hashPassword(password) {
+  return argon2.hash(password);
+}
+
+async function verifyPassword(hash, password) {
+  return argon2.verify(hash, password);
+}
 
 async function findUserByEmail(email) {
   const pool = await getDbPool();
@@ -50,7 +58,7 @@ async function login(body, requestContext) {
   const user = await findUserByEmail(email);
 
   const passwordMatches = user
-    ? await argon2.verify(user.password_hash, password)
+    ? await verifyPassword(user.password_hash, password)
     : false;
 
   if (!user || !passwordMatches || !user.is_active || !VALID_ROLES.has(user.role)) {
@@ -93,4 +101,4 @@ async function login(body, requestContext) {
   };
 }
 
-module.exports = { login, signSessionToken };
+module.exports = { hashPassword, login, signSessionToken, verifyPassword };

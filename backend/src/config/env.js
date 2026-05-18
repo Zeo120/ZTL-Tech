@@ -70,6 +70,7 @@ const env = {
   csrfHeaderName: (process.env.CSRF_HEADER_NAME || 'x-csrf-token').toLowerCase(),
   sql: {
     server: required('SQL_SERVER'),
+    instanceName: optional('SQL_INSTANCE'),
     port: parsePositiveInt('SQL_PORT', 1433),
     database: required('SQL_DATABASE'),
     user: optional('SQL_USER'),
