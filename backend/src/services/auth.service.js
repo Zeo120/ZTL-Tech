@@ -36,6 +36,24 @@ async function findUserByEmail(email) {
   return result.recordset[0] || null;
 }
 
+async function findUserById(id) {
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .input('id', sql.Int, id)
+    .query(`
+      SELECT TOP 1
+        id,
+        email,
+        role,
+        is_active
+      FROM Users
+      WHERE id = @id;
+    `);
+
+  return result.recordset[0] || null;
+}
+
+
 function signSessionToken(user, session) {
   return jwt.sign(
     {
@@ -107,4 +125,4 @@ async function login(body, requestContext) {
   };
 }
 
-module.exports = { hashPassword, login, signSessionToken, verifyPassword };
+module.exports = { hashPassword, login, signSessionToken, verifyPassword, findUserById };

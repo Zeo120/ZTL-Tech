@@ -126,6 +126,37 @@ const tables = [
         sql: 'CREATE INDEX IX_Widgets_page_id ON dbo.Widgets(page_id);'
       }
     ]
+  },
+  {
+    name: 'PhasrAudits',
+    createSql: `
+      CREATE TABLE dbo.PhasrAudits (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PhasrAudits PRIMARY KEY,
+        user_id INT NOT NULL,
+        domain_name NVARCHAR(255) NOT NULL,
+        proof_details NVARCHAR(MAX) NOT NULL,
+        agreement_filename NVARCHAR(255) NULL,
+        status NVARCHAR(50) NOT NULL CONSTRAINT DF_PhasrAudits_status DEFAULT 'pending',
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_PhasrAudits_created_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_PhasrAudits_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_PhasrAudits_user_id DEFAULT 0' },
+      { name: 'domain_name', sql: 'NVARCHAR(255) NOT NULL CONSTRAINT DF_PhasrAudits_domain_name DEFAULT N\'\'' },
+      { name: 'proof_details', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_PhasrAudits_proof_details DEFAULT N\'\'' },
+      { name: 'agreement_filename', sql: 'NVARCHAR(255) NULL' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_PhasrAudits_status DEFAULT N\'pending\'' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PhasrAudits_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_PhasrAudits',
+    indexes: [
+      {
+        name: 'IX_PhasrAudits_user_id',
+        sql: 'CREATE INDEX IX_PhasrAudits_user_id ON dbo.PhasrAudits(user_id);'
+      }
+    ]
   }
 ];
 
@@ -323,6 +354,7 @@ async function initDb() {
   // Ensure Foreign Key constraints for referential integrity
   await ensureForeignKey(pool, 'Pages', 'FK_Pages_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Widgets', 'FK_Widgets_Pages', 'FOREIGN KEY (page_id) REFERENCES dbo.Pages(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'PhasrAudits', 'FK_PhasrAudits_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 

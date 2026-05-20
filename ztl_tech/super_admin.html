@@ -255,8 +255,8 @@
         <!-- Dashboard Top Header Bar -->
         <div class="header-bar">
             <div style="text-align: left;">
-                <h1 style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: #ffffff;">SYSTEM CONTROL HUB</h1>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Multi-tenant cluster monitoring and zero-trust perimeter control nodes.</p>
+                <h1 style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: #ffffff;" id="welcome-message">SYSTEM CONTROL HUB</h1>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Multi-tenant cluster monitoring and zero-trust perimeter control nodes.</p>
             </div>
             <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 0.6rem 1.4rem; font-size: 0.85rem;" onclick="alert('SUPERADMIN session safely terminated. All audited security keys cleared.');">Terminate Session (Logout)</a>
         </div>
@@ -523,4 +523,32 @@
             };
             appendTerminalLine('[SYSTEM] Live multi-tenant BroadcastChannel established. Awaiting cross-tab triggers...', 'terminal-info');
         } catch (e) {
-            appendTerminalLine('
+            appendTerminalLine('[SYSTEM] BroadcastChannel disabled in this sandbox environment.', 'terminal-warn');
+        }
+
+        async function loadUserData() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.user) {
+                        const user = payload.data.user;
+                        const email = user.email || '';
+                        const username = email.split('@')[0];
+                        const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
+                        
+                        document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to Super Admin Hub.`;
+                        document.getElementById('welcome-subtext').innerText = `Multi-tenant cluster monitoring. Role: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load user info", err);
+            }
+        }
+
+        loadUserData();
+    </script>
+</body>
+</html>

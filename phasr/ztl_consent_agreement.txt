@@ -1,0 +1,42 @@
+================================================================================
+                    ZTL TECH - SECURITY CONSULTING AGREEMENT
+              MUTUAL CONSENT & AUTHORIZATION FOR VULNERABILITY AUDITING
+================================================================================
+
+This Security Consulting & Consent Agreement (the "Agreement") is entered into
+by and between ZTL Tech Inc. ("ZTL") and the signatory party below ("Client" or 
+"Consent Party").
+
+1. PURPOSE OF ENGAGEMENT
+Client hereby engages ZTL to perform automated vulnerability scans, threat modeling,
+and penetration testing services (collectively, "Audits") on the target systems,
+applications, and public domain names registered by the Client under Phase -1 of
+the PHASR Shield defensive model.
+
+2. AUTHORIZATION & CONSENT
+Client represents and warrants that it holds full legal ownership, administrative
+rights, and/or express permission of the owner to audit the target Public Domain
+Names submitted during setup. Client explicitly authorizes ZTL to perform the Audits,
+which may include network port scanning, certificate inspection, and defensive
+hierarchy validation.
+
+3. LIMITATION OF LIABILITY
+ZTL shall perform all Audits in accordance with standard industrial cyber security
+practices. Client acknowledges that active scanning and diagnostic checks can
+occasionally trigger security locks or latency on active subnets. ZTL shall not
+be liable for any indirect, incidental, or consequential operational disruptions.
+
+4. CONFIDENTIALITY
+All findings, logs, vulnerabilities detected, and report files generated during
+the course of the Audits shall be treated as highly confidential and shall not
+be disclosed to any third parties without prior written consent.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement:
+
+For ZTL Tech Inc.:                             For Consent Party (Client):
+Signature: [ZTL Security Core]                 Signature: __________________________
+Date: May 20, 2026                             Name (Print): _______________________
+                                               Title: ______________________________
+                                               Domain Target: ______________________
+                                               Date: _______________________________
+================================================================================

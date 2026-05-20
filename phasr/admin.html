@@ -101,7 +101,7 @@
         /* Interactive 5-Phase Security Timeline */
         .timeline-steps {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 0.5rem;
             background: rgba(255, 255, 255, 0.02);
             padding: 0.8rem;
@@ -315,6 +315,59 @@
         .terminal-warn { color: #ebcb8b; }
         .terminal-error { color: #bf616a; }
         .terminal-success { color: #a3be8c; }
+
+        /* Mobile Responsiveness Refinements */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 5.5rem 1rem 1rem;
+                gap: 1rem;
+            }
+            .header-bar {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            .header-bar div {
+                text-align: center !important;
+            }
+            .header-bar h1 {
+                justify-content: center;
+                font-size: 1.2rem !important;
+            }
+            .timeline-steps {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.4rem;
+                padding: 0.5rem;
+            }
+            .timeline-btn {
+                padding: 0.5rem 0.15rem;
+                font-size: 0.62rem;
+            }
+            .timeline-btn-num {
+                font-size: 0.7rem;
+            }
+            .hierarchy-layout {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            .operator-panel {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            nav {
+                padding: 0.8rem 1rem;
+            }
+            nav .user-badge {
+                display: none; /* prevent header crowding / line wrap */
+            }
+        }
+        @media (max-width: 480px) {
+            .timeline-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
@@ -338,10 +391,10 @@
         <!-- Header Bar -->
         <div class="header-bar">
             <div style="text-align: left;">
-                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;" id="welcome-message">
                     PHASR SECURITY CONTROL PLANE
                 </h1>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Enterprise security reasoning engine tracking Phase, Hierarchy, Assumptions, State, and Redundancy metrics.</p>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Enterprise security reasoning engine tracking Phase, Hierarchy, Assumptions, State, and Redundancy metrics.</p>
             </div>
             <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Auditor session securely closed.');">Logout Operator</a>
         </div>
@@ -354,11 +407,15 @@
                 <!-- Timeline Module -->
                 <div class="operator-panel">
                     <h2 class="panel-header-title">
-                        <span>1. 5-Phase Security Timeline</span>
+                        <span>1. PHASR Security Timeline</span>
                         <span style="font-size: 0.75rem; color: var(--text-secondary);" id="timeline-completion">Verification Progress: 0%</span>
                     </h2>
                     <div class="timeline-steps">
-                        <button class="timeline-btn active" id="btn-t1" onclick="selectPhase(1)">
+                        <button class="timeline-btn active" id="btn-t-1" onclick="selectPhase(-1)">
+                            <span class="timeline-btn-num">Phase -1</span>
+                            <span style="color:#00ffaa; font-weight:bold;">Try PHASR</span>
+                        </button>
+                        <button class="timeline-btn" id="btn-t1" onclick="selectPhase(1)">
                             <span class="timeline-btn-num">Phase 1</span>
                             <span>Threat Model</span>
                         </button>
@@ -530,7 +587,7 @@
 
     <script>
         const terminal = document.getElementById('terminal');
-        let verifiedPhases = { 1: false, 2: false, 3: false, 4: false, 5: false };
+        let verifiedPhases = { [-1]: false, 1: false, 2: false, 3: false, 4: false, 5: false };
 
         function logEvent(text, type = '') {
             const line = document.createElement('div');
@@ -541,8 +598,13 @@
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        // 5-Phase Timeline Data
+        // 5-Phase Timeline Data + Phase -1 (Free Audit)
         const phasesData = {
+            [-1]: {
+                title: "Phase -1: Try PHASR (Free Audit Target Registration)",
+                objective: "Provide public domain credentials and verify authority to run free defensive checks.",
+                btnText: "Activate Free Audit Scan"
+            },
             1: {
                 title: "Phase 1: Threat Model",
                 objective: "Deconstruct entry vector paths, interface boundaries, and resource bindings.",
@@ -590,11 +652,11 @@
             }
         };
 
-        let currentPhase = 1;
+        let currentPhase = -1;
         function selectPhase(num) {
             currentPhase = num;
-            document.querySelectorAll('.timeline-btn').forEach((btn, idx) => {
-                if (idx + 1 === num) {
+            document.querySelectorAll('.timeline-btn').forEach((btn) => {
+                if (btn.id === `btn-t${num}`) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
@@ -604,20 +666,46 @@
             const data = phasesData[num];
             const detailView = document.getElementById('phase-detail-view');
             
-            const checksList = data.checks.map(c => `<div style="font-size:0.75rem; color:${c.startsWith('✓') ? '#00ffaa' : '#ff3366'}; margin-top:0.3rem;">${c}</div>`).join('');
-            
-            detailView.innerHTML = `
-                <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
-                <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
-                <div class="detail-row"><span class="telemetry-label">Assessed Risk Score</span><span class="telemetry-value text-neon">${data.riskScore}</span></div>
-                <div class="detail-row"><span class="telemetry-label">Computed Blast Radius</span><span class="telemetry-value" style="color:#ffaa00;">${data.blastRadius}</span></div>
-                <div class="detail-row"><span class="telemetry-label">Recommended Mitigation</span><span class="telemetry-value" style="font-size:0.7rem; color:#ffffff; max-width:60%; text-align:right;">${data.mitigation}</span></div>
-                <div style="margin-top:0.8rem;">
-                    <span style="font-size:0.75rem; font-weight:bold; color:#ffffff;">Active Audit Checks:</span>
-                    ${checksList}
-                </div>
-                <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(${num})">${data.btnText}</button>
-            `;
+            if (num === -1) {
+                detailView.innerHTML = `
+                    <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                    
+                    <form id="free-audit-form" onsubmit="event.preventDefault(); submitFreeAudit();" style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-top:0.5rem;">
+                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">1. Public Domain Name</label>
+                            <input type="text" id="audit-domain" placeholder="e.g. yourcompany.com" required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">2. Proof of Access to Domain (DNS Verification)</label>
+                            <textarea id="audit-proof" placeholder="e.g. Enter DNS TXT record ztl-verification=xxx, or verify file route credentials..." required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%; height:50px; resize:none; font-family:monospace;"></textarea>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">3. Signed Consent Agreement</label>
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.2rem;">
+                                <a href="ztl_consent_agreement.txt" download class="btn-primary" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.68rem; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15);">Download Agreement</a>
+                            </div>
+                            <input type="file" id="audit-file" style="font-size:0.7rem; color:var(--text-secondary);" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;">${data.btnText}</button>
+                    </form>
+                `;
+            } else {
+                const checksList = data.checks.map(c => `<div style="font-size:0.75rem; color:${c.startsWith('✓') ? '#00ffaa' : '#ff3366'}; margin-top:0.3rem;">${c}</div>`).join('');
+                
+                detailView.innerHTML = `
+                    <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                    <div class="detail-row"><span class="telemetry-label">Assessed Risk Score</span><span class="telemetry-value text-neon">${data.riskScore}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Computed Blast Radius</span><span class="telemetry-value" style="color:#ffaa00;">${data.blastRadius}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Recommended Mitigation</span><span class="telemetry-value" style="font-size:0.7rem; color:#ffffff; max-width:60%; text-align:right;">${data.mitigation}</span></div>
+                    <div style="margin-top:0.8rem;">
+                        <span style="font-size:0.75rem; font-weight:bold; color:#ffffff;">Active Audit Checks:</span>
+                        ${checksList}
+                    </div>
+                    <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(${num})">${data.btnText}</button>
+                `;
+            }
         }
 
         function runPhaseAudit(num) {
@@ -628,14 +716,142 @@
                 const btn = document.getElementById(`btn-t${num}`);
                 btn.classList.add('verified');
                 
-                // Calculate total completion percentage
-                let completed = Object.values(verifiedPhases).filter(v => v).length;
-                let percent = completed * 20;
-                document.getElementById('timeline-completion').innerText = `Verification Progress: ${percent}%`;
+                updateProgress();
                 
                 logEvent(`[SUCCESS] Phase ${num} security variables audited. Mitigations validated.`, 'terminal-success');
                 selectPhase(num); // refresh view
             }, 1000);
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        async function loadUserData() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.user) {
+                        const user = payload.data.user;
+                        const email = user.email || '';
+                        const username = email.split('@')[0];
+                        const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
+                        
+                        document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to PHASR.`;
+                        document.getElementById('welcome-subtext').innerText = `Defensive control plane active. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load user info", err);
+            }
+        }
+
+        let displayedLogIds = new Set();
+        async function pollRealLogs() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/admin/phasr/logs`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.logs) {
+                        const logs = [...payload.data.logs].reverse();
+                        logs.forEach(log => {
+                            if (!displayedLogIds.has(log.id)) {
+                                displayedLogIds.add(log.id);
+                                let typeClass = 'terminal-info';
+                                if (log.action.includes('fail') || log.action.includes('error') || log.success === false) {
+                                    typeClass = 'terminal-error';
+                                } else if (log.action.includes('success') || log.action.includes('complete') || log.action.includes('verified')) {
+                                    typeClass = 'terminal-success';
+                                } else if (log.action.includes('warn') || log.action.includes('setup')) {
+                                    typeClass = 'terminal-warn';
+                                }
+
+                                const detailsText = log.metadata && log.metadata.details 
+                                    ? log.metadata.details 
+                                    : (log.metadata && log.metadata.domainName 
+                                        ? `Audit setup initiated for target: ${log.metadata.domainName}` 
+                                        : `Audit action: ${log.action} on ${log.targetType || 'system'} (${log.targetId || 'global'})`);
+                                
+                                const timeStr = new Date(log.createdAt).toLocaleTimeString();
+                                const line = document.createElement('div');
+                                line.className = `terminal-line ${typeClass}`;
+                                line.innerHTML = `<span style="color: rgba(255,0,60,0.5)">[${timeStr}]</span> ${detailsText}`;
+                                terminal.appendChild(line);
+                            }
+                        });
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to poll logs", err);
+            }
+        }
+
+        async function submitFreeAudit() {
+            const domainName = document.getElementById('audit-domain').value.trim();
+            const proofDetails = document.getElementById('audit-proof').value.trim();
+            const fileInput = document.getElementById('audit-file');
+            
+            if (!domainName || !proofDetails) {
+                alert('Domain name and proof details are required.');
+                return;
+            }
+
+            const agreementFilename = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';
+
+            logEvent(`[SETUP] Registering free audit target: ${domainName}...`, 'terminal-info');
+            logEvent(`[SETUP] Verifying signed agreement upload: ${agreementFilename || 'Pending'}`, 'terminal-warn');
+
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const csrfToken = getCookie('ztl_csrf');
+                
+                const response = await fetch(`${apiBase}/api/admin/phasr/free-audit`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': csrfToken
+                    },
+                    body: JSON.stringify({ domainName, proofDetails, agreementFilename })
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    logEvent(`[SUCCESS] Consent verified and Free Audit scheduled for ${domainName}!`, 'terminal-success');
+                    alert(`[SUCCESS] Free Audit Scheduled!\n\nAutomated scanning has begun for target: ${domainName}.\nReal-time signals will stream to the operational feed.`);
+                    
+                    // Mark phase -1 as verified
+                    verifiedPhases[-1] = true;
+                    document.getElementById('btn-t-1').classList.add('verified');
+                    updateProgress();
+
+                    // Refresh log view immediately
+                    setTimeout(pollRealLogs, 500);
+                } else {
+                    const err = payload.error || 'Failed to submit consent audit.';
+                    logEvent(`[ERROR] Setup failed: ${err}`, 'terminal-error');
+                    alert(`Error: ${err}`);
+                }
+            } catch (error) {
+                logEvent(`[ERROR] Connection failed while registering consent details.`, 'terminal-error');
+                alert('Connection error occurred. Ensure the server is online.');
+            }
+        }
+
+        function updateProgress() {
+            let completed = Object.values(verifiedPhases).filter(v => v).length;
+            let percent = Math.round((completed / 6) * 100);
+            document.getElementById('timeline-completion').innerText = `Verification Progress: ${percent}%`;
         }
 
         // Hierarchy Access Auditor Data
@@ -873,11 +1089,16 @@
         }
 
         // Initial setup loads
-        selectPhase(1);
+        selectPhase(-1);
         selectRole('sa');
         selectTrustNode('browser');
         calculateAssumptionRisk();
         runTransitionAudit('gu');
+        
+        // Load real user details and poll logs
+        loadUserData();
+        pollRealLogs();
+        setInterval(pollRealLogs, 2500);
     </script>
 </body>
 </html>

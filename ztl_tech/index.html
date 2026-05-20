@@ -87,67 +87,480 @@
             </div>
             
             <div class="hero-image-container animate delay-3">
-                <svg class="hero-svg" viewBox="0 0 800 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Futuristic Neural Network Core">
+                <svg class="hero-svg" viewBox="0 0 800 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="ZTL Tech Interactive Hexagonal Core">
                     <defs>
-                        <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+                        <!-- Radial Ambient Glows -->
+                        <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
                             <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15" />
                             <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                         </radialGradient>
-                        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <radialGradient id="phasrGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ff003c" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </radialGradient>
+                        <radialGradient id="gridGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ffaa00" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </radialGradient>
+                        <radialGradient id="paradigmGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#d500f9" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </radialGradient>
+                        <radialGradient id="scalpelGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#00f3ff" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </radialGradient>
+
+                        <!-- Linear Color Gradients -->
+                        <linearGradient id="phasrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff003c" />
+                            <stop offset="100%" stop-color="#ff5376" />
+                        </linearGradient>
+                        <linearGradient id="gridGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffaa00" />
+                            <stop offset="100%" stop-color="#ffd700" />
+                        </linearGradient>
+                        <linearGradient id="paradigmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#d500f9" />
+                            <stop offset="100%" stop-color="#e040fb" />
+                        </linearGradient>
+                        <linearGradient id="scalpelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00f3ff" />
+                            <stop offset="100%" stop-color="#00ffaa" />
+                        </linearGradient>
+                        <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#ffffff" />
-                            <stop offset="100%" stop-color="#a0a0a0" />
+                            <stop offset="100%" stop-color="#888888" />
                         </linearGradient>
-                        <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#666666" />
-                            <stop offset="100%" stop-color="#d0d0d0" />
-                        </linearGradient>
-                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="8" result="blur" />
+
+                        <!-- Glow Filters -->
+                        <filter id="neonPhasr" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
                             <feMerge>
                                 <feMergeNode in="blur" />
                                 <feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
+                        <filter id="neonGrid" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="neonParadigm" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="neonScalpel" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="neonCore" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="9" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+
+                        <!-- Hexagonal grid pattern background -->
+                        <pattern id="hexGrid" width="40" height="69.28" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 20 11.54 L 0 0 L 0 23.09 L 20 34.64 L 40 23.09 Z M 0 34.64 L 20 46.18 L 0 57.73 L 0 69.28 L 20 80.83 L 40 69.28 L 40 57.73 L 20 46.18" fill="none" stroke="rgba(255, 255, 255, 0.02)" stroke-width="0.8" />
+                            <circle cx="20" cy="11.54" r="1" fill="rgba(255, 255, 255, 0.05)" />
+                            <circle cx="20" cy="46.18" r="1" fill="rgba(255, 255, 255, 0.05)" />
+                        </pattern>
+
+                        <style>
+                            @keyframes flow-ticks {
+                                to { stroke-dashoffset: -80; }
+                            }
+                            @keyframes sweep {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                            }
+                            @keyframes sweep-reverse {
+                                from { transform: rotate(360deg); }
+                                to { transform: rotate(0deg); }
+                            }
+                            @keyframes pulse-core-node {
+                                0% { transform: scale(1); opacity: 0.8; }
+                                50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.7)); }
+                                100% { transform: scale(1); opacity: 0.8; }
+                            }
+                            @keyframes pulse-dot {
+                                0% { r: 3px; opacity: 0.4; }
+                                50% { r: 6px; opacity: 0.9; }
+                                100% { r: 3px; opacity: 0.4; }
+                            }
+                            .flow-phasr {
+                                stroke-dasharray: 8, 12;
+                                animation: flow-ticks 1.8s linear infinite;
+                            }
+                            .flow-grid {
+                                stroke-dasharray: 6, 14;
+                                animation: flow-ticks 2.2s linear infinite;
+                            }
+                            .flow-paradigm {
+                                stroke-dasharray: 10, 10;
+                                animation: flow-ticks 1.5s linear infinite;
+                            }
+                            .flow-scalpel {
+                                stroke-dasharray: 4, 16;
+                                animation: flow-ticks 2.8s linear infinite;
+                            }
+                            .flow-neutral {
+                                stroke-dasharray: 5, 15;
+                                animation: flow-ticks 3s linear infinite;
+                            }
+                            .rot-cw-slow {
+                                animation: sweep 24s linear infinite;
+                            }
+                            .rot-ccw-slow {
+                                animation: sweep-reverse 18s linear infinite;
+                            }
+                            .rot-cw-fast {
+                                animation: sweep 12s linear infinite;
+                            }
+                            .rot-ccw-fast {
+                                animation: sweep-reverse 8s linear infinite;
+                            }
+                            .interactive-group {
+                                cursor: pointer;
+                                transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease;
+                                opacity: 0.75;
+                            }
+                            .interactive-group:hover {
+                                transform: scale(1.08);
+                                opacity: 1;
+                            }
+                        </style>
                     </defs>
 
-                    <circle cx="400" cy="300" r="300" fill="url(#glowGrad)" />
+                    <!-- Hexagonal Grid Backdrop -->
+                    <rect width="100%" height="100%" fill="url(#hexGrid)" />
 
-                    <g opacity="0.15">
-                        <path d="M 100,50 L 700,50 M 100,150 L 700,150 M 100,250 L 700,250 M 100,350 L 700,350 M 100,450 L 700,450 M 100,550 L 700,550" stroke="#c0c0c0" stroke-width="1" stroke-dasharray="5,5" />
-                        <path d="M 100,50 L 100,550 M 200,50 L 200,550 M 300,50 L 300,550 M 400,50 L 400,550 M 500,50 L 500,550 M 600,50 L 600,550 M 700,50 L 700,550" stroke="#c0c0c0" stroke-width="1" stroke-dasharray="5,5" />
+                    <!-- ========================================== -->
+                    <!-- BACKGROUND OVERLAPPING ROTATING HEXAGONS -->
+                    <!-- ========================================== -->
+                    <g class="rot-cw-slow" transform-origin="400 300">
+                        <polygon points="400,40 625,170 625,430 400,560 175,430 175,170" stroke="url(#gridGrad)" stroke-width="1" fill="none" opacity="0.15" />
+                    </g>
+                    <g class="rot-ccw-slow" transform-origin="400 300">
+                        <polygon points="400,80 591,190 591,410 400,520 209,410 209,190" stroke="url(#scalpelGrad)" stroke-width="1.2" fill="none" opacity="0.18" />
+                    </g>
+                    <g class="rot-cw-fast" transform-origin="400 300">
+                        <polygon points="400,130 547,215 547,385 400,470 253,385 253,215" stroke="url(#paradigmGrad)" stroke-width="1.5" stroke-dasharray="10, 15" fill="none" opacity="0.22" filter="url(#neonParadigm)" />
                     </g>
 
-                    <g stroke="url(#goldGrad)" stroke-width="1.5" fill="none" opacity="0.6" filter="url(#glow)">
-                        <path d="M 150,150 L 300,300 L 500,300 L 650,450" />
-                        <path d="M 150,440 L 300,300" />
-                        <path d="M 650,150 L 500,300" />
-                        <path d="M 400,100 L 400,200" />
-                        <path d="M 400,400 L 400,500" />
+                    <!-- Ambient Glowing Hexagon Backdrops -->
+                    <polygon points="300,37 378,82 378,172 300,217 222,172 222,82" fill="url(#phasrGlow)" opacity="0.7" />
+                    <polygon points="500,37 578,82 578,172 500,217 422,172 422,82" fill="url(#gridGlow)" opacity="0.7" />
+                    <polygon points="300,383 378,428 378,518 300,563 222,518 222,428" fill="url(#paradigmGlow)" opacity="0.7" />
+                    <polygon points="500,383 578,428 578,518 500,563 422,518 422,428" fill="url(#scalpelGlow)" opacity="0.7" />
+                    <polygon points="400,160 521,230 521,370 400,440 279,370 279,230" fill="url(#hubGlow)" opacity="0.85" />
+
+                    <!-- ========================================== -->
+                    <!-- DENSE NETWORK CONNECTIONS (CURVED MESH & DYNAMIC DATA STREAM) -->
+                    <!-- ============================================================= -->
+                    
+                    <!-- Spokes / Core Convergence Lanes (Curved Backdrops) -->
+                    <g stroke-width="1.2" opacity="0.2" fill="none">
+                        <path id="p-phasr-hub" d="M 300,127 Q 310,230 400,300" stroke="url(#phasrGrad)" />
+                        <path id="p-grid-hub" d="M 500,127 Q 490,230 400,300" stroke="url(#gridGrad)" />
+                        <path id="p-scalpel-hub" d="M 500,473 Q 490,370 400,300" stroke="url(#scalpelGrad)" />
+                        <path id="p-paradigm-hub" d="M 300,473 Q 310,370 400,300" stroke="url(#paradigmGrad)" />
+                        <path id="p-left-hub" d="M 200,300 Q 300,310 400,300" stroke="url(#coreGrad)" />
+                        <path id="p-right-hub" d="M 600,300 Q 500,290 400,300" stroke="url(#coreGrad)" />
+                    </g>
+                    
+                    <!-- Hexagonal Perimeter Channels (Curved Backdrops) -->
+                    <g stroke-width="1.2" opacity="0.2" fill="none">
+                        <path id="p-phasr-grid" d="M 300,127 Q 400,90 500,127" stroke="url(#gridGrad)" />
+                        <path id="p-grid-right" d="M 500,127 Q 580,200 600,300" stroke="url(#gridGrad)" />
+                        <path id="p-right-scalpel" d="M 600,300 Q 580,400 500,473" stroke="url(#scalpelGrad)" />
+                        <path id="p-scalpel-paradigm" d="M 500,473 Q 400,510 300,473" stroke="url(#scalpelGrad)" />
+                        <path id="p-paradigm-left" d="M 300,473 Q 220,400 200,300" stroke="url(#paradigmGrad)" />
+                        <path id="p-left-phasr" d="M 200,300 Q 220,200 300,127" stroke="url(#phasrGrad)" />
                     </g>
 
-                    <g class="rotating-slow" transform-origin="400 300">
-                        <circle cx="400" cy="300" r="180" stroke="url(#silverGrad)" stroke-width="1.5" fill="none" stroke-dasharray="10, 80, 90, 40" opacity="0.4" />
-                        <circle cx="400" cy="300" r="220" stroke="url(#goldGrad)" stroke-width="1" fill="none" stroke-dasharray="40, 150, 60, 30" opacity="0.3" />
+                    <!-- Overlapping Star Diagonals (Curved Backdrops) -->
+                    <g stroke-width="1.2" opacity="0.15" fill="none">
+                        <path id="p-phasr-scalpel" d="M 300,127 C 330,220 470,380 500,473" stroke="url(#phasrGrad)" />
+                        <path id="p-grid-paradigm" d="M 500,127 C 470,220 330,380 300,473" stroke="url(#gridGrad)" />
+                        <path id="p-left-right" d="M 200,300 C 300,260 500,340 600,300" stroke="url(#coreGrad)" />
+                        <path id="p-phasr-paradigm" d="M 300,127 Q 270,300 300,473" stroke="url(#paradigmGrad)" />
+                        <path id="p-grid-scalpel" d="M 500,127 Q 530,300 500,473" stroke="url(#scalpelGrad)" />
                     </g>
 
-                    <g class="rotating-fast" transform-origin="400 300">
-                        <circle cx="400" cy="300" r="120" stroke="url(#goldGrad)" stroke-width="2" fill="none" stroke-dasharray="100, 30, 20, 40" filter="url(#glow)" />
-                        <circle cx="400" cy="300" r="90" stroke="url(#silverGrad)" stroke-width="1.5" fill="none" stroke-dasharray="40, 40" opacity="0.7" />
+                    <!-- Glowing Flow Lines (Curved Dashed Running Tracers) -->
+                    <g stroke-width="2.5" fill="none" opacity="0.75">
+                        <use href="#p-phasr-hub" stroke="url(#phasrGrad)" class="flow-phasr" filter="url(#neonPhasr)" />
+                        <use href="#p-grid-hub" stroke="url(#gridGrad)" class="flow-grid" filter="url(#neonGrid)" />
+                        <use href="#p-scalpel-hub" stroke="url(#scalpelGrad)" class="flow-scalpel" filter="url(#neonScalpel)" />
+                        <use href="#p-paradigm-hub" stroke="url(#paradigmGrad)" class="flow-paradigm" filter="url(#neonParadigm)" />
+                        <use href="#p-left-hub" stroke="url(#coreGrad)" class="flow-neutral" />
+                        <use href="#p-right-hub" stroke="url(#coreGrad)" class="flow-neutral" />
+                        
+                        <!-- Direct Interconnect Tracers between the 4 systems -->
+                        <use href="#p-phasr-grid" stroke="url(#phasrGrad)" class="flow-phasr" filter="url(#neonPhasr)" />
+                        <use href="#p-grid-scalpel" stroke="url(#gridGrad)" class="flow-grid" filter="url(#neonGrid)" />
+                        <use href="#p-scalpel-paradigm" stroke="url(#scalpelGrad)" class="flow-scalpel" filter="url(#neonScalpel)" />
+                        <use href="#p-phasr-paradigm" stroke="url(#paradigmGrad)" class="flow-paradigm" filter="url(#neonParadigm)" />
+                        
+                        <!-- Diagonal Flow Overlay -->
+                        <use href="#p-phasr-scalpel" stroke="url(#phasrGrad)" class="flow-phasr" filter="url(#neonPhasr)" opacity="0.45" />
+                        <use href="#p-grid-paradigm" stroke="url(#gridGrad)" class="flow-grid" filter="url(#neonGrid)" opacity="0.45" />
                     </g>
 
-                    <circle cx="400" cy="300" r="40" fill="url(#goldGrad)" filter="url(#glow)" class="pulsing-core" />
-                    <circle cx="400" cy="300" r="15" fill="#ffffff" />
+                    <!-- FLOWING PARTICLES (DENSE DATA SWARM SYSTEM) -->
+                    <!-- Spokes Swarm -->
+                    <circle r="3.5" fill="#ff003c" filter="url(#neonPhasr)">
+                        <animateMotion dur="2.4s" repeatCount="indefinite">
+                            <mpath href="#p-phasr-hub" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3.5" fill="#ffaa00" filter="url(#neonGrid)">
+                        <animateMotion dur="2.9s" repeatCount="indefinite">
+                            <mpath href="#p-grid-hub" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3.5" fill="#00f3ff" filter="url(#neonScalpel)">
+                        <animateMotion dur="2.2s" repeatCount="indefinite">
+                            <mpath href="#p-scalpel-hub" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3.5" fill="#d500f9" filter="url(#neonParadigm)">
+                        <animateMotion dur="2.7s" repeatCount="indefinite">
+                            <mpath href="#p-paradigm-hub" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#ffffff" filter="url(#neonCore)">
+                        <animateMotion dur="3.1s" repeatCount="indefinite">
+                            <mpath href="#p-left-hub" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#ffffff" filter="url(#neonCore)">
+                        <animateMotion dur="3.5s" repeatCount="indefinite">
+                            <mpath href="#p-right-hub" />
+                        </animateMotion>
+                    </circle>
 
-                    <g fill="url(#silverGrad)">
-                        <circle class="pulse-node" cx="150" cy="150" r="6" />
-                        <circle class="pulse-node" cx="150" cy="440" r="6" />
-                        <circle class="pulse-node" cx="650" cy="150" r="6" />
-                        <circle class="pulse-node" cx="650" cy="450" r="6" />
-                        <circle class="pulse-node" cx="400" cy="100" r="5" />
-                        <circle class="pulse-node" cx="400" cy="500" r="5" />
-                        <circle class="pulse-node" cx="300" cy="300" r="7" fill="url(#goldGrad)" filter="url(#glow)" />
-                        <circle class="pulse-node" cx="500" cy="300" r="7" fill="url(#goldGrad)" filter="url(#glow)" />
+                    <!-- Perimeter Loop Swarm -->
+                    <circle r="2.5" fill="#ffaa00" filter="url(#neonGrid)">
+                        <animateMotion dur="3.4s" repeatCount="indefinite">
+                            <mpath href="#p-phasr-grid" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="2.5" fill="#00f3ff" filter="url(#neonScalpel)">
+                        <animateMotion dur="2.8s" repeatCount="indefinite">
+                            <mpath href="#p-grid-right" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="2.5" fill="#00f3ff" filter="url(#neonScalpel)">
+                        <animateMotion dur="3.1s" repeatCount="indefinite">
+                            <mpath href="#p-right-scalpel" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="2.5" fill="#d500f9" filter="url(#neonParadigm)">
+                        <animateMotion dur="3.8s" repeatCount="indefinite">
+                            <mpath href="#p-scalpel-paradigm" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="2.5" fill="#ff003c" filter="url(#neonPhasr)">
+                        <animateMotion dur="2.6s" repeatCount="indefinite">
+                            <mpath href="#p-paradigm-left" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="2.5" fill="#ff003c" filter="url(#neonPhasr)">
+                        <animateMotion dur="3.2s" repeatCount="indefinite">
+                            <mpath href="#p-left-phasr" />
+                        </animateMotion>
+                    </circle>
+
+                    <!-- Direct System-to-System Interconnect Swarms (Complete Graph Mesh) -->
+                    <circle r="3" fill="#ffaa00" filter="url(#neonGrid)">
+                        <animateMotion dur="2.6s" repeatCount="indefinite">
+                            <mpath href="#p-grid-scalpel" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#d500f9" filter="url(#neonParadigm)">
+                        <animateMotion dur="3.0s" repeatCount="indefinite">
+                            <mpath href="#p-phasr-paradigm" />
+                        </animateMotion>
+                    </circle>
+
+                    <!-- Cross Mesh Swarm -->
+                    <circle r="3" fill="#ff003c" filter="url(#neonPhasr)">
+                        <animateMotion dur="4.2s" repeatCount="indefinite">
+                            <mpath href="#p-phasr-scalpel" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#ffaa00" filter="url(#neonGrid)">
+                        <animateMotion dur="4.6s" repeatCount="indefinite">
+                            <mpath href="#p-grid-paradigm" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#ffffff" filter="url(#neonCore)">
+                        <animateMotion dur="5.0s" repeatCount="indefinite">
+                            <mpath href="#p-left-right" />
+                        </animateMotion>
+                    </circle>
+
+
+                    <!-- ========================================== -->
+                    <!-- PORTAL QUADRANTS (INTERACTIVE GROUPS) -->
+                    <!-- ========================================== -->
+                    
+                    <!-- QUADRANT 1: PHASR (Crimson - Top Left) -->
+                    <a href="../phasr/index.html" style="cursor: pointer; text-decoration: none;">
+                        <g class="interactive-group" data-filter="neonPhasr" data-url="../phasr/index.html" data-name="PHASR | Cyber Security" data-status="Trust boundary mapping, state security scanning &amp; audit logging." data-color="#ff003c" transform-origin="300 127">
+                            <!-- Hexagonal border -->
+                            <polygon points="300,107 317,117 317,137 300,147 283,137 283,117" stroke="url(#phasrGrad)" stroke-width="1.2" fill="none" opacity="0.6" />
+                            <polygon points="300,97 326,112 326,142 300,157 274,142 274,112" stroke="url(#phasrGrad)" stroke-width="0.8" stroke-dasharray="4, 8" fill="none" opacity="0.4" class="rot-cw-slow" transform-origin="300 127" />
+                            
+                            <!-- Core Hexagon Node -->
+                            <polygon points="300,117 309,122 309,132 300,137 291,132 291,122" fill="url(#phasrGrad)" filter="url(#neonPhasr)" />
+                            <!-- Sweep Radar Laser (hexagonal vector path) -->
+                            <line x1="300" y1="127" x2="300" y2="77" stroke="url(#phasrGrad)" stroke-width="1.5" class="rot-cw-fast" transform-origin="300 127" opacity="0.75" filter="url(#neonPhasr)" />
+                            
+                            <circle cx="280" cy="115" r="3" fill="#ffffff" style="animation: pulse-dot 1.8s infinite;" />
+                            <circle cx="320" cy="139" r="3" fill="#ffffff" style="animation: pulse-dot 2.2s infinite -0.6s;" />
+                        </g>
+                    </a>
+
+                    <!-- QUADRANT 2: GRID (Gold - Top Right) -->
+                    <a href="../grid/index.html" style="cursor: pointer; text-decoration: none;">
+                        <g class="interactive-group" data-filter="neonGrid" data-url="../grid/index.html" data-name="GRID | High-Throughput Architectures" data-status="Systems blueprinting, sharding planners &amp; latency budget modeling." data-color="#ffaa00" transform-origin="500 127">
+                            <!-- Hexagonal border -->
+                            <polygon points="500,107 517,117 517,137 500,147 483,137 483,117" stroke="url(#gridGrad)" stroke-width="1.2" fill="none" opacity="0.6" />
+                            <polygon points="500,97 526,112 526,142 500,157 474,142 474,112" stroke="url(#gridGrad)" stroke-width="0.8" stroke-dasharray="8, 4" fill="none" opacity="0.4" class="rot-ccw-slow" transform-origin="500 127" />
+                            
+                            <!-- Core Hexagon Node -->
+                            <polygon points="500,117 509,122 509,132 500,137 491,132 491,122" fill="url(#gridGrad)" filter="url(#neonGrid)" />
+                            
+                            <!-- Multi-tier grid sub-nodes -->
+                            <circle cx="500" cy="87" r="4.5" fill="#ffffff" style="animation: pulse-dot 1.5s infinite;" />
+                            <circle cx="465" cy="127" r="4.5" fill="url(#gridGrad)" filter="url(#neonGrid)" />
+                            <circle cx="535" cy="127" r="4.5" fill="url(#gridGrad)" filter="url(#neonGrid)" />
+                            <circle cx="500" cy="167" r="5" fill="#ffffff" style="animation: pulse-dot 2s infinite -0.4s;" />
+                            
+                            <!-- Connecting paths inside -->
+                            <line x1="500" y1="87" x2="465" y2="127" stroke="url(#gridGrad)" stroke-width="0.8" opacity="0.4" />
+                            <line x1="500" y1="87" x2="535" y2="127" stroke="url(#gridGrad)" stroke-width="0.8" opacity="0.4" />
+                            <line x1="465" y1="127" x2="500" y2="167" stroke="url(#gridGrad)" stroke-width="0.8" opacity="0.4" />
+                            <line x1="535" y1="127" x2="500" y2="167" stroke="url(#gridGrad)" stroke-width="0.8" opacity="0.4" />
+                        </g>
+                    </a>
+
+                    <!-- QUADRANT 3: PARADIGM (Purple - Bottom Left) -->
+                    <a href="../paradigm/index.html" style="cursor: pointer; text-decoration: none;">
+                        <g class="interactive-group" data-filter="neonParadigm" data-url="../paradigm/index.html" data-name="PARADIGM | Enterprise Custom Suites" data-status="Custom CRM, custom HR, operations planners &amp; design debt analysis." data-color="#d500f9" transform-origin="300 473">
+                            <!-- Hexagonal border -->
+                            <polygon points="300,453 317,463 317,483 300,493 283,483 283,463" stroke="url(#paradigmGrad)" stroke-width="1.2" fill="none" opacity="0.6" />
+                            <polygon points="300,443 326,458 326,488 300,503 274,488 274,458" stroke="url(#paradigmGrad)" stroke-width="0.8" stroke-dasharray="10, 5" fill="none" opacity="0.4" class="rot-ccw-slow" transform-origin="300 473" />
+                            
+                            <!-- Core Hexagon Node -->
+                            <polygon points="300,463 309,468 309,478 300,483 291,478 291,468" fill="url(#paradigmGrad)" filter="url(#neonParadigm)" />
+                            
+                            <!-- App wireframe blueprint overlay hex-grid -->
+                            <polygon points="300,438 317,448 317,468 300,478 283,468 283,448" stroke="url(#paradigmGrad)" stroke-width="1" fill="none" opacity="0.4" filter="url(#neonParadigm)" />
+                            <line x1="283" y1="458" x2="317" y2="458" stroke="url(#paradigmGrad)" stroke-width="0.8" opacity="0.3" />
+                        </g>
+                    </a>
+
+                    <!-- QUADRANT 4: SCALPEL (Cyan - Bottom Right) -->
+                    <a href="../scalpel/index.html" style="cursor: pointer; text-decoration: none;">
+                        <g class="interactive-group" data-filter="neonScalpel" data-url="../scalpel/index.html" data-name="SCALPEL | Automation &amp; Agent Swarms" data-status="Agentic workflows, operator verification &amp; self-healing circuits." data-color="#00f3ff" transform-origin="500 473">
+                            <!-- Hexagonal border -->
+                            <polygon points="500,453 517,463 517,483 500,493 483,483 483,463" stroke="url(#scalpelGrad)" stroke-width="1.2" fill="none" opacity="0.6" />
+                            <polygon points="500,443 526,458 526,488 500,503 474,488 474,458" stroke="url(#scalpelGrad)" stroke-width="0.8" stroke-dasharray="2, 6" fill="none" opacity="0.4" class="rot-cw-slow" transform-origin="500 473" />
+                            
+                            <!-- Core Hexagon Node -->
+                            <polygon points="500,463 509,468 509,478 500,483 491,478 491,468" fill="url(#scalpelGrad)" filter="url(#neonScalpel)" />
+                            
+                            <!-- Rotating dual dial gears -->
+                            <g class="rot-cw-fast" transform-origin="480 455">
+                                <circle cx="480" cy="455" r="22" stroke="url(#scalpelGrad)" stroke-width="1" stroke-dasharray="4, 8" fill="none" opacity="0.4" filter="url(#neonScalpel)" />
+                            </g>
+                            <g class="rot-ccw-fast" transform-origin="520 491">
+                                <circle cx="520" cy="491" r="18" stroke="url(#scalpelGrad)" stroke-width="0.8" stroke-dasharray="3, 6" fill="none" opacity="0.4" />
+                            </g>
+                            
+                            <polygon points="497,445 503,445 500,439" fill="#ffffff" style="animation: pulse-dot 1.8s infinite;" />
+                        </g>
+                    </a>
+
+                    <!-- AUXILIARY SIDE NODES (HEXAGONAL STATIONS - BLACK WITH WHITE PARTICLES) -->
+                    <!-- LEFT AUX: HUMAN INTERACTION -->
+                    <g class="interactive-group" data-filter="neonCore" data-url="#services" data-name="HUMAN INTERACTION" data-status="" data-color="#ffffff" transform-origin="200 300">
+                        <!-- Hexagonal border (Black with White border) -->
+                        <polygon points="200,285 213,292 213,307 200,315 187,307 187,292" stroke="#ffffff" stroke-width="1.2" fill="#000000" filter="url(#neonCore)" />
+                        <polygon points="200,280 217,290 217,310 200,320 183,310 183,290" stroke="#ffffff" stroke-width="0.6" stroke-dasharray="3, 3" fill="none" opacity="0.5" class="rot-cw-slow" transform-origin="200 300" />
+                        
+                        <!-- Pulsing inner element -->
+                        <polygon points="200,292 207,296 207,304 200,308 193,304 193,296" fill="#111111" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="1, 3" />
+                        
+                        <!-- Orbiting white particles inside the node -->
+                        <g class="rot-cw-fast" transform-origin="200 300">
+                            <circle cx="200" cy="275" r="2.5" fill="#ffffff" filter="url(#neonCore)" />
+                        </g>
+                        <g class="rot-ccw-fast" transform-origin="200 300">
+                            <circle cx="200" cy="325" r="2.5" fill="#ffffff" filter="url(#neonCore)" />
+                        </g>
                     </g>
+                    
+                    <!-- RIGHT AUX: INFRASTRUCTURE -->
+                    <g class="interactive-group" data-filter="neonCore" data-url="#services" data-name="INFRASTRUCTURE" data-status="" data-color="#ffffff" transform-origin="600 300">
+                        <!-- Hexagonal border (Black with White border) -->
+                        <polygon points="600,285 613,292 613,307 600,315 587,307 587,292" stroke="#ffffff" stroke-width="1.2" fill="#000000" filter="url(#neonCore)" />
+                        <polygon points="600,280 617,290 617,310 600,320 583,310 583,290" stroke="#ffffff" stroke-width="0.6" stroke-dasharray="3, 3" fill="none" opacity="0.5" class="rot-ccw-slow" transform-origin="600 300" />
+                        
+                        <!-- Pulsing inner element -->
+                        <polygon points="600,292 607,296 607,304 600,308 593,304 593,296" fill="#111111" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="1, 3" />
+                        
+                        <!-- Orbiting white particles inside the node -->
+                        <g class="rot-cw-fast" transform-origin="600 300">
+                            <circle cx="600" cy="275" r="2.5" fill="#ffffff" filter="url(#neonCore)" />
+                        </g>
+                        <g class="rot-ccw-fast" transform-origin="600 300">
+                            <circle cx="600" cy="325" r="2.5" fill="#ffffff" filter="url(#neonCore)" />
+                        </g>
+                    </g>
+
+
+                    <!-- ========================================== -->
+                    <!-- CENTRAL HUB: THE OVERLAPPING NEURAL CORE -->
+                    <!-- ========================================== -->
+                    <g>
+                        <!-- Pulsing outer layers -->
+                        <polygon points="400,240 452,270 452,330 400,360 348,330 348,270" stroke="url(#coreGrad)" stroke-width="1.2" stroke-dasharray="8, 12" fill="none" opacity="0.3" class="rot-cw-slow" transform-origin="400 300" />
+                        <polygon points="400,255 439,277 439,322 400,345 361,322 361,277" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="30, 15" fill="none" opacity="0.5" class="rot-ccw-slow" transform-origin="400 300" filter="url(#neonCore)" />
+                        
+                        <!-- Pulsing solid hub core hexagon -->
+                        <polygon points="400,275 422,287 422,313 400,325 378,313 378,287" fill="url(#coreGrad)" filter="url(#neonCore)" style="transform-origin: 400px 300px; animation: pulse-core-node 5s ease-in-out infinite;" />
+                        <polygon points="400,287 411,293 411,307 400,313 389,307 389,293" fill="#ffffff" />
+                    </g>
+
+                    <!-- ========================================== -->
+                    <!-- DYNAMIC CENTRAL STATUS DISPLAY -->
+                    <!-- ========================================== -->
+                    <a id="hud-link" href="#" style="cursor: pointer; text-decoration: none;">
+                        <g id="hud-group" style="opacity: 0; transition: opacity 0.35s ease; pointer-events: none;">
+                            <!-- Glass panel card for tooltip -->
+                            <rect x="230" y="362" width="340" height="54" rx="8" fill="rgba(0, 0, 0, 0.85)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+                            
+                            <!-- Dynamic Text contents -->
+                            <text id="core-status" x="400" y="382" text-anchor="middle" fill="#ffffff" font-size="12" font-family="monospace" font-weight="900" letter-spacing="2">ZTL TECH HUB</text>
+                            <text id="core-desc" x="400" y="400" text-anchor="middle" fill="#a0a0a0" font-size="9.5" font-family="sans-serif">Hover over any node layer to engage subsystem data streams.</text>
+                        </g>
+                    </a>
                 </svg>
             </div>
         </section>
@@ -310,6 +723,103 @@
                 mobileDropdown.classList.toggle('active');
             });
         }
+
+        // Slow down particles associated with a system
+        function adjustParticleSpeed(systemColor, slowDown) {
+            const particles = document.querySelectorAll(`circle[fill="${systemColor}"]`);
+            particles.forEach(particle => {
+                const anim = particle.querySelector('animateMotion');
+                if (anim) {
+                    if (!anim.hasAttribute('data-orig-dur')) {
+                        anim.setAttribute('data-orig-dur', anim.getAttribute('dur'));
+                    }
+                    if (slowDown) {
+                        const origVal = parseFloat(anim.getAttribute('data-orig-dur'));
+                        anim.setAttribute('dur', `${origVal * 4.5}s`);
+                    } else {
+                        anim.setAttribute('dur', anim.getAttribute('data-orig-dur'));
+                    }
+                }
+            });
+        }
+
+        // Intensify glow filter stdDeviation (blooms filter)
+        function adjustGlowIntensity(filterId, intensify) {
+            const filter = document.getElementById(filterId);
+            if (filter) {
+                const blur = filter.querySelector('feGaussianBlur');
+                if (blur) {
+                    if (!blur.hasAttribute('data-orig-dev')) {
+                        blur.setAttribute('data-orig-dev', blur.getAttribute('stdDeviation') || '7');
+                    }
+                    if (intensify) {
+                        blur.setAttribute('stdDeviation', '20');
+                    } else {
+                        blur.setAttribute('stdDeviation', blur.getAttribute('data-orig-dev'));
+                    }
+                }
+            }
+        }
+
+        // Interactive SVG Hexagon Quadrant Hover listeners
+        document.querySelectorAll('.interactive-group').forEach(group => {
+            group.addEventListener('mouseenter', () => {
+                const name = group.getAttribute('data-name');
+                const status = group.getAttribute('data-status');
+                const color = group.getAttribute('data-color');
+                const url = group.getAttribute('data-url');
+                const filterId = group.getAttribute('data-filter');
+                const statusText = document.getElementById('core-status');
+                const descText = document.getElementById('core-desc');
+                const hudGroup = document.getElementById('hud-group');
+                const hudLink = document.getElementById('hud-link');
+                
+                if (statusText && descText) {
+                    statusText.textContent = name;
+                    statusText.setAttribute('fill', color);
+                    descText.textContent = status;
+                    statusText.style.filter = `drop-shadow(0 0 8px ${color})`;
+                    
+                    // Centering logic for empty description nodes (e.g. side auxiliary nodes)
+                    if (!status || status === "") {
+                        statusText.setAttribute('y', '396'); // Vertically centered
+                    } else {
+                        statusText.setAttribute('y', '382'); // Standard position
+                    }
+                }
+                if (hudGroup && hudLink) {
+                    hudGroup.style.opacity = '1';
+                    hudGroup.style.pointerEvents = 'auto';
+                    hudLink.setAttribute('href', url);
+                }
+
+                // Apply interactive speed adjustments and bloom filter glows
+                adjustParticleSpeed(color, true);
+                if (filterId) adjustGlowIntensity(filterId, true);
+            });
+            group.addEventListener('mouseleave', () => {
+                const color = group.getAttribute('data-color');
+                const filterId = group.getAttribute('data-filter');
+                const statusText = document.getElementById('core-status');
+                const descText = document.getElementById('core-desc');
+                const hudGroup = document.getElementById('hud-group');
+                const hudLink = document.getElementById('hud-link');
+                
+                if (statusText && descText) {
+                    statusText.style.filter = '';
+                    statusText.setAttribute('y', '382'); // Restore standard position
+                }
+                if (hudGroup && hudLink) {
+                    hudGroup.style.opacity = '0';
+                    hudGroup.style.pointerEvents = 'none';
+                    hudLink.setAttribute('href', '#');
+                }
+
+                // Restore speeds and blurs
+                adjustParticleSpeed(color, false);
+                if (filterId) adjustGlowIntensity(filterId, false);
+            });
+        });
 
         // Force all hero section elements to be visible immediately on load to prevent viewport blackouts
         const forceHeroVisible = () => {

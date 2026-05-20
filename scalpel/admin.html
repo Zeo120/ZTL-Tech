@@ -282,6 +282,46 @@
         .terminal-warn { color: #ebcb8b; }
         .terminal-error { color: #bf616a; }
         .terminal-success { color: #a3be8c; }
+
+        /* Mobile Responsiveness Refinements */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 5.5rem 1rem 1rem;
+                gap: 1rem;
+            }
+            .header-bar {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            .header-bar div {
+                text-align: center !important;
+            }
+            .header-bar h1 {
+                justify-content: center;
+                font-size: 1.2rem !important;
+            }
+            .breaker-outages-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .operator-panel {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            nav {
+                padding: 0.8rem 1rem;
+            }
+            nav .user-badge {
+                display: none; /* prevent header crowding / line wrap */
+            }
+        }
+        @media (max-width: 480px) {
+            .breaker-outages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -305,10 +345,10 @@
         <!-- Header Bar -->
         <div class="header-bar">
             <div style="text-align: left;">
-                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;" id="welcome-message">
                     SCALPEL WORKFLOW AUTOMATION CENTER
                 </h1>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Automation control plane: executing traditional cron pipelines, dispatching hybrid AI swarms, and managing circuit reflex breakers.</p>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Automation control plane: executing traditional cron pipelines, dispatching hybrid AI swarms, and managing circuit reflex breakers.</p>
             </div>
             <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Orchestrator session securely closed.');">Logout Operator</a>
         </div>
@@ -651,8 +691,31 @@
             `;
         }
 
+        async function loadUserData() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.user) {
+                        const user = payload.data.user;
+                        const email = user.email || '';
+                        const username = email.split('@')[0];
+                        const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
+                        
+                        document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to SCALPEL.`;
+                        document.getElementById('welcome-subtext').innerText = `Automation control plane active. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load user info", err);
+            }
+        }
+
         // Initial setup loads
         tripAutoHealer('db_crash');
+        loadUserData();
     </script>
 </body>
 </html>

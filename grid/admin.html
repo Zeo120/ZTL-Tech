@@ -281,6 +281,68 @@
         .terminal-warn { color: #ebcb8b; }
         .terminal-error { color: #bf616a; }
         .terminal-success { color: #a3be8c; }
+
+        /* Mobile Responsiveness Refinements */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 5.5rem 1rem 1rem;
+                gap: 1rem;
+            }
+            .header-bar {
+                padding: 1rem 1.2rem;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            .header-bar div {
+                text-align: center !important;
+            }
+            .header-bar h1 {
+                justify-content: center;
+                font-size: 1.2rem !important;
+            }
+            .blueprint-node {
+                min-width: 75px;
+                font-size: 0.62rem;
+                padding: 0.4rem 0.5rem;
+            }
+            .failure-injector-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .operator-panel {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            nav {
+                padding: 0.8rem 1rem;
+            }
+            nav .user-badge {
+                display: none; /* prevent header crowding / line wrap */
+            }
+        }
+        @media (max-width: 480px) {
+            .failure-injector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Grid Consultation Suite Cards */
+        .suite-card {
+            border: 1px solid var(--surface-border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .suite-card:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .suite-card.active {
+            border-color: #ffaa00 !important;
+            background: rgba(255, 255, 255, 0.07) !important;
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -304,23 +366,71 @@
         <!-- Header Bar -->
         <div class="header-bar">
             <div style="text-align: left;">
-                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;" id="welcome-message">
                     GRID SYSTEMS ARCHITECTURE CONTROL PANEL
                 </h1>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Systems design war-room: modeling core structures, analyzing sharding loads, and managing latency budgets.</p>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Systems design war-room: modeling core structures, analyzing sharding loads, and managing latency budgets.</p>
             </div>
             <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('GRID architect session securely closed.');">Logout Operator</a>
         </div>
 
         <!-- 2-Column Main Workspace -->
         <div class="workspace-grid">
-            <!-- LEFT COLUMN -->
+            <!-- LEFT COLUMN: The 3 Systems Consultation Blueprint Cards -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Global API Gateway & Cache Card -->
+                <div class="operator-panel suite-card active" id="card-suite-api" onclick="selectSuite('api')">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <span class="badge" style="background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2); margin-bottom: 0;">API Gateway &amp; Caching</span>
+                        <span class="active-dot" id="dot-suite-api" style="width: 8px; height: 8px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 8px #00ffaa;"></span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.2rem; color: #ffffff;">Global API Gateway &amp; Cache</h3>
+                    <h4 style="font-size: 0.82rem; font-weight: 600; color: var(--accent-primary); margin-bottom: 0.8rem; letter-spacing: 0.5px;">We Blueprint High-Throughput Global Gateways</h4>
+                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Designed for massive ingress load mitigation, Redis caching layers, p99 latency guarantees, and global regional load balancing topologies.</p>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
+                        <span>Complexity: <strong style="color: #ffffff;">Level 54</strong></span>
+                        <span>Resilience Score: <strong style="color: #00ffaa;">A+ (98%)</strong></span>
+                    </div>
+                </div>
+
+                <!-- Real-Time Data Broker & Pipeline Card -->
+                <div class="operator-panel suite-card" id="card-suite-broker" onclick="selectSuite('broker')">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <span class="badge" style="background: rgba(255, 170, 0, 0.1); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.2); margin-bottom: 0;">Event Ingestion Pipeline</span>
+                        <span class="active-dot" id="dot-suite-broker" style="width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: none;"></span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; color: #ffffff;">Real-Time Data Broker &amp; Pipeline</h3>
+                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Architected for high-frequency ingestion writes, multi-topic partitions, Kafka message queue persistence, and sub-millisecond dispatch lag.</p>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
+                        <span>Complexity: <strong style="color: #ffffff;">Level 72</strong></span>
+                        <span>Resilience Score: <strong style="color: #ffaa00;">A (92%)</strong></span>
+                    </div>
+                </div>
+
+                <!-- Sharded Multi-Region Database Card -->
+                <div class="operator-panel suite-card" id="card-suite-db" onclick="selectSuite('db')">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <span class="badge" style="background: rgba(255, 51, 102, 0.1); color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.2); margin-bottom: 0;">Database Persistence</span>
+                        <span class="active-dot" id="dot-suite-db" style="width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: none;"></span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; color: #ffffff;">Sharded Multi-Region Database</h3>
+                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Engineered for hot-partition avoidance, multi-master active database replication, regional backup failovers, and read-replica cluster scaling.</p>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
+                        <span>Complexity: <strong style="color: #ffffff;">Level 62</strong></span>
+                        <span>Resilience Score: <strong style="color: #ff3366;">B+ (85%)</strong></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Blueprint Modeler Canvas, Latency Budget & Sharding Simulators -->
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 
                 <!-- Blueprint Modeler -->
                 <div class="operator-panel">
-                    <h2 class="panel-header-title">1. Interactive Blueprint Modeler</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Toggle node layers to inspect bottlenecks, recalculate overall consensus integrity, and resilience scores.</p>
+                    <h2 class="panel-header-title">Systems Topology Blueprint</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Inspect redundant mesh nodes. Click node blocks to isolate regional configuration bottlenecks.</p>
                     
                     <div class="blueprint-canvas">
                         <!-- LB Row -->
@@ -348,15 +458,15 @@
                     </div>
 
                     <div class="consequence-box" id="blueprint-telemetry">
-                        <!-- Dynamic -->
+                        <!-- Dynamic blueprint telemetry -->
                     </div>
                 </div>
 
                 <!-- Load Simulator -->
                 <div class="operator-panel">
-                    <h2 class="panel-header-title">2. Load Scaling & Latency Budget Simulator</h2>
+                    <h2 class="panel-header-title">Capacity &amp; Latency Budgets</h2>
                     <div class="simulator-slider-box">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; text-align: left;">
                             <span>Target Concurrency Scaling</span>
                             <span class="text-neon" id="concurrency-val" style="font-family: monospace; font-weight: bold;">450k req/sec</span>
                         </div>
@@ -364,41 +474,26 @@
                     </div>
 
                     <div class="consequence-box" id="load-telemetry-metrics">
-                        <!-- Dynamic -->
+                        <!-- Dynamic load telemetry -->
                     </div>
                 </div>
 
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                
                 <!-- Database Sharding Planner -->
                 <div class="operator-panel">
-                    <h2 class="panel-header-title">3. Database Sharding Planner</h2>
+                    <h2 class="panel-header-title">Database Sharding &amp; Failure Injection</h2>
                     <div class="simulator-slider-box">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; text-align: left;">
                             <span>Active DB Shard Clusters</span>
                             <span class="text-neon" id="shards-count-val" style="font-family: monospace; font-weight: bold;">16 Shards</span>
                         </div>
                         <input type="range" class="custom-slider" id="shards-slider" min="1" max="64" value="16" oninput="calculateShardingPlan()">
                     </div>
 
-                    <div class="shards-bar-container" id="shards-bars">
+                    <div class="shards-bar-container" id="shards-bars" style="margin-bottom: 1rem;">
                         <!-- Dynamic bars representing partition data load -->
                     </div>
 
-                    <div class="consequence-box" id="shards-telemetry-details">
-                        <!-- Dynamic sharding plan output -->
-                    </div>
-                </div>
-
-                <!-- Failure Injection Simulator -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">4. Failure Injection Simulator</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Audit systems blast-radius, backup workflows, and failover paths by injecting active cluster errors.</p>
-                    
-                    <div class="failure-injector-grid">
+                    <div class="failure-injector-grid" style="margin-bottom: 1rem;">
                         <button class="fail-btn" onclick="injectFailure('app_node')">Kill App Node</button>
                         <button class="fail-btn" onclick="injectFailure('cache_outage')">Cache Failure</button>
                         <button class="fail-btn" onclick="injectFailure('region_loss')">Region Loss</button>
@@ -407,7 +502,7 @@
                         <button class="fail-btn" onclick="injectFailure('repl_delay')">Replication Lag</button>
                     </div>
 
-                    <div class="consequence-box" id="fail-injection-details" style="min-height: 110px;">
+                    <div class="consequence-box" id="fail-injection-details" style="min-height: 90px; text-align: left;">
                         [STANDBY] Failure inject loop initialized. Select failure mode to run drill...
                     </div>
                 </div>
@@ -451,6 +546,103 @@
             db: true,
             rep: true
         };
+
+        let currentSuite = 'api';
+        const suites = {
+            api: {
+                name: "Global API Gateway & Cache",
+                nodes: { lb: true, gw: true, app: true, cache: true, mq: false, db: true, rep: true },
+                load: 250, // 250k req/sec
+                shards: 8,
+                logs: [
+                    "[SUITE] Loaded API Gateway & Cache Consultation blueprint.",
+                    "[SUITE] Default parameters: 250k load targets, 8 database shards, Redis cache enabled.",
+                    "[SUITE] Optimization goals: Minimize p99 response times and handle ingress bursts."
+                ]
+            },
+            broker: {
+                name: "Real-Time Data Broker & Pipeline",
+                nodes: { lb: true, gw: true, app: true, cache: false, mq: true, db: true, rep: false },
+                load: 750, // 750k req/sec
+                shards: 16,
+                logs: [
+                    "[SUITE] Loaded Real-Time Data Broker & Pipeline Consultation blueprint.",
+                    "[SUITE] Default parameters: 750k load targets, 16 partition shards, Kafka broker enabled.",
+                    "[SUITE] Optimization goals: Sub-millisecond queue ingest limits and multi-topic sharding."
+                ]
+            },
+            db: {
+                name: "Sharded Multi-Region Database",
+                nodes: { lb: true, gw: false, app: true, cache: true, mq: false, db: true, rep: true },
+                load: 450, // 450k req/sec
+                shards: 32,
+                logs: [
+                    "[SUITE] Loaded Sharded Multi-Region Database Consultation blueprint.",
+                    "[SUITE] Default parameters: 450k load targets, 32 db clusters, replication nodes enabled.",
+                    "[SUITE] Optimization goals: Eliminate hot partition writes, support dynamic cross-region syncing."
+                ]
+            }
+        };
+
+        function selectSuite(suiteKey) {
+            currentSuite = suiteKey;
+            
+            // Toggle active card classes
+            document.querySelectorAll('.suite-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const selectedCard = document.getElementById(`card-suite-${suiteKey}`);
+            if (selectedCard) selectedCard.classList.add('active');
+
+            // Switch active dots
+            const dots = {
+                api: { id: 'dot-suite-api', color: '#00ffaa' },
+                broker: { id: 'dot-suite-broker', color: '#ffaa00' },
+                db: { id: 'dot-suite-db', color: '#ff3366' }
+            };
+            for (const key in dots) {
+                const dotEl = document.getElementById(dots[key].id);
+                if (dotEl) {
+                    if (key === suiteKey) {
+                        dotEl.style.background = dots[key].color;
+                        dotEl.style.boxShadow = `0 0 8px ${dots[key].color}`;
+                    } else {
+                        dotEl.style.background = 'transparent';
+                        dotEl.style.boxShadow = 'none';
+                    }
+                }
+            }
+            
+            // Set node status
+            const suiteData = suites[suiteKey];
+            nodesStatus = JSON.parse(JSON.stringify(suiteData.nodes));
+            
+            // Update node elements styling
+            for (const nodeKey in nodesStatus) {
+                const el = document.getElementById(`node-${nodeKey}`);
+                if (el) {
+                    if (nodesStatus[nodeKey]) {
+                        el.classList.add('active');
+                        el.classList.remove('disabled');
+                    } else {
+                        el.classList.remove('active');
+                        el.classList.add('disabled');
+                    }
+                }
+            }
+            
+            // Update sliders
+            document.getElementById('concurrency-slider').value = suiteData.load;
+            document.getElementById('shards-slider').value = suiteData.shards;
+            
+            // Log events
+            suiteData.logs.forEach(log => logEvent(log, 'terminal-success'));
+            
+            // Recalculate metrics
+            recalculateBlueprint();
+            calculateLoadScaling();
+            calculateShardingPlan();
+        }
 
         function toggleNode(nodeKey) {
             nodesStatus[nodeKey] = !nodesStatus[nodeKey];
@@ -650,10 +842,31 @@
             logEvent(`[FAILURE INJECTION] Injected error trigger: ${data.title}`, 'terminal-error');
         }
 
+        async function loadUserData() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.user) {
+                        const user = payload.data.user;
+                        const email = user.email || '';
+                        const username = email.split('@')[0];
+                        const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
+                        
+                        document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to GRID.`;
+                        document.getElementById('welcome-subtext').innerText = `Systems design war-room. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load user info", err);
+            }
+        }
+
         // Initial setup loads
-        recalculateBlueprint();
-        calculateLoadScaling();
-        calculateShardingPlan();
+        selectSuite('api');
+        loadUserData();
     </script>
 </body>
 </html>

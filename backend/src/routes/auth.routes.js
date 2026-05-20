@@ -6,7 +6,7 @@ const { env } = require('../config/env');
 const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
 const { asyncHandler } = require('../utils/asyncHandler');
 const { ok } = require('../utils/responses');
-const { login } = require('../services/auth.service');
+const { login, findUserById } = require('../services/auth.service');
 const { revokeSession, revokeAllSessions } = require('../services/session.service');
 
 const authRoutes = express.Router();
@@ -42,9 +42,19 @@ authRoutes.post('/logout-all', authenticateCookie, requireCsrf, asyncHandler(asy
   return ok(res, {});
 }));
 
-authRoutes.get('/me', authenticateCookie, (req, res) => {
-  return ok(res, { user: req.auth });
-});
+authRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
+  const user = await findUserById(req.auth.userId);
+  if (!user) {
+    return res.status(404).json({ success: false, error: 'User not found' });
+  }
+  return ok(res, {
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role
+    }
+  });
+}));
 
 module.exports = { authRoutes };
 ;
