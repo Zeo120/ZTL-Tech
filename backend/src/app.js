@@ -38,8 +38,16 @@ function createApp() {
 
   console.log('Frontend Path:', frontendPath);
 
-  // Serve static files
-  app.use(express.static(frontendPath));
+  // Serve static files from specific whitelisted directories only
+  // This prevents public access to backend source code, node_modules, and configuration (.env)
+  app.use('/grid', express.static(path.join(frontendPath, 'grid')));
+  app.use('/paradigm', express.static(path.join(frontendPath, 'paradigm')));
+  app.use('/phasr', express.static(path.join(frontendPath, 'phasr')));
+  app.use('/scalpel', express.static(path.join(frontendPath, 'scalpel')));
+  app.use('/ztl_tech', express.static(path.join(frontendPath, 'ztl_tech')));
+  app.get('/style.css', (_req, res) => {
+    res.sendFile(path.join(frontendPath, 'style.css'));
+  });
 
   // Main pages
   app.get('/', (_req, res) => {

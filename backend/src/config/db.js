@@ -3,16 +3,18 @@ const { env } = require('./env');
 const { logger } = require('../utils/logger');
 
 let pool;
+let connectingDb;
 
 async function getDbPool() {
   if (pool) return pool;
+  if (connectingDb) return connectingDb;
 
   const options = {
     ...env.sql.options,
     ...(env.sql.instanceName ? { instanceName: env.sql.instanceName } : {})
   };
 
-  pool = await sql.connect({
+  connectingDb = sql.connect({
     server: env.sql.server,
     ...(env.sql.instanceName ? {} : { port: env.sql.port }),
     database: env.sql.database,
@@ -24,9 +26,20 @@ async function getDbPool() {
       min: 0,
       idleTimeoutMillis: 30000
     }
+  })
+  .then((connectedPool) => {
+    pool = connectedPool;
+    return pool;
+  })
+  .catch((error) => {
+    pool = undefined;
+    throw error;
+  })
+  .finally(() => {
+    connectingDb = undefined;
   });
 
-  return pool;
+  return connectingDb;
 }
 
 async function closeDbPool() {

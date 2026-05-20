@@ -28,7 +28,10 @@ function requireRole(...allowedRoles) {
 function requireAtLeastRole(minRole) {
   return function roleRankMiddleware(req, res, next) {
     const role = req.auth && req.auth.role;
-    if (!role || !ROLE_RANK[role] || ROLE_RANK[role] < ROLE_RANK[minRole]) {
+    const minRank = ROLE_RANK[minRole];
+    const userRank = ROLE_RANK[role];
+
+    if (!minRank || !userRank || userRank < minRank) {
       return fail(res, 403, 'Insufficient permissions');
     }
     return next();
@@ -40,9 +43,14 @@ function revalidateRoleAtLeast(minRole) {
     const userId = req.auth && req.auth.userId;
     if (!userId) return fail(res, 401, 'Authentication required');
 
+    const minRank = ROLE_RANK[minRole];
+    if (!minRank) return fail(res, 403, 'Insufficient permissions');
+
     try {
       const user = await findUserAuthState(userId);
-      if (!user || !user.is_active || !ROLE_RANK[user.role] || ROLE_RANK[user.role] < ROLE_RANK[minRole]) {
+      const userRank = user && ROLE_RANK[user.role];
+
+      if (!user || !user.is_active || !userRank || userRank < minRank) {
         return fail(res, 403, 'Insufficient permissions');
       }
 

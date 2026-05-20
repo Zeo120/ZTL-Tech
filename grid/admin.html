@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRID | Systems Architecture Control Plane</title>
+    <meta name="description" content="Secure administration control plane for the GRID systems design, blueprinting, and hyper-scale simulation.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header-bar {
+            background: rgba(3, 2, 0, 0.9);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 170, 0, 0.04);
+            border: 1px solid var(--surface-border);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-primary);
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; box-shadow: 0 0 3px var(--accent-primary); }
+            100% { opacity: 1; box-shadow: 0 0 10px var(--accent-primary); }
+        }
+
+        /* 2-Column Main Workspace */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .operator-panel {
+            background: rgba(5, 4, 2, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .panel-header-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-neon {
+            color: var(--accent-secondary);
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        /* Interactive Blueprint Modeler Layout */
+        .blueprint-canvas {
+            background: #000000;
+            border: 1px solid rgba(255, 170, 0, 0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            min-height: 260px;
+        }
+
+        .blueprint-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+        }
+
+        .blueprint-node {
+            background: rgba(255, 170, 0, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 95px;
+            text-align: center;
+        }
+
+        .blueprint-node.active {
+            border-color: var(--accent-primary);
+            background: rgba(255, 170, 0, 0.08);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.15);
+        }
+
+        .blueprint-node.disabled {
+            border-color: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.15);
+            text-decoration: line-through;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .telemetry-label {
+            color: var(--text-secondary);
+        }
+
+        .telemetry-value {
+            font-family: monospace;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Load Simulator Slider */
+        .simulator-slider-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,170,0,0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .custom-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            background: #201808;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* Sharding Planner */
+        .shards-bar-container {
+            display: flex;
+            gap: 3px;
+            height: 60px;
+            background: #000000;
+            border: 1px solid rgba(255,170,0,0.08);
+            border-radius: 6px;
+            padding: 0.3rem;
+            align-items: flex-end;
+        }
+
+        .shard-bar {
+            flex: 1;
+            background: rgba(255,170,0,0.2);
+            transition: all 0.3s;
+            border-radius: 2px;
+            min-height: 5%;
+        }
+
+        .shard-bar.hot {
+            background: #ff3366;
+            box-shadow: 0 0 6px rgba(255,51,102,0.5);
+        }
+
+        /* Failure Injector */
+        .failure-injector-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .fail-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 0.2rem;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .fail-btn:hover {
+            border-color: #ff3366;
+            background: rgba(255,51,102,0.03);
+            color: #ffffff;
+        }
+
+        .consequence-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 6px;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            text-align: left;
+        }
+
+        /* Operational log terminal */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            color: var(--accent-primary);
+            height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: inset 0 0 15px rgba(255, 170, 0, 0.02);
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-info { color: #88c0d0; }
+        .terminal-warn { color: #ebcb8b; }
+        .terminal-error { color: #bf616a; }
+        .terminal-success { color: #a3be8c; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="user-badge">
+            <div class="status-dot"></div>
+            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">GRID OPERATOR</span>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div style="text-align: left;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                    GRID SYSTEMS ARCHITECTURE CONTROL PANEL
+                </h1>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Systems design war-room: modeling core structures, analyzing sharding loads, and managing latency budgets.</p>
+            </div>
+            <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('GRID architect session securely closed.');">Logout Operator</a>
+        </div>
+
+        <!-- 2-Column Main Workspace -->
+        <div class="workspace-grid">
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Blueprint Modeler -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">1. Interactive Blueprint Modeler</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Toggle node layers to inspect bottlenecks, recalculate overall consensus integrity, and resilience scores.</p>
+                    
+                    <div class="blueprint-canvas">
+                        <!-- LB Row -->
+                        <div class="blueprint-row">
+                            <div class="blueprint-node active" id="node-lb" onclick="toggleNode('lb')">Load Balancer</div>
+                        </div>
+                        <!-- Gateway Row -->
+                        <div class="blueprint-row">
+                            <div class="blueprint-node active" id="node-gw" onclick="toggleNode('gw')">Gateway Proxy</div>
+                        </div>
+                        <!-- Apps & Cache -->
+                        <div class="blueprint-row">
+                            <div class="blueprint-node active" id="node-app" onclick="toggleNode('app')">App Clusters</div>
+                            <div class="blueprint-node active" id="node-cache" onclick="toggleNode('cache')">Redis Cache</div>
+                        </div>
+                        <!-- Queue -->
+                        <div class="blueprint-row">
+                            <div class="blueprint-node active" id="node-mq" onclick="toggleNode('mq')">Kafka Queue</div>
+                        </div>
+                        <!-- DB Shards & Replicas -->
+                        <div class="blueprint-row">
+                            <div class="blueprint-node active" id="node-db" onclick="toggleNode('db')">DB Shard Nodes</div>
+                            <div class="blueprint-node active" id="node-rep" onclick="toggleNode('rep')">Read Replicas</div>
+                        </div>
+                    </div>
+
+                    <div class="consequence-box" id="blueprint-telemetry">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+                <!-- Load Simulator -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">2. Load Scaling & Latency Budget Simulator</h2>
+                    <div class="simulator-slider-box">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>Target Concurrency Scaling</span>
+                            <span class="text-neon" id="concurrency-val" style="font-family: monospace; font-weight: bold;">450k req/sec</span>
+                        </div>
+                        <input type="range" class="custom-slider" id="concurrency-slider" min="1" max="1000" value="450" oninput="calculateLoadScaling()">
+                    </div>
+
+                    <div class="consequence-box" id="load-telemetry-metrics">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Database Sharding Planner -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">3. Database Sharding Planner</h2>
+                    <div class="simulator-slider-box">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>Active DB Shard Clusters</span>
+                            <span class="text-neon" id="shards-count-val" style="font-family: monospace; font-weight: bold;">16 Shards</span>
+                        </div>
+                        <input type="range" class="custom-slider" id="shards-slider" min="1" max="64" value="16" oninput="calculateShardingPlan()">
+                    </div>
+
+                    <div class="shards-bar-container" id="shards-bars">
+                        <!-- Dynamic bars representing partition data load -->
+                    </div>
+
+                    <div class="consequence-box" id="shards-telemetry-details">
+                        <!-- Dynamic sharding plan output -->
+                    </div>
+                </div>
+
+                <!-- Failure Injection Simulator -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">4. Failure Injection Simulator</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Audit systems blast-radius, backup workflows, and failover paths by injecting active cluster errors.</p>
+                    
+                    <div class="failure-injector-grid">
+                        <button class="fail-btn" onclick="injectFailure('app_node')">Kill App Node</button>
+                        <button class="fail-btn" onclick="injectFailure('cache_outage')">Cache Failure</button>
+                        <button class="fail-btn" onclick="injectFailure('region_loss')">Region Loss</button>
+                        <button class="fail-btn" onclick="injectFailure('redis_outage')">Redis Outage</button>
+                        <button class="fail-btn" onclick="injectFailure('packet_loss')">Packet Loss</button>
+                        <button class="fail-btn" onclick="injectFailure('repl_delay')">Replication Lag</button>
+                    </div>
+
+                    <div class="consequence-box" id="fail-injection-details" style="min-height: 110px;">
+                        [STANDBY] Failure inject loop initialized. Select failure mode to run drill...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Terminal Output Log -->
+        <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 1px;">OPERATIONAL SIGNAL FEED</h3>
+            <div class="terminal-box" id="terminal">
+                <div class="terminal-line terminal-info">[SYSTEM] Initializing telemetry synchronization locks...</div>
+                <div class="terminal-line terminal-success">[SUCCESS] Cluster systems sync established. Telemetry streams active.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+        <p>© 2026 ZTL Tech Inc. GRID Architecture Control Plane.</p>
+    </footer>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        
+        function logEvent(text, type = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.innerHTML = `<span style="color: rgba(255,170,0,0.5)">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Blueprint Nodes Status
+        let nodesStatus = {
+            lb: true,
+            gw: true,
+            app: true,
+            cache: true,
+            mq: true,
+            db: true,
+            rep: true
+        };
+
+        function toggleNode(nodeKey) {
+            nodesStatus[nodeKey] = !nodesStatus[nodeKey];
+            const el = document.getElementById(`node-${nodeKey}`);
+            if (nodesStatus[nodeKey]) {
+                el.classList.add('active');
+                el.classList.remove('disabled');
+                logEvent(`[Topology Modeler] Node layer "${el.innerText}" enabled.`, 'terminal-success');
+            } else {
+                el.classList.remove('active');
+                el.classList.add('disabled');
+                logEvent(`[Topology Modeler] Node layer "${el.innerText}" disabled.`, 'terminal-error');
+            }
+            recalculateBlueprint();
+        }
+
+        function recalculateBlueprint() {
+            let activeCount = Object.values(nodesStatus).filter(v => v).length;
+            let score = Math.round((activeCount / 7) * 100);
+            let throughput = score * 8.5; // Gbps
+            let bottleneck = "None";
+            let consensus = "Normal";
+
+            if (!nodesStatus.cache) {
+                bottleneck = "Redis Cache Bypass -> SQL Core Overload Risk";
+                score -= 15;
+            }
+            if (!nodesStatus.mq) {
+                bottleneck = "Message Queue Off -> Synchronous Wait Locks";
+                score -= 20;
+            }
+            if (!nodesStatus.rep) {
+                bottleneck = "Read Replicas Offline -> Primary DB Read Spikes";
+                score -= 10;
+            }
+            if (!nodesStatus.db) {
+                bottleneck = "DATABASE STORE OFFLINE -> CRITICAL DISRUPTIONS";
+                score = 0;
+                throughput = 0;
+                consensus = "CRITICAL FAIL";
+            }
+
+            score = Math.max(0, score);
+            
+            const view = document.getElementById('blueprint-telemetry');
+            view.innerHTML = `
+                <div class="detail-row"><span class="telemetry-label">Architecture Resilience Score</span><span class="telemetry-value text-neon">${score}%</span></div>
+                <div class="detail-row"><span class="telemetry-label">Max Bandwidth Throughput</span><span class="telemetry-value">${throughput.toFixed(1)} Gbps</span></div>
+                <div class="detail-row"><span class="telemetry-label">Detected Infrastructure Bottleneck</span><span class="telemetry-value" style="color:${bottleneck === 'None' ? '#00ffaa' : '#ff3366'}">${bottleneck}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Cluster Consensus State</span><span class="telemetry-value" style="color:${consensus === 'Normal' ? '#00ffaa' : '#ff3366'}">${consensus}</span></div>
+            `;
+        }
+
+        // Load Simulator Calculations
+        function calculateLoadScaling() {
+            const sliderVal = parseInt(document.getElementById('concurrency-slider').value);
+            const rps = sliderVal; // 1k to 1000k (1M) req/sec
+            document.getElementById('concurrency-val').innerText = `${rps}k req/sec`;
+
+            // Calculate metrics based on RPS
+            let cpu = Math.round(rps * 0.095);
+            let netLatency = 12 + Math.round(rps * 0.03);
+            let p95 = 20 + Math.round(rps * 0.12);
+            let p99 = 45 + Math.round(rps * 0.45);
+            let replicationLag = 2 + Math.round(rps * 0.065);
+            
+            let status = "Healthy";
+            let warning = "";
+            let recommendation = "Cluster scaling constraints aligned.";
+
+            if (cpu > 80) {
+                status = "CPU Saturation Risk: High";
+                recommendation = "Add Gateway replicas & provision additional App nodes.";
+            } else if (cpu > 50) {
+                status = "CPU Saturation Risk: Moderate";
+                recommendation = "Add read replicas to scale query capacities.";
+            }
+
+            if (rps > 800) {
+                warning = "CRITICAL LIMIT: Queue Saturation High";
+            } else if (rps > 600) {
+                warning = "WARNING: Replication lag exceeds replication time window";
+            }
+
+            cpu = Math.min(100, cpu);
+
+            const view = document.getElementById('load-telemetry-metrics');
+            view.innerHTML = `
+                <div class="detail-row"><span class="telemetry-label">CPU Saturation State</span><span class="telemetry-value" style="color:${cpu > 80 ? '#ff3366' : cpu > 50 ? '#ffaa00' : '#00ffaa'};">${status} (${cpu}%)</span></div>
+                <div class="detail-row"><span class="telemetry-label">p95 Latency / p99 Latency</span><span class="telemetry-value">${p95}ms / ${p99}ms</span></div>
+                <div class="detail-row"><span class="telemetry-label">Replication Synchronization Lag</span><span class="telemetry-value" style="color:${replicationLag > 30 ? '#ff3366' : '#ffffff'};">+${replicationLag}ms</span></div>
+                <div class="detail-row"><span class="telemetry-label">System Warning Alerts</span><span class="telemetry-value" style="color:#ff3366;">${warning || 'None'}</span></div>
+                <div style="margin-top:0.4rem; font-size:0.72rem; color:var(--text-secondary);">Recommendation: <span style="color:#ffffff;">${recommendation}</span></div>
+            `;
+        }
+
+        // Sharding Planner Calculations
+        function calculateShardingPlan() {
+            const sliderVal = parseInt(document.getElementById('shards-slider').value);
+            document.getElementById('shards-count-val').innerText = `${sliderVal} Shards`;
+
+            // Draw graphical visual representations of partition balance
+            const container = document.getElementById('shards-bars');
+            container.innerHTML = '';
+
+            let balance = 99 - (sliderVal % 3) * 4 - (sliderVal > 30 ? 15 : 0);
+            let hotRisk = balance < 80 ? "High" : "Low";
+            let warningText = balance < 80 ? "Split hot partition group C & D" : "All shard groups balanced.";
+
+            // Render mock shard distribution bars
+            for (let i = 0; i < Math.min(24, sliderVal); i++) {
+                const bar = document.createElement('div');
+                bar.className = 'shard-bar';
+                
+                // Simulate an imbalanced hot partition for certain configurations
+                let heightPercent = 30 + (Math.sin(i * 1.7) * 20) + (sliderVal % 4 === 0 && i === 2 ? 40 : 0);
+                heightPercent = Math.min(100, Math.max(5, heightPercent));
+
+                bar.style.height = `${heightPercent}%`;
+                if (heightPercent > 75) {
+                    bar.className += ' hot';
+                }
+                container.appendChild(bar);
+            }
+
+            const view = document.getElementById('shards-telemetry-details');
+            view.innerHTML = `
+                <div class="detail-row"><span class="telemetry-label">Global Shard Balance Rating</span><span class="telemetry-value text-neon">${balance}%</span></div>
+                <div class="detail-row"><span class="telemetry-label">Hot Shard Partition Risk</span><span class="telemetry-value" style="color:${hotRisk === 'High' ? '#ff3366' : '#00ffaa'};">${hotRisk}</span></div>
+                <div style="margin-top:0.4rem; font-size:0.72rem; color:var(--text-secondary);">Recommendation: <span style="color:#ffffff;">${warningText}</span></div>
+            `;
+        }
+
+        // Failure Injection Simulator
+        const failuresData = {
+            app_node: {
+                title: "Injected: Terminated App Node Instance",
+                blast: "App container pool drops by 25%",
+                path: "Ingress proxy automatically routes requests to remaining nodes.",
+                latency: "+14ms (Node failover routing sync delay)",
+                degraded: "Reduced payload compiling limits",
+                eta: "45s (Auto-scaler spinning standby node)"
+            },
+            cache_outage: {
+                title: "Injected: Redis Cache Outage",
+                blast: "100% cache misses. Traffic bypassed directly to Database Core.",
+                path: "Read replica endpoints forced to sustain query overhead.",
+                latency: "+142ms (Cache-bypass database query fetch time)",
+                degraded: "Dynamic queries rate-limited",
+                eta: "12s (Rebooting Redis daemon locks)"
+            },
+            region_loss: {
+                title: "Injected: Complete Loss of Western Region Gateway",
+                blast: "50% ingress paths unresponsive",
+                path: "Geo-DNS routes client tunnels to Eastern Region centers.",
+                latency: "+85ms (Cross-country network path routing delay)",
+                degraded: "Global replication sync paused",
+                eta: "180s (Manual DNS reconciliation check)"
+            },
+            redis_outage: {
+                title: "Injected: Cache Connection Pool Leaks",
+                blast: "Cached sessions data inaccessible",
+                path: "Force fallback validation using local static encryption keys.",
+                latency: "+28ms",
+                degraded: "None",
+                eta: "8s"
+            },
+            packet_loss: {
+                title: "Injected: 15% Network Packet Loss",
+                blast: "Consensus heartbeats delayed",
+                path: "Raft protocol extends consensus term clocks.",
+                latency: "+210ms (TCP packet transmission retries)",
+                degraded: "Synchronized writes locked",
+                eta: "30s"
+            },
+            repl_delay: {
+                title: "Injected: Replica Sync Lag Exceeding Bounds",
+                blast: "Read replicas serve stale transactional records",
+                path: "Force read queries onto Primary core database.",
+                latency: "+19ms",
+                degraded: "Stale data allowed for transient records",
+                eta: "15s (Catch-up sync buffer dump)"
+            }
+        };
+
+        function injectFailure(type) {
+            const data = failuresData[type];
+            const consoleView = document.getElementById('fail-injection-details');
+            
+            consoleView.innerHTML = `
+                <div style="font-weight:bold; color:#ff3366; font-size:0.8rem; margin-bottom:0.3rem;">${data.title}</div>
+                <div class="detail-row"><span class="telemetry-label">Blast Radius</span><span style="color:#ffffff;">${data.blast}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Failover Path</span><span style="color:#00ffaa;">${data.path}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Latency Increase / Recovery ETA</span><span style="color:#ffaa00;">${data.latency} / ${data.eta}</span></div>
+            `;
+
+            logEvent(`[FAILURE INJECTION] Injected error trigger: ${data.title}`, 'terminal-error');
+        }
+
+        // Initial setup loads
+        recalculateBlueprint();
+        calculateLoadScaling();
+        calculateShardingPlan();
+    </script>
+</body>
+</html>

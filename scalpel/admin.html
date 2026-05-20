@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCALPEL | Automation Control Plane</title>
+    <meta name="description" content="Secure administrative control plane for the SCALPEL traditional automation flows and hybrid agentic swarm frameworks.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header-bar {
+            background: rgba(2, 4, 8, 0.9);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(0, 243, 255, 0.04);
+            border: 1px solid var(--surface-border);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-primary);
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; box-shadow: 0 0 3px var(--accent-primary); }
+            100% { opacity: 1; box-shadow: 0 0 10px var(--accent-primary); }
+        }
+
+        /* 2-Column Main Workspace */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .operator-panel {
+            background: rgba(2, 6, 12, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .panel-header-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-neon {
+            color: var(--accent-primary);
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .telemetry-label {
+            color: var(--text-secondary);
+        }
+
+        .telemetry-value {
+            font-family: monospace;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Traditional Automation Composer Table */
+        .job-composer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .composer-job-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 0.7rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+        }
+
+        .status-light {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 0.3rem;
+        }
+
+        .status-light.pending { background: #8fa0b5; }
+        .status-light.running { background: var(--accent-primary); box-shadow: 0 0 5px var(--accent-primary); }
+        .status-light.success { background: var(--accent-secondary); box-shadow: 0 0 5px var(--accent-secondary); }
+
+        /* DAG Visualizer */
+        .dag-container {
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dag-node {
+            transition: all 0.3s;
+        }
+
+        .dag-node.active {
+            fill: rgba(0, 243, 255, 0.15);
+            stroke: var(--accent-primary);
+        }
+
+        .dag-node.completed {
+            fill: rgba(0, 255, 170, 0.1);
+            stroke: var(--accent-secondary);
+        }
+
+        .dag-node.pending {
+            fill: rgba(255,255,255,0.02);
+            stroke: rgba(255,255,255,0.2);
+        }
+
+        /* Swarm Goal Input */
+        .swarm-input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .swarm-textarea {
+            width: 100%;
+            background: #000000;
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.8rem;
+            padding: 0.5rem;
+            resize: none;
+        }
+
+        /* Human Approval Layer Form */
+        .approval-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.78rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .approval-btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .appr-btn {
+            flex: 1;
+            padding: 0.4rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .appr-btn.approve { background: rgba(0, 255, 170, 0.1); border-color: var(--accent-secondary); }
+        .appr-btn.approve:hover { background: rgba(0, 255, 170, 0.2); }
+        .appr-btn.reject { background: rgba(255, 51, 102, 0.1); border-color: #ff3366; }
+        .appr-btn.reject:hover { background: rgba(255, 51, 102, 0.2); }
+
+        /* Reflex Auto-healer details */
+        .breaker-outages-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .breaker-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .breaker-btn:hover {
+            border-color: var(--accent-primary);
+            background: rgba(0, 243, 255, 0.03);
+            color: #ffffff;
+        }
+
+        /* Operations log terminal */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            color: var(--accent-primary);
+            height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.02);
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-info { color: #88c0d0; }
+        .terminal-warn { color: #ebcb8b; }
+        .terminal-error { color: #bf616a; }
+        .terminal-success { color: #a3be8c; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="user-badge">
+            <div class="status-dot"></div>
+            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">SCALPEL OPERATOR</span>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div style="text-align: left;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                    SCALPEL WORKFLOW AUTOMATION CENTER
+                </h1>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Automation control plane: executing traditional cron pipelines, dispatching hybrid AI swarms, and managing circuit reflex breakers.</p>
+            </div>
+            <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Orchestrator session securely closed.');">Logout Operator</a>
+        </div>
+
+        <!-- 2-Column Main Workspace -->
+        <div class="workspace-grid">
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Traditional Automation Flow Composer -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">1. Traditional Automation Flow Composer</h2>
+                    <div class="job-composer-list">
+                        <div class="composer-job-card">
+                            <div style="text-align:left;">
+                                <div style="font-weight:bold; color:#ffffff;">Database Backup (Cron: Daily 02:00)</div>
+                                <div style="font-size:0.68rem; color:var(--text-secondary);">Execution Strategy: Direct dump to isolated S3 replicas</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <span id="job-1-status"><span class="status-light success"></span>SUCCESS</span>
+                                <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(1)">Run Flow</button>
+                            </div>
+                        </div>
+                        <div class="composer-job-card">
+                            <div style="text-align:left;">
+                                <div style="font-weight:bold; color:#ffffff;">CDN Cache Purge (On Asset Update)</div>
+                                <div style="font-size:0.68rem; color:var(--text-secondary);">Execution Strategy: Invalidate cloud edge pathways</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <span id="job-2-status"><span class="status-light success"></span>SUCCESS</span>
+                                <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(2)">Run Flow</button>
+                            </div>
+                        </div>
+                        <div class="composer-job-card">
+                            <div style="text-align:left;">
+                                <div style="font-weight:bold; color:#ffffff;">Log Rotation (On Disk Saturation)</div>
+                                <div style="font-size:0.68rem; color:var(--text-secondary);">Execution Strategy: Compress logs older than 7 days</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <span id="job-3-status"><span class="status-light success"></span>SUCCESS</span>
+                                <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(3)">Run Flow</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hybrid Agentic Swarm -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">2. Hybrid Agentic Swarm Planner</h2>
+                    <div class="swarm-input-box">
+                        <textarea class="swarm-textarea" id="swarm-goal" rows="2" placeholder="Describe agent goal... (e.g. 'Deploy security patch and verify database connection logs')">Deploy security patch and verify database connection logs</textarea>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <select class="stack-picker" id="swarm-strategy">
+                                <option value="human">Strategy: Human-in-the-loop</option>
+                                <option value="collab">Strategy: Collaborative Swarm</option>
+                                <option value="auto">Strategy: Fully Autonomous</option>
+                            </select>
+                            <button class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem;" id="dispatch-swarm-btn" onclick="dispatchAgentSwarm()">Dispatch Swarm</button>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 0.72rem; color: var(--text-secondary); text-align: left; margin-bottom: -0.5rem;">Execution Plan DAG (State Nodes):</p>
+                    <div class="dag-container">
+                        <svg width="100%" height="80" viewBox="0 0 540 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- DAG Arrows -->
+                            <line x1="50" y1="40" x2="140" y2="40" stroke="rgba(0, 243, 255, 0.2)" stroke-width="2" />
+                            <line x1="140" y1="40" x2="245" y2="40" stroke="rgba(0, 243, 255, 0.2)" stroke-width="2" />
+                            <line x1="245" y1="40" x2="350" y2="40" stroke="rgba(0, 243, 255, 0.2)" stroke-width="2" />
+                            <line x1="350" y1="40" x2="455" y2="40" stroke="rgba(0, 243, 255, 0.2)" stroke-width="2" />
+
+                            <!-- Node 1: Planner -->
+                            <circle class="dag-node pending" id="dag-node-planner" cx="50" cy="40" r="22" fill="#000" stroke-width="1.5" />
+                            <text x="50" y="43" fill="#ffffff" font-size="7" font-family="monospace" text-anchor="middle" pointer-events="none">Planner</text>
+
+                            <!-- Node 2: Retriever -->
+                            <circle class="dag-node pending" id="dag-node-retriever" cx="150" cy="40" r="22" fill="#000" stroke-width="1.5" />
+                            <text x="150" y="43" fill="#ffffff" font-size="7" font-family="monospace" text-anchor="middle" pointer-events="none">Retriever</text>
+
+                            <!-- Node 3: Validator -->
+                            <circle class="dag-node pending" id="dag-node-validator" cx="255" cy="40" r="22" fill="#000" stroke-width="1.5" />
+                            <text x="255" y="43" fill="#ffffff" font-size="7" font-family="monospace" text-anchor="middle" pointer-events="none">Validator</text>
+
+                            <!-- Node 4: Executor -->
+                            <circle class="dag-node pending" id="dag-node-executor" cx="360" cy="40" r="22" fill="#000" stroke-width="1.5" />
+                            <text x="360" y="43" fill="#ffffff" font-size="7" font-family="monospace" text-anchor="middle" pointer-events="none">Executor</text>
+
+                            <!-- Node 5: Human Approval -->
+                            <circle class="dag-node pending" id="dag-node-human" cx="465" cy="40" r="22" fill="#000" stroke-width="1.5" />
+                            <text x="465" y="43" fill="#ffffff" font-size="7" font-family="monospace" text-anchor="middle" pointer-events="none">Approval</text>
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Human Approval Layer -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">3. Human Approval Layer</h2>
+                    <div class="approval-card" id="approval-details-box">
+                        <div style="color:var(--text-secondary); text-align:center;">No pending sensitive actions awaiting execution validation.</div>
+                    </div>
+                </div>
+
+                <!-- Reflex Auto-Healer -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">4. Reflex Auto-Healer</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Simulate cluster outages to test breaker trips and self-healing pathways.</p>
+                    
+                    <div class="breaker-outages-grid">
+                        <button class="breaker-btn" onclick="tripAutoHealer('db_crash')">Simulate DB Crash</button>
+                        <button class="breaker-btn" onclick="tripAutoHealer('cache_stall')">Simulate Cache Outage</button>
+                        <button class="breaker-btn" onclick="tripAutoHealer('queue_stall')">Queue Stall</button>
+                        <button class="breaker-btn" onclick="tripAutoHealer('timeout')">Service Timeout</button>
+                    </div>
+
+                    <div class="consequence-box" id="healer-telemetry" style="min-height:90px;">
+                        <!-- Dynamic healer telemetry status -->
+                    </div>
+                </div>
+
+                <!-- Automation Failure Tree Analyzer -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">5. Automation Failure Tree</h2>
+                    <div class="consequence-box" id="failure-tree-details" style="font-size:0.75rem;">
+                        <!-- Dynamic fallback and rollback logs -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Terminal Output Log -->
+        <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 1px;">OPERATIONAL SIGNAL FEED</h3>
+            <div class="terminal-box" id="terminal">
+                <div class="terminal-line terminal-info">[SYSTEM] Accessing SCALPEL automation flow engine buffers...</div>
+                <div class="terminal-line terminal-success">[SUCCESS] Scheduled workflows aligned. Telemetry hooks online.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+        <p>© 2026 ZTL Tech Inc. SCALPEL Automation Control Plane.</p>
+    </footer>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        
+        function logEvent(text, type = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.innerHTML = `<span style="color: rgba(0,243,255,0.5)">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Traditional Cron Job Flow Simulator
+        function runCronJob(jobId) {
+            const statusEl = document.getElementById(`job-${jobId}-status`);
+            statusEl.innerHTML = `<span class="status-light running"></span>RUNNING`;
+            logEvent(`[Cron Flow] Triggered manual execution flow for Job #${jobId}...`, 'terminal-info');
+
+            setTimeout(() => {
+                statusEl.innerHTML = `<span class="status-light success"></span>SUCCESS`;
+                logEvent(`[SUCCESS] Job #${jobId} completed. Output code checks verified.`, 'terminal-success');
+            }, 1000);
+        }
+
+        // Swarm Agent DAG Actions
+        let swarmProgress = 0;
+        let swarmTimer = null;
+        let activeGoal = "";
+        let activeStrategy = "human";
+
+        function resetDAGNodes() {
+            document.querySelectorAll('.dag-node').forEach(node => {
+                node.setAttribute('class', 'dag-node pending');
+            });
+        }
+
+        function dispatchAgentSwarm() {
+            if (swarmTimer) clearInterval(swarmTimer);
+            resetDAGNodes();
+
+            activeGoal = document.getElementById('swarm-goal').value;
+            activeStrategy = document.getElementById('swarm-strategy').value;
+
+            logEvent(`[Swarm] Dispatching agent swarm. Goal: "${activeGoal.substring(0, 45)}..." | Strategy: ${activeStrategy}`, 'terminal-info');
+            
+            swarmProgress = 1;
+            runDAGStep();
+        }
+
+        function runDAGStep() {
+            if (swarmProgress === 1) {
+                document.getElementById('dag-node-planner').setAttribute('class', 'dag-node active');
+                logEvent('[Swarm Node: Planner] Synthesizing execution step dependencies...', 'terminal-info');
+                
+                swarmTimer = setTimeout(() => {
+                    document.getElementById('dag-node-planner').setAttribute('class', 'dag-node completed');
+                    swarmProgress = 2;
+                    runDAGStep();
+                }, 1000);
+            } else if (swarmProgress === 2) {
+                document.getElementById('dag-node-retriever').setAttribute('class', 'dag-node active');
+                logEvent('[Swarm Node: Retriever] Querying database schemas and key cache profiles...', 'terminal-info');
+
+                swarmTimer = setTimeout(() => {
+                    document.getElementById('dag-node-retriever').setAttribute('class', 'dag-node completed');
+                    swarmProgress = 3;
+                    runDAGStep();
+                }, 1000);
+            } else if (swarmProgress === 3) {
+                document.getElementById('dag-node-validator').setAttribute('class', 'dag-node active');
+                logEvent('[Swarm Node: Validator] Running pre-deployment testing parameters...', 'terminal-info');
+
+                swarmTimer = setTimeout(() => {
+                    document.getElementById('dag-node-validator').setAttribute('class', 'dag-node completed');
+                    swarmProgress = 4;
+                    runDAGStep();
+                }, 1000);
+            } else if (swarmProgress === 4) {
+                document.getElementById('dag-node-executor').setAttribute('class', 'dag-node active');
+                logEvent('[Swarm Node: Executor] Preparing code execution tasks...', 'terminal-info');
+
+                swarmTimer = setTimeout(() => {
+                    document.getElementById('dag-node-executor').setAttribute('class', 'dag-node completed');
+                    
+                    if (activeStrategy === 'human') {
+                        swarmProgress = 5;
+                        runDAGStep();
+                    } else {
+                        logEvent('[SUCCESS] Swarm execution sequence complete. Goal satisfied.', 'terminal-success');
+                    }
+                }, 1000);
+            } else if (swarmProgress === 5) {
+                document.getElementById('dag-node-human').setAttribute('class', 'dag-node active');
+                logEvent('[Swarm Node: Human Approval] Sensitive action detected. Awaiting operator authorization...', 'terminal-warn');
+                
+                // Load approval details box
+                const approval = document.getElementById('approval-details-box');
+                approval.innerHTML = `
+                    <div style="font-weight:bold; font-size:0.85rem; color:#ffffff;">Awaiting Agent Action Authorization</div>
+                    <div class="detail-row"><span class="telemetry-label">Queued Task Goal</span><span style="color:#ffffff; font-size:0.72rem;">${activeGoal}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Assessed Risk Level</span><span style="color:#ff3366; font-weight:bold;">HIGH RISK</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Rollback Security Impact</span><span style="color:#ffffff;">Automated system snapshot restore available</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Agent Execution Confidence</span><span class="text-neon">94.8%</span></div>
+                    <div class="approval-btn-group">
+                        <button class="appr-btn approve" onclick="handleOperatorApproval(true)">Approve Action</button>
+                        <button class="appr-btn reject" onclick="handleOperatorApproval(false)">Reject Action</button>
+                    </div>
+                `;
+            }
+        }
+
+        function handleOperatorApproval(approved) {
+            const approval = document.getElementById('approval-details-box');
+            if (approved) {
+                document.getElementById('dag-node-human').setAttribute('class', 'dag-node completed');
+                approval.innerHTML = `<div style="color:var(--accent-secondary); text-align:center; font-weight:bold;">✓ Action Approved. Swarm task completed successfully.</div>`;
+                logEvent('[SUCCESS] Operator approved queued action. Swarm execution pipeline closed.', 'terminal-success');
+            } else {
+                resetDAGNodes();
+                approval.innerHTML = `<div style="color:#ff3366; text-align:center; font-weight:bold;">✗ Action Rejected. Automated rollback triggered.</div>`;
+                logEvent('[CRITICAL] Operator rejected queued action. Terminating swarm and rolling back transaction logs...', 'terminal-error');
+                
+                // Trigger automation failure tree details
+                const tree = document.getElementById('failure-tree-details');
+                tree.innerHTML = `
+                    <div style="font-weight:bold; color:#ff3366; margin-bottom:0.3rem;">Rollback Incident Report</div>
+                    <div class="detail-row"><span class="telemetry-label">Root Cause Trigger</span><span style="color:#ffffff;">Operator Manual Rejection</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Execution Retry Count</span><span style="color:#ffffff;">1</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Rollback Log Signature</span><span class="telemetry-value">rb_sig_9921_trans</span></div>
+                    <div style="margin-top:0.4rem; color:var(--text-secondary); font-size:0.7rem;">Rollback outcome: <span style="color:#00ffaa;">Cluster state consistency fully restored.</span></div>
+                `;
+            }
+        }
+
+        // Reflex Auto-Healer Circuit Breaker Data
+        const healerOutages = {
+            db_crash: {
+                outage: "Database Connection Pool Collapse",
+                breaker: "TRIPPED (Open)",
+                fallback: "Route queries to Read Replicas",
+                recovery: "Standby database promoted. System online in 3.4s.",
+                root: "Connection pool exhausted",
+                retries: 2
+            },
+            cache_outage: {
+                outage: "Redis Cache System Timeout",
+                breaker: "TRIPPED (Open)",
+                fallback: "Direct database fetch (SQL query limits enforced)",
+                recovery: "Redis database restarted. Reconnected in 8.2s.",
+                root: "Daemon socket lock error",
+                retries: 1
+            },
+            queue_stall: {
+                outage: "Kafka Broker Node Stall",
+                breaker: "TRIPPED (Half-Open)",
+                fallback: "Buffered local memory files queue",
+                recovery: "Partition offsets verified. Queue processed in 4s.",
+                root: "Metadata sync timeout",
+                retries: 3
+            },
+            timeout: {
+                outage: "Billing API Gateway Timeout",
+                breaker: "TRIPPED (Open)",
+                fallback: "Offline transaction caching queue",
+                recovery: "API handshake restablished. Connection live in 12s.",
+                root: "External DNS host error",
+                retries: 1
+            }
+        };
+
+        function tripAutoHealer(type) {
+            const data = healerOutages[type];
+            const telemetry = document.getElementById('healer-telemetry');
+            
+            telemetry.innerHTML = `
+                <div style="font-weight:bold; color:#ff3366; font-size:0.8rem; margin-bottom:0.3rem;">${data.outage}</div>
+                <div class="detail-row"><span class="telemetry-label">Circuit Breaker State</span><span class="text-neon" style="font-weight:bold;">${data.breaker}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Fallback Recovery Path</span><span style="color:#00ffaa;">${data.fallback}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Self-healing Status</span><span style="color:#ffffff;">${data.recovery}</span></div>
+            `;
+
+            logEvent(`[Reflex Auto-Healer] Incident detected: ${data.outage}`, 'terminal-error');
+
+            // Generate Failure Tree Info
+            const tree = document.getElementById('failure-tree-details');
+            tree.innerHTML = `
+                <div style="font-weight:bold; color:#ffffff; margin-bottom:0.3rem;">Incident Failure Tree</div>
+                <div class="detail-row"><span class="telemetry-label">Root Cause Trigger</span><span style="color:#ffffff;">${data.root}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Execution Retry Count</span><span style="color:#ffffff;">${data.retries}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Fallback Active</span><span style="color:#00ffaa; font-weight:bold;">YES</span></div>
+                <div style="margin-top:0.4rem; color:var(--text-secondary); font-size:0.7rem;">Rollback outcome: <span style="color:#ffffff;">Automated reflex recovery success.</span></div>
+            `;
+        }
+
+        // Initial setup loads
+        tripAutoHealer('db_crash');
+    </script>
+</body>
+</html>

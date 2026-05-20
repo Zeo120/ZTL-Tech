@@ -34,26 +34,51 @@ async function start() {
 async function shutdown(signal) {
   logger.info('server_shutdown_started', { signal });
 
+  // Set a hard timeout to force shutdown if server.close hangs under active keep-alive connections
+  const forceShutdownTimeout = setTimeout(async () => {
+    logger.warn('server_shutdown_forced', { reason: 'Graceful shutdown timeout exceeded' });
+    try {
+      await Promise.all([
+        closeDbPool(),
+        closeRedisClient()
+      ]);
+    } catch (err) {
+      logger.error('server_shutdown_forced_cleanup_failed', { error: err });
+    }
+    process.exit(1);
+  }, 10000); // 10 seconds hard timeout
+
+  if (forceShutdownTimeout.unref) {
+    forceShutdownTimeout.unref();
+  }
+
   try {
     if (!server) {
       await Promise.all([
         closeDbPool(),
         closeRedisClient()
       ]);
-
+      clearTimeout(forceShutdownTimeout);
       process.exit(0);
       return;
     }
 
     server.close(async () => {
-      await closeDbPool();
-      await closeRedisClient();
-
-      logger.info('server_shutdown_complete');
-
-      process.exit(0);
+      clearTimeout(forceShutdownTimeout);
+      try {
+        await Promise.all([
+          closeDbPool(),
+          closeRedisClient()
+        ]);
+        logger.info('server_shutdown_complete');
+        process.exit(0);
+      } catch (error) {
+        logger.error('server_shutdown_failed', { error });
+        process.exit(1);
+      }
     });
   } catch (error) {
+    clearTimeout(forceShutdownTimeout);
     logger.error('server_shutdown_failed', { error });
     process.exit(1);
   }

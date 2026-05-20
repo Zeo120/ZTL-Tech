@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASR | Security Consulting Control Plane</title>
+    <meta name="description" content="Secure administrative control plane for the PHASR security audit framework (Phase, Hierarchy, Assumptions, State, Redundancy).">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header-bar {
+            background: rgba(3, 3, 3, 0.9);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 0, 60, 0.04);
+            border: 1px solid var(--surface-border);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-primary);
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; box-shadow: 0 0 3px var(--accent-primary); }
+            100% { opacity: 1; box-shadow: 0 0 10px var(--accent-primary); }
+        }
+
+        /* 2-Column Main Workspace */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .operator-panel {
+            background: rgba(5, 5, 6, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .panel-header-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-neon {
+            color: var(--accent-secondary);
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        /* Interactive 5-Phase Security Timeline */
+        .timeline-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 0, 60, 0.08);
+        }
+
+        .timeline-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 0.2rem;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .timeline-btn.active {
+            border-color: var(--accent-primary);
+            background: rgba(255, 0, 60, 0.06);
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(255, 0, 60, 0.2);
+        }
+
+        .timeline-btn.verified {
+            border-color: #00ffaa;
+            background: rgba(0, 255, 170, 0.03);
+            color: #ffffff;
+        }
+
+        .timeline-btn-num {
+            font-family: monospace;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .phase-detail-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* Hierarchy Access Auditor */
+        .hierarchy-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1rem;
+        }
+
+        .role-nodes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .role-node {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .role-node:hover, .role-node.active {
+            background: rgba(255, 0, 60, 0.05);
+            border-color: var(--accent-primary);
+        }
+
+        .role-node.danger-node {
+            border-color: rgba(255, 170, 0, 0.4);
+        }
+
+        .boundary-info-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* SVG Trust Boundary Mapper */
+        .svg-container {
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .svg-node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .svg-node:hover {
+            fill-opacity: 0.15;
+            stroke-width: 2px;
+        }
+
+        /* Assumption dependency graph */
+        .assumption-selector {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 0.5rem;
+            color: #ffffff;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+
+        .assumption-report {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 0, 60, 0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.78rem;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        /* Transition Model */
+        .transition-select {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .transition-btn {
+            flex: 1;
+            padding: 0.4rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .transition-btn.active {
+            border-color: var(--accent-primary);
+            background: rgba(255, 0, 60, 0.05);
+            color: #ffffff;
+        }
+
+        /* Failover drill simulator */
+        .failover-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            text-align: left;
+            font-family: monospace;
+        }
+
+        /* Operations log terminal */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            color: var(--accent-primary);
+            height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: inset 0 0 15px rgba(255, 0, 60, 0.02);
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-info { color: #88c0d0; }
+        .terminal-warn { color: #ebcb8b; }
+        .terminal-error { color: #bf616a; }
+        .terminal-success { color: #a3be8c; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="user-badge">
+            <div class="status-dot"></div>
+            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">PHASR OPERATOR</span>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div style="text-align: left;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                    PHASR SECURITY CONTROL PLANE
+                </h1>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Enterprise security reasoning engine tracking Phase, Hierarchy, Assumptions, State, and Redundancy metrics.</p>
+            </div>
+            <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Auditor session securely closed.');">Logout Operator</a>
+        </div>
+
+        <!-- 2-Column Main Workspace -->
+        <div class="workspace-grid">
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Timeline Module -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">
+                        <span>1. 5-Phase Security Timeline</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);" id="timeline-completion">Verification Progress: 0%</span>
+                    </h2>
+                    <div class="timeline-steps">
+                        <button class="timeline-btn active" id="btn-t1" onclick="selectPhase(1)">
+                            <span class="timeline-btn-num">Phase 1</span>
+                            <span>Threat Model</span>
+                        </button>
+                        <button class="timeline-btn" id="btn-t2" onclick="selectPhase(2)">
+                            <span class="timeline-btn-num">Phase 2</span>
+                            <span>Hierarchy Audit</span>
+                        </button>
+                        <button class="timeline-btn" id="btn-t3" onclick="selectPhase(3)">
+                            <span class="timeline-btn-num">Phase 3</span>
+                            <span>Assumptions</span>
+                        </button>
+                        <button class="timeline-btn" id="btn-t4" onclick="selectPhase(4)">
+                            <span class="timeline-btn-num">Phase 4</span>
+                            <span>State Monitor</span>
+                        </button>
+                        <button class="timeline-btn" id="btn-t5" onclick="selectPhase(5)">
+                            <span class="timeline-btn-num">Phase 5</span>
+                            <span>Redundancy</span>
+                        </button>
+                    </div>
+
+                    <div class="phase-detail-box" id="phase-detail-view">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Hierarchy Access Auditor -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">2. Hierarchy Access Auditor</h2>
+                    <div class="hierarchy-layout">
+                        <div class="role-nodes-list">
+                            <div class="role-node active" id="role-sa" onclick="selectRole('sa')">
+                                <span>Super Admin</span>
+                                <span style="font-size: 0.65rem; color: #00ffaa;">FULL ROOT</span>
+                            </div>
+                            <div class="role-node" id="role-a" onclick="selectRole('a')">
+                                <span>Admin</span>
+                                <span style="font-size: 0.65rem; color: #00ffaa;">TENANT LOCK</span>
+                            </div>
+                            <div class="role-node" id="role-s" onclick="selectRole('s')">
+                                <span>Staff</span>
+                                <span style="font-size: 0.65rem; color: #ffaa00;">VERIFIED ACCESS</span>
+                            </div>
+                            <div class="role-node danger-node" id="role-g" onclick="selectRole('g')">
+                                <span>Guest</span>
+                                <span style="font-size: 0.65rem; color: #ff3366;">RISK DETECTED</span>
+                            </div>
+                        </div>
+                        <div class="boundary-info-box" id="role-boundary-details">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trust Boundary Mapper -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">3. Trust Boundary Mapper</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Click nodes on the path to audit boundaries, sensitive crossings, and attack vectors.</p>
+                    <div class="svg-container">
+                        <svg width="100%" height="90" viewBox="0 0 560 90" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Connection Lines -->
+                            <line x1="60" y1="45" x2="160" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                            <line x1="160" y1="45" x2="270" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                            <line x1="270" y1="45" x2="380" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                            <line x1="380" y1="45" x2="490" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+
+                            <!-- Boundary Cross Indicators -->
+                            <line x1="110" y1="20" x2="110" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <text x="115" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
+                            
+                            <line x1="435" y1="20" x2="435" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <text x="440" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
+
+                            <!-- Node: Browser -->
+                            <rect class="svg-node" id="svg-node-browser" x="10" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('browser')" />
+                            <text x="60" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Browser</text>
+                            <text x="60" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">UNTRUSTED</text>
+
+                            <!-- Node: Gateway -->
+                            <rect class="svg-node" id="svg-node-gateway" x="110" y="20" width="100" height="50" rx="6" fill="rgba(255,0,60,0.05)" stroke="var(--accent-primary)" stroke-width="1.5" onclick="selectTrustNode('gateway')" />
+                            <text x="160" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">API Gateway</text>
+                            <text x="160" y="60" fill="rgba(0,255,170,0.8)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">VALIDATION</text>
+
+                            <!-- Node: Auth Layer -->
+                            <rect class="svg-node" id="svg-node-auth" x="220" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('auth')" />
+                            <text x="270" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Auth Layer</text>
+                            <text x="270" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">JWT TOKEN</text>
+
+                            <!-- Node: Redis -->
+                            <rect class="svg-node" id="svg-node-redis" x="330" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('redis')" />
+                            <text x="380" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Redis Cache</text>
+                            <text x="380" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">SESSION KEY</text>
+
+                            <!-- Node: Database -->
+                            <rect class="svg-node" id="svg-node-db" x="440" y="20" width="110" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('db')" />
+                            <text x="495" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Database Core</text>
+                            <text x="495" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">PERSISTENCE</text>
+                        </svg>
+                    </div>
+                    <div class="boundary-info-box" id="trust-boundary-details" style="min-height: 80px;">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Assumption Dependency Graph -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">4. Assumption Dependency Graph</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Assess structural threat vulnerabilities arising from system assumptions.</p>
+                    
+                    <select class="assumption-selector" id="assumption-picker" onchange="calculateAssumptionRisk()">
+                        <option value="trust">Assumption: "Internal network traffic is trusted"</option>
+                        <option value="sanitize">Assumption: "All user input is sanitized at client-side"</option>
+                        <option value="revocation">Assumption: "Expired JWT tokens do not require instant revocation checks"</option>
+                        <option value="replica">Assumption: "Database replication backup stores are fully isolated"</option>
+                    </select>
+
+                    <div class="assumption-report" id="assumption-view">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+                <!-- State Transition Vulnerability Model -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">5. State Transition Vulnerability Model</h2>
+                    <div class="transition-select">
+                        <button class="transition-btn active" id="btn-tr-gu" onclick="runTransitionAudit('gu')">guest → user</button>
+                        <button class="transition-btn" id="btn-tr-ua" onclick="runTransitionAudit('ua')">user → admin</button>
+                        <button class="transition-btn" id="btn-tr-as" onclick="runTransitionAudit('as')">admin → super-admin</button>
+                    </div>
+
+                    <div class="phase-detail-box" id="transition-report-view">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+                <!-- Redundancy Failover Drill -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">6. Redundancy Failover Drill</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Simulate host failure on primary databases to test hot backup replica promotions.</p>
+                    
+                    <button class="btn-primary" style="padding: 0.6rem; font-size: 0.8rem; width: 100%;" id="failover-btn" onclick="startFailoverDrill()">Simulate Primary Database Failure</button>
+                    
+                    <div class="failover-display" id="failover-console">
+                        [STANDBY] Failover simulation engine loaded. Ready to inject primary failure...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Terminal Output Log -->
+        <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 1px;">OPERATIONAL SIGNAL FEED</h3>
+            <div class="terminal-box" id="terminal">
+                <div class="terminal-line terminal-info">[SYSTEM] Initializing post-auth PHASR security analysis tunnels...</div>
+                <div class="terminal-line terminal-success">[SUCCESS] Cryptographic reasoning console secured. Ready to audit.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+        <p>© 2026 ZTL Tech Inc. PHASR Security Operator Control Plane.</p>
+    </footer>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        let verifiedPhases = { 1: false, 2: false, 3: false, 4: false, 5: false };
+
+        function logEvent(text, type = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.innerHTML = `<span style="color: rgba(255,0,60,0.5)">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // 5-Phase Timeline Data
+        const phasesData = {
+            1: {
+                title: "Phase 1: Threat Model",
+                objective: "Deconstruct entry vector paths, interface boundaries, and resource bindings.",
+                riskScore: "78 / 100",
+                blastRadius: "High (Exposed API subnets)",
+                mitigation: "Establish mTLS access paths on internal routes and isolate backend modules.",
+                checks: ["✓ Edge proxy bounds verified", "✗ No dynamic boundary checks on internal API routes"],
+                btnText: "Audit Threat Model Bounds"
+            },
+            2: {
+                title: "Phase 2: Hierarchy Audit",
+                objective: "Trace privilege boundaries, access hierarchy depths, and check permissions maps.",
+                riskScore: "42 / 100",
+                blastRadius: "Critical (Privilege escalation path)",
+                mitigation: "Enforce strict fail-closed role matching in authentication middleware modules.",
+                checks: ["✓ Super admin tokens validated", "✗ Guest -> Admin elevation vector detected in session bindings"],
+                btnText: "Run Privilege Check"
+            },
+            3: {
+                title: "Phase 3: Assumption Validation",
+                objective: "Validate core threat model assumptions against runtime network environments.",
+                riskScore: "85 / 100",
+                blastRadius: "High (Zero-trust assumptions failing)",
+                mitigation: "Apply strict sanitization parameters on entryways and discard raw state assumptions.",
+                checks: ["✓ Whitelisted routes locked", "✗ Assumptions that internal cluster traffic is safe failed audit"],
+                btnText: "Run Assumptions Check"
+            },
+            4: {
+                title: "Phase 4: State Monitoring",
+                objective: "Verify session state consistency, token expirations, and active revocation logs.",
+                riskScore: "20 / 100",
+                blastRadius: "Low (Transient session tokens)",
+                mitigation: "Establish instant token invalidation checks using cached memory layers.",
+                checks: ["✓ Active sessions monitored", "✓ Expiry clocks tracking"],
+                btnText: "Verify State Consistency"
+            },
+            5: {
+                title: "Phase 5: Redundancy Failover",
+                objective: "Test backup replication consistency, database hot standby, and cluster resilience.",
+                riskScore: "12 / 100",
+                blastRadius: "Low (3x redundancy config)",
+                mitigation: "Optimize log synchronization to minimize replication lag under peak loads.",
+                checks: ["✓ Active replica synchronizations online", "✓ Standby nodes ready"],
+                btnText: "Test Redundancy Channels"
+            }
+        };
+
+        let currentPhase = 1;
+        function selectPhase(num) {
+            currentPhase = num;
+            document.querySelectorAll('.timeline-btn').forEach((btn, idx) => {
+                if (idx + 1 === num) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            const data = phasesData[num];
+            const detailView = document.getElementById('phase-detail-view');
+            
+            const checksList = data.checks.map(c => `<div style="font-size:0.75rem; color:${c.startsWith('✓') ? '#00ffaa' : '#ff3366'}; margin-top:0.3rem;">${c}</div>`).join('');
+            
+            detailView.innerHTML = `
+                <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                <div class="detail-row"><span class="telemetry-label">Assessed Risk Score</span><span class="telemetry-value text-neon">${data.riskScore}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Computed Blast Radius</span><span class="telemetry-value" style="color:#ffaa00;">${data.blastRadius}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Recommended Mitigation</span><span class="telemetry-value" style="font-size:0.7rem; color:#ffffff; max-width:60%; text-align:right;">${data.mitigation}</span></div>
+                <div style="margin-top:0.8rem;">
+                    <span style="font-size:0.75rem; font-weight:bold; color:#ffffff;">Active Audit Checks:</span>
+                    ${checksList}
+                </div>
+                <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(${num})">${data.btnText}</button>
+            `;
+        }
+
+        function runPhaseAudit(num) {
+            logEvent(`[PHASR Timeline] Initiating active audits for Phase ${num}: ${phasesData[num].title}...`, 'terminal-info');
+            
+            setTimeout(() => {
+                verifiedPhases[num] = true;
+                const btn = document.getElementById(`btn-t${num}`);
+                btn.classList.add('verified');
+                
+                // Calculate total completion percentage
+                let completed = Object.values(verifiedPhases).filter(v => v).length;
+                let percent = completed * 20;
+                document.getElementById('timeline-completion').innerText = `Verification Progress: ${percent}%`;
+                
+                logEvent(`[SUCCESS] Phase ${num} security variables audited. Mitigations validated.`, 'terminal-success');
+                selectPhase(num); // refresh view
+            }, 1000);
+        }
+
+        // Hierarchy Access Auditor Data
+        const rolesData = {
+            sa: {
+                title: "Super Admin",
+                privilege: "Read & Write across global config, database schemas, and cryptographic nodes.",
+                pathway: "Direct access boundary to core infrastructure (Zero trust boundary crossed).",
+                warning: "None. Operator holds maximum root permissions."
+            },
+            a: {
+                title: "Tenant Admin",
+                privilege: "Read & Write restricted to local tenant workspace resources.",
+                pathway: "Authorized gateway validation checks required for tenant state changes.",
+                warning: "None. Permissions map strictly isolates separate tenant boundaries."
+            },
+            s: {
+                title: "Staff",
+                privilege: "Read access across logs; limited operational task trigger options.",
+                pathway: "Access requires JWT signatures verified at the Gateway border.",
+                warning: "Minor Warning: 1 verification checkpoint bypassed in manual workflows."
+            },
+            g: {
+                title: "Guest",
+                privilege: "Limited read capabilities on public resources.",
+                pathway: "Border authentication bypass check failed.",
+                warning: "🚨 SECURITY ESCALATION DETECTED: Guest role path contains direct read/write bypass paths on the configuration endpoints. Revoke immediate."
+            }
+        };
+
+        function selectRole(roleKey) {
+            document.querySelectorAll('.role-node').forEach(el => el.classList.remove('active'));
+            const el = document.getElementById(`role-${roleKey}`);
+            if (el) el.classList.add('active');
+
+            const data = rolesData[roleKey];
+            const details = document.getElementById('role-boundary-details');
+            details.innerHTML = `
+                <div style="font-weight:bold; font-size:0.85rem; color:#ffffff;">Audit Node: ${data.title}</div>
+                <div><span style="color:var(--text-secondary); font-size:0.7rem;">Privilege Bounds:</span><br>${data.privilege}</div>
+                <div><span style="color:var(--text-secondary); font-size:0.7rem;">Escalation Path:</span><br>${data.pathway}</div>
+                <div style="color:${roleKey === 'g' ? '#ff3366' : '#ffaa00'}; font-weight:bold; font-size:0.7rem;">${data.warning}</div>
+            `;
+            
+            logEvent(`[Hierarchy Auditor] Auditing access boundaries for role: ${data.title}...`, 'terminal-info');
+        }
+
+        // Trust Boundary Mapper Data
+        const trustNodes = {
+            browser: {
+                name: "Browser Endpoint",
+                crossing: "Crosses User -> Edge proxy boundary. Connection untrusted.",
+                vectors: "XSS script injections, forged cookie tokens, header manipulation attempts.",
+                assumptions: "Input verification will filter out script strings before server routing."
+            },
+            gateway: {
+                name: "API Gateway Proxy",
+                crossing: "Validates public tokens and filters traffic. Entrance to trusted boundary.",
+                vectors: "DDoS spikes, port probe mappings, rate limit exhaustion bypass.",
+                assumptions: "Rate limiting locks down rogue IPs dynamically."
+            },
+            auth: {
+                name: "Auth Layer Middleware",
+                crossing: "Verifies session roles. Access privileges assigned here.",
+                vectors: "JWT signature forgery, brute force credential harvesting, time bypass attacks.",
+                assumptions: "Secret key database is isolated from public view."
+            },
+            redis: {
+                name: "Redis Cache System",
+                crossing: "Fast session key store. Runs internally.",
+                vectors: "Unauthenticated socket calls, cache poisoning, connection pools leaks.",
+                assumptions: "External access to port 6379 is blocked by firewalls."
+            },
+            db: {
+                name: "Database Storage Core",
+                crossing: "Holds production user data. Core trust persistence.",
+                vectors: "SQL Injection commands, orphaned queries locking tables, unencrypted backups.",
+                assumptions: "Read replicas match write states synchronously."
+            }
+        };
+
+        function selectTrustNode(nodeKey) {
+            document.querySelectorAll('.svg-node').forEach(node => {
+                node.style.strokeWidth = "1.5px";
+                node.style.fillOpacity = "0.03";
+            });
+
+            const svgNode = document.getElementById(`svg-node-${nodeKey}`);
+            if (svgNode) {
+                svgNode.style.strokeWidth = "3px";
+                svgNode.style.fillOpacity = "0.15";
+            }
+
+            const data = trustNodes[nodeKey];
+            const details = document.getElementById('trust-boundary-details');
+            details.innerHTML = `
+                <div style="font-weight:bold; font-size:0.8rem; color:#ffffff;">Trust Node: ${data.name}</div>
+                <div class="detail-row"><span class="telemetry-label">Crossing Path</span><span style="color:#ffffff;">${data.crossing}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Attack Vectors</span><span style="color:#ff3366;">${data.vectors}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Exposed Assumption</span><span style="color:#ffaa00;">${data.assumptions}</span></div>
+            `;
+            logEvent(`[Boundary Mapper] Audited trust crossings at node node "${data.name}".`, 'terminal-info');
+        }
+
+        // Assumption Risk Analyzer Data
+        const assumptionsRisk = {
+            trust: {
+                score: "85 / 100 (HIGH RISK)",
+                radius: "Critical (Entire app subnet exposed)",
+                risks: ["Lateral Movement", "Privilege Abuse", "Token Replay"],
+                mitigation: "Enforce mTLS network boundaries, authenticate nodes using secure backend handshakes."
+            },
+            sanitize: {
+                score: "65 / 100 (MODERATE)",
+                radius: "High (Exposes backend persistence directly)",
+                risks: ["SQL Injection", "XSS Payload Persistence", "Database Poisoning"],
+                mitigation: "Strict validation schema filters run on all API controllers."
+            },
+            revocation: {
+                score: "40 / 100 (LOW)",
+                radius: "Moderate (Stale sessions persistent)",
+                risks: ["Session hijacking", "Bypassed role revocations"],
+                mitigation: "Implement token blacklisting database synced to key cache systems."
+            },
+            replica: {
+                score: "25 / 100 (LOW)",
+                radius: "Low (Replicas restricted to VPC)",
+                risks: ["Data leakage from backups", "Stale transaction reads"],
+                mitigation: "Encrypt replica storage blocks using separate rotating secret seeds."
+            }
+        };
+
+        function calculateAssumptionRisk() {
+            const val = document.getElementById('assumption-picker').value;
+            const data = assumptionsRisk[val];
+            const view = document.getElementById('assumption-view');
+
+            const list = data.risks.map(r => `<span style="background:rgba(255,0,60,0.1); border:1px solid rgba(255,0,60,0.2); padding:0.2rem 0.5rem; border-radius:4px; font-size:0.65rem; color:#ff3366;">${r}</span>`).join(' ');
+
+            view.innerHTML = `
+                <div class="detail-row"><span class="telemetry-label">Calculated Risk Score</span><span class="telemetry-value text-neon">${data.score}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Computed Blast Radius</span><span class="telemetry-value" style="color:#ffaa00;">${data.radius}</span></div>
+                <div style="margin-top:0.4rem;">
+                    <span style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:0.2rem;">Linked Vulnerabilities:</span>
+                    <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">${list}</div>
+                </div>
+                <div style="margin-top:0.5rem;"><span style="color:var(--text-secondary); font-size:0.7rem;">Mitigation Actions:</span><br><span style="color:#ffffff;">${data.mitigation}</span></div>
+            `;
+            logEvent(`[Assumptions Auditor] Re-calculating risk scores for selected threat assumptions.`, 'terminal-warn');
+        }
+
+        // State Transition Auditor
+        const transitionData = {
+            gu: {
+                title: "guest → user promotion pathway",
+                checks: {
+                    "Replay attack validation": "✓ PASS (Nonce tokens validated)",
+                    "Stale privileges checks": "✓ PASS (Clean token assignment)",
+                    "Forged state tokens check": "✓ PASS (Key validation forced)",
+                    "Revocation validation": "✓ PASS (Invalid user signatures blocked)"
+                },
+                risk: "Low"
+            },
+            ua: {
+                title: "user → admin promotion pathway",
+                checks: {
+                    "Replay attack validation": "✗ WARNING (No transaction nonces on promote request)",
+                    "Stale privileges checks": "✓ PASS (Credentials scrubbed)",
+                    "Forged state tokens check": "✓ PASS (Signed signatures required)",
+                    "Revocation validation": "✗ WARNING (Sessions take 60s to expire after revocation)"
+                },
+                risk: "Moderate"
+            },
+            as: {
+                title: "admin → super-admin promotion pathway",
+                checks: {
+                    "Replay attack validation": "✗ FAILED (Promotions lack dynamic request challenges)",
+                    "Stale privileges checks": "✗ FAILED (Stale admin tokens hold super-admin permissions)",
+                    "Forged state tokens check": "✓ PASS (Signed keys mandatory)",
+                    "Revocation validation": "✗ FAILED (Revocation checks lack memory layer syncing)"
+                },
+                risk: "Critical Risk"
+            }
+        };
+
+        function runTransitionAudit(type) {
+            document.querySelectorAll('.transition-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-tr-${type}`).classList.add('active');
+
+            const data = transitionData[type];
+            const view = document.getElementById('transition-report-view');
+            
+            const checksList = Object.entries(data.checks).map(([key, val]) => {
+                const color = val.startsWith('✓') ? '#00ffaa' : '#ff3366';
+                return `<div class="detail-row"><span class="telemetry-label">${key}</span><span style="color:${color}; font-weight:bold;">${val}</span></div>`;
+            }).join('');
+
+            view.innerHTML = `
+                <div style="font-weight:bold; font-size:0.8rem; color:#ffffff; margin-bottom:0.4rem;">${data.title}</div>
+                ${checksList}
+                <div style="margin-top:0.6rem; text-align:right;"><span style="font-size:0.7rem; color:var(--text-secondary);">Promotion Risk:</span> <span class="text-neon" style="font-weight:bold;">${data.risk}</span></div>
+            `;
+            logEvent(`[Transition Model] Ran validation checks on promotion transition: ${data.title}.`, 'terminal-warn');
+        }
+
+        // Redundancy Failover Drill Logic
+        let failoverActive = false;
+        function startFailoverDrill() {
+            if (failoverActive) return;
+            failoverActive = true;
+
+            const consoleView = document.getElementById('failover-console');
+            const btn = document.getElementById('failover-btn');
+            btn.disabled = true;
+
+            consoleView.innerHTML = `[FATAL] Primary Database Failure Injected!\n[INFO] Initializing failover sequence...`;
+            logEvent('[Redundancy Drill] Primary database failover injected. Terminating master connection...', 'terminal-error');
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[STANDBY] Promoting backup replica (db-replica-01) to Primary...`;
+                logEvent('[Redundancy Drill] Target promotion command sent to replica 1.', 'terminal-info');
+            }, 1000);
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[STANDBY] Replaying transaction log queues (Offset: +14291)...`;
+                logEvent('[Redundancy Drill] Replaying uncommitted transactional queues into promoted master database...', 'terminal-info');
+            }, 2000);
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[SUCCESS] Promotion complete. State consistency verified (0 gaps).\n[STATS] Recovery ETA: 3.2s. Data Loss Risk: 0.00%`;
+                logEvent('[SUCCESS] Redundancy recovery test complete. Replication hot standby master online.', 'terminal-success');
+                btn.disabled = false;
+                failoverActive = false;
+            }, 3200);
+        }
+
+        // Initial setup loads
+        selectPhase(1);
+        selectRole('sa');
+        selectTrustNode('browser');
+        calculateAssumptionRisk();
+        runTransitionAudit('gu');
+    </script>
+</body>
+</html>

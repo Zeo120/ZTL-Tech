@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID | Systems Design &amp; Architecture Blueprinting by ZTL Tech</title>
-    <meta name="description" content="GRID by ZTL Tech designs hyper-scale redundant mesh grids, microservices routing protocols, and global consensus database blueprints for high-throughput enterprise operations.">
+    <title>GRID | Systems Architecture Design &amp; Blueprinting by ZTL Tech</title>
+    <meta name="description" content="GRID by ZTL Tech designs hyper-scale redundant blueprint topologies, concurrent load scaling simulators, and global database sharding layouts for high-throughput enterprise systems.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -78,9 +78,9 @@
 
     <main>
         <section class="hero" id="home" style="min-height: 75vh;">
-            <span class="badge animate" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.25); display: inline-block; margin-bottom: 1.5rem; letter-spacing: 1px; box-shadow: 0 0 10px rgba(255, 170, 0, 0.15);">SYSTEMS DESIGN &amp; BLUEPRINTING</span>
+            <span class="badge animate" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.25); display: inline-block; margin-bottom: 1.5rem; letter-spacing: 1px; box-shadow: 0 0 10px rgba(255, 170, 0, 0.15);">SYSTEMS ARCHITECTURE DESIGN &amp; BLUEPRINTING</span>
             <h1 class="animate" style="color: #ffffff; letter-spacing: 3px;">GRID</h1>
-            <p class="animate delay-1" style="max-width: 700px; color: var(--text-secondary);">We blueprint highly concurrent system grid topologies, decentralized cluster synchronizations, and global database sync layers at hyper-scale.</p>
+            <p class="animate delay-1" style="max-width: 700px; color: var(--text-secondary);">We blueprint highly concurrent distributed systems topologies, database sharding balances, and latency budgets at hyper-scale.</p>
             <div class="animate delay-2" style="margin-top: 2rem; margin-bottom: 1rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                 <a href="#products" class="btn-primary" style="text-decoration: none; background: transparent; border-color: rgba(255, 170, 0, 0.4); color: #ffaa00; box-shadow: none;">Explore Blueprint</a>
                 <a href="login.html" class="btn-primary" style="text-decoration: none;">Launch GRID Console</a>
@@ -90,65 +90,128 @@
                 <svg class="hero-svg" viewBox="0 0 600 400" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="GRID Systems Architecture &amp; Node Topology Blueprint Map">
                     <defs>
                         <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ffaa00" stop-opacity="0.15" />
+                            <stop offset="0%" stop-color="#ffaa00" stop-opacity="0.25" />
                             <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                         </radialGradient>
                         <linearGradient id="goldBronzeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#ffaa00" />
                             <stop offset="100%" stop-color="#ff7700" />
                         </linearGradient>
-                        <filter id="goldNeon" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="5" result="blur" />
+                        <filter id="goldNeon" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="6" result="blur" />
                             <feMerge>
                                 <feMergeNode in="blur" />
                                 <feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
+                        <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 170, 0, 0.04)" stroke-width="0.7" />
+                            <circle cx="40" cy="0" r="1" fill="rgba(255, 170, 0, 0.12)" />
+                        </pattern>
+                        <style>
+                            @keyframes flow-packets {
+                                to { stroke-dashoffset: -100; }
+                            }
+                            @keyframes rotate-dial-cw {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                            }
+                            @keyframes rotate-dial-ccw {
+                                from { transform: rotate(360deg); }
+                                to { transform: rotate(0deg); }
+                            }
+                            @keyframes expand-pulse {
+                                0% { r: 10px; opacity: 0.8; }
+                                100% { r: 40px; opacity: 0; }
+                            }
+                            @keyframes wave-vibration {
+                                0% { transform: scale(1); opacity: 0.8; }
+                                50% { transform: scale(1.05); opacity: 0.9; }
+                                100% { transform: scale(1); opacity: 0.8; }
+                            }
+                            .packet-line {
+                                stroke-dasharray: 8, 20;
+                                animation: flow-packets 3s linear infinite;
+                            }
+                            .packet-line-fast {
+                                stroke-dasharray: 12, 12;
+                                animation: flow-packets 1.5s linear infinite;
+                            }
+                            .dial-cw {
+                                animation: rotate-dial-cw 20s linear infinite;
+                                transform-origin: 300px 200px;
+                            }
+                            .dial-ccw {
+                                animation: rotate-dial-ccw 14s linear infinite;
+                                transform-origin: 300px 200px;
+                            }
+                            .ping-wave {
+                                animation: expand-pulse 3s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
+                                transform-origin: center;
+                                transform-box: fill-box;
+                            }
+                            .system-mesh {
+                                animation: wave-vibration 8s ease-in-out infinite;
+                                transform-origin: 300px 200px;
+                            }
+                        </style>
                     </defs>
 
-                    <circle cx="300" cy="200" r="180" fill="url(#goldGlow)" />
+                    <!-- Background System Blueprint Grid -->
+                    <rect width="100%" height="100%" fill="url(#gridPattern)" />
+                    
+                    <!-- Ambient Glow -->
+                    <circle cx="300" cy="200" r="190" fill="url(#goldGlow)" opacity="0.9" />
 
-                    <!-- Isometric Grid Matrix Backdrop -->
-                    <g stroke="rgba(255, 170, 0, 0.06)" stroke-width="1" fill="none">
-                        <polygon points="300,40 480,130 300,220 120,130" />
-                        <polygon points="300,100 420,160 300,220 180,160" />
-                        <polygon points="300,220 480,310 300,400 120,310" />
-                        <line x1="300" y1="40" x2="300" y2="400" />
-                        <line x1="120" y1="130" x2="480" y2="310" />
-                        <line x1="120" y1="310" x2="480" y2="130" />
+                    <!-- Telemetry Ring Rotators -->
+                    <g class="dial-cw">
+                        <circle cx="300" cy="200" r="130" stroke="url(#goldBronzeGrad)" stroke-width="1.5" stroke-dasharray="100, 50, 40, 20" fill="none" opacity="0.35" filter="url(#goldNeon)" />
+                        <circle cx="300" cy="200" r="160" stroke="url(#goldBronzeGrad)" stroke-width="1" stroke-dasharray="4, 12" fill="none" opacity="0.25" />
+                    </g>
+                    <g class="dial-ccw">
+                        <circle cx="300" cy="200" r="145" stroke="url(#goldBronzeGrad)" stroke-width="2" stroke-dasharray="10, 120, 40, 60" fill="none" opacity="0.4" />
+                        <circle cx="300" cy="200" r="95" stroke="url(#goldBronzeGrad)" stroke-width="1" stroke-dasharray="80, 40" fill="none" opacity="0.15" />
                     </g>
 
-                    <!-- Circular Measurement Rings -->
-                    <g class="rotating-slow" transform-origin="300 200">
-                        <circle cx="300" cy="200" r="130" stroke="url(#goldBronzeGrad)" stroke-width="1.5" fill="none" stroke-dasharray="15, 45, 5, 20" opacity="0.6" filter="url(#goldNeon)" />
-                        <circle cx="300" cy="200" r="160" stroke="#ffffff" stroke-width="0.8" fill="none" stroke-dasharray="6, 80" opacity="0.25" />
+                    <!-- Network Link Lines (Static Base) -->
+                    <g stroke="url(#goldBronzeGrad)" stroke-width="1.2" fill="none" opacity="0.15" class="system-mesh">
+                        <line x1="300" y1="100" x2="120" y2="130" />
+                        <line x1="300" y1="100" x2="480" y2="130" />
+                        <line x1="120" y1="130" x2="300" y2="200" />
+                        <line x1="480" y1="130" x2="300" y2="200" />
+                        <line x1="300" y1="200" x2="300" y2="310" />
                     </g>
 
-                    <g class="rotating-fast" transform-origin="300 200">
-                        <circle cx="300" cy="200" r="90" stroke="url(#goldBronzeGrad)" stroke-width="2" fill="none" stroke-dasharray="80, 40, 20, 20" filter="url(#goldNeon)" />
+                    <!-- Glowing Flowing System Channels -->
+                    <g stroke="url(#goldBronzeGrad)" stroke-width="2.2" fill="none" opacity="0.75" filter="url(#goldNeon)">
+                        <path d="M 300,100 L 120,130" class="packet-line" />
+                        <path d="M 300,100 L 480,130" class="packet-line" />
+                        <path d="M 120,130 L 300,200" class="packet-line-fast" />
+                        <path d="M 480,130 L 300,200" class="packet-line-fast" />
+                        <path d="M 300,200 L 300,310" class="packet-line" />
                     </g>
 
-                    <!-- Structural Topology Vectors -->
-                    <g stroke="url(#goldBronzeGrad)" stroke-width="1.8" fill="none" opacity="0.8" filter="url(#goldNeon)">
-                        <!-- Cluster Interconnects -->
-                        <path d="M 120,130 L 300,100 L 480,130 L 300,200 L 120,130 Z" />
-                        <path d="M 300,200 L 300,310" />
-                        <path d="M 120,310 L 300,310 L 480,310" stroke-dasharray="5, 5" />
+                    <!-- Expanding Telemetry Waves -->
+                    <circle cx="300" cy="100" r="10" fill="none" stroke="url(#goldBronzeGrad)" class="ping-wave" />
+                    <circle cx="120" cy="130" r="10" fill="none" stroke="url(#goldBronzeGrad)" class="ping-wave" />
+                    <circle cx="480" cy="130" r="10" fill="none" stroke="url(#goldBronzeGrad)" class="ping-wave" />
+                    <circle cx="300" cy="310" r="10" fill="none" stroke="url(#goldBronzeGrad)" class="ping-wave" />
+
+                    <!-- Node Core Systems -->
+                    <g fill="#120c02" stroke="url(#goldBronzeGrad)" stroke-width="2.5">
+                        <circle class="pulse-node" cx="300" cy="100" r="12" filter="url(#goldNeon)" />
+                        <circle class="pulse-node" cx="120" cy="130" r="12" filter="url(#goldNeon)" />
+                        <circle class="pulse-node" cx="480" cy="130" r="12" filter="url(#goldNeon)" />
+                        <circle class="pulse-node" cx="300" cy="310" r="12" filter="url(#goldNeon)" />
+                        
+                        <!-- Mini Gateways -->
+                        <circle cx="210" cy="165" r="4" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
+                        <circle cx="390" cy="165" r="4" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
                     </g>
 
-                    <!-- Redundant Nodes -->
-                    <g fill="#ffffff">
-                        <circle class="pulse-node" cx="300" cy="100" r="6" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
-                        <circle class="pulse-node" cx="120" cy="130" r="6" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
-                        <circle class="pulse-node" cx="480" cy="130" r="6" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
-                        <circle class="pulse-node" cx="300" cy="310" r="6" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" />
-                        <circle class="pulse-node" cx="300" cy="200" r="4" />
-                        <circle class="pulse-node" cx="180" cy="160" r="4" opacity="0.6" />
-                        <circle class="pulse-node" cx="420" cy="160" r="4" opacity="0.6" />
-                    </g>
-
-                    <circle cx="300" cy="200" r="26" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" class="pulsing-core" />
-                    <circle cx="300" cy="200" r="9" fill="#ffffff" />
+                    <!-- Main Router Hub -->
+                    <circle cx="300" cy="200" r="28" fill="url(#goldBronzeGrad)" filter="url(#goldNeon)" class="pulsing-core" />
+                    <circle cx="300" cy="200" r="10" fill="#ffffff" />
                 </svg>
             </div>
         </section>
@@ -156,25 +219,25 @@
         <section class="products" id="products">
             <div class="section-header animate">
                 <h2>Architectural Grid Systems</h2>
-                <p style="color: var(--text-secondary)">High-frequency blueprinting designed to sustain infinite scaling parameters.</p>
+                <p style="color: var(--text-secondary)">High-fidelity operator control planes engineered for enterprise systems planning.</p>
             </div>
             
             <div class="product-card animate">
-                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Mesh Architecture</span>
-                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">1. Redundant High-Availability Systems Design (GRID Mesh)</h3>
-                <p style="color: var(--text-secondary); line-height: 1.6;">Decentralized, self-healing mesh structures engineered to sustain concurrent traffic of 100M+ active nodes without a single point of failure. Dynamically adjusts data pathway allocations during massive regional cloud infrastructure outages.</p>
+                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Topology Modeler</span>
+                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">1. Systems Topology &amp; Blueprinting</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Build, toggle, and inspect redundant mesh topologies spanning Ingress Proxies down to sharded Read Replicas, calculating infrastructure resilience scores and detecting node configuration bottlenecks.</p>
             </div>
 
             <div class="product-card animate">
-                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Telemetry &amp; Routing</span>
-                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">2. High-Frequency Telemetry &amp; Microservices Routing (GRID Route)</h3>
-                <p style="color: var(--text-secondary); line-height: 1.6;">Symmetrical routing grids designed to distribute petabyte-scale data packets across globally replicated cloud clusters with zero packet jitter. Monitors real-time pipeline bottlenecks and reroutes traffic automatically.</p>
+                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Budget Simulator</span>
+                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">2. Load Scaling &amp; Latency Budgets</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Simulate concurrency loads from 1k to 1M requests per second to evaluate CPU thresholds, database replication lag profiles, queue backlogs, and p95/p99 latency budgets in real time.</p>
             </div>
 
             <div class="product-card animate">
-                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Database Sync</span>
-                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">3. Decentralized Database Replication Blueprints (GRID Sync)</h3>
-                <p style="color: var(--text-secondary); line-height: 1.6;">Consensus-driven distributed database layouts utilizing custom Raft and Byzantine fault-tolerant synchronization protocols for global data consistency. Guarantees conflict-free replicated data types across complex multi-region storage systems.</p>
+                <span class="badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33; padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 170, 0, 0.2); display: inline-block; margin-bottom: 1rem; box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);">Sharding &amp; Failure</span>
+                <h3 style="margin-bottom: 0.8rem; font-size: 1.6rem; font-weight: 700;">3. Database Sharding &amp; Failure Injection</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Plan sharding partition loads across active database clusters to eliminate hot partitions, and inject active failures (such as Redis timeouts or regional packet loss) to run resilience drills.</p>
             </div>
         </section>
 
@@ -285,11 +348,17 @@
         }
 
         // Force all hero section elements to be visible immediately on load to prevent viewport blackouts
-        window.addEventListener('DOMContentLoaded', () => {
+        const forceHeroVisible = () => {
             document.querySelectorAll('.hero .animate').forEach(el => {
                 el.classList.add('visible');
             });
-        });
+        };
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', forceHeroVisible);
+        } else {
+            forceHeroVisible();
+        }
+
 
         // Intersection Observer for Smooth Scroll Animations (with viewport fallback)
         try {
@@ -302,4 +371,20 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate').forEach(element => {
+                observer.observe(element);
+            });
+        } catch(e) {
+            // Fallback for older browsers
+            document.querySelectorAll('.animate').forEach(el => {
+                el.classList.add('visible');
+            });
+        }
+    </script>
+</body>
+</html>
              

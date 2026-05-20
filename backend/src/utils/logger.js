@@ -19,7 +19,8 @@ function sanitize(value) {
   if (value instanceof Error) {
     return {
       name: value.name,
-      message: value.message
+      message: value.message,
+      stack: value.stack
     };
   }
 

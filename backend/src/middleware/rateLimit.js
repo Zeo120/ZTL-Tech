@@ -7,6 +7,20 @@ const { logger } = require('../utils/logger');
 function fallbackMemoryRateLimit({ windowMs, max }) {
   const buckets = new Map();
 
+  // Periodically prune expired rate limit entries to prevent memory leaks
+  const interval = setInterval(() => {
+    const now = Date.now();
+    for (const [key, current] of buckets.entries()) {
+      if (current.resetAt <= now) {
+        buckets.delete(key);
+      }
+    }
+  }, 60000);
+
+  if (interval.unref) {
+    interval.unref();
+  }
+
   return function check(key) {
     const now = Date.now();
     const current = buckets.get(key);
@@ -24,7 +38,16 @@ function fallbackMemoryRateLimit({ windowMs, max }) {
 async function incrementRedisLimit(key, windowSeconds) {
   return withRedis(async (redis) => {
     const count = await redis.incr(key);
-    if (count === 1) await redis.expire(key, windowSeconds);
+    if (count === 1) {
+      await redis.expire(key, windowSeconds);
+    } else {
+      // Self-healing check: if the key somehow has no expiration (e.g. process crashed
+      // between INCR and EXPIRE), set it now so the user is not permanently locked out.
+      const ttl = await redis.ttl(key);
+      if (ttl === -1) {
+        await redis.expire(key, windowSeconds);
+      }
+    }
     return count;
   });
 }

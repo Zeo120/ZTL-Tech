@@ -53,13 +53,19 @@ function signSessionToken(user, session) {
   );
 }
 
+const DUMMY_HASH = '$argon2id$v=19$m=65536,t=3,p=4$7aUA7GPkSnBru/DiJ4uB5g$HcLVIJt4kCEjmaXMKhAzeAWeq3Uc90CeTvxAe9wxOtI';
+
 async function login(body, requestContext) {
   const { email, password } = validateLoginBody(body);
   const user = await findUserByEmail(email);
 
-  const passwordMatches = user
-    ? await verifyPassword(user.password_hash, password)
-    : false;
+  let passwordMatches = false;
+  if (user) {
+    passwordMatches = await verifyPassword(user.password_hash, password);
+  } else {
+    // Run dummy verification to prevent email enumeration timing attacks
+    await verifyPassword(DUMMY_HASH, password);
+  }
 
   if (!user || !passwordMatches || !user.is_active || !VALID_ROLES.has(user.role)) {
     await writeAuditEvent({

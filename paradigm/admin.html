@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARADIGM | Software Design Control Plane</title>
+    <meta name="description" content="Secure administrative control plane for the PARADIGM software architecture design and delivery framework.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header-bar {
+            background: rgba(10, 10, 12, 0.9);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; box-shadow: 0 0 3px rgba(255, 255, 255, 0.3); }
+            100% { opacity: 1; box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
+        }
+
+        /* 2-Column Main Workspace */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .operator-panel {
+            background: rgba(8, 8, 10, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .panel-header-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-neon {
+            color: #ffffff;
+            text-shadow: 0 0 4px rgba(255,255,255,0.4);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .telemetry-label {
+            color: var(--text-secondary);
+        }
+
+        .telemetry-value {
+            font-family: monospace;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Requirements Input */
+        .req-input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 0.8rem;
+        }
+
+        .req-textarea {
+            width: 100%;
+            background: #050506;
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.8rem;
+            padding: 0.5rem;
+            resize: vertical;
+        }
+
+        .stack-picker {
+            background: #050506;
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.78rem;
+            padding: 0.4rem;
+        }
+
+        /* Debt Detector Toggles */
+        .debt-toggle-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+        }
+
+        .debt-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .debt-checkbox-label input {
+            cursor: pointer;
+        }
+
+        /* Code Boilerplate Generator */
+        .boilerplate-layout {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 1rem;
+            min-height: 250px;
+        }
+
+        .file-tree-container {
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            text-align: left;
+        }
+
+        .tree-node {
+            font-size: 0.72rem;
+            font-family: monospace;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tree-node:hover, .tree-node.active {
+            background: rgba(255,255,255,0.05);
+            color: #ffffff;
+        }
+
+        .code-preview-container {
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            background: #000000;
+            padding: 0.8rem;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.7rem;
+            color: #d0d0d5;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        /* Sprint Simulator Display */
+        .sprint-console {
+            background: #000000;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            text-align: left;
+            font-family: monospace;
+            min-height: 90px;
+        }
+
+        /* Operations log terminal */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            color: #ffffff;
+            height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02);
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-info { color: #88c0d0; }
+        .terminal-warn { color: #ebcb8b; }
+        .terminal-error { color: #bf616a; }
+        .terminal-success { color: #a3be8c; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="user-badge">
+            <div class="status-dot"></div>
+            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">PARADIGM OPERATOR</span>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div style="text-align: left;">
+                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                    PARADIGM SOFTWARE DESIGN CONTROL PLANE
+                </h1>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Enterprise workspace for application planning: translating requirements, analyzing debt, and tracking sprint confidence.</p>
+            </div>
+            <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('PARADIGM software architect session securely closed.');">Logout Operator</a>
+        </div>
+
+        <!-- 2-Column Main Workspace -->
+        <div class="workspace-grid">
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Requirements Analyzer -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">1. Requirements Analyzer</h2>
+                    <div class="req-input-box">
+                        <textarea class="req-textarea" id="requirements-input" rows="3" placeholder="Input target system requirements... (e.g. 'Realtime WebSocket news feed with Redis cache')">Realtime WebSocket news feed with Redis cache</textarea>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <select class="stack-picker" id="requirements-stack">
+                                <option value="node">Stack: Node / Express</option>
+                                <option value="go">Stack: Go / Gin</option>
+                                <option value="python">Stack: Python / FastAPI</option>
+                            </select>
+                            <button class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem;" onclick="analyzeRequirements()">Analyze Requirements</button>
+                        </div>
+                    </div>
+
+                    <div class="consequence-box" id="requirements-report" style="font-size:0.75rem; text-align:left;">
+                        <!-- Dynamic analysis report -->
+                    </div>
+                </div>
+
+                <!-- Boilerplate Generator -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">2. Boilerplate Generator</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Explore custom generated directory structures and inspect file code baseline stubs.</p>
+                    
+                    <div class="boilerplate-layout">
+                        <div class="file-tree-container" id="tree-container">
+                            <!-- Tree nodes -->
+                        </div>
+                        <div class="code-preview-container">
+                            <div class="code-block" id="code-preview-view">
+                                // Select file to inspect boilerplate structure.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Architecture Debt Detector -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">3. Architecture Debt Detector</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Check anti-patterns to estimate system saturation limits and risks.</p>
+                    
+                    <div class="debt-toggle-grid">
+                        <label class="debt-checkbox-label">
+                            <input type="checkbox" id="debt-monolith" onchange="runDebtAudit()">
+                            <span>Monolithic Layout</span>
+                        </label>
+                        <label class="debt-checkbox-label">
+                            <input type="checkbox" id="debt-nocache" checked onchange="runDebtAudit()">
+                            <span>No Cache Layer</span>
+                        </label>
+                        <label class="debt-checkbox-label">
+                            <input type="checkbox" id="debt-directdb" checked onchange="runDebtAudit()">
+                            <span>Direct DB Writes</span>
+                        </label>
+                        <label class="debt-checkbox-label">
+                            <input type="checkbox" id="debt-singleinstance" onchange="runDebtAudit()">
+                            <span>Single App Instance</span>
+                        </label>
+                    </div>
+
+                    <div class="consequence-box" id="debt-details">
+                        <!-- Dynamic debt metrics -->
+                    </div>
+                </div>
+
+                <!-- Delivery Risk Estimator -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">4. Delivery Risk Estimator</h2>
+                    <div class="consequence-box" id="delivery-risk-details" style="font-size:0.75rem;">
+                        <!-- Dynamic confidence output -->
+                    </div>
+                </div>
+
+                <!-- Sprint Simulator -->
+                <div class="operator-panel">
+                    <h2 class="panel-header-title">5. Sprint Simulator</h2>
+                    <button class="btn-primary" style="padding: 0.6rem; font-size: 0.8rem; width: 100%;" id="sprint-btn" onclick="startSprintSimulation()">Run Software Delivery Sprint</button>
+                    
+                    <div class="sprint-console" id="sprint-console-view">
+                        [STANDBY] Sprint runner loaded. Ready to execute sprint loop...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Terminal Output Log -->
+        <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 1px;">OPERATIONAL SIGNAL FEED</h3>
+            <div class="terminal-box" id="terminal">
+                <div class="terminal-line terminal-info">[SYSTEM] Accessing PARADIGM client-side architecture models...</div>
+                <div class="terminal-line terminal-success">[SUCCESS] Software blueprints aligned. Ready for audit analyzer.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+        <p>© 2026 ZTL Tech Inc. PARADIGM Software Design Control Plane.</p>
+    </footer>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        
+        function logEvent(text, type = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.innerHTML = `<span style="color: rgba(255,255,255,0.4)">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Requirements Analyzer & Stack Maps
+        const architectures = {
+            node: {
+                map: "Gateway → Auth (JWT) → Redis Cache → Event Bus → Primary DB Core (PostgreSQL) → Winston Logs",
+                infra: "2x API Proxies, 3x Node App pods, 1x Redis instance, 1x Postgres database.",
+                complexity: "Moderate (Level 48/100)",
+                risk: "Low",
+                files: [
+                    { name: "server.js", code: `const express = require('express');\nconst app = express();\nconst PORT = process.env.PORT || 3000;\n\napp.use(express.json());\napp.listen(PORT, () => console.log('Server online'));` },
+                    { name: "auth.service.js", code: `const argon2 = require('argon2');\nconst jwt = require('jsonwebtoken');\n\nasync function verifyLogin(user, password) {\n  return await argon2.verify(user.hash, password);\n}` },
+                    { name: "schema.sql", code: `CREATE TABLE Users (\n  id SERIAL PRIMARY KEY,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  password VARCHAR(255) NOT NULL\n);\n\nCREATE TABLE Pages (\n  id SERIAL PRIMARY KEY,\n  user_id INT REFERENCES Users(id) ON DELETE CASCADE\n);` },
+                    { name: "redis.js", code: `const redis = require('redis');\nconst client = redis.createClient({ url: process.env.REDIS_URL });\n\nclient.on('error', (err) => console.log('Redis error', err));\nclient.connect();` }
+                ]
+            },
+            go: {
+                map: "Nginx Ingress → Gin Router → Auth Middleware → Redis (Cache) → Kafka Queue → PostgreSQL (DB)",
+                infra: "1x Nginx ingress, 2x Go pods, 1x Redis shard, 1x Kafka broker, 1x sharded PostgreSQL.",
+                complexity: "High (Level 72/100)",
+                risk: "Moderate",
+                files: [
+                    { name: "main.go", code: `package main\n\nimport "github.com/gin-gonic/gin"\n\nfunc main() {\n\tr := gin.Default()\n\tr.POST("/login", handleLogin)\n\tr.Run(":8080")\n}` },
+                    { name: "auth.go", code: `package auth\n\nimport "github.com/golang-jwt/jwt/v5"\n\nfunc GenerateToken(userID uint) (string, error) {\n\t// JWT signing logic\n}` },
+                    { name: "schema.sql", code: `CREATE TABLE Users (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  email VARCHAR(255) UNIQUE,\n  password VARCHAR(255)\n);` },
+                    { name: "kafka.go", code: `package queue\n\nimport "github.com/segmentio/kafka-go"\n\nfunc PublishEvent(topic string, payload []byte) {\n\t// Kafka publishing logic\n}` }
+                ]
+            },
+            python: {
+                map: "FastAPI Routing → JWT verification → Redis Cache → Celery Workers → SQLite / PostgreSQL Core",
+                infra: "2x Uvicorn app servers, 1x Redis broker, 2x Celery worker hosts, 1x PostgreSQL storage.",
+                complexity: "Low-Moderate (Level 35/100)",
+                risk: "Low",
+                files: [
+                    { name: "main.py", code: `from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef read_root():\n    return {"status": "online"}` },
+                    { name: "auth.py", code: `from passlib.context import CryptContext\npwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")\n\ndef verify_password(plain, hashed):\n    return pwd_context.verify(plain, hashed)` },
+                    { name: "models.py", code: `from sqlalchemy import Column, Integer, String\nfrom database import Base\n\nclass User(Base):\n    __tablename__ = "users"\n    id = Column(Integer, primary_key=True)\n    email = Column(String, unique=True)` },
+                    { name: "celery.py", code: `from celery import Celery\n\napp = Celery('tasks', broker='redis://localhost:6379/0')\n\n@app.task\ndef process_job():\n    pass` }
+                ]
+            }
+        };
+
+        let activeStack = 'node';
+
+        function analyzeRequirements() {
+            const req = document.getElementById('requirements-input').value;
+            const stack = document.getElementById('requirements-stack').value;
+            activeStack = stack;
+
+            const data = architectures[stack];
+            logEvent(`[Analyzer] Parsing requirements for project: "${req.substring(0, 40)}..."`, 'terminal-info');
+            
+            setTimeout(() => {
+                const report = document.getElementById('requirements-report');
+                report.innerHTML = `
+                    <div style="font-weight:bold; color:#ffffff; margin-bottom:0.4rem;">Generated Custom Architecture Blueprint</div>
+                    <div class="detail-row"><span class="telemetry-label">Architecture Map</span><span style="color:#ffffff; font-size:0.7rem; font-family:monospace; max-width:65%; text-align:right;">${data.map}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Infrastructure Needs</span><span style="color:#ffffff;">${data.infra}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Estimated Complexity</span><span class="telemetry-value text-neon">${data.complexity}</span></div>
+                    <div class="detail-row"><span class="telemetry-label">Security Risk Score</span><span style="color:${data.risk === 'Low' ? '#00ffaa' : '#ffaa00'}; font-weight:bold;">${data.risk}</span></div>
+                `;
+
+                // Regenerate file tree
+                const tree = document.getElementById('tree-container');
+                tree.innerHTML = '';
+                data.files.forEach((file, idx) => {
+                    const node = document.createElement('div');
+                    node.className = `tree-node${idx === 0 ? ' active' : ''}`;
+                    node.innerHTML = `📄 ${file.name}`;
+                    node.onclick = () => selectFileNode(idx);
+                    tree.appendChild(node);
+                });
+                
+                // Show first file preview
+                selectFileNode(0);
+                
+                // Update delivery confidence estimation
+                calculateDeliveryConfidence();
+
+                logEvent(`[SUCCESS] Custom software architecture map rendered. Boilerplate ready.`, 'terminal-success');
+            }, 800);
+        }
+
+        function selectFileNode(idx) {
+            document.querySelectorAll('.tree-node').forEach((node, i) => {
+                if (i === idx) node.classList.add('active');
+                else node.classList.remove('active');
+            });
+
+            const file = architectures[activeStack].files[idx];
+            const preview = document.getElementById('code-preview-view');
+            preview.innerText = file.code;
+            logEvent(`[Boilerplate] Selected file template: ${file.name}`, 'terminal-info');
+        }
+
+        // Architecture Debt Calculations
+        function runDebtAudit() {
+            const monolith = document.getElementById('debt-monolith').checked;
+            const nocache = document.getElementById('debt-nocache').checked;
+            const directdb = document.getElementById('debt-directdb').checked;
+            const singleinstance = document.getElementById('debt-singleinstance').checked;
+
+            let score = "Low";
+            let failure = "None predicted under standard test parameters.";
+            let recommendation = "Software blueprint optimized.";
+
+            let dangerCount = (monolith?1:0) + (nocache?1:0) + (directdb?1:0) + (singleinstance?1:0);
+
+            if (dangerCount >= 3) {
+                score = "CRITICAL LIMIT RISK";
+                failure = "Database saturation > 15k users; single point bottleneck collapse.";
+                recommendation = "Introduce caching layers, sharded persistence, and scale instances.";
+            } else if (dangerCount >= 1) {
+                score = "MODERATE RISK";
+                failure = "Connection pools saturated under peak request concurrent loads.";
+                recommendation = "Implement Redis caching on query layers to shield the database.";
+            }
+
+            const view = document.getElementById('debt-details');
+            view.innerHTML = `
+                <div class="detail-row"><span class="telemetry-label">Architecture Debt Rating</span><span class="telemetry-value" style="color:${dangerCount >= 3 ? '#ff3366' : dangerCount >= 1 ? '#ffaa00' : '#00ffaa'};">${score}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Predicted Failure Target</span><span class="telemetry-value" style="font-size:0.72rem; color:#ffffff; max-width:60%; text-align:right;">${failure}</span></div>
+                <div style="margin-top:0.4rem; font-size:0.72rem; color:var(--text-secondary);">Recommendation: <span style="color:#ffffff;">${recommendation}</span></div>
+            `;
+            logEvent(`[Debt Detector] Re-calculated architectural risks. Checked ${dangerCount} anti-patterns.`, 'terminal-warn');
+        }
+
+        // Delivery Confidence estimation
+        function calculateDeliveryConfidence() {
+            const monolith = document.getElementById('debt-monolith').checked;
+            const nocache = document.getElementById('debt-nocache').checked;
+            const directdb = document.getElementById('debt-directdb').checked;
+            const singleinstance = document.getElementById('debt-singleinstance').checked;
+            let complexityLevel = activeStack === 'go' ? 72 : activeStack === 'node' ? 48 : 35;
+
+            let dangerCount = (monolith?1:0) + (nocache?1:0) + (directdb?1:0) + (singleinstance?1:0);
+            
+            // confidence starts at 95%, drops with complexity and debt
+            let confidence = Math.round(95 - (complexityLevel * 0.3) - (dangerCount * 6));
+            let burden = complexityLevel > 60 ? "High" : "Moderate";
+            let integration = complexityLevel > 50 ? "High" : "Low";
+
+            const view = document.getElementById('delivery-risk-details');
+            view.innerHTML = `
+                <div style="font-weight:bold; color:#ffffff; margin-bottom:0.3rem;">Delivery Risk Estimation</div>
+                <div class="detail-row"><span class="telemetry-label">Delivery Confidence Score</span><span class="telemetry-value text-neon">${confidence}%</span></div>
+                <div class="detail-row"><span class="telemetry-label">Dependency / Integration Risk</span><span class="telemetry-value">${burden} / ${integration}</span></div>
+                <div class="detail-row"><span class="telemetry-label">Est. Development Effort</span><span class="telemetry-value" style="color:#ffaa00;">${Math.round(complexityLevel * 1.5)} Person-Days</span></div>
+            `;
+        }
+
+        // Sprint Simulator Logic
+        let sprintActive = false;
+        function startSprintSimulation() {
+            if (sprintActive) return;
+            sprintActive = true;
+
+            const consoleView = document.getElementById('sprint-console-view');
+            const btn = document.getElementById('sprint-btn');
+            btn.disabled = true;
+
+            consoleView.innerHTML = `[SPRINT] Starting sprint execution loop...\n[STAGE 1] Mocking APIs & Interface Contracts...`;
+            logEvent('[Sprint Simulator] Initializing Software Sprint. API contracts locked.', 'terminal-info');
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[STAGE 2] Implementing Core Logic & Middleware layers...`;
+                logEvent('[Sprint Simulator] Compiling controllers, service modules, and configuration bindings.', 'terminal-info');
+            }, 1000);
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[STAGE 3] Running Automated Unit and Integration Tests...`;
+                logEvent('[Sprint Simulator] Executing test runner checks (142 test specs passing).', 'terminal-info');
+            }, 2000);
+
+            setTimeout(() => {
+                consoleView.innerHTML += `\n[SUCCESS] CI/CD Compilation complete. Target packages deployed.\n[STATS] Blocker resolution: 100% | Delay Risk: None`;
+                logEvent('[SUCCESS] Software sprint successfully completed. Artifact package uploaded.', 'terminal-success');
+                btn.disabled = false;
+                sprintActive = false;
+            }, 3200);
+        }
+
+        // Initial setup loads
+        analyzeRequirements();
+        runDebtAudit();
+    </script>
+</body>
+</html>

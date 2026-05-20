@@ -6,8 +6,12 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 function requireCsrf(req, res, next) {
   if (SAFE_METHODS.has(req.method)) return next();
 
-  if (!req.auth || req.auth.authSource !== 'cookie') {
-    return fail(res, 403, 'CSRF requires cookie authentication');
+  if (!req.auth) {
+    return fail(res, 401, 'Authentication required');
+  }
+
+  if (req.auth.authSource !== 'cookie') {
+    return next();
   }
 
   const cookieToken = req.cookies[env.csrfCookieName];

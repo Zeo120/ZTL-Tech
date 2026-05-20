@@ -64,7 +64,9 @@
         const errorBox = document.getElementById('login-error');
         const loginButton = document.getElementById('login-button');
         const loginButtonText = document.getElementById('login-button-text');
-        const LOGIN_ENDPOINT = 'http://localhost:3000/api/auth/login';
+        const origin = window.location.origin;
+        const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+        const LOGIN_ENDPOINT = `${apiBase}/api/auth/login`;
 
         function setError(message) {
             errorBox.textContent = message;
@@ -130,9 +132,14 @@
                     return;
                 }
 
-                window.location.href = './super_admin.html';
+                const userRole = payload.data && payload.data.user && payload.data.user.role;
+                if (userRole === 'super_admin' || userRole === 'super-admin') {
+                    window.location.href = './super_admin.html';
+                } else {
+                    window.location.href = './admin.html';
+                }
             } catch (error) {
-                setError('Unable to connect to the authentication server. Confirm the backend is running on http://localhost:3000.');
+                setError('Unable to connect to the authentication server. Confirm the backend is running.');
             } finally {
                 setLoading(false);
             }

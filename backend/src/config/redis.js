@@ -16,6 +16,10 @@ async function getRedisClient() {
 
   connecting = client.connect()
     .then(() => client)
+    .catch((error) => {
+      client = undefined;
+      throw error;
+    })
     .finally(() => {
       connecting = undefined;
     });
@@ -24,8 +28,16 @@ async function getRedisClient() {
 }
 
 async function closeRedisClient() {
-  if (!client || !client.isOpen) return;
-  await client.quit();
+  if (!client) return;
+  try {
+    if (client.isOpen) {
+      await client.quit();
+    }
+  } catch (error) {
+    logger.error('redis_client_close_failed', { error });
+  } finally {
+    client = undefined;
+  }
 }
 
 async function withRedis(operation) {

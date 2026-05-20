@@ -268,23 +268,42 @@ amily=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
             });
         }
 
-        // Intersection Observer for Smooth Scroll Animations
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -40px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
+        // Force all hero section elements to be visible immediately on load to prevent viewport blackouts
+        const forceHeroVisible = () => {
+            document.querySelectorAll('.hero .animate').forEach(el => {
+                el.classList.add('visible');
             });
-        }, observerOptions);
+        };
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', forceHeroVisible);
+        } else {
+            forceHeroVisible();
+        }
 
-        document.querySelectorAll('.animate').forEach(element => {
-            observer.observe(element);
-        });
+        // Intersection Observer for Smooth Scroll Animations (with viewport fallback)
+        try {
+            const observerOptions = {
+                threshold: 0.05,
+                rootMargin: '0px 0px -10px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate').forEach(element => {
+                observer.observe(element);
+            });
+        } catch(e) {
+            document.querySelectorAll('.animate').forEach(el => {
+                el.classList.add('visible');
+            });
+        }
     </script>
 </body>
 </html>
+

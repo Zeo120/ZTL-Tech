@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZTL Tech | Unified ADMIN Console</title>
+    <meta name="description" content="Secure post-login multi-tenant administrative dashboard for ZTL Tech portals.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header-bar {
+            background: rgba(3, 3, 3, 0.75);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; box-shadow: 0 0 4px #00f3ff; }
+            100% { opacity: 1; box-shadow: 0 0 12px #00f3ff; }
+        }
+
+        /* Responsive Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .portal-widget {
+            background: rgba(3, 3, 3, 0.85);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .portal-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        /* Widget Custom Borders */
+        .widget-paradigm::before { background: #ffffff; }
+        .widget-phasr::before { background: #ff003c; }
+        .widget-grid::before { background: #ffaa00; }
+        .widget-scalpel::before { background: #00f3ff; }
+
+        .portal-widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        }
+
+        .widget-title-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .widget-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .widget-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.85rem;
+        }
+
+        .telemetry-row:last-child {
+            border-bottom: none;
+        }
+
+        .telemetry-label {
+            color: var(--text-secondary);
+        }
+
+        .telemetry-value {
+            font-weight: 700;
+            color: #ffffff;
+            font-family: monospace;
+        }
+
+        /* Action Panel */
+        .control-panel {
+            background: rgba(3, 3, 3, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        @media (max-width: 900px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-header {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Live Terminal console */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #00f3ff;
+            height: 250px;
+            overflow-y: auto;
+            text-align: left;
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-info { color: #88c0d0; }
+        .terminal-warn { color: #ebcb8b; }
+        .terminal-error { color: #bf616a; }
+        .terminal-success { color: #a3be8c; }
+
+        .btn-action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-panel {
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-panel:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00f3ff;
+            transform: scale(1.02);
+        }
+
+        .btn-panel svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="user-badge">
+            <div class="status-dot"></div>
+            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">ADMIN SESSION</span>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Dashboard Top Header Bar -->
+        <div class="header-bar">
+            <div style="text-align: left;">
+                <h1 style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: #ffffff;">ADMIN DASHBOARD</h1>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Multi-tenant cluster monitoring and standard administrative control room.</p>
+            </div>
+            <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 0.6rem 1.4rem; font-size: 0.85rem;" onclick="alert('ADMIN session safely terminated. Cached session tokens cleared.');">Terminate Session (Logout)</a>
+        </div>
+
+        <!-- Telemetry Cards Grid -->
+        <div class="dashboard-grid">
+            <!-- Paradigm Node -->
+            <div class="portal-widget widget-paradigm">
+                <div class="widget-title-group">
+                    <h2 class="widget-title" style="color: #ffffff;">PARADIGM</h2>
+                    <span class="widget-badge" style="background: rgba(255, 255, 255, 0.05); color: #ffffff;">SaaS Node</span>
+                </div>
+                <div class="widget-telemetry">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Active CRMs</span>
+                        <span class="telemetry-value">12 / 12</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Worker Load</span>
+                        <span class="telemetry-value">14.2%</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Worker Memory</span>
+                        <span class="telemetry-value">1.05MB / 80MB</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Status</span>
+                        <span class="telemetry-value" style="color: #00ffaa;">NOMINAL</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASR Node -->
+            <div class="portal-widget widget-phasr">
+                <div class="widget-title-group">
+                    <h2 class="widget-title" style="color: #ff003c;">PHASR</h2>
+                    <span class="widget-badge" style="background: rgba(255, 0, 60, 0.08); color: #ff5376;">Security Shield</span>
+                </div>
+                <div class="widget-telemetry">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Threats Blocked</span>
+                        <span class="telemetry-value">142,910</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Audit Scan Rating</span>
+                        <span class="telemetry-value">100 / 100</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Zero-Trust Vault</span>
+                        <span class="telemetry-value">LOCKED</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Shield Defense</span>
+                        <span class="telemetry-value" style="color: #00ffaa;">100% SECURE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID Node -->
+            <div class="portal-widget widget-grid">
+                <div class="widget-title-group">
+                    <h2 class="widget-title" style="color: #ffaa00;">GRID</h2>
+                    <span class="widget-badge" style="background: rgba(255, 170, 0, 0.08); color: #ffbb33;">Topologies</span>
+                </div>
+                <div class="widget-telemetry">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Mesh Clusters</span>
+                        <span class="telemetry-value">8 / 8</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Consensus Latency</span>
+                        <span class="telemetry-value">42 ms</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Raft Sync State</span>
+                        <span class="telemetry-value" style="color: #777777;">FOLLOWER</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Replication</span>
+                        <span class="telemetry-value" style="color: #00ffaa;">SYNCHRONIZED</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCALPEL Node -->
+            <div class="portal-widget widget-scalpel">
+                <div class="widget-title-group">
+                    <h2 class="widget-title" style="color: #00f3ff;">SCALPEL</h2>
+                    <span class="widget-badge" style="background: rgba(0, 243, 255, 0.08); color: #00ffaa;">Orchestration</span>
+                </div>
+                <div class="widget-telemetry">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Active Swarms</span>
+                        <span class="telemetry-value">4 / 4 Swarms</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Refire Triggers</span>
+                        <span class="telemetry-value">8,219 Execs</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Reflex Safety State</span>
+                        <span class="telemetry-value">NOMINAL</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Telemetry Feed</span>
+                        <span class="telemetry-value" style="color: #00ffaa;">NOMINAL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Controls & Live console Terminal -->
+        <div class="control-panel">
+            <!-- Left Side: Interactive Live console Terminal -->
+            <div style="display: flex; flex-direction: column; text-align: left;">
+                <h3 class="panel-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00f3ff;"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    Live Operations Terminal
+                </h3>
+                <div class="terminal-box" id="terminal">
+                    <div class="terminal-line terminal-info">[SYSTEM] Initializing post-auth telemetry matrices...</div>
+                    <div class="terminal-line terminal-success">[SUCCESS] ADMIN Session successfully connected from secure endpoint tunnel.</div>
+                    <div class="terminal-line">[INFO] Monitoring multi-tenant metrics. Permissions: Standard Admin.</div>
+                    <div class="terminal-line terminal-info">[INFO] Node metrics sync: 100% matched. Telemetry running...</div>
+                </div>
+            </div>
+
+            <!-- Right Side: Interactive Operations Triggers -->
+            <div style="display: flex; flex-direction: column; text-align: left;">
+                <h3 class="panel-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                    Administrative Actions
+                </h3>
+                <div class="btn-action-grid">
+                    <!-- Health Check Trigger -->
+                    <button class="btn-panel" onclick="triggerAction('health')">
+                        <svg style="color: #00f3ff;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span style="color: #00f3ff; font-size: 0.8rem;">Run Health Check</span>
+                    </button>
+
+                    <!-- Site Cache Refresh -->
+                    <button class="btn-panel" onclick="triggerAction('cache')">
+                        <svg style="color: #ffaa00;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                        <span style="color: #ffbb33; font-size: 0.8rem;">Rebuild Site Cache</span>
+                    </button>
+
+                    <!-- Refresh Swarm Telemetry -->
+                    <button class="btn-panel" onclick="triggerAction('refresh')">
+                        <svg style="color: #ff003c;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span style="color: #ff5376; font-size: 0.8rem;">Refresh Telemetry</span>
+                    </button>
+
+                    <!-- Reset Log -->
+                    <button class="btn-panel" onclick="triggerAction('reset')">
+                        <svg style="color: #ffffff;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                        <span style="color: #ffffff; font-size: 0.8rem;">Reset Terminal Feed</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 4rem; padding: 4rem 10% 2rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary);">
+        <p>© 2026 ZTL Tech Inc. Admin Audited Control Room.</p>
+    </footer>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+
+        function appendTerminalLine(text, type = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.innerHTML = `<span style="color: rgba(255,255,255,0.4)">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Action Console simulation
+        function triggerAction(action) {
+            if (action === 'health') {
+                appendTerminalLine('[ADMIN] Running database and cache ping diagnostics...', 'terminal-info');
+                setTimeout(() => {
+                    appendTerminalLine('[SUCCESS] Database & cache check: 100% healthy. Latency 2ms.', 'terminal-success');
+                }, 1000);
+            } else if (action === 'cache') {
+                appendTerminalLine('[ADMIN] Dispatching purge-cache command to front-facing CDN routes...', 'terminal-info');
+                setTimeout(() => {
+                    appendTerminalLine('[SUCCESS] Cache rebuilt. purged: 84 assets.', 'terminal-success');
+                }, 1200);
+            } else if (action === 'refresh') {
+                appendTerminalLine('[ADMIN] Pulling latest metrics feed from pipeline agent instances...', 'terminal-info');
+                setTimeout(() => {
+                    appendTerminalLine('[SUCCESS] Telemetry refreshed. No alerts triggered.', 'terminal-success');
+                }, 1400);
+            } else if (action === 'reset') {
+                terminal.innerHTML = '';
+                appendTerminalLine('[SYSTEM] Initializing post-auth telemetry matrices...', 'terminal-info');
+                appendTerminalLine('[SUCCESS] ADMIN Session successfully connected from secure endpoint tunnel.', 'terminal-success');
+            }
+        }
+
+        // Unified telemetry handler
+        function handleIncomingTelemetry(data) {
+            const { portal, type, message, stats } = data;
+            const prefix = type === 'contact' ? '🚨 LIVE TRANSMISSION' : 'HEARTBEAT';
+            appendTerminalLine(`[${portal.toUpperCase()}] ${prefix}: ${message}`, type === 'contact' ? 'terminal-success' : '');
+            
+            // Highlight card
+            const card = document.querySelector(`.widget-${portal}`);
+            if (card) {
+                card.style.borderColor = '#00f3ff';
+                card.style.boxShadow = '0 0 25px rgba(0, 243, 255, 0.25)';
+                setTimeout(() => { card.style.borderColor = ''; card.style.boxShadow = ''; }, 1000);
+            }
+        }
+
+        try {
+            const telemetryChannel = new BroadcastChannel('ztl-telemetry');
+            telemetryChannel.onmessage = (event) => {
+                handleIncomingTelemetry(event.data);
+            };
+            appendTerminalLine('[SYSTEM] Live BroadcastChannel monitoring initialized.', 'terminal-info');
+        } catch (e) {
+            appendTerminalLine('[WARN] BroadcastChannel not supported in this client.', 'terminal-warn');
+        }
+    </script>
+</body>
+</html>

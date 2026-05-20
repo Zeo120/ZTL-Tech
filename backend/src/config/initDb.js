@@ -84,7 +84,8 @@ const tables = [
         id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Pages PRIMARY KEY,
         user_id INT NOT NULL,
         title NVARCHAR(200) NOT NULL,
-        created_at DATETIME2 NOT NULL CONSTRAINT DF_Pages_created_at DEFAULT SYSUTCDATETIME()
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Pages_created_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_Pages_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
       );
     `,
     columns: [
@@ -108,7 +109,8 @@ const tables = [
         id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Widgets PRIMARY KEY,
         page_id INT NOT NULL,
         type NVARCHAR(100) NOT NULL,
-        config_json NVARCHAR(MAX) NULL
+        config_json NVARCHAR(MAX) NULL,
+        CONSTRAINT FK_Widgets_Pages FOREIGN KEY (page_id) REFERENCES dbo.Pages(id) ON DELETE CASCADE
       );
     `,
     columns: [
@@ -282,6 +284,25 @@ async function seedAdmin(pool) {
   logger.info('admin_seeded', { email: ADMIN_EMAIL, role: ADMIN_ROLE });
 }
 
+async function foreignKeyExists(pool, constraintName) {
+  const result = await pool.request()
+    .input('constraintName', sql.NVarChar(128), constraintName)
+    .query(`
+      SELECT 1 AS exists_flag
+      FROM sys.foreign_keys
+      WHERE name = @constraintName;
+    `);
+
+  return Boolean(result.recordset[0]);
+}
+
+async function ensureForeignKey(pool, tableName, constraintName, foreignKeySql) {
+  if (await foreignKeyExists(pool, constraintName)) return;
+
+  await pool.request().batch(`ALTER TABLE dbo.${tableName} ADD CONSTRAINT ${constraintName} ${foreignKeySql};`);
+  logger.info('foreign_key_created', { table: tableName, constraint: constraintName });
+}
+
 async function initDb() {
   logger.info('db_init_started');
 
@@ -298,6 +319,10 @@ async function initDb() {
   for (const table of tables) {
     await ensureIndexes(pool, table);
   }
+
+  // Ensure Foreign Key constraints for referential integrity
+  await ensureForeignKey(pool, 'Pages', 'FK_Pages_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'Widgets', 'FK_Widgets_Pages', 'FOREIGN KEY (page_id) REFERENCES dbo.Pages(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 
