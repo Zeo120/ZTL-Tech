@@ -45,13 +45,10 @@ function createApp() {
   app.use('/phasr', express.static(path.join(frontendPath, 'phasr')));
   app.use('/scalpel', express.static(path.join(frontendPath, 'scalpel')));
   app.use('/ztl_tech', express.static(path.join(frontendPath, 'ztl_tech')));
-  app.get('/style.css', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'style.css'));
-  });
 
   // Main pages
   app.get('/', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
+    res.redirect('/ztl_tech/index.html');
   });
 
   app.get('/phasr', (_req, res) => {

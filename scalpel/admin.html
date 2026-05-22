@@ -500,12 +500,17 @@
     <script>
         const terminal = document.getElementById('terminal');
         
+        const MAX_LOGS = 100;
         function logEvent(text, type = '') {
             const line = document.createElement('div');
             line.className = `terminal-line ${type}`;
             const timestamp = new Date().toLocaleTimeString();
             line.innerHTML = `<span style="color: rgba(0,243,255,0.5)">[${timestamp}]</span> ${text}`;
             terminal.appendChild(line);
+            
+            while (terminal.children.length > MAX_LOGS) {
+                terminal.removeChild(terminal.firstChild);
+            }
             terminal.scrollTop = terminal.scrollHeight;
         }
 
@@ -534,7 +539,7 @@
         }
 
         function dispatchAgentSwarm() {
-            if (swarmTimer) clearInterval(swarmTimer);
+            if (swarmTimer) clearTimeout(swarmTimer);
             resetDAGNodes();
 
             activeGoal = document.getElementById('swarm-goal').value;

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASR | Telemetry Stats for Nerds</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            padding-top: 80px;
+            font-family: var(--font-main);
+            background-color: #030303;
+            color: #ffffff;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--surface-border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.02);
+        }
+
+        .stats-title-group h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-title-group p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cyber-card {
+            background: rgba(10, 10, 10, 0.85);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            margin-bottom: 2rem;
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-primary);
+        }
+
+        .cyber-card.secure::before {
+            background: #00ffaa;
+            box-shadow: 0 0 8px #00ffaa;
+        }
+
+        .cyber-card.warning::before {
+            background: #ffaa00;
+            box-shadow: 0 0 8px #ffaa00;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title span.badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 3px;
+            font-weight: 900;
+        }
+
+        .badge.secure {
+            background: rgba(0, 255, 170, 0.1);
+            color: #00ffaa;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+        }
+
+        .badge.warning {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .badge.vulnerable {
+            background: rgba(255, 0, 60, 0.1);
+            color: var(--accent-primary);
+            border: 1px solid var(--surface-border);
+        }
+
+        .telemetry-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .telemetry-table th {
+            text-align: left;
+            padding: 0.6rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .telemetry-table td {
+            padding: 0.75rem 0.6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .telemetry-table tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .pipeline-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pipeline-step {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 0.8rem 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 0, 60, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+
+        .step-num.active {
+            background: rgba(0, 255, 170, 0.15);
+            color: #00ffaa;
+            border-color: #00ffaa;
+            box-shadow: 0 0 6px rgba(0, 255, 170, 0.3);
+        }
+
+        .step-info h4 {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.15rem;
+        }
+
+        .step-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-badge-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-badge-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-badge-card .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #00ffaa;
+            margin-bottom: 0.25rem;
+            font-family: monospace;
+        }
+
+        .stat-badge-card .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .priority-rule {
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.01);
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.8rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .priority-rule.hit {
+            border-left-color: #00ffaa;
+            background: rgba(0, 255, 170, 0.02);
+        }
+
+        .priority-rule.miss {
+            opacity: 0.6;
+        }
+
+        .priority-rule h5 {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .priority-rule h5 span {
+            font-size: 0.65rem;
+            font-family: monospace;
+        }
+
+        .priority-rule p {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo-group" aria-label="PHASR Shield Home">
+            <div class="logo-diamond"></div>
+            <div class="logo-text">PHASR<span class="logo-separator">/</span>SHIELD</div>
+        </a>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <a href="admin.html" class="btn-back">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="stats-container">
+        <div class="stats-header">
+            <div class="stats-title-group">
+                <h1 id="telemetry-main-title">Telemetry Stats for Nerds</h1>
+                <p id="target-subtitle">Target: [Loading...] | Network Verification Insights</p>
+            </div>
+            <div id="safety-badge-container">
+                <span class="badge" style="font-size:1.1rem; padding:0.4rem 1rem;">STATUS LOADING</span>
+            </div>
+        </div>
+
+        <div class="stat-badge-row">
+            <div class="stat-badge-card">
+                <div class="value" id="val-files-scanned">...</div>
+                <div class="label">Files Scanned</div>
+            </div>
+            <div class="stat-badge-card">
+                <div class="value" id="val-vulns-found">0</div>
+                <div class="label">Vulnerabilities Found</div>
+            </div>
+            <div class="stat-badge-card">
+                <div class="value" id="val-critical">0</div>
+                <div class="label">Critical / Warnings</div>
+            </div>
+        </div>
+
+        <div id="codebase-report-view">
+            <!-- Loading layout -->
+            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                Loading telemetry logs and reporting streams...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Retrieve reports
+            const auditDataStr = localStorage.getItem('latestAuditReport');
+            const codebaseDataStr = localStorage.getItem('latestCodebaseReport');
+
+            // Determine mode. Check query param or select most relevant report.
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get('mode') || (codebaseDataStr ? 'codebase' : 'audit');
+
+            if (mode === 'codebase' && codebaseDataStr) {
+                renderCodebaseReport(JSON.parse(codebaseDataStr));
+            } else if (auditDataStr) {
+                renderAuditReport(JSON.parse(auditDataStr));
+            } else if (codebaseDataStr) {
+                renderCodebaseReport(JSON.parse(codebaseDataStr));
+            } else {
+                document.getElementById('target-subtitle').innerText = "No scan data available. Return to Dashboard to run a scan.";
+                document.getElementById('codebase-report-view').innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        No telemetry logs or reports found in local memory storage.
+                    </div>
+                `;
+            }
+        });
+
+        function renderAuditReport(report) {
+            document.title = "PHASR Shield | Cache State Audit Telemetry";
+            document.getElementById('telemetry-main-title').innerText = "Cache State Audit Telemetry";
+            document.getElementById('target-subtitle').innerText = `Target: ${report.domainName} | Active TLS Audited Status`;
+            
+            const badgeContainer = document.getElementById('safety-badge-container');
+            let badgeClass = 'badge secure';
+            if (report.safetyStatus === 'WARNING') badgeClass = 'badge warning';
+            else if (report.safetyStatus === 'VULNERABLE') badgeClass = 'badge vulnerable';
+            badgeContainer.innerHTML = `<span class="${badgeClass}">${report.safetyStatus}</span>`;
+
+            document.getElementById('val-files-scanned').innerText = report.classifiedIntent;
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(1) .label').innerText = "Classified Intent";
+
+            document.getElementById('val-vulns-found').innerText = `${report.latency} ms`;
+            document.getElementById('val-vulns-found').style.color = '#00ffaa';
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(2) .label').innerText = "Response Latency";
+
+            document.getElementById('val-critical').innerText = report.latency > 0 ? "HTTP/1.1 TLS 1.3" : "Fallback Emulated";
+            document.getElementById('val-critical').style.color = '#ffffff';
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(3) .label').innerText = "Transport Protocol";
+
+            const findingsHTML = (report.findings && report.findings.length > 0)
+                ? report.findings.map(f => {
+                    let prefixColor = '#ff3366';
+                    if (f.startsWith('SECURE')) prefixColor = '#00ffaa';
+                    if (f.startsWith('WARNING')) prefixColor = '#ffaa00';
+                    return `
+                        <div style="padding: 0.6rem; border-radius: 4px; background: rgba(255,255,255,0.02); margin-bottom: 0.5rem; border-left: 3px solid ${prefixColor};">
+                            <span style="font-weight:bold; color:${prefixColor};">${f.split(':')[0]}:</span> ${f.split(':').slice(1).join(':') || ''}
+                        </div>
+                    `;
+                  }).join('')
+                : `<div style="color:#00ffaa; text-align:center; padding:1rem; border:1px dashed rgba(0,255,170,0.3); border-radius:4px;">No critical cache leaks detected. The endpoint enforces safe, zero-trust caching configuration policies.</div>`;
+
+            const tbodyRows = [];
+            const h = report.headers;
+            const headersList = [
+                { key: 'Cache-Control', val: h.cacheControl, desc: 'Controls caching permissions across proxy nodes.' },
+                { key: 'ETag', val: h.etag, desc: 'Unique fingerprint identifying the current resource version.' },
+                { key: 'Vary', val: h.vary, desc: 'Determines context variances (headers matching) for proxy caching.' },
+                { key: 'Age', val: h.age, desc: 'Indicates how many seconds the response has been cached by proxies.' },
+                { key: 'CF-Cache-Status', val: h.cfCacheStatus, desc: 'Represents Cloudflare-specific edge node hit/miss status.' },
+                { key: 'X-Cache', val: h.xCache, desc: 'Generic proxy headers reporting origin delivery stats.' }
+            ];
+            headersList.forEach(item => {
+                tbodyRows.push(`
+                    <tr>
+                        <td style="font-weight:bold; color:#00ffaa;">${item.key}</td>
+                        <td style="color:${item.val ? '#ffffff' : 'rgba(255,255,255,0.25)'};">${item.val || '[NOT OBSERVED]'}</td>
+                        <td style="color:var(--text-secondary); font-size:0.75rem;">${item.desc}</td>
+                    </tr>
+                `);
+            });
+
+            document.getElementById('codebase-report-view').innerHTML = `
+                <div class="grid-layout">
+                    <div>
+                        <div class="cyber-card">
+                            <div class="card-title">PHASR Scan Pipeline Execution</div>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1.2rem;">
+                                This details the exact steps PHASR took during the Phase -1 passive verification scan to safely derive telemetry details from the endpoint.
+                            </p>
+                            <div class="pipeline-flow">
+                                <div class="pipeline-step"><div class="step-num active">1</div><div class="step-info"><h4>Authority Verification</h4><p>DNS validation and consensus signature matching was completed. Checked consent file token binding.</p></div></div>
+                                <div class="pipeline-step"><div class="step-num active">2</div><div class="step-info"><h4>Port-Scan Assessment</h4><p>Verified socket parameters on target host. Confirmed ports 80 (HTTP) and 443 (HTTPS) are active.</p></div></div>
+                                <div class="pipeline-step"><div class="step-num active">3</div><div class="step-info"><h4>Optimized Probe Dispatch</h4><p>Dispatched HTTP <code>HEAD</code> requests first to request metadata without fetching actual page contents.</p></div></div>
+                                <div class="pipeline-step"><div class="step-num active">4</div><div class="step-info"><h4>GET Byte-Range Fallback (Safety Barrier)</h4><p>Sent a fallback <code>GET</code> request with <code>Range: bytes=0-0</code>. This secures user privacy by preventing reading the response body payload while capturing header response envelopes.</p></div></div>
+                            </div>
+                        </div>
+                        <div class="cyber-card">
+                            <div class="card-title">Observed HTTP Caching Headers</div>
+                            <table class="telemetry-table">
+                                <thead>
+                                    <tr>
+                                        <th>Header Key</th>
+                                        <th>Observed Value</th>
+                                        <th>Defensive Implication</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tbodyRows.join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="cyber-card">
+                            <div class="card-title">Classification State Machine</div>
+                            <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:1rem;">
+                                Priority rules used by the classification engine to parse headers and determine overall cache intent:
+                            </p>
+                            <div class="priority-rule" id="rule-noncache"><h5>1. Non-Cacheable Checks <span id="badge-noncache">BYPASSED</span></h5><p>Checks for presence of <code>no-store</code>, <code>no-cache</code>, or <code>Pragma: no-cache</code> directives.</p></div>
+                            <div class="priority-rule" id="rule-private"><h5>2. Private Separation <span id="badge-private">BYPASSED</span></h5><p>Verifies if the <code>private</code> directive is present, isolating content specifically to the localized user agent.</p></div>
+                            <div class="priority-rule" id="rule-shared"><h5>3. Shared Cache Checks <span id="badge-shared">BYPASSED</span></h5><p>Checks for <code>public</code> or <code>s-maxage</code> instructions enabling intermediaries to cache responses.</p></div>
+                            <div class="priority-rule" id="rule-validation"><h5>4. Conditional Validation <span id="badge-validation">BYPASSED</span></h5><p>Verifies existence of revalidation parameters like <code>must-revalidate</code>, <code>ETag</code>, or <code>Last-Modified</code>.</p></div>
+                            <div class="priority-rule" id="rule-cdn"><h5>5. Edge/CDN Cache Check <span id="badge-cdn">BYPASSED</span></h5><p>Decodes presence of cloud proxy status tags (e.g. <code>CF-Cache-Status</code>, <code>X-Cache</code>, or <code>Via</code>).</p></div>
+                        </div>
+                        <div class="cyber-card">
+                            <div class="card-title">Defensive Mitigation Action Logs</div>
+                            <div style="font-size:0.8rem; line-height:1.4; display:flex; flex-direction:column; gap:0.8rem;">
+                                ${findingsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Highlight classification rule
+            const intent = report.classifiedIntent.toLowerCase();
+            let elementId = 'rule-validation';
+            let badgeId = 'badge-validation';
+            let statusText = 'INFERRED MATCH';
+            if (intent.includes('non-cacheable')) { elementId = 'rule-noncache'; badgeId = 'badge-noncache'; statusText = 'TRIGGERED (MATCH)'; }
+            else if (intent.includes('private')) { elementId = 'rule-private'; badgeId = 'badge-private'; statusText = 'TRIGGERED (MATCH)'; }
+            else if (intent.includes('shared')) { elementId = 'rule-shared'; badgeId = 'badge-shared'; statusText = 'TRIGGERED (MATCH)'; }
+            else if (intent.includes('conditional')) { elementId = 'rule-validation'; badgeId = 'badge-validation'; statusText = 'TRIGGERED (MATCH)'; }
+            else if (intent.includes('cdn')) { elementId = 'rule-cdn'; badgeId = 'badge-cdn'; statusText = 'TRIGGERED (MATCH)'; }
+
+            const ruleEl = document.getElementById(elementId);
+            const badgeEl = document.getElementById(badgeId);
+            if (ruleEl && badgeEl) {
+                ruleEl.classList.add('hit');
+                badgeEl.innerText = statusText;
+                badgeEl.style.color = '#00ffaa';
+                badgeEl.style.fontWeight = 'bold';
+            }
+        }
+
+        let selectedFindingIndex = null;
+        let codebaseReportData = null;
+
+        function renderCodebaseReport(report) {
+            codebaseReportData = report;
+            document.title = "PHASR | Static Codebase Telemetry";
+            document.getElementById('telemetry-main-title').innerText = "Static Codebase Telemetry";
+            document.getElementById('target-subtitle').innerText = `Target Codebase: ${report.targetPath} | Focus: ${report.scanFocus.toUpperCase()}`;
+
+            const badgeContainer = document.getElementById('safety-badge-container');
+            const totalVulns = report.summary.vulnerabilitiesCount || 0;
+            let statusText = 'SECURE';
+            let badgeClass = 'badge secure';
+            if (totalVulns > 0) {
+                if (report.summary.criticalCount > 0) {
+                    statusText = 'CRITICAL VULNS';
+                    badgeClass = 'badge vulnerable';
+                } else {
+                    statusText = 'WARNINGS ACTIVE';
+                    badgeClass = 'badge warning';
+                }
+            }
+            badgeContainer.innerHTML = `<span class="${badgeClass}">${statusText}</span>`;
+
+            document.getElementById('val-files-scanned').innerText = report.summary.totalFilesScanned || 0;
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(1) .label').innerText = "Files Scanned";
+
+            const valVulns = document.getElementById('val-vulns-found');
+            valVulns.innerText = totalVulns;
+            valVulns.style.color = totalVulns > 0 ? '#ff3366' : '#00ffaa';
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(2) .label').innerText = "Vulnerabilities Found";
+
+            const criticalVal = report.summary.criticalCount || 0;
+            const warningVal = report.summary.warningCount || 0;
+            const valCrit = document.getElementById('val-critical');
+            valCrit.innerText = `${criticalVal} / ${warningVal}`;
+            valCrit.style.color = criticalVal > 0 ? '#ff3366' : (warningVal > 0 ? '#ffaa00' : '#ffffff');
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(3) .label').innerText = "Critical / Warnings";
+
+            const pipelineHTML = `
+                <div class="pipeline-flow" style="display:flex; flex-direction:row; flex-wrap:wrap; gap:0.5rem; justify-content:space-between; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:1rem;">
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(0,255,170,0.05); border:1px solid rgba(0,255,170,0.2); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:#00ffaa; font-weight:bold; font-family:monospace;">STAGE 1</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">DISCOVERY</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">Languages & Frameworks</div>
+                    </div>
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:var(--text-secondary); font-family:monospace;">STAGE 2</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">TECH STACK</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">Documentation Profiles</div>
+                    </div>
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:var(--text-secondary); font-family:monospace;">STAGE 3</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">COOKIES</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">Consent & Identifiers</div>
+                    </div>
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:var(--text-secondary); font-family:monospace;">STAGE 4</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">NETWORK</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">API Endpoints & Paths</div>
+                    </div>
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:var(--text-secondary); font-family:monospace;">STAGE 5</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">AUTH FLOW</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">Tokens & Session Mapping</div>
+                    </div>
+                    <div style="flex:1; min-width:140px; padding:0.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; text-align:center;">
+                        <div style="font-size:0.6rem; color:var(--text-secondary); font-family:monospace;">STAGE 6</div>
+                        <div style="font-size:0.75rem; font-weight:bold; margin-top:0.25rem;">REPORT</div>
+                        <div style="font-size:0.6rem; color:var(--text-secondary); margin-top:0.15rem;">Executive Summary</div>
+                    </div>
+                </div>
+            `;
+
+            if (totalVulns === 0) {
+                document.getElementById('codebase-report-view').innerHTML = `
+                    ${pipelineHTML}
+                    <div style="text-align:center; padding:4rem; border:1px dashed rgba(0,255,170,0.3); border-radius:8px; background:rgba(0,255,170,0.01);">
+                        <div style="font-size:2.5rem; color:#00ffaa; margin-bottom:1rem;">✓</div>
+                        <h3 style="font-size:1.2rem; color:#ffffff; font-weight:bold; margin-bottom:0.5rem;">Zero Vulnerabilities Detected</h3>
+                        <p style="color:var(--text-secondary); font-size:0.85rem; max-width:500px; margin:0 auto;">
+                            PHASR static analysis scan finished successfully on the codebase. No transition anomalies, hardcoded secrets, or leaky timers observed.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Build Split Layout HTML
+            document.getElementById('codebase-report-view').innerHTML = `
+                ${pipelineHTML}
+                <div style="display:grid; grid-template-columns: 0.9fr 1.1fr; gap:1.5rem; min-height: 550px;">
+                    <!-- Left Sidebar: File Tree & Findings List -->
+                    <div class="cyber-card" style="padding:1rem; margin:0; display:flex; flex-direction:column; gap:1rem;">
+                        <div style="font-weight:bold; font-size:0.85rem; letter-spacing:0.5px; text-transform:uppercase; color:#ffffff; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.5rem;">
+                            Flagged Vulnerability Indexes
+                        </div>
+                        <div id="findings-list-sidebar" style="overflow-y:auto; flex-grow:1; max-height:480px; display:flex; flex-direction:column; gap:0.5rem; padding-right:0.25rem;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Code Preview Panel -->
+                    <div class="cyber-card" id="code-preview-panel" style="padding:1rem; margin:0; display:flex; flex-direction:column; gap:1rem; border-color: rgba(255, 255, 255, 0.05);">
+                        <!-- Loaded dynamically based on selected finding -->
+                        <div style="text-align:center; margin:auto; padding:2rem; color:var(--text-secondary); font-size:0.85rem;">
+                            <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+                            Select a finding index item from the sidebar to inspect vulnerable source context lines and remediation path.
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            renderSidebarFindings();
+        }
+
+        function renderSidebarFindings() {
+            const listContainer = document.getElementById('findings-list-sidebar');
+            listContainer.innerHTML = '';
+
+            codebaseReportData.findings.forEach((f, idx) => {
+                const item = document.createElement('div');
+                item.style.padding = '0.75rem';
+                item.style.borderRadius = '4px';
+                item.style.background = (selectedFindingIndex === idx) ? 'rgba(255, 0, 60, 0.06)' : 'rgba(255,255,255,0.01)';
+                item.style.border = '1px solid';
+                item.style.borderColor = (selectedFindingIndex === idx) ? 'var(--accent-primary)' : 'rgba(255,255,255,0.04)';
+                item.style.cursor = 'pointer';
+                item.style.transition = 'all 0.2s';
+                item.style.display = 'flex';
+                item.style.flexDirection = 'column';
+                item.style.gap = '0.3rem';
+
+                let sevColor = '#a3be8c'; // Info
+                if (f.severity === 'Critical') sevColor = '#ff3366';
+                else if (f.severity === 'Warning') sevColor = '#ffaa00';
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.75rem; font-weight:800; color:${sevColor}; text-transform:uppercase; letter-spacing:0.5px;">${f.category}</span>
+                        <span style="font-size:0.62rem; font-weight:bold; background:${sevColor}20; color:${sevColor}; border:1px solid ${sevColor}40; padding:0.08rem 0.3rem; border-radius:3px;">${f.severity.toUpperCase()}</span>
+                    </div>
+                    <div style="font-size:0.75rem; font-weight:bold; color:#ffffff; font-family:monospace; word-break:break-all;">
+                        ${f.file}
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--text-secondary); display:flex; justify-content:space-between;">
+                        <span>Line: ${f.line}</span>
+                        <span style="color:#00ffaa; font-family:monospace; font-size:0.62rem;">Inspect ➔</span>
+                    </div>
+                `;
+
+                item.addEventListener('mouseenter', () => {
+                    if (selectedFindingIndex !== idx) {
+                        item.style.background = 'rgba(255,255,255,0.03)';
+                    }
+                });
+                item.addEventListener('mouseleave', () => {
+                    if (selectedFindingIndex !== idx) {
+                        item.style.background = 'rgba(255,255,255,0.01)';
+                    }
+                });
+                item.addEventListener('click', () => {
+                    selectedFindingIndex = idx;
+                    renderSidebarFindings();
+                    inspectFinding(f);
+                });
+
+                listContainer.appendChild(item);
+            });
+        }
+
+        function inspectFinding(finding) {
+            const previewPanel = document.getElementById('code-preview-panel');
+            
+            // Build remediation recommendations block
+            const remHTML = `
+                <div style="background:rgba(0, 255, 170, 0.02); border:1px solid rgba(0, 255, 170, 0.15); border-left:4px solid #00ffaa; border-radius:4px; padding:0.75rem; font-size:0.75rem; text-align:left;">
+                    <div style="font-weight:bold; color:#00ffaa; margin-bottom:0.25rem;">PHASR Mitigation Directive</div>
+                    <p style="color:#ffffff; margin:0; line-height:1.4;">${finding.remediation}</p>
+                </div>
+            `;
+
+            let sevColor = '#88c0d0'; // Info
+            if (finding.severity === 'Critical') sevColor = '#ff3366';
+            else if (finding.severity === 'Warning') sevColor = '#ffaa00';
+
+            // Check if context lines exist, otherwise fallback to displaying a simple matching code snippet
+            let previewHTML = '';
+            if (finding.context && finding.context.length > 0) {
+                // Compile context code block
+                const contextLines = finding.context.map(c => {
+                    const isTarget = (c.lineNum === finding.line);
+                    const bgStyle = isTarget ? 'background:rgba(255,0,60,0.1); border-left:3px solid var(--accent-primary);' : '';
+                    const numColor = isTarget ? 'var(--accent-primary)' : 'rgba(255,255,255,0.2)';
+                    const escapedContent = escapeHTML(c.content);
+                    
+                    return `
+                        <div style="display:grid; grid-template-columns: 35px 1fr; font-family:'Courier New', Courier, monospace; font-size:0.72rem; line-height:1.4; padding:0.08rem 0.35rem; ${bgStyle}">
+                            <span style="color:${numColor}; font-weight:bold; text-align:right; padding-right:0.6rem; user-select:none;">${c.lineNum}</span>
+                            <span style="white-space:pre; color:${isTarget ? '#ffffff' : '#b2ccd6'};">${escapedContent}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                previewHTML = `
+                    <div style="background:#050506; border:1px solid rgba(255,255,255,0.06); border-radius:6px; max-height:350px; overflow-y:auto; padding:0.5rem 0; text-align:left; box-shadow:inset 0 0 10px rgba(0,0,0,0.8);">
+                        ${contextLines}
+                    </div>
+                `;
+            } else {
+                // Fallback rendering
+                previewHTML = `
+                    <div style="background:#050506; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:1.2rem; text-align:left; font-family:monospace; font-size:0.75rem; color:#ff3366;">
+                        <span style="color:rgba(255,255,255,0.2); font-weight:bold; margin-right:0.5rem;">${finding.line}</span> ${escapeHTML(finding.code)}
+                    </div>
+                `;
+            }
+
+            previewPanel.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.5rem;">
+                    <div>
+                        <div style="font-size:0.72rem; color:var(--text-secondary); font-family:monospace;">File Target:</div>
+                        <h4 style="font-size:0.85rem; font-weight:bold; color:#ffffff; font-family:monospace; margin-top:0.15rem;">${finding.file}</h4>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.68rem; color:${sevColor}; font-weight:bold; letter-spacing:0.5px; text-transform:uppercase;">${finding.category}</div>
+                        <div style="font-size:0.62rem; color:var(--text-secondary); font-family:monospace; margin-top:0.15rem;">Line: ${finding.line}</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.5rem; flex-grow:1; justify-content:center;">
+                    <div style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary); text-align:left; margin-bottom:0.25rem;">
+                        Vulnerable Source Context Preview:
+                    </div>
+                    ${previewHTML}
+                </div>
+
+                ${remHTML}
+            `;
+        }
+
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

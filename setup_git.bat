@@ -25,7 +25,7 @@ if %errorlevel% neq 0 (
 echo.
 
 :: Stage all files
-echo [2/3] Staging all files (including index.html, style.css, .gitignore)...
+echo [2/3] Staging all files (including .gitignore)...
 git add .
 if %errorlevel% neq 0 (
     echo [ERROR] Failed to stage files.

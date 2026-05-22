@@ -98,58 +98,161 @@
             text-shadow: 0 0 5px var(--accent-glow);
         }
 
-        /* Interactive 5-Phase Security Timeline */
-        .timeline-steps {
+        /* Card Layout Dashboard Styles */
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 0.8rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 0, 60, 0.08);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .timeline-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 0.6rem 0.2rem;
-            border-radius: 6px;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-align: center;
+        @media (max-width: 900px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .phase-card {
+            background: rgba(10, 10, 10, 0.85);
+            border: 1px solid rgba(255, 0, 60, 0.15);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
             cursor: pointer;
-            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 0.3rem;
+            justify-content: space-between;
+            min-height: 180px;
         }
 
-        .timeline-btn.active {
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-primary);
+            transition: var(--transition);
+        }
+
+        .phase-card.verified::before {
+            background: #00ffaa;
+            box-shadow: 0 0 8px #00ffaa;
+        }
+
+        .phase-card.active {
             border-color: var(--accent-primary);
-            background: rgba(255, 0, 60, 0.06);
-            color: #ffffff;
-            box-shadow: 0 0 8px rgba(255, 0, 60, 0.2);
+            background: rgba(255, 0, 60, 0.04);
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.15);
+            transform: translateY(-4px);
         }
 
-        .timeline-btn.verified {
+        .phase-card.active.verified {
             border-color: #00ffaa;
-            background: rgba(0, 255, 170, 0.03);
-            color: #ffffff;
+            background: rgba(0, 255, 170, 0.02);
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.12);
         }
 
-        .timeline-btn-num {
+        .phase-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(255, 0, 60, 0.1);
+        }
+
+        .phase-card-badge {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            font-size: 0.62rem;
+            padding: 0.15rem 0.45rem;
+            border-radius: 3px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .phase-card-badge.free {
+            background: rgba(0, 255, 170, 0.1);
+            color: #00ffaa;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+        }
+
+        .phase-card-badge.premium {
+            background: rgba(255, 0, 60, 0.1);
+            color: var(--accent-primary);
+            border: 1px solid var(--surface-border);
+        }
+
+        .phase-card-num {
             font-family: monospace;
-            font-size: 0.8rem;
-            opacity: 0.7;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .phase-card-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-top: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .phase-card-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+        }
+
+        .phase-card-status {
+            font-size: 0.7rem;
+            font-weight: 800;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-indicator.ready {
+            background: var(--text-secondary);
+        }
+
+        .status-indicator.active {
+            background: #ffaa00;
+            box-shadow: 0 0 6px #ffaa00;
+        }
+
+        .status-indicator.verified {
+            background: #00ffaa;
+            box-shadow: 0 0 6px #00ffaa;
         }
 
         .phase-detail-box {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 8px;
-            padding: 1rem;
+            padding: 1.5rem;
             text-align: left;
         }
 
@@ -399,175 +502,77 @@
             <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Auditor session securely closed.');">Logout Operator</a>
         </div>
 
-        <!-- 2-Column Main Workspace -->
-        <div class="workspace-grid">
-            <!-- LEFT COLUMN -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                
-                <!-- Timeline Module -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">
-                        <span>1. PHASR Security Timeline</span>
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);" id="timeline-completion">Verification Progress: 0%</span>
-                    </h2>
-                    <div class="timeline-steps">
-                        <button class="timeline-btn active" id="btn-t-1" onclick="selectPhase(-1)">
-                            <span class="timeline-btn-num">Phase -1</span>
-                            <span style="color:#00ffaa; font-weight:bold;">Try PHASR</span>
-                        </button>
-                        <button class="timeline-btn" id="btn-t1" onclick="selectPhase(1)">
-                            <span class="timeline-btn-num">Phase 1</span>
-                            <span>Threat Model</span>
-                        </button>
-                        <button class="timeline-btn" id="btn-t2" onclick="selectPhase(2)">
-                            <span class="timeline-btn-num">Phase 2</span>
-                            <span>Hierarchy Audit</span>
-                        </button>
-                        <button class="timeline-btn" id="btn-t3" onclick="selectPhase(3)">
-                            <span class="timeline-btn-num">Phase 3</span>
-                            <span>Assumptions</span>
-                        </button>
-                        <button class="timeline-btn" id="btn-t4" onclick="selectPhase(4)">
-                            <span class="timeline-btn-num">Phase 4</span>
-                            <span>State Monitor</span>
-                        </button>
-                        <button class="timeline-btn" id="btn-t5" onclick="selectPhase(5)">
-                            <span class="timeline-btn-num">Phase 5</span>
-                            <span>Redundancy</span>
-                        </button>
-                    </div>
-
-                    <div class="phase-detail-box" id="phase-detail-view">
-                        <!-- Loaded dynamically -->
-                    </div>
+        <!-- Cards Grid: PHASE - 1 Free to Phase-5 -->
+        <div class="cards-grid">
+            <div class="phase-card active" id="card-t-1" onclick="selectPhase(-1)">
+                <div class="phase-card-badge free">FREE</div>
+                <div class="phase-card-num">PHASE - 1</div>
+                <div class="phase-card-title">PHASE - 1 Free</div>
+                <div class="phase-card-desc">Audit HTTP/HTTPS Cache State behaviors dynamically.</div>
+                <div class="phase-card-status" id="status-t-1">
+                    <span class="status-indicator active"></span> ACTIVE
                 </div>
-
-                <!-- Hierarchy Access Auditor -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">2. Hierarchy Access Auditor</h2>
-                    <div class="hierarchy-layout">
-                        <div class="role-nodes-list">
-                            <div class="role-node active" id="role-sa" onclick="selectRole('sa')">
-                                <span>Super Admin</span>
-                                <span style="font-size: 0.65rem; color: #00ffaa;">FULL ROOT</span>
-                            </div>
-                            <div class="role-node" id="role-a" onclick="selectRole('a')">
-                                <span>Admin</span>
-                                <span style="font-size: 0.65rem; color: #00ffaa;">TENANT LOCK</span>
-                            </div>
-                            <div class="role-node" id="role-s" onclick="selectRole('s')">
-                                <span>Staff</span>
-                                <span style="font-size: 0.65rem; color: #ffaa00;">VERIFIED ACCESS</span>
-                            </div>
-                            <div class="role-node danger-node" id="role-g" onclick="selectRole('g')">
-                                <span>Guest</span>
-                                <span style="font-size: 0.65rem; color: #ff3366;">RISK DETECTED</span>
-                            </div>
-                        </div>
-                        <div class="boundary-info-box" id="role-boundary-details">
-                            <!-- Dynamic -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Trust Boundary Mapper -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">3. Trust Boundary Mapper</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Click nodes on the path to audit boundaries, sensitive crossings, and attack vectors.</p>
-                    <div class="svg-container">
-                        <svg width="100%" height="90" viewBox="0 0 560 90" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Connection Lines -->
-                            <line x1="60" y1="45" x2="160" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
-                            <line x1="160" y1="45" x2="270" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
-                            <line x1="270" y1="45" x2="380" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
-                            <line x1="380" y1="45" x2="490" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
-
-                            <!-- Boundary Cross Indicators -->
-                            <line x1="110" y1="20" x2="110" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
-                            <text x="115" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
-                            
-                            <line x1="435" y1="20" x2="435" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
-                            <text x="440" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
-
-                            <!-- Node: Browser -->
-                            <rect class="svg-node" id="svg-node-browser" x="10" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('browser')" />
-                            <text x="60" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Browser</text>
-                            <text x="60" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">UNTRUSTED</text>
-
-                            <!-- Node: Gateway -->
-                            <rect class="svg-node" id="svg-node-gateway" x="110" y="20" width="100" height="50" rx="6" fill="rgba(255,0,60,0.05)" stroke="var(--accent-primary)" stroke-width="1.5" onclick="selectTrustNode('gateway')" />
-                            <text x="160" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">API Gateway</text>
-                            <text x="160" y="60" fill="rgba(0,255,170,0.8)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">VALIDATION</text>
-
-                            <!-- Node: Auth Layer -->
-                            <rect class="svg-node" id="svg-node-auth" x="220" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('auth')" />
-                            <text x="270" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Auth Layer</text>
-                            <text x="270" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">JWT TOKEN</text>
-
-                            <!-- Node: Redis -->
-                            <rect class="svg-node" id="svg-node-redis" x="330" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('redis')" />
-                            <text x="380" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Redis Cache</text>
-                            <text x="380" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">SESSION KEY</text>
-
-                            <!-- Node: Database -->
-                            <rect class="svg-node" id="svg-node-db" x="440" y="20" width="110" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('db')" />
-                            <text x="495" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Database Core</text>
-                            <text x="495" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">PERSISTENCE</text>
-                        </svg>
-                    </div>
-                    <div class="boundary-info-box" id="trust-boundary-details" style="min-height: 80px;">
-                        <!-- Dynamic -->
-                    </div>
-                </div>
-
             </div>
 
-            <!-- RIGHT COLUMN -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                
-                <!-- Assumption Dependency Graph -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">4. Assumption Dependency Graph</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Assess structural threat vulnerabilities arising from system assumptions.</p>
-                    
-                    <select class="assumption-selector" id="assumption-picker" onchange="calculateAssumptionRisk()">
-                        <option value="trust">Assumption: "Internal network traffic is trusted"</option>
-                        <option value="sanitize">Assumption: "All user input is sanitized at client-side"</option>
-                        <option value="revocation">Assumption: "Expired JWT tokens do not require instant revocation checks"</option>
-                        <option value="replica">Assumption: "Database replication backup stores are fully isolated"</option>
-                    </select>
-
-                    <div class="assumption-report" id="assumption-view">
-                        <!-- Dynamic -->
-                    </div>
+            <div class="phase-card" id="card-t1" onclick="selectPhase(1)">
+                <div class="phase-card-badge premium">PREMIUM</div>
+                <div class="phase-card-num">PHASE - 1</div>
+                <div class="phase-card-title">Phase-1</div>
+                <div class="phase-card-desc">Audit entry vector path boundary definitions.</div>
+                <div class="phase-card-status" id="status-t1">
+                    <span class="status-indicator ready"></span> READY
                 </div>
+            </div>
 
-                <!-- State Transition Vulnerability Model -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">5. State Transition Vulnerability Model</h2>
-                    <div class="transition-select">
-                        <button class="transition-btn active" id="btn-tr-gu" onclick="runTransitionAudit('gu')">guest → user</button>
-                        <button class="transition-btn" id="btn-tr-ua" onclick="runTransitionAudit('ua')">user → admin</button>
-                        <button class="transition-btn" id="btn-tr-as" onclick="runTransitionAudit('as')">admin → super-admin</button>
-                    </div>
-
-                    <div class="phase-detail-box" id="transition-report-view">
-                        <!-- Dynamic -->
-                    </div>
+            <div class="phase-card" id="card-t2" onclick="selectPhase(2)">
+                <div class="phase-card-badge premium">PREMIUM</div>
+                <div class="phase-card-num">PHASE - 2</div>
+                <div class="phase-card-title">Phase-2</div>
+                <div class="phase-card-desc">Analyze role privileges and trust boundary maps.</div>
+                <div class="phase-card-status" id="status-t2">
+                    <span class="status-indicator ready"></span> READY
                 </div>
+            </div>
 
-                <!-- Redundancy Failover Drill -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">6. Redundancy Failover Drill</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Simulate host failure on primary databases to test hot backup replica promotions.</p>
-                    
-                    <button class="btn-primary" style="padding: 0.6rem; font-size: 0.8rem; width: 100%;" id="failover-btn" onclick="startFailoverDrill()">Simulate Primary Database Failure</button>
-                    
-                    <div class="failover-display" id="failover-console">
-                        [STANDBY] Failover simulation engine loaded. Ready to inject primary failure...
-                    </div>
+            <div class="phase-card" id="card-t3" onclick="selectPhase(3)">
+                <div class="phase-card-badge premium">PREMIUM</div>
+                <div class="phase-card-num">PHASE - 3</div>
+                <div class="phase-card-title">Phase-3</div>
+                <div class="phase-card-desc">Verify threat assumptions in runtime environments.</div>
+                <div class="phase-card-status" id="status-t3">
+                    <span class="status-indicator ready"></span> READY
                 </div>
+            </div>
 
+            <div class="phase-card" id="card-t4" onclick="selectPhase(4)">
+                <div class="phase-card-badge premium">PREMIUM</div>
+                <div class="phase-card-num">PHASE - 4</div>
+                <div class="phase-card-title">Phase-4</div>
+                <div class="phase-card-desc">Monitor session state transition consistency.</div>
+                <div class="phase-card-status" id="status-t4">
+                    <span class="status-indicator ready"></span> READY
+                </div>
+            </div>
+
+            <div class="phase-card" id="card-t5" onclick="selectPhase(5)">
+                <div class="phase-card-badge premium">PREMIUM</div>
+                <div class="phase-card-num">PHASE - 5</div>
+                <div class="phase-card-title">Phase-5</div>
+                <div class="phase-card-desc">Inject database failures and verify standby failover.</div>
+                <div class="phase-card-status" id="status-t5">
+                    <span class="status-indicator ready"></span> READY
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Workspace Panel -->
+        <div class="operator-panel" id="active-phase-workspace" style="margin-bottom: 2rem;">
+            <h2 class="panel-header-title">
+                <span id="active-workspace-title">PHASE WORKSPACE</span>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);" id="timeline-completion">Verification Progress: 0%</span>
+            </h2>
+            <div class="phase-detail-box" id="phase-detail-view" style="min-height: 150px;">
+                <!-- Loaded dynamically -->
             </div>
         </div>
 
@@ -588,22 +593,28 @@
     <script>
         const terminal = document.getElementById('terminal');
         let verifiedPhases = { [-1]: false, 1: false, 2: false, 3: false, 4: false, 5: false };
+        let latestAuditReport = null;
 
+        const MAX_LOGS = 100;
         function logEvent(text, type = '') {
             const line = document.createElement('div');
             line.className = `terminal-line ${type}`;
             const timestamp = new Date().toLocaleTimeString();
             line.innerHTML = `<span style="color: rgba(255,0,60,0.5)">[${timestamp}]</span> ${text}`;
             terminal.appendChild(line);
+            
+            while (terminal.children.length > MAX_LOGS) {
+                terminal.removeChild(terminal.firstChild);
+            }
             terminal.scrollTop = terminal.scrollHeight;
         }
 
         // 5-Phase Timeline Data + Phase -1 (Free Audit)
         const phasesData = {
             [-1]: {
-                title: "Phase -1: Try PHASR (Free Audit Target Registration)",
+                title: "PHASE - 1 Free: Try PHASR (Passive Cache Audit)",
                 objective: "Provide public domain credentials and verify authority to run free defensive checks.",
-                btnText: "Activate Free Audit Scan"
+                btnText: "Start PHASE -1 Testing"
             },
             1: {
                 title: "Phase 1: Threat Model",
@@ -615,7 +626,7 @@
                 btnText: "Audit Threat Model Bounds"
             },
             2: {
-                title: "Phase 2: Hierarchy Audit",
+                title: "Phase 2: Hierarchy Audit & Privilege Boundaries",
                 objective: "Trace privilege boundaries, access hierarchy depths, and check permissions maps.",
                 riskScore: "42 / 100",
                 blastRadius: "Critical (Privilege escalation path)",
@@ -655,43 +666,234 @@
         let currentPhase = -1;
         function selectPhase(num) {
             currentPhase = num;
-            document.querySelectorAll('.timeline-btn').forEach((btn) => {
-                if (btn.id === `btn-t${num}`) {
-                    btn.classList.add('active');
+            document.querySelectorAll('.phase-card').forEach((card) => {
+                const targetId = num === -1 ? 'card-t-1' : `card-t${num}`;
+                if (card.id === targetId) {
+                    card.classList.add('active');
                 } else {
-                    btn.classList.remove('active');
+                    card.classList.remove('active');
                 }
             });
 
+            // Update workspace header title
+            const titles = {
+                [-1]: "Phase -1 Free: Try PHASR (Passive Cache Audit)",
+                1: "Phase 1: Threat Model Boundary Audit",
+                2: "Phase 2: Hierarchy Privilege Boundaries & Trust Map",
+                3: "Phase 3: Threat Assumption Dependency Graph",
+                4: "Phase 4: State Transition Consistency Monitor",
+                5: "Phase 5: Redundancy Failover Drill Engine"
+            };
+            const workspaceTitle = document.getElementById('active-workspace-title');
+            if (workspaceTitle) {
+                workspaceTitle.innerText = titles[num] || "PHASR WORKSPACE";
+            }
+
             const data = phasesData[num];
             const detailView = document.getElementById('phase-detail-view');
+            if (!detailView) return;
             
             if (num === -1) {
+                if (latestAuditReport) {
+                    const headersDetails = [];
+                    if (latestAuditReport.headers.cacheControl) headersDetails.push("<div>Cache-Control: " + latestAuditReport.headers.cacheControl + "</div>");
+                    if (latestAuditReport.headers.etag) headersDetails.push("<div>ETag: " + latestAuditReport.headers.etag + "</div>");
+                    if (latestAuditReport.headers.vary) headersDetails.push("<div>Vary: " + latestAuditReport.headers.vary + "</div>");
+                    if (latestAuditReport.headers.age) headersDetails.push("<div>Age: " + latestAuditReport.headers.age + "</div>");
+                    if (latestAuditReport.headers.cfCacheStatus) headersDetails.push("<div>CF-Cache-Status: " + latestAuditReport.headers.cfCacheStatus + "</div>");
+                    if (latestAuditReport.headers.xCache) headersDetails.push("<div>X-Cache: " + latestAuditReport.headers.xCache + "</div>");
+                    if (headersDetails.length === 0) headersDetails.push("<div>[No standard caching headers observed]</div>");
+
+                    const findingsList = latestAuditReport.findings && latestAuditReport.findings.length > 0
+                        ? latestAuditReport.findings.map(f => {
+                            const color = f.startsWith('SECURE') ? '#00ffaa' : (f.startsWith('WARNING') ? '#ffaa00' : '#ff3366');
+                            return "<div style='font-size:0.72rem; color:" + color + "; margin-top:0.25rem;'>" + f + "</div>";
+                          }).join('')
+                        : "<div style='font-size:0.72rem; color:#00ffaa; margin-top:0.25rem;'>SECURE: No cache leak or configuration defects detected.</div>";
+
+                    detailView.innerHTML = `
+                        <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">Phase -1 Audit Complete: ${latestAuditReport.domainName}</div>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">HTTP/HTTPS Cache State Audit insights fed directly from scanning engine output:</p>
+                        
+                        <div class="detail-row"><span class="telemetry-label">Classified Intent</span><span class="telemetry-value text-neon" style="font-weight:bold; text-transform:uppercase;">${latestAuditReport.classifiedIntent}</span></div>
+                        <div class="detail-row"><span class="telemetry-label">Request Latency</span><span class="telemetry-value" style="color:#00ffaa;">${latestAuditReport.latency} ms</span></div>
+                        <div class="detail-row"><span class="telemetry-label">Safety Status</span><span class="telemetry-value" style="color:${latestAuditReport.safetyStatus === 'SECURE' ? '#00ffaa' : (latestAuditReport.safetyStatus === 'WARNING' ? '#ffaa00' : '#ff3366')}; font-weight:bold;">${latestAuditReport.safetyStatus}</span></div>
+                        
+                        <div style="margin-top:0.8rem;">
+                            <span style="font-size:0.75rem; font-weight:bold; color:#ffffff;">Observed Cache Headers:</span>
+                            <div style="background:rgba(0,0,0,0.5); padding:0.5rem; border-radius:4px; font-family:monospace; font-size:0.68rem; margin-top:0.3rem; border:1px solid rgba(255,255,255,0.05); color:#00ffaa;">
+                                ${headersDetails.join('')}
+                            </div>
+                        </div>
+
+                        <div style="margin-top:0.8rem;">
+                            <span style="font-size:0.75rem; font-weight:bold; color:#ffffff;">Defensive Findings:</span>
+                            ${findingsList}
+                            <button class="btn-primary" id="stats-nerds-btn" style="width:100%; margin-top:1.2rem; padding:0.5rem; font-size:0.75rem; background:rgba(0, 255, 170, 0.04); border-color:rgba(0, 255, 170, 0.3); color:#00ffaa;" onclick="openNerdStatsPage()">Stats for Nerds</button>
+                        </div>
+                        <button class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;" onclick="resetFreeAuditForm()">Scan Another Target</button>
+                    `;
+                } else {
+                    detailView.innerHTML = `
+                        <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                        
+                        <form id="free-audit-form" onsubmit="event.preventDefault(); submitFreeAudit();" style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-top:0.5rem;">
+                            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">1. Public Domain Name</label>
+                                <input type="text" id="audit-domain" placeholder="e.g. yourcompany.com" required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%;">
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">2. Proof of Access to Domain (DNS Verification)</label>
+                                <textarea id="audit-proof" placeholder="e.g. Enter DNS TXT record ztl-verification=xxx, or verify file route credentials..." required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%; height:50px; resize:none; font-family:monospace;"></textarea>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">3. Signed Consent Agreement</label>
+                                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.2rem;">
+                                    <a href="ztl_consent_agreement.txt" download class="btn-primary" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.68rem; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15);">Download Agreement</a>
+                                </div>
+                                <input type="file" id="audit-file" style="font-size:0.7rem; color:var(--text-secondary);" required>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;">${data.btnText}</button>
+                        </form>
+                    `;
+                }
+            } else if (num === 2) {
                 detailView.innerHTML = `
                     <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
                     <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
                     
-                    <form id="free-audit-form" onsubmit="event.preventDefault(); submitFreeAudit();" style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-top:0.5rem;">
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">1. Public Domain Name</label>
-                            <input type="text" id="audit-domain" placeholder="e.g. yourcompany.com" required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%;">
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">2. Proof of Access to Domain (DNS Verification)</label>
-                            <textarea id="audit-proof" placeholder="e.g. Enter DNS TXT record ztl-verification=xxx, or verify file route credentials..." required style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.45rem; color:#fff; font-size:0.75rem; width:100%; height:50px; resize:none; font-family:monospace;"></textarea>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                            <label style="font-size:0.7rem; color:var(--text-secondary); font-weight:bold;">3. Signed Consent Agreement</label>
-                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.2rem;">
-                                <a href="ztl_consent_agreement.txt" download class="btn-primary" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.68rem; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15);">Download Agreement</a>
+                    <div class="hierarchy-layout" style="margin-bottom:1.5rem;">
+                        <div class="role-nodes-list">
+                            <div class="role-node active" id="role-sa" onclick="selectRole('sa')">
+                                <span>Super Admin</span>
+                                <span style="font-size: 0.65rem; color: #00ffaa;">FULL ROOT</span>
                             </div>
-                            <input type="file" id="audit-file" style="font-size:0.7rem; color:var(--text-secondary);" required>
+                            <div class="role-node" id="role-a" onclick="selectRole('a')">
+                                <span>Admin</span>
+                                <span style="font-size: 0.65rem; color: #00ffaa;">TENANT LOCK</span>
+                            </div>
+                            <div class="role-node" id="role-s" onclick="selectRole('s')">
+                                <span>Staff</span>
+                                <span style="font-size: 0.65rem; color: #ffaa00;">VERIFIED ACCESS</span>
+                            </div>
+                            <div class="role-node danger-node" id="role-g" onclick="selectRole('g')">
+                                <span>Guest</span>
+                                <span style="font-size: 0.65rem; color: #ff3366;">RISK DETECTED</span>
+                            </div>
                         </div>
-                        <button type="submit" class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;">${data.btnText}</button>
-                    </form>
+                        <div class="boundary-info-box" id="role-boundary-details" style="min-height: 120px;">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:1.5rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:1rem;">
+                        <div style="font-size:0.85rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">Trust Boundary Mapper</div>
+                        <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.8rem;">Click nodes on the path to audit boundaries, sensitive crossings, and attack vectors.</p>
+                        <div class="svg-container">
+                            <svg width="100%" height="90" viewBox="0 0 560 90" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="60" y1="45" x2="160" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                                <line x1="160" y1="45" x2="270" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                                <line x1="270" y1="45" x2="380" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+                                <line x1="380" y1="45" x2="490" y2="45" stroke="rgba(255,0,60,0.3)" stroke-width="2" />
+
+                                <line x1="110" y1="20" x2="110" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
+                                <text x="115" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
+                                
+                                <line x1="435" y1="20" x2="435" y2="70" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,3" />
+                                <text x="440" y="28" fill="#ff3366" font-size="6" font-family="monospace">TRUST CROSSING</text>
+
+                                <rect class="svg-node" id="svg-node-browser" x="10" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('browser')" />
+                                <text x="60" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Browser</text>
+                                <text x="60" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">UNTRUSTED</text>
+
+                                <rect class="svg-node" id="svg-node-gateway" x="110" y="20" width="100" height="50" rx="6" fill="rgba(255,0,60,0.05)" stroke="var(--accent-primary)" stroke-width="1.5" onclick="selectTrustNode('gateway')" />
+                                <text x="160" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">API Gateway</text>
+                                <text x="160" y="60" fill="rgba(0,255,170,0.8)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">VALIDATION</text>
+
+                                <rect class="svg-node" id="svg-node-auth" x="220" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('auth')" />
+                                <text x="270" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Auth Layer</text>
+                                <text x="270" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">JWT TOKEN</text>
+
+                                <rect class="svg-node" id="svg-node-redis" x="330" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('redis')" />
+                                <text x="380" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Redis Cache</text>
+                                <text x="380" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">SESSION KEY</text>
+
+                                <rect class="svg-node" id="svg-node-db" x="440" y="20" width="110" height="50" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" onclick="selectTrustNode('db')" />
+                                <text x="495" y="48" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" pointer-events="none">Database Core</text>
+                                <text x="495" y="60" fill="rgba(255,255,255,0.4)" font-size="6" font-family="monospace" text-anchor="middle" pointer-events="none">PERSISTENCE</text>
+                            </svg>
+                        </div>
+                        <div class="boundary-info-box" id="trust-boundary-details" style="min-height: 80px; margin-top:0.8rem;">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" style="width:100%; margin-top:1.5rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(2)">${data.btnText}</button>
+                `;
+                setTimeout(() => {
+                    selectRole('sa');
+                    selectTrustNode('browser');
+                }, 0);
+            } else if (num === 3) {
+                detailView.innerHTML = `
+                    <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-bottom:1rem;">
+                        <select class="assumption-selector" id="assumption-picker" onchange="calculateAssumptionRisk()">
+                            <option value="trust">Assumption: "Internal network traffic is trusted"</option>
+                            <option value="sanitize">Assumption: "All user input is sanitized at client-side"</option>
+                            <option value="revocation">Assumption: "Expired JWT tokens do not require instant revocation checks"</option>
+                            <option value="replica">Assumption: "Database replication backup stores are fully isolated"</option>
+                        </select>
+                        <div class="assumption-report" id="assumption-view">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(3)">${data.btnText}</button>
+                `;
+                setTimeout(() => {
+                    calculateAssumptionRisk();
+                }, 0);
+            } else if (num === 4) {
+                detailView.innerHTML = `
+                    <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-bottom:1rem;">
+                        <div class="transition-select">
+                            <button class="transition-btn active" id="btn-tr-gu" onclick="runTransitionAudit('gu')">guest → user</button>
+                            <button class="transition-btn" id="btn-tr-ua" onclick="runTransitionAudit('ua')">user → admin</button>
+                            <button class="transition-btn" id="btn-tr-as" onclick="runTransitionAudit('as')">admin → super-admin</button>
+                        </div>
+                        <div class="phase-detail-box" id="transition-report-view">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(4)">${data.btnText}</button>
+                `;
+                setTimeout(() => {
+                    runTransitionAudit('gu');
+                }, 0);
+            } else if (num === 5) {
+                detailView.innerHTML = `
+                    <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${data.objective}</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:0.8rem; text-align:left; margin-bottom:1.5rem;">
+                        <button class="btn-primary" style="padding: 0.6rem; font-size: 0.8rem; width: 100%;" id="failover-btn" onclick="startFailoverDrill()">Simulate Primary Database Failure</button>
+                        <div class="failover-display" id="failover-console">
+                            [STANDBY] Failover simulation engine loaded. Ready to inject primary failure...
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAudit(5)">${data.btnText}</button>
                 `;
             } else {
-                const checksList = data.checks.map(c => `<div style="font-size:0.75rem; color:${c.startsWith('✓') ? '#00ffaa' : '#ff3366'}; margin-top:0.3rem;">${c}</div>`).join('');
+                const checksList = data.checks.map(c => "<div style='font-size:0.75rem; color:" + (c.startsWith('✓') ? '#00ffaa' : '#ff3366') + "; margin-top:0.3rem;'>" + c + "</div>").join('');
                 
                 detailView.innerHTML = `
                     <div style="font-size: 0.95rem; font-weight:bold; margin-bottom:0.5rem; color:#ffffff;">${data.title}</div>
@@ -709,16 +911,22 @@
         }
 
         function runPhaseAudit(num) {
-            logEvent(`[PHASR Timeline] Initiating active audits for Phase ${num}: ${phasesData[num].title}...`, 'terminal-info');
+            logEvent("[PHASR Timeline] Initiating active audits for Phase " + num + ": " + phasesData[num].title + "...", 'terminal-info');
             
             setTimeout(() => {
                 verifiedPhases[num] = true;
-                const btn = document.getElementById(`btn-t${num}`);
-                btn.classList.add('verified');
+                const card = num === -1 ? document.getElementById('card-t-1') : document.getElementById("card-t" + num);
+                if (card) {
+                    card.classList.add('verified');
+                    const statusText = card.querySelector('.phase-card-status');
+                    if (statusText) {
+                        statusText.innerHTML = '<span class="status-indicator verified"></span> VERIFIED';
+                    }
+                }
                 
                 updateProgress();
                 
-                logEvent(`[SUCCESS] Phase ${num} security variables audited. Mitigations validated.`, 'terminal-success');
+                logEvent("[SUCCESS] Phase " + num + " security variables audited. Mitigations validated.", 'terminal-success');
                 selectPhase(num); // refresh view
             }, 1000);
         }
@@ -753,7 +961,14 @@
         }
 
         let displayedLogIds = new Set();
+        let logIdOrder = [];
+        let isPolling = false;
+
+        let latestCodebaseReport = null;
+
         async function pollRealLogs() {
+            if (isPolling) return;
+            isPolling = true;
             try {
                 const origin = window.location.origin;
                 const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
@@ -762,15 +977,53 @@
                     const payload = await res.json();
                     if (payload.success && payload.data && payload.data.logs) {
                         const logs = [...payload.data.logs].reverse();
+                        let addedAny = false;
                         logs.forEach(log => {
+                            if (log.action === 'phasr.vulnerability_report_generated' && log.metadata) {
+                                if (log.metadata.classifiedIntent) {
+                                    latestAuditReport = log.metadata;
+                                    verifiedPhases[-1] = true;
+                                    const card = document.getElementById('card-t-1');
+                                    if (card) {
+                                        card.classList.add('verified');
+                                        const statusText = card.querySelector('.phase-card-status');
+                                        if (statusText) {
+                                            statusText.innerHTML = '<span class="status-indicator verified"></span> VERIFIED';
+                                        }
+                                    }
+                                    updateProgress();
+                                    if (currentPhase === -1) {
+                                        selectPhase(-1);
+                                    }
+                                } else if (log.metadata.scanFocus) {
+                                    latestCodebaseReport = log.metadata;
+                                    verifiedPhases[1] = true;
+                                    const card = document.getElementById('card-t1');
+                                    if (card) {
+                                        card.classList.add('verified');
+                                        const statusText = card.querySelector('.phase-card-status');
+                                        if (statusText) {
+                                            statusText.innerHTML = '<span class="status-indicator verified"></span> VERIFIED';
+                                        }
+                                    }
+                                    updateProgress();
+                                    if (currentPhase === 1) {
+                                        selectPhase(1);
+                                    }
+                                }
+                            }
+
                             if (!displayedLogIds.has(log.id)) {
                                 displayedLogIds.add(log.id);
+                                logIdOrder.push(log.id);
+                                addedAny = true;
+                                
                                 let typeClass = 'terminal-info';
                                 if (log.action.includes('fail') || log.action.includes('error') || log.success === false) {
                                     typeClass = 'terminal-error';
-                                } else if (log.action.includes('success') || log.action.includes('complete') || log.action.includes('verified')) {
+                                } else if (log.action.includes('success') || log.action.includes('complete') || log.action.includes('verified') || log.action.includes('cloned') || log.action.includes('indexed')) {
                                     typeClass = 'terminal-success';
-                                } else if (log.action.includes('warn') || log.action.includes('setup')) {
+                                } else if (log.action.includes('warn') || log.action.includes('setup') || log.action.includes('progress') || log.action.includes('cloning') || log.action.includes('indexing')) {
                                     typeClass = 'terminal-warn';
                                 }
 
@@ -787,11 +1040,24 @@
                                 terminal.appendChild(line);
                             }
                         });
-                        terminal.scrollTop = terminal.scrollHeight;
+
+                        while (terminal.children.length > MAX_LOGS) {
+                            terminal.removeChild(terminal.firstChild);
+                        }
+                        while (logIdOrder.length > MAX_LOGS) {
+                            const oldestId = logIdOrder.shift();
+                            displayedLogIds.delete(oldestId);
+                        }
+
+                        if (addedAny) {
+                            terminal.scrollTop = terminal.scrollHeight;
+                        }
                     }
                 }
             } catch (err) {
                 console.error("Failed to poll logs", err);
+            } finally {
+                isPolling = false;
             }
         }
 
@@ -830,11 +1096,6 @@
                     logEvent(`[SUCCESS] Consent verified and Free Audit scheduled for ${domainName}!`, 'terminal-success');
                     alert(`[SUCCESS] Free Audit Scheduled!\n\nAutomated scanning has begun for target: ${domainName}.\nReal-time signals will stream to the operational feed.`);
                     
-                    // Mark phase -1 as verified
-                    verifiedPhases[-1] = true;
-                    document.getElementById('btn-t-1').classList.add('verified');
-                    updateProgress();
-
                     // Refresh log view immediately
                     setTimeout(pollRealLogs, 500);
                 } else {
@@ -845,6 +1106,106 @@
             } catch (error) {
                 logEvent(`[ERROR] Connection failed while registering consent details.`, 'terminal-error');
                 alert('Connection error occurred. Ensure the server is online.');
+            }
+        }
+
+        async function submitCodebaseScan() {
+            const sourceType = document.getElementById('source-type').value;
+            const targetPath = document.getElementById('target-path').value.trim();
+            const scanFocus = document.getElementById('scan-focus').value;
+
+            if (!targetPath) {
+                alert('Target directory path or GitHub URL is required.');
+                return;
+            }
+
+            logEvent(`[PREMIUM SCAN] Initializing static analysis. Type: ${sourceType}, Focus: ${scanFocus}`, 'terminal-warn');
+            logEvent(`[PREMIUM SCAN] Targeting: ${targetPath}`, 'terminal-info');
+
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const csrfToken = getCookie('ztl_csrf');
+                
+                const response = await fetch(`${apiBase}/api/admin/phasr/scan-codebase`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': csrfToken
+                    },
+                    body: JSON.stringify({ sourceType, targetPath, scanFocus })
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    logEvent(`[SUCCESS] Codebase Static Scan dispatched!`, 'terminal-success');
+                    alert(`[SUCCESS] Codebase Scan Dispatched!\n\nStatic analysis is running in the background. Real-time parsed files and finding signals will log below.`);
+                    
+                    // Poll logs immediately
+                    setTimeout(pollRealLogs, 300);
+                } else {
+                    const err = payload.error || 'Failed to dispatch static scanner.';
+                    logEvent(`[ERROR] Scan dispatch failed: ${err}`, 'terminal-error');
+                    alert(`Error: ${err}`);
+                }
+            } catch (error) {
+                logEvent(`[ERROR] Connection failed while dispatching codebase scan.`, 'terminal-error');
+                alert('Connection error occurred. Ensure the server is online.');
+            }
+        }
+
+        function toggleSourceFields() {
+            const type = document.getElementById('source-type').value;
+            const label = document.getElementById('path-label');
+            const input = document.getElementById('target-path');
+            if (type === 'offline') {
+                label.innerText = "Local Directory Path";
+                input.placeholder = "e.g. d:/Project XT";
+                input.value = "d:/Project XT";
+            } else {
+                label.innerText = "GitHub Repository HTTPS URL";
+                input.placeholder = "e.g. https://github.com/expressjs/express.git";
+                input.value = "";
+            }
+        }
+
+        function resetCodebaseScanForm() {
+            latestCodebaseReport = null;
+            verifiedPhases[1] = false;
+            const card = document.getElementById('card-t1');
+            if (card) {
+                card.classList.remove('verified');
+                const statusText = card.querySelector('.phase-card-status');
+                if (statusText) {
+                    statusText.innerHTML = '<span class="status-indicator ready"></span> READY';
+                }
+            }
+            updateProgress();
+            selectPhase(1);
+        }
+
+        function resetFreeAuditForm() {
+            latestAuditReport = null;
+            verifiedPhases[-1] = false;
+            const card = document.getElementById('card-t-1');
+            if (card) {
+                card.classList.remove('verified');
+                const statusText = card.querySelector('.phase-card-status');
+                if (statusText) {
+                    statusText.innerHTML = '<span class="status-indicator active"></span> ACTIVE';
+                }
+            }
+            updateProgress();
+            selectPhase(-1);
+        }
+
+        function openNerdStatsPage() {
+            if (latestAuditReport) {
+                localStorage.setItem('latestAuditReport', JSON.stringify(latestAuditReport));
+                window.open('nerd-stats.html', '_blank');
+            } else {
+                alert('No active scan telemetry report found. Please run a scan first.');
             }
         }
 
@@ -1095,10 +1456,14 @@
         calculateAssumptionRisk();
         runTransitionAudit('gu');
         
-        // Load real user details and poll logs
+        // Load real user details and start polling loop
         loadUserData();
-        pollRealLogs();
-        setInterval(pollRealLogs, 2500);
+        
+        async function startPollingLoop() {
+            await pollRealLogs();
+            setTimeout(startPollingLoop, 2500);
+        }
+        startPollingLoop();
     </script>
 </body>
 </html>
