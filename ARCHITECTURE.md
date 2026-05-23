@@ -281,10 +281,30 @@ flowchart TD
 
 | Platform | Command | Back-end selected |
 | :--- | :--- | :--- |
-| **Windows x86-64** | `cd phasr\src && build.bat` | `fsm_validator.asm` (MASM ml64) |
-| **Linux x86-64** | `cd phasr/src && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
-| **Linux AArch64** | `cd phasr/src && make` | `fsm_validator_linux_arm64.s` (GAS) |
-| **Any other** | `cd phasr/src && make fallback` | `fsm_validator_fallback.c` (C99) |
+| **Windows x86-64** | `cd phasr\Phase-1 && build.bat` | `fsm_validator.asm` (MASM ml64) |
+| **Linux x86-64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
+| **Linux AArch64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_arm64.s` (GAS) |
+| **Any other** | `cd phasr/Phase-1 && make fallback` | `fsm_validator_fallback.c` (C99) |
 | **Regenerate x64 .s** | `node generate_fsm_asm_linux_x64.js` | *(re-generates 130,562 lines)* |
 | **Regenerate ARM64 .s** | `node generate_fsm_asm_arm64.js` | *(re-generates 130,559 lines)* |
+
+---
+
+## 5. Phase-2 Hierarchy Reachability Engine
+
+The **Hierarchy Reachability Engine** audits access paths and privilege boundaries on the active reachability graph.
+
+### 5.1 Adjacency and Reachability Matrices
+The access graph is flattened in memory as a contiguous bit-packed matrix of size $16 \times 16$:
+- Adjacency matrix: `uint16_t adjacency[16]` where bit $j$ in row $i$ is set if there is an edge $i \rightarrow j$.
+- Reachability matrix: `uint16_t reachability[16]` representing the transitive closure (with self-reachability) of the adjacency matrix.
+
+### 5.2 ARM64 NEON assembly implementation
+The core transitive closure sweep is implemented in raw ARM64 assembly ([reachability_arm64.s](file:///d:/Project%20XT/phasr/Phase-2/reachability_arm64.s)) utilizing ARM64 registers for bit-packed rows, executing Warshall's algorithm with zero runtime heap allocation.
+
+### 5.3 Build Matrix
+- **Windows:** Run `cd phasr\Phase-2 && build.bat` to build and run using the MSVC C++ fallback engine.
+- **Linux ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the ARM64 NEON Assembly engine.
+- **Linux non-ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the C++ fallback engine.
+
 

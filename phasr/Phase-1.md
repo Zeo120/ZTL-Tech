@@ -4,11 +4,12 @@
 The **Phase FSM Validator** is the core hot-path temporal execution sequencing check in Workflow 1 of the PHASR engine. It validates execution sequencing and prevents unauthorized state jumps or privilege escalation.
 
 ### Implementation Stack
-- **Windows x86-64:** MASM Assembly ([fsm_validator.asm](file:///d:/Project%20XT/phasr/src/fsm_validator.asm)) using Windows x64 ABI (RCX, RDX, R8 registers) compiled with MSVC `ml64.exe` and `cl.exe`.
-- **Linux x86-64:** GNU Assembler Intel-syntax Assembly ([fsm_validator_linux_x64.s](file:///d:/Project%20XT/phasr/src/fsm_validator_linux_x64.s)) using System V AMD64 ABI (EDI, ESI, RDX registers).
-- **Linux ARM64:** GNU Assembler AArch64 Assembly ([fsm_validator_linux_arm64.s](file:///d:/Project%20XT/phasr/src/fsm_validator_linux_arm64.s)) using AAPCS64 ABI (W0, W1, X2 registers).
-- **Portable Fallback:** Standard ISO C99 ([fsm_validator_fallback.c](file:///d:/Project%20XT/phasr/src/fsm_validator_fallback.c)).
-- **Build System:** Cross-platform [Makefile](file:///d:/Project%20XT/phasr/src/Makefile) (automatically selects the proper target via `uname -m`) and Windows [build.bat](file:///d:/Project%20XT/phasr/src/build.bat) script.
+- **Windows x86-64:** MASM Assembly ([fsm_validator.asm](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator.asm)) using Windows x64 ABI (RCX, RDX, R8 registers) compiled with MSVC `ml64.exe` and `cl.exe`.
+- **Linux x86-64:** GNU Assembler Intel-syntax Assembly ([fsm_validator_linux_x64.s](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_linux_x64.s)) using System V AMD64 ABI (EDI, ESI, RDX registers).
+- **Linux ARM64:** GNU Assembler AArch64 Assembly ([fsm_validator_linux_arm64.s](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_linux_arm64.s)) using AAPCS64 ABI (W0, W1, X2 registers).
+- **Portable Fallback:** Standard ISO C99 ([fsm_validator_fallback.c](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_fallback.c)).
+- **Build System:** Cross-platform [Makefile](file:///d:/Project%20XT/phasr/Phase-1/Makefile) (automatically selects the proper target via `uname -m`) and Windows [build.bat](file:///d:/Project%20XT/phasr/Phase-1/build.bat) script.
+
 
 ---
 

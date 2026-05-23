@@ -109,7 +109,7 @@ PHASR is our security audit platform.
 *   **`phasr/ztl_consent_agreement.txt`**: A terms and conditions agreement file that users upload when testing the PHASR scanner.
 *   **`phasr/admin.html`**: The dashboard console. It includes interactive diagrams mapping trust boundaries and a portal to submit DNS configurations for audits.
 * **`phasr/nerd-stats.html`**: The codebase analyzer screen. It has a split layout: a list of flagged files on the left, and a code editor pane on the right highlighting vulnerable lines.
-* **`phasr/src/`**: The core source code directory for Phase-1 security verification.
+* **`phasr/Phase-1/`**: The consolidated directory containing Phase-1 temporal FSM validator code.
   * **`fsm_validator.asm`**: Core transition logic written in **x86-64 MASM assembly** (Windows/MSVC). Contains 4,500 helper procedures and the master `validate_transition` dispatcher.
   * **`fsm_validator_linux_x64.s`**: Port of the FSM validator in **x86-64 GAS assembly** (Linux System V AMD64 ABI, Intel syntax). Auto-generated, 130,562 lines.
   * **`fsm_validator_linux_arm64.s`**: Port of the FSM validator in **ARM64 AArch64 GAS assembly** (Linux AAPCS64 ABI). Auto-generated, 130,559 lines.
@@ -117,6 +117,12 @@ PHASR is our security audit platform.
   * **`phase_fsm.c`**: The self-contained C test runner and FDTD numerical wave simulation (with state mappings and configuration constants inlined).
   * **`build.bat`**: The Windows build script using MSVC `ml64` and `cl`.
   * **`Makefile`**: Cross-platform build file. Automatically selects the x86-64 or ARM64 assembly back-end based on the host architecture.
+* **`phasr/Phase-2/`**: The source directory for Phase-2 hierarchy access boundary verification.
+  * **`reachability_engine.cpp`**: C++ driver and verification suite, implementing a damped numerical wave simulation and containing 1,000 unit tests.
+  * **`reachability_arm64.s`**: High-performance ARM64 assembly implementation of transitive closure sweeps.
+  * **`Makefile`**: Cross-platform Makefile to compile the assembly on ARM64 or compile the C++ fallback on other hosts.
+  * **`build.bat`**: Windows MSVC compilation and test runner script.
+
 
 
 ---
@@ -177,7 +183,7 @@ The FSM validator ships with two assembly back-ends and a pure-C fallback.
 2. Open a standard command prompt in the workspace root.
 3. Run the build batch file:
    ```cmd
-   cd phasr\src
+   cd phasr\Phase-1
    build.bat
    ```
 4. This script automatically:
@@ -194,7 +200,7 @@ The FSM validator ships with two assembly back-ends and a pure-C fallback.
    ```
 2. Build using the cross-platform Makefile:
    ```bash
-   cd phasr/src
+   cd phasr/Phase-1
    make
    ```
 3. The Makefile automatically detects the host architecture (`uname -m`) and links against `fsm_validator_linux_x64.s` (on x86-64) or `fsm_validator_linux_arm64.s` (on AArch64/ARM64). It falls back to the pure C implementation (`fsm_validator_fallback.c`) on other architectures.
