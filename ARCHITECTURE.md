@@ -1,6 +1,6 @@
 # PHASR | Workflows Data Path & Flow Specification
 
-This document details the complete data pathways, system execution flows, and integration mappings for the five codebase security verification workflows within the **PHASR** validation platform.
+This document details the complete data pathways, system execution flows, integration mappings, and **platform-specific assembly back-end architecture** for the five codebase security verification workflows within the **PHASR** validation platform.
 
 ---
 
@@ -29,7 +29,7 @@ graph TB
         SubgraphCache <--> CoreEngine
         
         subgraph SubEngines [P-H-A-S-R Validators]
-            P_Eng[Phase FSM Validator]
+            P_Eng["Phase FSM Validator\n(x86-64 MASM / ARM64 GAS / C-fallback)"]
             H_Eng[Hierarchy Reachability Validator]
             A_Eng[Assumption Graph Propagator]
             S_Eng[Solutions Mitigation Verifier]
@@ -59,7 +59,7 @@ The following matrix maps every data path from telemetry source to its target wo
 
 | Telemetry Source | Data Path Interface | Target Workflow | Verification Type |
 | :--- | :--- | :--- | :--- |
-| **eBPF: Syscalls & Execs** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 1: Phase** | Temporal execution sequencing check. |
+| **eBPF: Syscalls & Execs** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 1: Phase** | Temporal execution sequencing check. FSM evaluated by `validate_transition` (x86-64/ARM64). |
 | **eBPF: Network Connects** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 2: Hierarchy** | Access boundary & reachability audit. |
 | **IAM & RBAC Configs** | Static Config Parsers -> Active Spec Graph | **Workflow 2: Hierarchy** | Privilege boundary & role audit. |
 | **App Logs & Metrics** | Systemd / File Monitors -> Normalizer -> NATS P1 | **Workflow 3: Assumptions** | Invariant drift & performance decay check. |
@@ -191,3 +191,100 @@ sequenceDiagram
         Core->>NodeB: Promote backup node to Primary
     end
 ```
+
+---
+
+## 4. Phase FSM Validator — Multi-Platform Assembly Architecture
+
+The Phase FSM Engine (`validate_transition`) is the innermost hot-path of Workflow 1. To maximize throughput and portability across deployment targets it ships as **four interchangeable back-ends**, selected at compile time:
+
+| Back-end | File | Target | Assembler / Compiler | Lines |
+| :--- | :--- | :--- | :--- | :--- |
+| **x86-64 MASM** | `fsm_validator.asm` | Windows x86-64 | MSVC `ml64.exe` | ~117 K |
+| **x86-64 GAS (Intel)** | `fsm_validator_linux_x64.s` | Linux x86-64 | GNU `as` / `gcc` | 130,562 |
+| **AArch64 GAS** | `fsm_validator_linux_arm64.s` | Linux ARM64 | GNU `as` / `gcc` | 130,559 |
+| **Pure-C Fallback** | `fsm_validator_fallback.c` | Any platform | Any C99 compiler | ~65 |
+
+### 4.1 Shared Logic — 4,500 Helper Procedures
+
+Both assembly back-ends emit an identical set of **4,500 helper procedures** (`validate_path_0000` … `validate_path_4499`) plus one **master dispatcher** (`validate_transition`). The helper index `i` encodes:
+
+```
+current_state  = i % 8
+next_state     = (i + 1) % 8
+prereq_bit     = next_state > 0 ? next_state - 1 : 0
+```
+
+Each helper performs three checks in sequence:
+1. **State match** — compare `current_state` and `next_state` against register arguments, branch to *no-match* (`-1`) if wrong.
+2. **Prerequisite bit** — test bit `prereq_bit` in the `prerequisites` argument, branch to *invalid* (`0`) if clear.
+3. **Valid return** — return `1` if both checks pass.
+
+### 4.2 Linux x86-64 GAS Back-end (Intel Syntax) — Key Facts
+
+```
+Calling convention : System V AMD64 ABI
+  edi = current_state (int32)      // first parameter
+  esi = next_state    (int32)      // second parameter
+  rdx = prerequisites (uint64_t)   // third parameter (64-bit)
+  eax = return value  (1 / 0 / -1)
+
+Key instructions used:
+  .intel_syntax noprefix           // Use Intel style assembly syntax
+  cmp  edi, N                      // 32-bit comparison of current state
+  cmp  esi, N                      // 32-bit comparison of next state
+  shl  rax, cl                     // Shift rax by cl bits (cl is the lower 8 bits of rcx)
+  test rdx, rax                    // Test if prerequisite bit is set
+  xor  eax, eax                    // Return 0
+  mov  eax, -1                     // Return -1
+  ret                              // Return to caller
+```
+
+### 4.3 ARM64 AArch64 GAS Back-end — Key Facts
+
+```
+Calling convention : AAPCS64
+  w0  = current_state (int32)      // w-register = 32-bit view of x0
+  w1  = next_state    (int32)
+  x2  = prerequisites (uint64_t)   // full 64-bit
+  w0  = return value  (1 / 0 / -1)
+
+Key instructions used:
+  cmp  w0, #N          // 32-bit comparison
+  b.ne / b.eq / b.lt / b.gt / b.ge
+  cbz  w1, label       // compare-and-branch-if-zero (no flags needed)
+  mov  x3, #1
+  lsl  x3, x3, x4     // x3 = 1 << x4   (64-bit left shift)
+  tst  x2, x3         // bitwise AND, sets NZCV flags
+  mvn  w0, wzr         // w0 = 0xFFFFFFFF = -1 (signed)
+  ret                  // return via link register x30
+```
+
+### 4.4 Master `validate_transition` — Control Flow
+
+```mermaid
+flowchart TD
+    A(["validate_transition\n(w0/edi)=current, (w1/esi)=next, (x2/rdx)=prereqs"]) --> B{"0 ≤ current ≤ 7?"}
+    B -- No --> INV["return 0  (invalid)"]
+    B -- Yes --> C{"0 ≤ next ≤ 7?"}
+    C -- No --> INV
+    C -- Yes --> D{"next == 0?\n(reset)"}
+    D -- Yes --> VALID["return 1  (valid)"]
+    D -- No --> E{"next == current + 1?\n(sequential)"}
+    E -- No --> INV
+    E -- Yes --> F{"bit (next-1) set\nin prereqs?"}
+    F -- No --> INV
+    F -- Yes --> VALID
+```
+
+### 4.5 Build Matrix
+
+| Platform | Command | Back-end selected |
+| :--- | :--- | :--- |
+| **Windows x86-64** | `cd phasr\src && build.bat` | `fsm_validator.asm` (MASM ml64) |
+| **Linux x86-64** | `cd phasr/src && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
+| **Linux AArch64** | `cd phasr/src && make` | `fsm_validator_linux_arm64.s` (GAS) |
+| **Any other** | `cd phasr/src && make fallback` | `fsm_validator_fallback.c` (C99) |
+| **Regenerate x64 .s** | `node generate_fsm_asm_linux_x64.js` | *(re-generates 130,562 lines)* |
+| **Regenerate ARM64 .s** | `node generate_fsm_asm_arm64.js` | *(re-generates 130,559 lines)* |
+

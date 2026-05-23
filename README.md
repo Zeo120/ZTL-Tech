@@ -110,9 +110,13 @@ PHASR is our security audit platform.
 *   **`phasr/admin.html`**: The dashboard console. It includes interactive diagrams mapping trust boundaries and a portal to submit DNS configurations for audits.
 * **`phasr/nerd-stats.html`**: The codebase analyzer screen. It has a split layout: a list of flagged files on the left, and a code editor pane on the right highlighting vulnerable lines.
 * **`phasr/src/`**: The core source code directory for Phase-1 security verification.
-  * **`fsm_validator.asm`**: Core transition logic written in x86-64 assembly.
+  * **`fsm_validator.asm`**: Core transition logic written in **x86-64 MASM assembly** (Windows/MSVC). Contains 4,500 helper procedures and the master `validate_transition` dispatcher.
+  * **`fsm_validator_linux_x64.s`**: Port of the FSM validator in **x86-64 GAS assembly** (Linux System V AMD64 ABI, Intel syntax). Auto-generated, 130,562 lines.
+  * **`fsm_validator_linux_arm64.s`**: Port of the FSM validator in **ARM64 AArch64 GAS assembly** (Linux AAPCS64 ABI). Auto-generated, 130,559 lines.
+  * **`fsm_validator_fallback.c`**: Pure-C fallback implementation of `validate_transition`, used when assembling on unsupported platforms.
   * **`phase_fsm.c`**: The self-contained C test runner and FDTD numerical wave simulation (with state mappings and configuration constants inlined).
   * **`build.bat`**: The Windows build script using MSVC `ml64` and `cl`.
+  * **`Makefile`**: Cross-platform build file. Automatically selects the x86-64 or ARM64 assembly back-end based on the host architecture.
 
 
 ---
@@ -164,9 +168,13 @@ This forces the browser to register the hidden state first, resulting in a smoot
 ---
 
 ### 3. Compiling and Running Phase-1 FSM Validator
-To compile and execute the FSM transition assertions and telemetry wave simulation:
-1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler and tools) are installed.
-2. Open a standard command prompt or terminal in the workspace root.
+
+The FSM validator ships with two assembly back-ends and a pure-C fallback.
+
+#### Option A — Windows x86-64 (MSVC / MASM)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler and MASM tools) are installed.
+2. Open a standard command prompt in the workspace root.
 3. Run the build batch file:
    ```cmd
    cd phasr\src
@@ -175,6 +183,26 @@ To compile and execute the FSM transition assertions and telemetry wave simulati
 4. This script automatically:
    * Sets up the x64 environment via `vcvars64.bat`.
    * Assembles `fsm_validator.asm` with MASM `ml64.exe`.
-   * Compiles and links `phase_fsm.c` with `cl.exe` utilizing security flags (`/GS`, `/guard:cf`, `/WX`).
+   * Compiles and links `phase_fsm.c` with `cl.exe` using security flags (`/GS`, `/guard:cf`, `/WX`).
    * Runs the `phase_fsm.exe` binary displaying test outputs and a real-time ASCII wave simulation.
 
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Ensure a **GCC toolchain** and GNU Assembler (`as`) are installed on your Linux host:
+   ```bash
+   sudo apt install gcc binutils   # Debian/Ubuntu
+   ```
+2. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/src
+   make
+   ```
+3. The Makefile automatically detects the host architecture (`uname -m`) and links against `fsm_validator_linux_x64.s` (on x86-64) or `fsm_validator_linux_arm64.s` (on AArch64/ARM64). It falls back to the pure C implementation (`fsm_validator_fallback.c`) on other architectures.
+4. Run the output binary:
+   ```bash
+   ./phase_fsm
+   ```
+
+> **Note:** The assembly files are auto-generated. To regenerate them:
+> * Linux x86-64: `node generate_fsm_asm_linux_x64.js`
+> * Linux ARM64: `node generate_fsm_asm_arm64.js`

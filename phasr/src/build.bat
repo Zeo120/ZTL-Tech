@@ -1,4 +1,19 @@
 @echo off
+REM =============================================================
+REM PHASR Phase-1 FSM Validator — Windows Build Script
+REM Toolchain: MSVC cl.exe + ml64.exe (MASM)
+REM
+REM For Linux x86-64 or ARM64, use the Makefile instead:
+REM   Linux x86-64 : make PLATFORM=x64
+REM   Linux ARM64  : make PLATFORM=arm64
+REM   Pure C       : make fallback
+REM
+REM Platform-specific assembly files:
+REM   Windows x64 : fsm_validator.asm          (MASM, RCX/RDX/R8 ABI)
+REM   Linux x64   : fsm_validator_linux_x64.s  (GAS, RDI/RSI/RDX ABI)
+REM   Linux ARM64 : fsm_validator_linux_arm64.s (GAS, x0/x1/x2 ABI)
+REM   C fallback  : fsm_validator_fallback.c    (portable ISO C99)
+REM =============================================================
 setlocal enabledelayedexpansion
 
 echo ==================================================
