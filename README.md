@@ -135,6 +135,13 @@ PHASR is our security audit platform.
   * **`control_arm64.s`**: Statically generated ARM64 assembly containing 4,500 control verification helper routines.
   * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
   * **`build.bat`**: Windows MSVC C++ compilation and test runner script.
+* **`phasr/Phase-5/`**: The source directory for Phase-5 redundancy failover attestation.
+  * **`consensus_auditor.c`**: C driver and attestation engine, implementing a heartbeat sync FDTD wave simulation and containing 1,000 unit tests.
+  * **`consensus_linux_x64.s`**: Statically generated x86-64 assembly containing 4,500 consensus verification helper routines.
+  * **`consensus_arm64.s`**: Statically generated ARM64 assembly containing 4,500 consensus verification helper routines.
+  * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
+  * **`build.bat`**: Windows MSVC C compilation and test runner script.
+
 
 
 
@@ -324,6 +331,39 @@ The chaos verifier compiles with either of the two assembly back-ends (x86-64 / 
 
 > **Note:** The Phase-4 assembly files are auto-generated. To regenerate them, run:
 > * `node generate_phase_4.js`
+
+---
+
+### 7. Compiling and Running Phase-5 Consensus Auditor
+
+The consensus auditor compiles with either of the two assembly back-ends (x86-64 / ARM64) or a C fallback.
+
+#### Option A — Windows x86-64 (MSVC C Fallback)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler) is installed.
+2. Run the build batch file:
+   ```cmd
+   cd phasr\Phase-5
+   build.bat
+   ```
+3. The script compiles `consensus_auditor.c` with `/W4 /WX /GS` flags and executes the test suite.
+
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/Phase-5
+   make
+   ```
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `consensus_linux_x64.s` (on x86-64) or `consensus_arm64.s` (on ARM64), falling back to C on other architectures.
+3. Run the output binary:
+   ```bash
+   ./consensus_auditor
+   ```
+
+> **Note:** The Phase-5 assembly files are auto-generated. To regenerate them, run:
+> * `node generate_phase_5.js`
+
 
 
 
