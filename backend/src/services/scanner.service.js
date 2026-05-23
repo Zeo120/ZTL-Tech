@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const { writeAuditEvent } = require('./audit.service');
+const { sql, getDbPool } = require('../config/db');
+
 
 // Supported file extensions (Mainstream and niche ones like Assembly, OCaml)
 const SUPPORTED_EXTENSIONS = new Set([
@@ -64,6 +66,145 @@ async function limitConcurrency(tasks, limit, fn) {
     }
   }
   return Promise.all(results);
+}
+
+// Helper: Scan project manifest files and extract dependencies
+async function extractDependencies(scanDir) {
+  const dependencies = [];
+  try {
+    // 1. package.json (NodeJS)
+    const packageJsonPath = path.join(scanDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      const content = await fs.promises.readFile(packageJsonPath, 'utf8');
+      const pkg = JSON.parse(content);
+      if (pkg.dependencies) {
+        for (const [name, ver] of Object.entries(pkg.dependencies)) {
+          dependencies.push({ name, version: ver, manager: 'npm (package.json)', type: 'Direct Dependency' });
+        }
+      }
+      if (pkg.devDependencies) {
+        for (const [name, ver] of Object.entries(pkg.devDependencies)) {
+          dependencies.push({ name, version: ver, manager: 'npm (package.json)', type: 'Dev Dependency' });
+        }
+      }
+    }
+
+    // 2. requirements.txt (Python)
+    const reqPath = path.join(scanDir, 'requirements.txt');
+    if (fs.existsSync(reqPath)) {
+      const content = await fs.promises.readFile(reqPath, 'utf8');
+      const lines = content.split(/\r?\n/);
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#')) {
+          const parts = trimmed.split(/==|>=|<=|~=|>|</);
+          const name = parts[0].trim();
+          const version = parts[1] ? parts[1].trim() : 'latest';
+          dependencies.push({ name, version, manager: 'pip (requirements.txt)', type: 'Dependency' });
+        }
+      }
+    }
+
+    // 3. go.mod (Go)
+    const goModPath = path.join(scanDir, 'go.mod');
+    if (fs.existsSync(goModPath)) {
+      const content = await fs.promises.readFile(goModPath, 'utf8');
+      const lines = content.split(/\r?\n/);
+      let inRequireBlock = false;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('require (')) {
+          inRequireBlock = true;
+          continue;
+        }
+        if (inRequireBlock && trimmed.startsWith(')')) {
+          inRequireBlock = false;
+          continue;
+        }
+        if (inRequireBlock) {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length >= 2) {
+            const name = parts[0];
+            const version = parts[1];
+            const type = trimmed.includes('indirect') ? 'Indirect Dependency' : 'Direct Dependency';
+            dependencies.push({ name, version, manager: 'go mod (go.mod)', type });
+          }
+        } else if (trimmed.startsWith('require ')) {
+          const parts = trimmed.replace('require ', '').split(/\s+/);
+          if (parts.length >= 2) {
+            const name = parts[0];
+            const version = parts[1];
+            dependencies.push({ name, version, manager: 'go mod (go.mod)', type: 'Direct Dependency' });
+          }
+        }
+      }
+    }
+
+    // 4. Cargo.toml (Rust)
+    const cargoTomlPath = path.join(scanDir, 'Cargo.toml');
+    if (fs.existsSync(cargoTomlPath)) {
+      const content = await fs.promises.readFile(cargoTomlPath, 'utf8');
+      const lines = content.split(/\r?\n/);
+      let section = '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          section = trimmed.toLowerCase();
+          continue;
+        }
+        if (section === '[dependencies]' || section === '[dev-dependencies]') {
+          if (trimmed && !trimmed.startsWith('#')) {
+            const eqIdx = trimmed.indexOf('=');
+            if (eqIdx !== -1) {
+              const name = trimmed.substring(0, eqIdx).trim();
+              let verVal = trimmed.substring(eqIdx + 1).trim();
+              let version = 'latest';
+              if (verVal.startsWith('{')) {
+                const match = verVal.match(/version\s*=\s*['"]([^'"]+)['"]/);
+                if (match) version = match[1];
+              } else {
+                version = verVal.replace(/['"]/g, '');
+              }
+              const type = (section === '[dependencies]') ? 'Direct Dependency' : 'Dev Dependency';
+              dependencies.push({ name, version, manager: 'cargo (Cargo.toml)', type });
+            }
+          }
+        }
+      }
+    }
+
+    // 5. CMakeLists.txt (C/C++)
+    const cmakePath = path.join(scanDir, 'CMakeLists.txt');
+    if (fs.existsSync(cmakePath)) {
+      const content = await fs.promises.readFile(cmakePath, 'utf8');
+      const regex = /find_package\s*\(\s*([a-zA-Z0-9_\-]+)(?:\s+([0-9\.]+))?/gi;
+      let match;
+      while ((match = regex.exec(content)) !== null) {
+        const name = match[1];
+        const version = match[2] || 'latest';
+        dependencies.push({ name, version, manager: 'cmake (CMakeLists.txt)', type: 'Package Dependency' });
+      }
+    }
+
+    // 6. dune-project (OCaml)
+    const dunePath = path.join(scanDir, 'dune-project');
+    if (fs.existsSync(dunePath)) {
+      const content = await fs.promises.readFile(dunePath, 'utf8');
+      const depMatch = content.match(/\(depends\s+([\s\S]+?)\)/);
+      if (depMatch) {
+        const items = depMatch[1].split(/\s+/);
+        for (const item of items) {
+          const cleanItem = item.replace(/[\(\)\"\']/g, '').trim();
+          if (cleanItem && !cleanItem.startsWith(':') && isNaN(cleanItem[0])) {
+            dependencies.push({ name: cleanItem, version: 'latest', manager: 'dune (dune-project)', type: 'Library Dependency' });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error scanning dependencies:', err);
+  }
+  return dependencies;
 }
 
 // Main static codebase scan logic
@@ -383,6 +524,9 @@ async function runCodebaseScan({ userId, sourceType, targetPath, scanFocus, ip, 
     // Concurrency limit of 5 parallel reads
     await limitConcurrency(filePaths, 5, processFile);
 
+    // Extract dependencies from target directory
+    const dependencies = await extractDependencies(scanDir);
+
     // 4. Summarize results
     const criticalCount = findings.filter(f => f.severity === 'Critical').length;
     const warningCount = findings.filter(f => f.severity === 'Warning').length;
@@ -393,6 +537,7 @@ async function runCodebaseScan({ userId, sourceType, targetPath, scanFocus, ip, 
       sourceType,
       targetPath,
       scanFocus,
+      dependencies,
       summary: {
         totalFilesScanned: filePaths.length,
         criticalCount,
@@ -403,6 +548,44 @@ async function runCodebaseScan({ userId, sourceType, targetPath, scanFocus, ip, 
       findings,
       details: `Static code scan finalized. Scanned ${filePaths.length} files. Issues found: ${findings.length} (Critical: ${criticalCount}, Warning: ${warningCount}, Info: ${infoCount}).`
     };
+
+    // Save scan metadata and dependencies to database
+    try {
+      const pool = await getDbPool();
+      const scanResult = await pool.request()
+        .input('userId', sql.Int, userId)
+        .input('targetPath', sql.NVarChar(sql.MAX), targetPath)
+        .input('sourceType', sql.NVarChar(50), sourceType)
+        .input('scanFocus', sql.NVarChar(50), scanFocus)
+        .input('totalFiles', sql.Int, filePaths.length)
+        .input('criticalCount', sql.Int, criticalCount)
+        .input('warningCount', sql.Int, warningCount)
+        .input('infoCount', sql.Int, infoCount)
+        .query(`
+          INSERT INTO CodebaseScans (user_id, target_path, source_type, scan_focus, total_files, critical_count, warning_count, info_count, created_at)
+          VALUES (@userId, @targetPath, @sourceType, @scanFocus, @totalFiles, @criticalCount, @warningCount, @infoCount, SYSUTCDATETIME());
+          SELECT SCOPE_IDENTITY() as id;
+        `);
+      
+      const scanId = scanResult.recordset[0].id;
+
+      if (dependencies && dependencies.length > 0) {
+        for (const dep of dependencies) {
+          await pool.request()
+            .input('scanId', sql.Int, scanId)
+            .input('name', sql.NVarChar(255), dep.name)
+            .input('version', sql.NVarChar(50), dep.version)
+            .input('manager', sql.NVarChar(100), dep.manager)
+            .input('type', sql.NVarChar(100), dep.type)
+            .query(`
+              INSERT INTO CodebaseDependencies (scan_id, name, version, manager, type, created_at)
+              VALUES (@scanId, @name, @version, @manager, @type, SYSUTCDATETIME());
+            `);
+        }
+      }
+    } catch (dbErr) {
+      console.error('Failed to save codebase scan telemetry to database:', dbErr);
+    }
 
     await writeAuditEvent({
       actorUserId: userId,

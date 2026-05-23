@@ -534,4 +534,145 @@ adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncH
   });
 }));
 
+// GET /api/admin/phasr/scans — list all historical codebase scans for this operator
+adminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const pool = await getDbPool();
+
+  const scansResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT
+        id,
+        user_id,
+        target_path,
+        source_type,
+        scan_focus,
+        total_files,
+        critical_count,
+        warning_count,
+        info_count,
+        created_at
+      FROM dbo.CodebaseScans
+      WHERE user_id = @userId
+      ORDER BY created_at DESC;
+    `);
+
+  return ok(res, {
+    scans: scansResult.recordset.map(row => ({
+      id: row.id,
+      userId: row.user_id,
+      targetPath: row.target_path,
+      sourceType: row.source_type,
+      scanFocus: row.scan_focus,
+      totalFiles: row.total_files,
+      criticalCount: row.critical_count,
+      warningCount: row.warning_count,
+      infoCount: row.info_count,
+      createdAt: row.created_at
+    }))
+  });
+}));
+
+// GET /api/admin/phasr/scans/:id — full detail: scan metadata + dependencies + findings from audit log
+adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const scanId = Number(req.params.id);
+
+  if (!scanId || isNaN(scanId)) {
+    return res.status(400).json({ success: false, error: 'Invalid scan ID.' });
+  }
+
+  const pool = await getDbPool();
+
+  // Fetch the scan metadata and verify ownership
+  const scanResult = await pool.request()
+    .input('scanId', sql.Int, scanId)
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT
+        id,
+        user_id,
+        target_path,
+        source_type,
+        scan_focus,
+        total_files,
+        critical_count,
+        warning_count,
+        info_count,
+        created_at
+      FROM dbo.CodebaseScans
+      WHERE id = @scanId AND user_id = @userId;
+    `);
+
+  if (!scanResult.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Scan record not found or access denied.' });
+  }
+
+  const scan = scanResult.recordset[0];
+
+  // Fetch all extracted dependencies for this scan
+  const depsResult = await pool.request()
+    .input('scanId', sql.Int, scanId)
+    .query(`
+      SELECT id, name, version, manager, type, created_at
+      FROM dbo.CodebaseDependencies
+      WHERE scan_id = @scanId
+      ORDER BY manager, name;
+    `);
+
+  // Fetch the final vulnerability report from audit log (stored as metadata JSON)
+  const auditResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('targetPath', sql.NVarChar(sql.MAX), scan.target_path)
+    .query(`
+      SELECT TOP 1 metadata_json, created_at
+      FROM dbo.AuditLog
+      WHERE actor_user_id = @userId
+        AND action = 'phasr.vulnerability_report_generated'
+        AND target_id = @targetPath
+      ORDER BY created_at DESC;
+    `);
+
+  let findings = [];
+  let reportMeta = null;
+  if (auditResult.recordset[0] && auditResult.recordset[0].metadata_json) {
+    try {
+      reportMeta = JSON.parse(auditResult.recordset[0].metadata_json);
+      findings = reportMeta.findings || [];
+    } catch (_) {
+      findings = [];
+    }
+  }
+
+  return ok(res, {
+    scan: {
+      id: scan.id,
+      targetPath: scan.target_path,
+      sourceType: scan.source_type,
+      scanFocus: scan.scan_focus,
+      totalFiles: scan.total_files,
+      criticalCount: scan.critical_count,
+      warningCount: scan.warning_count,
+      infoCount: scan.info_count,
+      createdAt: scan.created_at,
+      summary: {
+        totalFilesScanned: scan.total_files,
+        criticalCount: scan.critical_count,
+        warningCount: scan.warning_count,
+        infoCount: scan.info_count,
+        vulnerabilitiesCount: scan.critical_count + scan.warning_count + scan.info_count
+      },
+      dependencies: depsResult.recordset.map(d => ({
+        id: d.id,
+        name: d.name,
+        version: d.version,
+        manager: d.manager,
+        type: d.type
+      })),
+      findings
+    }
+  });
+}));
+
 module.exports = { adminRoutes };

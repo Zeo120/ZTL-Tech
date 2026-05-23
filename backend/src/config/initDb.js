@@ -157,8 +157,75 @@ const tables = [
         sql: 'CREATE INDEX IX_PhasrAudits_user_id ON dbo.PhasrAudits(user_id);'
       }
     ]
+  },
+  {
+    name: 'CodebaseScans',
+    createSql: `
+      CREATE TABLE dbo.CodebaseScans (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CodebaseScans PRIMARY KEY,
+        user_id INT NOT NULL,
+        target_path NVARCHAR(MAX) NOT NULL,
+        source_type NVARCHAR(50) NOT NULL,
+        scan_focus NVARCHAR(50) NOT NULL,
+        total_files INT NOT NULL,
+        critical_count INT NOT NULL,
+        warning_count INT NOT NULL,
+        info_count INT NOT NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_CodebaseScans_created_at DEFAULT SYSUTCDATETIME()
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScans_user_id DEFAULT 0' },
+      { name: 'target_path', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_CodebaseScans_target_path DEFAULT N\'\'' },
+      { name: 'source_type', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_CodebaseScans_source_type DEFAULT N\'\'' },
+      { name: 'scan_focus', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_CodebaseScans_scan_focus DEFAULT N\'\'' },
+      { name: 'total_files', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScans_total_files DEFAULT 0' },
+      { name: 'critical_count', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScans_critical_count DEFAULT 0' },
+      { name: 'warning_count', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScans_warning_count DEFAULT 0' },
+      { name: 'info_count', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScans_info_count DEFAULT 0' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CodebaseScans_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_CodebaseScans',
+    indexes: [
+      {
+        name: 'IX_CodebaseScans_user_id',
+        sql: 'CREATE INDEX IX_CodebaseScans_user_id ON dbo.CodebaseScans(user_id);'
+      }
+    ]
+  },
+  {
+    name: 'CodebaseDependencies',
+    createSql: `
+      CREATE TABLE dbo.CodebaseDependencies (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CodebaseDependencies PRIMARY KEY,
+        scan_id INT NOT NULL,
+        name NVARCHAR(255) NOT NULL,
+        version NVARCHAR(50) NOT NULL,
+        manager NVARCHAR(100) NOT NULL,
+        type NVARCHAR(100) NOT NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_CodebaseDependencies_created_at DEFAULT SYSUTCDATETIME()
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'scan_id', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseDependencies_scan_id DEFAULT 0' },
+      { name: 'name', sql: 'NVARCHAR(255) NOT NULL CONSTRAINT DF_CodebaseDependencies_name DEFAULT N\'\'' },
+      { name: 'version', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_CodebaseDependencies_version DEFAULT N\'\'' },
+      { name: 'manager', sql: 'NVARCHAR(100) NOT NULL CONSTRAINT DF_CodebaseDependencies_manager DEFAULT N\'\'' },
+      { name: 'type', sql: 'NVARCHAR(100) NOT NULL CONSTRAINT DF_CodebaseDependencies_type DEFAULT N\'\'' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CodebaseDependencies_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_CodebaseDependencies',
+    indexes: [
+      {
+        name: 'IX_CodebaseDependencies_scan_id',
+        sql: 'CREATE INDEX IX_CodebaseDependencies_scan_id ON dbo.CodebaseDependencies(scan_id);'
+      }
+    ]
   }
 ];
+
 
 async function objectExists(pool, name, type) {
   const result = await pool.request()
@@ -355,6 +422,8 @@ async function initDb() {
   await ensureForeignKey(pool, 'Pages', 'FK_Pages_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Widgets', 'FK_Widgets_Pages', 'FOREIGN KEY (page_id) REFERENCES dbo.Pages(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'PhasrAudits', 'FK_PhasrAudits_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CodebaseScans', 'FK_CodebaseScans_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CodebaseDependencies', 'FK_CodebaseDependencies_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 

@@ -336,15 +336,50 @@
         </div>
     </div>
 
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Retrieve reports
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Retrieve reports from localStorage
             const auditDataStr = localStorage.getItem('latestAuditReport');
             const codebaseDataStr = localStorage.getItem('latestCodebaseReport');
 
             // Determine mode. Check query param or select most relevant report.
             const params = new URLSearchParams(window.location.search);
+            const scanId = params.get('scanId');
             const mode = params.get('mode') || (codebaseDataStr ? 'codebase' : 'audit');
+
+            // If a specific DB scan ID is requested, fetch it live from the API
+            if (scanId) {
+                document.getElementById('target-subtitle').innerText = `Loading scan #${scanId} from database...`;
+                document.getElementById('codebase-report-view').innerHTML = `
+                    <div style="text-align:center; padding:3rem; color:var(--text-secondary);">
+                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">⏳</div>
+                        Fetching scan report from database...
+                    </div>
+                `;
+                try {
+                    const origin = window.location.origin;
+                    const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                    const res = await fetch(`${apiBase}/api/admin/phasr/scans/${scanId}`, { credentials: 'include' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.scan) {
+                        renderCodebaseReport(payload.data.scan);
+                    } else {
+                        throw new Error(payload.error || 'Unknown error');
+                    }
+                } catch (err) {
+                    document.getElementById('target-subtitle').innerText = `Failed to load scan #${scanId}`;
+                    document.getElementById('codebase-report-view').innerHTML = `
+                        <div style="text-align:center; padding:3rem; color:#ff3366;">
+                            <div style="font-size:1.5rem; margin-bottom:0.5rem;">✗</div>
+                            Failed to load scan from database: ${err.message}<br>
+                            <span style="font-size:0.75rem; color:var(--text-secondary);">Ensure you are logged in and the server is running.</span>
+                        </div>
+                    `;
+                }
+                return;
+            }
 
             if (mode === 'codebase' && codebaseDataStr) {
                 renderCodebaseReport(JSON.parse(codebaseDataStr));
@@ -361,6 +396,7 @@
                 `;
             }
         });
+
 
         function renderAuditReport(report) {
             document.title = "PHASR Shield | Cache State Audit Telemetry";
@@ -579,10 +615,55 @@
                 return;
             }
 
+            // Build Dependency Table HTML
+            let depRows = '';
+            if (report.dependencies && report.dependencies.length > 0) {
+                report.dependencies.forEach(dep => {
+                    depRows += `
+                        <tr>
+                            <td style="font-weight:bold; color:#00ffaa; font-family:monospace; font-size:0.78rem;">${dep.name}</td>
+                            <td style="color:#ffffff; font-family:monospace; font-size:0.78rem;">${dep.version}</td>
+                            <td style="color:var(--text-secondary); font-size:0.75rem;">${dep.manager}</td>
+                            <td style="color:#ffaa00; font-size:0.75rem; font-family:monospace;">${dep.type}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                depRows = `
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:var(--text-secondary); padding:2rem; font-size:0.8rem; border:1px dashed rgba(255,255,255,0.05); border-radius:4px;">
+                            No codebase dependencies detected. (Ensure package.json, requirements.txt, go.mod, Cargo.toml, or CMakeLists.txt are present).
+                        </td>
+                    </tr>
+                `;
+            }
+
+            const depSection = `
+                <div class="cyber-card" style="margin-top:1.5rem;">
+                    <div class="card-title">Codebase Dependency Analysis Map</div>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">
+                        Parsed project package manager files and noted all imported external libraries:
+                    </p>
+                    <table class="telemetry-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Library Name</th>
+                                <th>Version Constraint</th>
+                                <th>Manager / File Source</th>
+                                <th>Dependency Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${depRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
             // Build Split Layout HTML
             document.getElementById('codebase-report-view').innerHTML = `
                 ${pipelineHTML}
-                <div style="display:grid; grid-template-columns: 0.9fr 1.1fr; gap:1.5rem; min-height: 550px;">
+                <div style="display:grid; grid-template-columns: 0.9fr 1.1fr; gap:1.5rem; min-height: 550px; margin-bottom:1.5rem;">
                     <!-- Left Sidebar: File Tree & Findings List -->
                     <div class="cyber-card" style="padding:1rem; margin:0; display:flex; flex-direction:column; gap:1rem;">
                         <div style="font-weight:bold; font-size:0.85rem; letter-spacing:0.5px; text-transform:uppercase; color:#ffffff; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.5rem;">
@@ -602,6 +683,7 @@
                         </div>
                     </div>
                 </div>
+                ${depSection}
             `;
 
             renderSidebarFindings();

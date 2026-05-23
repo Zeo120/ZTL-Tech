@@ -108,9 +108,15 @@ PHASR is our security audit platform.
 *   **`phasr/style.css`**: The stylesheet specifying security-themed crimson red styles.
 *   **`phasr/ztl_consent_agreement.txt`**: A terms and conditions agreement file that users upload when testing the PHASR scanner.
 *   **`phasr/admin.html`**: The dashboard console. It includes interactive diagrams mapping trust boundaries and a portal to submit DNS configurations for audits.
-*   **`phasr/nerd-stats.html`**: The codebase analyzer screen. It has a split layout: a list of flagged file files on the left, and a code editor pane on the right highlighting vulnerable lines.
+* **`phasr/nerd-stats.html`**: The codebase analyzer screen. It has a split layout: a list of flagged files on the left, and a code editor pane on the right highlighting vulnerable lines.
+* **`phasr/src/`**: The core source code directory for Phase-1 security verification.
+  * **`fsm_validator.asm`**: Core transition logic written in x86-64 assembly.
+  * **`phase_fsm.c`**: The self-contained C test runner and FDTD numerical wave simulation (with state mappings and configuration constants inlined).
+  * **`build.bat`**: The Windows build script using MSVC `ml64` and `cl`.
+
 
 ---
+
 
 ### Scalpel Folder Files (`scalpel/`)
 SCALPEL orchestrates automated workflows with human approval gates.
@@ -154,3 +160,21 @@ const forceHeroVisible = () => {
 };
 ```
 This forces the browser to register the hidden state first, resulting in a smooth animation.
+
+---
+
+### 3. Compiling and Running Phase-1 FSM Validator
+To compile and execute the FSM transition assertions and telemetry wave simulation:
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler and tools) are installed.
+2. Open a standard command prompt or terminal in the workspace root.
+3. Run the build batch file:
+   ```cmd
+   cd phasr\src
+   build.bat
+   ```
+4. This script automatically:
+   * Sets up the x64 environment via `vcvars64.bat`.
+   * Assembles `fsm_validator.asm` with MASM `ml64.exe`.
+   * Compiles and links `phase_fsm.c` with `cl.exe` utilizing security flags (`/GS`, `/guard:cf`, `/WX`).
+   * Runs the `phase_fsm.exe` binary displaying test outputs and a real-time ASCII wave simulation.
+
