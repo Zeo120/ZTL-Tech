@@ -339,12 +339,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const phase = params.get('phase');
+            if (phase) {
+                renderPhaseDrillLogs(parseInt(phase, 10));
+                return;
+            }
+
             // Retrieve reports from localStorage
             const auditDataStr = localStorage.getItem('latestAuditReport');
             const codebaseDataStr = localStorage.getItem('latestCodebaseReport');
 
             // Determine mode. Check query param or select most relevant report.
-            const params = new URLSearchParams(window.location.search);
             const scanId = params.get('scanId');
             const mode = params.get('mode') || (codebaseDataStr ? 'codebase' : 'audit');
 
@@ -821,6 +827,102 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+
+        async function renderPhaseDrillLogs(phaseNum) {
+            document.title = `PHASR | Phase ${phaseNum} Validation Console`;
+            document.getElementById('telemetry-main-title').innerText = `Phase ${phaseNum} Validation Logs`;
+            document.getElementById('target-subtitle').innerText = `Target: Local System Binary | Real-time process execution logs`;
+            
+            const badgeContainer = document.getElementById('safety-badge-container');
+            badgeContainer.innerHTML = `<span class="badge warning">DRILL ACTIVE</span>`;
+
+            document.getElementById('val-files-scanned').innerText = `PHASR P-${phaseNum}`;
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(1) .label').innerText = "Verifier Module";
+
+            document.getElementById('val-vulns-found').innerText = "PENDING";
+            document.getElementById('val-vulns-found').style.color = '#ffaa00';
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(2) .label').innerText = "Attestation State";
+
+            document.getElementById('val-critical').innerText = "0";
+            document.getElementById('val-critical').style.color = '#ffffff';
+            document.querySelector('.stat-badge-row .stat-badge-card:nth-child(3) .label').innerText = "Drill Failures";
+
+            document.getElementById('codebase-report-view').innerHTML = `
+                <div class="cyber-card">
+                    <div class="card-title">Live Process Verification Console</div>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1.2rem;">
+                        This terminal streams raw stdout logs and FDTD wave simulations directly from the compiled security validator.
+                    </p>
+                    <div id="live-drill-terminal" style="background:#020202; border:1px solid var(--surface-border); border-radius:4px; padding:1.2rem; height:480px; overflow-y:auto; font-family:monospace; font-size:0.75rem; color:#00ffaa; white-space:pre-wrap; line-height:1.4; box-shadow: inset 0 0 20px rgba(0,0,0,0.9);">[SYSTEM] Initializing console sync for Phase ${phaseNum}...
+</div>
+                </div>
+            `;
+
+            const terminal = document.getElementById('live-drill-terminal');
+            let displayedLogIds = new Set();
+
+            async function pollLogs() {
+                try {
+                    const origin = window.location.origin;
+                    const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                    const res = await fetch(`${apiBase}/api/admin/phasr/logs`, { credentials: 'include' });
+                    if (res.ok) {
+                        const payload = await res.json();
+                        if (payload.success && payload.data && payload.data.logs) {
+                            const logs = [...payload.data.logs].reverse();
+                            let addedAny = false;
+                            
+                            logs.forEach(log => {
+                                if (log.targetId === `Phase-${phaseNum}`) {
+                                    if (!displayedLogIds.has(log.id)) {
+                                        displayedLogIds.add(log.id);
+                                        addedAny = true;
+                                        
+                                        const timeStr = new Date(log.createdAt).toLocaleTimeString();
+                                        const detailsText = log.metadata && log.metadata.details ? log.metadata.details : '';
+                                        
+                                        if (detailsText) {
+                                            const lineDiv = document.createElement('div');
+                                            lineDiv.style.marginBottom = '0.2rem';
+                                            
+                                            if (log.action === 'phasr.drill_success' || detailsText.includes('[SUCCESS]')) {
+                                                lineDiv.style.color = '#00ffaa';
+                                                document.getElementById('val-vulns-found').innerText = "VERIFIED";
+                                                document.getElementById('val-vulns-found').style.color = '#00ffaa';
+                                                badgeContainer.innerHTML = `<span class="badge secure">PASSED</span>`;
+                                            } else if (log.action === 'phasr.drill_failed' || detailsText.includes('[ERROR]') || detailsText.includes('[CRITICAL]')) {
+                                                lineDiv.style.color = '#ff3366';
+                                                document.getElementById('val-vulns-found').innerText = "FAILED";
+                                                document.getElementById('val-vulns-found').style.color = '#ff3366';
+                                                document.getElementById('val-critical').innerText = "1";
+                                                document.getElementById('val-critical').style.color = '#ff3366';
+                                                badgeContainer.innerHTML = `<span class="badge vulnerable">FAILED</span>`;
+                                            } else if (log.action === 'phasr.drill_started' || detailsText.includes('[DRILL]')) {
+                                                lineDiv.style.color = '#ffaa00';
+                                            } else {
+                                                lineDiv.style.color = '#00ffaa';
+                                            }
+                                            
+                                            lineDiv.innerHTML = `<span style="color: rgba(200,200,200,0.3)">[${timeStr}]</span> ${detailsText}`;
+                                            terminal.appendChild(lineDiv);
+                                        }
+                                    }
+                                }
+                            });
+
+                            if (addedAny) {
+                                terminal.scrollTop = terminal.scrollHeight;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error polling logs for phase", e);
+                }
+            }
+
+            await pollLogs();
+            setInterval(pollLogs, 1500);
         }
     </script>
 </body>
