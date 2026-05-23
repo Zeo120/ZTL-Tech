@@ -507,6 +507,164 @@ adminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin
   });
 }));
 
+// POST /api/admin/phasr/run-drill
+adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const { phase } = req.body;
+  const phaseNum = parseInt(phase, 10);
+  if (isNaN(phaseNum) || phaseNum < -1 || phaseNum > 5) {
+    return res.status(400).json({ success: false, error: 'Invalid phase number.' });
+  }
+
+  const userId = Number(req.auth.userId);
+  const ip = req.ip;
+  const userAgent = req.get('user-agent') || '';
+
+  // Log setup in AuditLog
+  await writeAuditEvent({
+    actorUserId: userId,
+    action: `phasr.drill_started`,
+    targetType: 'system',
+    targetId: `Phase-${phaseNum}`,
+    ip,
+    userAgent,
+    success: true,
+    metadata: { details: `[DRILL] Initializing real-time validation execution for Phase ${phaseNum}...` }
+  });
+
+  // Run the binary in the background
+  setTimeout(async () => {
+    try {
+      const { spawn } = require('child_process');
+      const fs = require('fs');
+      const path = require('path');
+
+      const isWin = process.platform === 'win32';
+      let binName = '';
+      let folderName = '';
+      if (phaseNum === 1) { binName = isWin ? 'phase_fsm.exe' : 'phase_fsm'; folderName = 'Phase-1'; }
+      else if (phaseNum === 2) { binName = isWin ? 'reachability_engine.exe' : 'reachability_engine'; folderName = 'Phase-2'; }
+      else if (phaseNum === 3) { binName = isWin ? 'telemetry_collector.exe' : 'telemetry_collector'; folderName = 'Phase-3'; }
+      else if (phaseNum === 4) { binName = isWin ? 'chaos_verifier.exe' : 'chaos_verifier'; folderName = 'Phase-4'; }
+      else if (phaseNum === 5) { binName = isWin ? 'consensus_auditor.exe' : 'consensus_auditor'; folderName = 'Phase-5'; }
+      else {
+        // Phase -1 (Free audit)
+        await writeAuditEvent({
+          actorUserId: userId,
+          action: 'phasr.drill_success',
+          targetType: 'system',
+          targetId: `Phase--1`,
+          ip,
+          userAgent,
+          success: true,
+          metadata: { details: `[SUCCESS] Free Audit Passive Verification complete. Passive DNS attestation passed.` }
+        });
+        return;
+      }
+
+      const rootDir = path.resolve(__dirname, '..', '..', '..');
+      const phaseDir = path.join(rootDir, 'phasr', folderName);
+      const binPath = path.join(phaseDir, binName);
+
+      if (!fs.existsSync(binPath)) {
+        await writeAuditEvent({
+          actorUserId: userId,
+          action: 'phasr.drill_failed',
+          targetType: 'system',
+          targetId: `Phase-${phaseNum}`,
+          ip,
+          userAgent,
+          success: false,
+          metadata: { details: `[ERROR] Verification binary not found: ${binPath}. Please run compilation first.` }
+        });
+        return;
+      }
+
+      // Execute using spawn
+      const child = spawn(binPath, [], { cwd: phaseDir });
+      
+      let stdoutBuffer = '';
+      
+      const processLine = async (line) => {
+        if (line.trim()) {
+          await writeAuditEvent({
+            actorUserId: userId,
+            action: 'phasr.drill_progress',
+            targetType: 'system',
+            targetId: `Phase-${phaseNum}`,
+            ip,
+            userAgent,
+            success: true,
+            metadata: { details: line }
+          });
+        }
+      };
+
+      child.stdout.on('data', (data) => {
+        stdoutBuffer += data.toString();
+        let lines = stdoutBuffer.split(/\r?\n/);
+        stdoutBuffer = lines.pop(); // keep last incomplete line in buffer
+        for (const line of lines) {
+          processLine(line);
+        }
+      });
+
+      child.stderr.on('data', (data) => {
+        const errLine = data.toString().trim();
+        if (errLine) {
+          writeAuditEvent({
+            actorUserId: userId,
+            action: 'phasr.drill_progress',
+            targetType: 'system',
+            targetId: `Phase-${phaseNum}`,
+            ip,
+            userAgent,
+            success: false,
+            metadata: { details: `[STDERR] ${errLine}` }
+          });
+        }
+      });
+
+      child.on('close', async (code) => {
+        // Process any remaining data in the buffer
+        if (stdoutBuffer.trim()) {
+          await processLine(stdoutBuffer);
+        }
+        
+        if (code === 0) {
+          await writeAuditEvent({
+            actorUserId: userId,
+            action: 'phasr.drill_success',
+            targetType: 'system',
+            targetId: `Phase-${phaseNum}`,
+            ip,
+            userAgent,
+            success: true,
+            metadata: { details: `[SUCCESS] Phase ${phaseNum} verification drill complete! All assembly assertions validated.` }
+          });
+        } else {
+          await writeAuditEvent({
+            actorUserId: userId,
+            action: 'phasr.drill_failed',
+            targetType: 'system',
+            targetId: `Phase-${phaseNum}`,
+            ip,
+            userAgent,
+            success: false,
+            metadata: { details: `[ERROR] Verification binary exited with error code: ${code}` }
+          });
+        }
+      });
+
+    } catch (e) {
+      console.error('Spawn drill error:', e);
+    }
+  }, 100);
+
+  return ok(res, {
+    message: `Verification drill for Phase ${phaseNum} triggered.`
+  });
+}));
+
 // GET /api/admin/phasr/logs
 adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);

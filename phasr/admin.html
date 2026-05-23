@@ -977,25 +977,37 @@
             }
         }
 
-        function runPhaseAudit(num) {
-            logEvent("[PHASR Timeline] Initiating active audits for Phase " + num + ": " + phasesData[num].title + "...", 'terminal-info');
+        async function runPhaseAudit(num) {
+            logEvent("[PHASR Timeline] Initiating active verification drill for Phase " + num + "...", 'terminal-info');
             
-            setTimeout(() => {
-                verifiedPhases[num] = true;
-                const card = num === -1 ? document.getElementById('card-t-1') : document.getElementById("card-t" + num);
-                if (card) {
-                    card.classList.add('verified');
-                    const statusText = card.querySelector('.phase-card-status');
-                    if (statusText) {
-                        statusText.innerHTML = '<span class="status-indicator verified"></span> VERIFIED';
-                    }
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const csrfToken = getCookie('ztl_csrf');
+                
+                const response = await fetch(`${apiBase}/api/admin/phasr/run-drill`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': csrfToken
+                    },
+                    body: JSON.stringify({ phase: num })
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    logEvent(`[INFO] Phase ${num} verification drill triggered successfully. Executing test binary...`, 'terminal-warn');
+                    setTimeout(pollRealLogs, 200);
+                } else {
+                    const err = payload.error || `Failed to trigger Phase ${num} verification drill.`;
+                    logEvent(`[ERROR] Drill trigger failed: ${err}`, 'terminal-error');
+                    alert(`Error: ${err}`);
                 }
-                
-                updateProgress();
-                
-                logEvent("[SUCCESS] Phase " + num + " security variables audited. Mitigations validated.", 'terminal-success');
-                selectPhase(num); // refresh view
-            }, 1000);
+            } catch (error) {
+                logEvent(`[ERROR] Connection failed while triggering Phase ${num} verification drill.`, 'terminal-error');
+                alert('Connection error occurred. Ensure the server is online.');
+            }
         }
 
         function getCookie(name) {
@@ -1080,6 +1092,27 @@
                                     }
                                 }
                             }
+
+                            if (log.action === 'phasr.drill_success') {
+                                const matched = log.targetId ? log.targetId.match(/Phase-(-?\d+)/) : null;
+                                if (matched) {
+                                    const phaseNum = parseInt(matched[1], 10);
+                                    verifiedPhases[phaseNum] = true;
+                                    const card = phaseNum === -1 ? document.getElementById('card-t-1') : document.getElementById("card-t" + phaseNum);
+                                    if (card) {
+                                        card.classList.add('verified');
+                                        const statusText = card.querySelector('.phase-card-status');
+                                        if (statusText) {
+                                            statusText.innerHTML = '<span class="status-indicator verified"></span> VERIFIED';
+                                        }
+                                    }
+                                    updateProgress();
+                                    if (currentPhase === phaseNum) {
+                                        selectPhase(phaseNum);
+                                    }
+                                }
+                            }
+
 
                             if (!displayedLogIds.has(log.id)) {
                                 displayedLogIds.add(log.id);
