@@ -120,8 +120,16 @@ PHASR is our security audit platform.
 * **`phasr/Phase-2/`**: The source directory for Phase-2 hierarchy access boundary verification.
   * **`reachability_engine.cpp`**: C++ driver and verification suite, implementing a damped numerical wave simulation and containing 1,000 unit tests.
   * **`reachability_arm64.s`**: High-performance ARM64 assembly implementation of transitive closure sweeps.
+  * **`reachability_linux_x64.s`**: High-performance x86-64 assembly implementation of transitive closure sweeps.
   * **`Makefile`**: Cross-platform Makefile to compile the assembly on ARM64 or compile the C++ fallback on other hosts.
   * **`build.bat`**: Windows MSVC compilation and test runner script.
+* **`phasr/Phase-3/`**: The source directory for Phase-3 invariant drift & telemetry monitoring.
+  * **`telemetry_collector.c`**: C driver and emulated eBPF ring buffer, containing C fallback invariants and 500 unit tests.
+  * **`telemetry_linux_x64.s`**: Statically generated x86-64 assembly containing 4,500 invariant checks.
+  * **`telemetry_arm64.s`**: Statically generated ARM64 assembly containing 4,500 invariant checks.
+  * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
+  * **`build.bat`**: Windows MSVC compilation and test runner script.
+
 
 
 
@@ -245,4 +253,37 @@ The reachability engine compiles with either of the two assembly back-ends (x86-
 > **Note:** The Phase-2 assembly files are auto-generated. To regenerate them:
 > * Linux x86-64: `node generate_reachability_asm_x64.js`
 > * Linux ARM64: `node generate_reachability_asm_arm64.js`
+
+---
+
+### 5. Compiling and Running Phase-3 Telemetry Collector
+
+The telemetry collector compiles with either of the two assembly back-ends (x86-64 / ARM64) or a C fallback.
+
+#### Option A — Windows x86-64 (MSVC C Fallback)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler) is installed.
+2. Run the build batch file:
+   ```cmd
+   cd phasr\Phase-3
+   build.bat
+   ```
+3. The script compiles `telemetry_collector.c` with `/W4 /WX /GS` flags and executes the test suite.
+
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/Phase-3
+   make
+   ```
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `telemetry_linux_x64.s` (on x86-64) or `telemetry_arm64.s` (on ARM64), falling back to C on other architectures.
+3. Run the output binary:
+   ```bash
+   ./telemetry_collector
+   ```
+
+> **Note:** The Phase-3 assembly files are auto-generated. To regenerate them, run:
+> * `node generate_phase_3.js`
+
 
