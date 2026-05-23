@@ -209,6 +209,40 @@ The FSM validator ships with two assembly back-ends and a pure-C fallback.
    ./phase_fsm
    ```
 
-> **Note:** The assembly files are auto-generated. To regenerate them:
+> **Note:** The Phase-1 assembly files are auto-generated. To regenerate them:
 > * Linux x86-64: `node generate_fsm_asm_linux_x64.js`
 > * Linux ARM64: `node generate_fsm_asm_arm64.js`
+
+---
+
+### 4. Compiling and Running Phase-2 Hierarchy Reachability Engine
+
+The reachability engine compiles with either of the two assembly back-ends (x86-64 / ARM64) or a C++ fallback.
+
+#### Option A — Windows x86-64 (MSVC C++ Fallback)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler) is installed.
+2. Run the build batch file:
+   ```cmd
+   cd phasr\Phase-2
+   build.bat
+   ```
+3. The script compiles `reachability_engine.cpp` with `/EHsc /W4 /WX /GS` flags and executes the test suite.
+
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/Phase-2
+   make
+   ```
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `reachability_linux_x64.s` (on x86-64) or `reachability_arm64.s` (on ARM64), falling back to C++ on other architectures.
+3. Run the output binary:
+   ```bash
+   ./reachability_engine
+   ```
+
+> **Note:** The Phase-2 assembly files are auto-generated. To regenerate them:
+> * Linux x86-64: `node generate_reachability_asm_x64.js`
+> * Linux ARM64: `node generate_reachability_asm_arm64.js`
+
