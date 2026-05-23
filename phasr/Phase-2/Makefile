@@ -16,6 +16,12 @@ ifeq ($(PLATFORM),arm64)
     AS      := as
     ASFLAGS :=
     CXXFLAGS += -D__aarch64__
+else ifeq ($(PLATFORM),x64)
+    ASM_SRC := reachability_linux_x64.s
+    ASM_OBJ := reachability_linux_x64.o
+    AS      := as
+    ASFLAGS := --64
+    CXXFLAGS += -D__x86_64__ -D__linux__
 else ifeq ($(UNAME_M),aarch64)
     ASM_SRC := reachability_arm64.s
     ASM_OBJ := reachability_arm64.o
@@ -28,8 +34,14 @@ else ifeq ($(UNAME_M),arm64)
     AS      := as
     ASFLAGS :=
     CXXFLAGS += -D__aarch64__
+else ifeq ($(UNAME_M),x86_64)
+    ASM_SRC := reachability_linux_x64.s
+    ASM_OBJ := reachability_linux_x64.o
+    AS      := as
+    ASFLAGS := --64
+    CXXFLAGS += -D__x86_64__ -D__linux__
 else
-    $(warning Non-ARM64 host $(UNAME_M) detected — compiling C++ fallback engine)
+    $(warning Unknown architecture $(UNAME_M) — compiling C++ fallback engine)
     FALLBACK := 1
 endif
 
@@ -45,7 +57,7 @@ reachability_engine.o: reachability_engine.cpp
 
 $(TARGET): reachability_engine.o $(ASM_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-	echo "[OK] Built $(TARGET) with ARM64 NEON Assembly engine"
+	echo "[OK] Built $(TARGET) using $(ASM_SRC) assembly engine"
 
 else
 
