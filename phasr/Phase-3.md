@@ -52,7 +52,7 @@ The engine dispatches invariant audits using target-specific calling conventions
 
 ## 4. Cascading Failure Wave Simulation
 
- cascading failure propagation across dependency chains is modeled using a discrete FDTD solver simulating the wave equation:
+Cascading failure propagation across dependency chains is modeled using a discrete FDTD solver simulating the wave equation:
 $$\frac{\partial^2 \phi_A}{\partial t^2} + \gamma_A \frac{\partial \phi_A}{\partial t} = v_A^2 \nabla^2 \phi_A$$
 
 Where:

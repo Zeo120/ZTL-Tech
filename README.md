@@ -129,6 +129,13 @@ PHASR is our security audit platform.
   * **`telemetry_arm64.s`**: Statically generated ARM64 assembly containing 4,500 invariant checks.
   * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
   * **`build.bat`**: Windows MSVC compilation and test runner script.
+* **`phasr/Phase-4/`**: The source directory for Phase-4 solutions mitigation & chaos verification.
+  * **`chaos_verifier.cpp`**: C++ driver and verification suite, implementing a driven FDTD wave simulation and containing 1,000 unit tests.
+  * **`control_linux_x64.s`**: Statically generated x86-64 assembly containing 4,500 control verification helper routines.
+  * **`control_arm64.s`**: Statically generated ARM64 assembly containing 4,500 control verification helper routines.
+  * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
+  * **`build.bat`**: Windows MSVC C++ compilation and test runner script.
+
 
 
 
@@ -285,5 +292,38 @@ The telemetry collector compiles with either of the two assembly back-ends (x86-
 
 > **Note:** The Phase-3 assembly files are auto-generated. To regenerate them, run:
 > * `node generate_phase_3.js`
+
+---
+
+### 6. Compiling and Running Phase-4 Chaos Verifier
+
+The chaos verifier compiles with either of the two assembly back-ends (x86-64 / ARM64) or a C++ fallback.
+
+#### Option A — Windows x86-64 (MSVC C++ Fallback)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler) is installed.
+2. Run the build batch file:
+   ```cmd
+   cd phasr\Phase-4
+   build.bat
+   ```
+3. The script compiles `chaos_verifier.cpp` with `/EHsc /W4 /WX /GS` flags and executes the test suite.
+
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/Phase-4
+   make
+   ```
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `control_linux_x64.s` (on x86-64) or `control_arm64.s` (on ARM64), falling back to C++ on other architectures.
+3. Run the output binary:
+   ```bash
+   ./chaos_verifier
+   ```
+
+> **Note:** The Phase-4 assembly files are auto-generated. To regenerate them, run:
+> * `node generate_phase_4.js`
+
 
 
