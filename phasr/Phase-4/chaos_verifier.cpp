@@ -13,6 +13,8 @@
 #include <cmath>
 #include <stdint.h>
 #include <stdlib.h>
+#include <thread>
+#include "../compute_balancer.h"
 
 #define NUM_CONTROLS 4500
 #define NUM_TEST_CASES 1000
@@ -31652,7 +31654,7 @@ void print_wave_profile(const WaveSim *sim) {
     std::cout << "  +----------------------------------------+\n";
 }
 
-void run_test_batch_0_to_100() {
+void run_test_batch_0_to_100(TestStats& stats) {
     { // Test Case 0
         ControlStatus cs = { 0, 2, 1, 1, 15, 5, 5, 1 };
         int computed_passes = 0;
@@ -31662,11 +31664,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 0 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31684,11 +31686,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 1 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31706,11 +31708,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 2 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31728,11 +31730,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 3 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31750,11 +31752,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 4 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31772,11 +31774,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 5 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31794,11 +31796,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 6 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31816,11 +31818,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 7 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31838,11 +31840,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 8 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31860,11 +31862,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 9 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31882,11 +31884,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 10 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31904,11 +31906,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 11 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31926,11 +31928,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 12 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31948,11 +31950,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 13 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31970,11 +31972,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 14 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -31992,11 +31994,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 15 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32014,11 +32016,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 16 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32036,11 +32038,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 17 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32058,11 +32060,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 18 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32080,11 +32082,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 19 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32102,11 +32104,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 20 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32124,11 +32126,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 21 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32146,11 +32148,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 22 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32168,11 +32170,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 23 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32190,11 +32192,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 24 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32212,11 +32214,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 25 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32234,11 +32236,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 26 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32256,11 +32258,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 27 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32278,11 +32280,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 28 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32300,11 +32302,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 29 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32322,11 +32324,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 30 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32344,11 +32346,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 31 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32366,11 +32368,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 32 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32388,11 +32390,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 33 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32410,11 +32412,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 34 << " (Expected Passes: " << 5 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32432,11 +32434,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 35 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32454,11 +32456,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 36 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32476,11 +32478,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 37 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32498,11 +32500,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 38 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32520,11 +32522,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 39 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32542,11 +32544,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 40 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32564,11 +32566,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 41 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32586,11 +32588,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 42 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32608,11 +32610,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 43 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32630,11 +32632,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 44 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32652,11 +32654,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 45 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32674,11 +32676,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 46 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32696,11 +32698,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 47 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32718,11 +32720,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 48 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32740,11 +32742,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 49 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32762,11 +32764,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 50 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32784,11 +32786,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 51 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32806,11 +32808,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 52 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32828,11 +32830,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 53 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32850,11 +32852,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 54 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32872,11 +32874,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 55 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32894,11 +32896,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 56 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32916,11 +32918,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 57 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32938,11 +32940,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 58 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32960,11 +32962,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 59 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -32982,11 +32984,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 60 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33004,11 +33006,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 61 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33026,11 +33028,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 62 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33048,11 +33050,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 63 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33070,11 +33072,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 64 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33092,11 +33094,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 65 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33114,11 +33116,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 66 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33136,11 +33138,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 67 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33158,11 +33160,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 68 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33180,11 +33182,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 69 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33202,11 +33204,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 70 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33224,11 +33226,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 71 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33246,11 +33248,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 72 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33268,11 +33270,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 73 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33290,11 +33292,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 74 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33312,11 +33314,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 75 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33334,11 +33336,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 76 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33356,11 +33358,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 77 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33378,11 +33380,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 78 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33400,11 +33402,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 79 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33422,11 +33424,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 80 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33444,11 +33446,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 81 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33466,11 +33468,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 82 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33488,11 +33490,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 83 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33510,11 +33512,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 84 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33532,11 +33534,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 85 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33554,11 +33556,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 86 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33576,11 +33578,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 87 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33598,11 +33600,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 88 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33620,11 +33622,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 89 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33642,11 +33644,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 90 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33664,11 +33666,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 91 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33686,11 +33688,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 92 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33708,11 +33710,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 93 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33730,11 +33732,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 94 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33752,11 +33754,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 95 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33774,11 +33776,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 96 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33796,11 +33798,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 97 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33818,11 +33820,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 98 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33840,11 +33842,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 99 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33855,7 +33857,7 @@ void run_test_batch_0_to_100() {
     }
 }
 
-void run_test_batch_100_to_200() {
+void run_test_batch_100_to_200(TestStats& stats) {
     { // Test Case 100
         ControlStatus cs = { 0, 2, 1, 0, 8, 9, 57, 3 };
         int computed_passes = 0;
@@ -33865,11 +33867,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 100 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33887,11 +33889,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 101 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33909,11 +33911,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 102 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33931,11 +33933,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 103 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33953,11 +33955,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 104 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33975,11 +33977,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 105 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -33997,11 +33999,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 106 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34019,11 +34021,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 107 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34041,11 +34043,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 108 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34063,11 +34065,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 109 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34085,11 +34087,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 110 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34107,11 +34109,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 111 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34129,11 +34131,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 112 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34151,11 +34153,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 113 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34173,11 +34175,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 114 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34195,11 +34197,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 115 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34217,11 +34219,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 116 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34239,11 +34241,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 117 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34261,11 +34263,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 118 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34283,11 +34285,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 119 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34305,11 +34307,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 120 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34327,11 +34329,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 121 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34349,11 +34351,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 122 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34371,11 +34373,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 123 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34393,11 +34395,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 124 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34415,11 +34417,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 125 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34437,11 +34439,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 126 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34459,11 +34461,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 127 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34481,11 +34483,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 128 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34503,11 +34505,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 129 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34525,11 +34527,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 130 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34547,11 +34549,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 131 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34569,11 +34571,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 132 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34591,11 +34593,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 133 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34613,11 +34615,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 134 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34635,11 +34637,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 135 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34657,11 +34659,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 136 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34679,11 +34681,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 137 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34701,11 +34703,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 138 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34723,11 +34725,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 139 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34745,11 +34747,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 140 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34767,11 +34769,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 141 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34789,11 +34791,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 142 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34811,11 +34813,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 143 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34833,11 +34835,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 144 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34855,11 +34857,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 145 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34877,11 +34879,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 146 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34899,11 +34901,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 147 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34921,11 +34923,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 148 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34943,11 +34945,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 149 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34965,11 +34967,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 150 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -34987,11 +34989,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 151 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35009,11 +35011,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 152 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35031,11 +35033,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 153 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35053,11 +35055,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 154 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35075,11 +35077,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 155 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35097,11 +35099,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 156 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35119,11 +35121,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 157 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35141,11 +35143,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 158 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35163,11 +35165,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 159 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35185,11 +35187,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 160 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35207,11 +35209,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 161 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35229,11 +35231,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 162 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35251,11 +35253,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 163 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35273,11 +35275,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 164 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35295,11 +35297,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 165 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35317,11 +35319,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 166 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35339,11 +35341,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 167 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35361,11 +35363,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 168 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35383,11 +35385,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 169 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35405,11 +35407,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 170 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35427,11 +35429,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 171 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35449,11 +35451,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 172 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35471,11 +35473,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 173 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35493,11 +35495,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 174 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35515,11 +35517,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 175 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35537,11 +35539,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 176 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35559,11 +35561,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 177 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35581,11 +35583,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 178 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35603,11 +35605,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 179 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35625,11 +35627,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 180 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35647,11 +35649,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 181 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35669,11 +35671,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 182 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35691,11 +35693,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 183 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35713,11 +35715,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 184 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35735,11 +35737,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 185 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35757,11 +35759,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 186 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35779,11 +35781,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 187 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35801,11 +35803,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 188 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35823,11 +35825,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 189 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35845,11 +35847,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 190 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35867,11 +35869,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 191 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35889,11 +35891,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 192 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35911,11 +35913,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 193 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35933,11 +35935,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 194 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35955,11 +35957,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 195 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35977,11 +35979,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 196 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -35999,11 +36001,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 197 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36021,11 +36023,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 198 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36043,11 +36045,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 199 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36058,7 +36060,7 @@ void run_test_batch_100_to_200() {
     }
 }
 
-void run_test_batch_200_to_300() {
+void run_test_batch_200_to_300(TestStats& stats) {
     { // Test Case 200
         ControlStatus cs = { 0, 1, 2, 1, 13, 7, 41, 1 };
         int computed_passes = 0;
@@ -36068,11 +36070,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 200 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36090,11 +36092,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 201 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36112,11 +36114,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 202 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36134,11 +36136,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 203 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36156,11 +36158,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 204 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36178,11 +36180,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 205 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36200,11 +36202,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 206 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36222,11 +36224,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 207 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36244,11 +36246,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 208 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36266,11 +36268,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 209 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36288,11 +36290,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 210 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36310,11 +36312,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 211 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36332,11 +36334,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 212 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36354,11 +36356,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 213 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36376,11 +36378,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 214 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36398,11 +36400,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 215 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36420,11 +36422,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 216 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36442,11 +36444,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 217 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36464,11 +36466,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 218 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36486,11 +36488,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 219 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36508,11 +36510,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 220 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36530,11 +36532,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 221 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36552,11 +36554,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 222 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36574,11 +36576,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 223 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36596,11 +36598,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 224 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36618,11 +36620,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 225 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36640,11 +36642,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 226 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36662,11 +36664,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 227 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36684,11 +36686,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 228 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36706,11 +36708,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 229 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36728,11 +36730,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 230 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36750,11 +36752,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 231 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36772,11 +36774,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 232 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36794,11 +36796,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 233 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36816,11 +36818,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 234 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36838,11 +36840,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 235 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36860,11 +36862,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 236 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36882,11 +36884,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 237 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36904,11 +36906,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 238 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36926,11 +36928,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 239 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36948,11 +36950,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 240 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36970,11 +36972,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 241 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -36992,11 +36994,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 242 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37014,11 +37016,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 243 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37036,11 +37038,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 244 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37058,11 +37060,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 245 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37080,11 +37082,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 246 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37102,11 +37104,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 247 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37124,11 +37126,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 248 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37146,11 +37148,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 249 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37168,11 +37170,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 250 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37190,11 +37192,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 251 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37212,11 +37214,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 252 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37234,11 +37236,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 253 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37256,11 +37258,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 254 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37278,11 +37280,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 255 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37300,11 +37302,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 256 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37322,11 +37324,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 257 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37344,11 +37346,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 258 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37366,11 +37368,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 259 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37388,11 +37390,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 260 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37410,11 +37412,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 261 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37432,11 +37434,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 262 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37454,11 +37456,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 263 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37476,11 +37478,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 264 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37498,11 +37500,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 265 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37520,11 +37522,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 266 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37542,11 +37544,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 267 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37564,11 +37566,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 268 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37586,11 +37588,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 269 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37608,11 +37610,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 270 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37630,11 +37632,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 271 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37652,11 +37654,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 272 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37674,11 +37676,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 273 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37696,11 +37698,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 274 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37718,11 +37720,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 275 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37740,11 +37742,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 276 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37762,11 +37764,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 277 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37784,11 +37786,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 278 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37806,11 +37808,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 279 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37828,11 +37830,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 280 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37850,11 +37852,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 281 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37872,11 +37874,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 282 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37894,11 +37896,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 283 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37916,11 +37918,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 284 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37938,11 +37940,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 285 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37960,11 +37962,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 286 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -37982,11 +37984,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 287 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38004,11 +38006,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 288 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38026,11 +38028,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 289 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38048,11 +38050,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 290 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38070,11 +38072,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 291 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38092,11 +38094,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 292 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38114,11 +38116,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 293 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38136,11 +38138,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 294 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38158,11 +38160,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 295 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38180,11 +38182,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 296 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38202,11 +38204,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 297 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38224,11 +38226,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 298 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38246,11 +38248,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 299 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38261,7 +38263,7 @@ void run_test_batch_200_to_300() {
     }
 }
 
-void run_test_batch_300_to_400() {
+void run_test_batch_300_to_400(TestStats& stats) {
     { // Test Case 300
         ControlStatus cs = { 0, 4, 1, 0, 18, 12, 69, 8 };
         int computed_passes = 0;
@@ -38271,11 +38273,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 300 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38293,11 +38295,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 301 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38315,11 +38317,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 302 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38337,11 +38339,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 303 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38359,11 +38361,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 304 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38381,11 +38383,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 305 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38403,11 +38405,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 306 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38425,11 +38427,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 307 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38447,11 +38449,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 308 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38469,11 +38471,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 309 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38491,11 +38493,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 310 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38513,11 +38515,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 311 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38535,11 +38537,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 312 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38557,11 +38559,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 313 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38579,11 +38581,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 314 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38601,11 +38603,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 315 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38623,11 +38625,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 316 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38645,11 +38647,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 317 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38667,11 +38669,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 318 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38689,11 +38691,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 319 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38711,11 +38713,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 320 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38733,11 +38735,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 321 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38755,11 +38757,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 322 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38777,11 +38779,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 323 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38799,11 +38801,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 324 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38821,11 +38823,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 325 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38843,11 +38845,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 326 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38865,11 +38867,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 327 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38887,11 +38889,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 328 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38909,11 +38911,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 329 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38931,11 +38933,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 330 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38953,11 +38955,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 331 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38975,11 +38977,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 332 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -38997,11 +38999,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 333 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39019,11 +39021,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 334 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39041,11 +39043,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 335 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39063,11 +39065,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 336 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39085,11 +39087,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 337 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39107,11 +39109,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 338 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39129,11 +39131,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 339 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39151,11 +39153,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 340 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39173,11 +39175,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 341 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39195,11 +39197,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 342 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39217,11 +39219,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 343 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39239,11 +39241,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 344 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39261,11 +39263,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 345 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39283,11 +39285,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 346 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39305,11 +39307,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 347 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39327,11 +39329,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 348 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39349,11 +39351,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 349 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39371,11 +39373,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 350 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39393,11 +39395,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 351 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39415,11 +39417,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 352 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39437,11 +39439,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 353 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39459,11 +39461,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 354 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39481,11 +39483,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 355 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39503,11 +39505,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 356 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39525,11 +39527,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 357 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39547,11 +39549,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 358 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39569,11 +39571,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 359 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39591,11 +39593,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 360 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39613,11 +39615,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 361 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39635,11 +39637,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 362 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39657,11 +39659,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 363 << " (Expected Passes: " << 5 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39679,11 +39681,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 364 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39701,11 +39703,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 365 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39723,11 +39725,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 366 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39745,11 +39747,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 367 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39767,11 +39769,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 368 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39789,11 +39791,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 369 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39811,11 +39813,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 370 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39833,11 +39835,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 371 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39855,11 +39857,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 372 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39877,11 +39879,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 373 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39899,11 +39901,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 374 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39921,11 +39923,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 375 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39943,11 +39945,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 376 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39965,11 +39967,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 377 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -39987,11 +39989,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 378 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40009,11 +40011,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 379 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40031,11 +40033,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 380 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40053,11 +40055,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 381 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40075,11 +40077,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 382 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40097,11 +40099,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 383 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40119,11 +40121,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 384 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40141,11 +40143,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 385 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40163,11 +40165,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 386 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40185,11 +40187,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 387 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40207,11 +40209,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 388 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40229,11 +40231,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 389 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40251,11 +40253,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 390 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40273,11 +40275,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 391 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40295,11 +40297,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 392 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40317,11 +40319,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 393 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40339,11 +40341,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 394 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40361,11 +40363,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 395 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40383,11 +40385,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 396 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40405,11 +40407,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 397 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40427,11 +40429,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 398 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40449,11 +40451,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 399 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40464,7 +40466,7 @@ void run_test_batch_300_to_400() {
     }
 }
 
-void run_test_batch_400_to_500() {
+void run_test_batch_400_to_500(TestStats& stats) {
     { // Test Case 400
         ControlStatus cs = { 0, 1, 2, 1, 7, 5, 71, 7 };
         int computed_passes = 0;
@@ -40474,11 +40476,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 400 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40496,11 +40498,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 401 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40518,11 +40520,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 402 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40540,11 +40542,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 403 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40562,11 +40564,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 404 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40584,11 +40586,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 405 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40606,11 +40608,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 406 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40628,11 +40630,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 407 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40650,11 +40652,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 408 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40672,11 +40674,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 409 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40694,11 +40696,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 410 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40716,11 +40718,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 411 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40738,11 +40740,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 412 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40760,11 +40762,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 413 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40782,11 +40784,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 414 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40804,11 +40806,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 415 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40826,11 +40828,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 416 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40848,11 +40850,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 417 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40870,11 +40872,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 418 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40892,11 +40894,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 419 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40914,11 +40916,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 420 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40936,11 +40938,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 421 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40958,11 +40960,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 422 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -40980,11 +40982,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 423 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41002,11 +41004,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 424 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41024,11 +41026,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 425 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41046,11 +41048,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 426 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41068,11 +41070,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 427 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41090,11 +41092,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 428 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41112,11 +41114,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 429 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41134,11 +41136,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 430 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41156,11 +41158,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 431 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41178,11 +41180,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 432 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41200,11 +41202,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 433 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41222,11 +41224,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 434 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41244,11 +41246,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 435 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41266,11 +41268,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 436 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41288,11 +41290,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 437 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41310,11 +41312,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 438 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41332,11 +41334,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 439 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41354,11 +41356,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 440 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41376,11 +41378,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 441 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41398,11 +41400,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 442 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41420,11 +41422,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 443 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41442,11 +41444,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 444 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41464,11 +41466,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 445 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41486,11 +41488,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 446 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41508,11 +41510,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 447 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41530,11 +41532,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 448 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41552,11 +41554,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 449 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41574,11 +41576,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 450 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41596,11 +41598,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 451 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41618,11 +41620,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 452 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41640,11 +41642,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 453 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41662,11 +41664,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 454 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41684,11 +41686,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 455 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41706,11 +41708,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 456 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41728,11 +41730,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 457 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41750,11 +41752,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 458 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41772,11 +41774,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 459 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41794,11 +41796,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 460 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41816,11 +41818,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 461 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41838,11 +41840,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 462 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41860,11 +41862,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 463 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41882,11 +41884,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 464 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41904,11 +41906,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 465 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41926,11 +41928,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 466 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41948,11 +41950,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 467 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41970,11 +41972,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 468 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -41992,11 +41994,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 469 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42014,11 +42016,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 470 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42036,11 +42038,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 471 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42058,11 +42060,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 472 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42080,11 +42082,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 473 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42102,11 +42104,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 474 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42124,11 +42126,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 475 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42146,11 +42148,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 476 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42168,11 +42170,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 477 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42190,11 +42192,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 478 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42212,11 +42214,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 479 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42234,11 +42236,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 480 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42256,11 +42258,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 481 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42278,11 +42280,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 482 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42300,11 +42302,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 483 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42322,11 +42324,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 484 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42344,11 +42346,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 485 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42366,11 +42368,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 486 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42388,11 +42390,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 487 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42410,11 +42412,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 488 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42432,11 +42434,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 489 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42454,11 +42456,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 490 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42476,11 +42478,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 491 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42498,11 +42500,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 492 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42520,11 +42522,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 493 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42542,11 +42544,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 494 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42564,11 +42566,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 495 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42586,11 +42588,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 496 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42608,11 +42610,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 497 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42630,11 +42632,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 498 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42652,11 +42654,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 499 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42667,7 +42669,7 @@ void run_test_batch_400_to_500() {
     }
 }
 
-void run_test_batch_500_to_600() {
+void run_test_batch_500_to_600(TestStats& stats) {
     { // Test Case 500
         ControlStatus cs = { 0, 4, 2, 1, 13, 11, 40, 8 };
         int computed_passes = 0;
@@ -42677,11 +42679,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 500 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42699,11 +42701,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 501 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42721,11 +42723,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 502 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42743,11 +42745,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 503 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42765,11 +42767,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 504 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42787,11 +42789,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 505 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42809,11 +42811,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 506 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42831,11 +42833,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 507 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42853,11 +42855,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 508 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42875,11 +42877,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 509 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42897,11 +42899,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 510 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42919,11 +42921,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 511 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42941,11 +42943,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 512 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42963,11 +42965,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 513 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -42985,11 +42987,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 514 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43007,11 +43009,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 515 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43029,11 +43031,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 516 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43051,11 +43053,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 517 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43073,11 +43075,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 518 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43095,11 +43097,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 519 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43117,11 +43119,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 520 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43139,11 +43141,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 521 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43161,11 +43163,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 522 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43183,11 +43185,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 523 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43205,11 +43207,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 524 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43227,11 +43229,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 525 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43249,11 +43251,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 526 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43271,11 +43273,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 527 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43293,11 +43295,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 528 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43315,11 +43317,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 529 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43337,11 +43339,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 530 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43359,11 +43361,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 531 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43381,11 +43383,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 532 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43403,11 +43405,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 533 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43425,11 +43427,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 534 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43447,11 +43449,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 535 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43469,11 +43471,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 536 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43491,11 +43493,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 537 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43513,11 +43515,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 538 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43535,11 +43537,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 539 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43557,11 +43559,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 540 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43579,11 +43581,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 541 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43601,11 +43603,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 542 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43623,11 +43625,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 543 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43645,11 +43647,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 544 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43667,11 +43669,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 545 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43689,11 +43691,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 546 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43711,11 +43713,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 547 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43733,11 +43735,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 548 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43755,11 +43757,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 549 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43777,11 +43779,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 550 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43799,11 +43801,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 551 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43821,11 +43823,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 552 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43843,11 +43845,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 553 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43865,11 +43867,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 554 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43887,11 +43889,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 555 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43909,11 +43911,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 556 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43931,11 +43933,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 557 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43953,11 +43955,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 558 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43975,11 +43977,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 559 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -43997,11 +43999,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 560 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44019,11 +44021,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 561 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44041,11 +44043,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 562 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44063,11 +44065,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 563 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44085,11 +44087,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 564 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44107,11 +44109,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 565 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44129,11 +44131,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 566 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44151,11 +44153,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 567 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44173,11 +44175,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 568 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44195,11 +44197,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 569 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44217,11 +44219,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 570 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44239,11 +44241,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 571 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44261,11 +44263,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 572 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44283,11 +44285,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 573 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44305,11 +44307,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 574 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44327,11 +44329,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 575 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44349,11 +44351,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 576 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44371,11 +44373,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 577 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44393,11 +44395,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 578 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44415,11 +44417,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 579 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44437,11 +44439,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 580 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44459,11 +44461,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 581 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44481,11 +44483,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 582 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44503,11 +44505,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 583 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44525,11 +44527,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 584 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44547,11 +44549,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 585 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44569,11 +44571,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 586 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44591,11 +44593,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 587 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44613,11 +44615,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 588 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44635,11 +44637,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 589 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44657,11 +44659,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 590 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44679,11 +44681,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 591 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44701,11 +44703,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 592 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44723,11 +44725,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 593 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44745,11 +44747,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 594 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44767,11 +44769,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 595 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44789,11 +44791,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 596 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44811,11 +44813,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 597 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44833,11 +44835,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 598 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44855,11 +44857,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 599 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44870,7 +44872,7 @@ void run_test_batch_500_to_600() {
     }
 }
 
-void run_test_batch_600_to_700() {
+void run_test_batch_600_to_700(TestStats& stats) {
     { // Test Case 600
         ControlStatus cs = { 0, 4, 3, 0, 8, 12, 66, 3 };
         int computed_passes = 0;
@@ -44880,11 +44882,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 600 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44902,11 +44904,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 601 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44924,11 +44926,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 602 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44946,11 +44948,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 603 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44968,11 +44970,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 604 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -44990,11 +44992,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 605 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45012,11 +45014,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 606 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45034,11 +45036,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 607 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45056,11 +45058,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 608 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45078,11 +45080,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 609 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45100,11 +45102,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 610 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45122,11 +45124,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 611 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45144,11 +45146,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 612 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45166,11 +45168,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 613 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45188,11 +45190,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 614 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45210,11 +45212,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 615 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45232,11 +45234,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 616 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45254,11 +45256,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 617 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45276,11 +45278,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 618 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45298,11 +45300,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 619 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45320,11 +45322,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 620 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45342,11 +45344,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 621 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45364,11 +45366,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 622 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45386,11 +45388,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 623 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45408,11 +45410,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 624 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45430,11 +45432,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 625 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45452,11 +45454,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 626 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45474,11 +45476,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 627 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45496,11 +45498,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 628 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45518,11 +45520,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 629 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45540,11 +45542,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 630 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45562,11 +45564,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 631 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45584,11 +45586,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 632 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45606,11 +45608,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 633 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45628,11 +45630,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 634 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45650,11 +45652,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 635 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45672,11 +45674,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 636 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45694,11 +45696,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 637 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45716,11 +45718,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 638 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45738,11 +45740,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 639 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45760,11 +45762,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 640 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45782,11 +45784,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 641 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45804,11 +45806,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 642 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45826,11 +45828,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 643 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45848,11 +45850,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 644 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45870,11 +45872,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 645 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45892,11 +45894,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 646 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45914,11 +45916,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 647 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45936,11 +45938,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 648 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45958,11 +45960,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 649 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -45980,11 +45982,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 650 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46002,11 +46004,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 651 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46024,11 +46026,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 652 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46046,11 +46048,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 653 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46068,11 +46070,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 654 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46090,11 +46092,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 655 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46112,11 +46114,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 656 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46134,11 +46136,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 657 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46156,11 +46158,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 658 << " (Expected Passes: " << 5 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46178,11 +46180,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 659 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46200,11 +46202,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 660 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46222,11 +46224,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 661 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46244,11 +46246,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 662 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46266,11 +46268,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 663 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46288,11 +46290,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 664 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46310,11 +46312,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 665 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46332,11 +46334,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 666 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46354,11 +46356,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 667 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46376,11 +46378,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 668 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46398,11 +46400,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 669 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46420,11 +46422,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 670 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46442,11 +46444,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 671 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46464,11 +46466,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 672 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46486,11 +46488,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 673 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46508,11 +46510,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 674 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46530,11 +46532,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 675 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46552,11 +46554,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 676 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46574,11 +46576,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 677 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46596,11 +46598,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 678 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46618,11 +46620,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 679 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46640,11 +46642,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 680 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46662,11 +46664,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 681 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46684,11 +46686,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 682 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46706,11 +46708,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 683 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46728,11 +46730,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 684 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46750,11 +46752,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 685 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46772,11 +46774,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 686 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46794,11 +46796,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 687 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46816,11 +46818,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 688 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46838,11 +46840,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 689 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46860,11 +46862,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 690 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46882,11 +46884,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 691 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46904,11 +46906,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 692 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46926,11 +46928,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 693 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46948,11 +46950,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 694 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46970,11 +46972,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 695 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -46992,11 +46994,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 696 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47014,11 +47016,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 697 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47036,11 +47038,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 698 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47058,11 +47060,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 699 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47073,7 +47075,7 @@ void run_test_batch_600_to_700() {
     }
 }
 
-void run_test_batch_700_to_800() {
+void run_test_batch_700_to_800(TestStats& stats) {
     { // Test Case 700
         ControlStatus cs = { 0, 2, 2, 0, 8, 5, 43, 5 };
         int computed_passes = 0;
@@ -47083,11 +47085,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 700 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47105,11 +47107,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 701 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47127,11 +47129,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 702 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47149,11 +47151,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 703 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47171,11 +47173,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 704 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47193,11 +47195,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 705 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47215,11 +47217,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 706 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47237,11 +47239,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 707 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47259,11 +47261,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 708 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47281,11 +47283,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 709 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47303,11 +47305,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 710 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47325,11 +47327,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 711 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47347,11 +47349,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 712 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47369,11 +47371,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 713 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47391,11 +47393,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 714 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47413,11 +47415,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 715 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47435,11 +47437,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 716 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47457,11 +47459,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 717 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47479,11 +47481,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 718 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47501,11 +47503,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 719 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47523,11 +47525,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 720 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47545,11 +47547,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 721 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47567,11 +47569,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 722 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47589,11 +47591,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 723 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47611,11 +47613,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 724 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47633,11 +47635,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 725 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47655,11 +47657,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 726 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47677,11 +47679,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 727 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47699,11 +47701,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 728 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47721,11 +47723,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 729 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47743,11 +47745,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 730 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47765,11 +47767,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 731 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47787,11 +47789,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 732 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47809,11 +47811,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 733 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47831,11 +47833,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 734 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47853,11 +47855,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 735 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47875,11 +47877,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 736 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47897,11 +47899,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 737 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47919,11 +47921,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 738 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47941,11 +47943,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 739 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47963,11 +47965,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 740 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -47985,11 +47987,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 741 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48007,11 +48009,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 742 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48029,11 +48031,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 743 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48051,11 +48053,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 744 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48073,11 +48075,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 745 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48095,11 +48097,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 746 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48117,11 +48119,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 747 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48139,11 +48141,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 748 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48161,11 +48163,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 749 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48183,11 +48185,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 750 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48205,11 +48207,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 751 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48227,11 +48229,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 752 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48249,11 +48251,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 753 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48271,11 +48273,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 754 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48293,11 +48295,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 755 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48315,11 +48317,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 756 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48337,11 +48339,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 757 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48359,11 +48361,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 758 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48381,11 +48383,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 759 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48403,11 +48405,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 760 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48425,11 +48427,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 761 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48447,11 +48449,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 762 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48469,11 +48471,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 763 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48491,11 +48493,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 764 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48513,11 +48515,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 765 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48535,11 +48537,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 766 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48557,11 +48559,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 767 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48579,11 +48581,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 768 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48601,11 +48603,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 769 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48623,11 +48625,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 770 << " (Expected Passes: " << 6 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48645,11 +48647,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 771 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48667,11 +48669,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 772 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48689,11 +48691,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 773 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48711,11 +48713,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 774 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48733,11 +48735,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 775 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48755,11 +48757,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 776 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48777,11 +48779,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 777 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48799,11 +48801,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 778 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48821,11 +48823,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 779 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48843,11 +48845,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 780 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48865,11 +48867,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 781 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48887,11 +48889,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 782 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48909,11 +48911,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 783 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48931,11 +48933,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 784 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48953,11 +48955,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 785 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48975,11 +48977,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 786 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -48997,11 +48999,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 787 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49019,11 +49021,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 788 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49041,11 +49043,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 789 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49063,11 +49065,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 790 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49085,11 +49087,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 791 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49107,11 +49109,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 792 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49129,11 +49131,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 793 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49151,11 +49153,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 794 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49173,11 +49175,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 795 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49195,11 +49197,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 796 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49217,11 +49219,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 797 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49239,11 +49241,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 798 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49261,11 +49263,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 799 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49276,7 +49278,7 @@ void run_test_batch_700_to_800() {
     }
 }
 
-void run_test_batch_800_to_900() {
+void run_test_batch_800_to_900(TestStats& stats) {
     { // Test Case 800
         ControlStatus cs = { 0, 2, 4, 0, 6, 7, 34, 3 };
         int computed_passes = 0;
@@ -49286,11 +49288,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 800 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49308,11 +49310,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 801 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49330,11 +49332,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 802 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49352,11 +49354,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 803 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49374,11 +49376,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 804 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49396,11 +49398,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 805 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49418,11 +49420,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 806 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49440,11 +49442,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 807 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49462,11 +49464,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 808 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49484,11 +49486,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 809 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49506,11 +49508,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 810 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49528,11 +49530,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 811 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49550,11 +49552,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 812 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49572,11 +49574,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 813 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49594,11 +49596,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 814 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49616,11 +49618,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 815 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49638,11 +49640,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 816 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49660,11 +49662,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 817 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49682,11 +49684,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 818 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49704,11 +49706,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 819 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49726,11 +49728,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 820 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49748,11 +49750,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 821 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49770,11 +49772,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 822 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49792,11 +49794,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 823 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49814,11 +49816,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 824 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49836,11 +49838,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 825 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49858,11 +49860,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 826 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49880,11 +49882,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 827 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49902,11 +49904,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 828 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49924,11 +49926,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 829 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49946,11 +49948,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 830 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49968,11 +49970,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 831 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -49990,11 +49992,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 832 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50012,11 +50014,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 833 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50034,11 +50036,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 834 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50056,11 +50058,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 835 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50078,11 +50080,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 836 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50100,11 +50102,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 837 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50122,11 +50124,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 838 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50144,11 +50146,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 839 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50166,11 +50168,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 840 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50188,11 +50190,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 841 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50210,11 +50212,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 842 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50232,11 +50234,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 843 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50254,11 +50256,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 844 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50276,11 +50278,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 845 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50298,11 +50300,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 846 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50320,11 +50322,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 847 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50342,11 +50344,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 848 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50364,11 +50366,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 849 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50386,11 +50388,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 850 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50408,11 +50410,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 851 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50430,11 +50432,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 852 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50452,11 +50454,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 853 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50474,11 +50476,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 854 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50496,11 +50498,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 855 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50518,11 +50520,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 856 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50540,11 +50542,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 857 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50562,11 +50564,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 858 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50584,11 +50586,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 859 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50606,11 +50608,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 860 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50628,11 +50630,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 861 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50650,11 +50652,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 862 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50672,11 +50674,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 863 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50694,11 +50696,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 864 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50716,11 +50718,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 865 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50738,11 +50740,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 866 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50760,11 +50762,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 867 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50782,11 +50784,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 868 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50804,11 +50806,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 869 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50826,11 +50828,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 870 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50848,11 +50850,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 871 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50870,11 +50872,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 872 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50892,11 +50894,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 873 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50914,11 +50916,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 874 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50936,11 +50938,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 875 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50958,11 +50960,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 876 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -50980,11 +50982,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 877 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51002,11 +51004,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 878 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51024,11 +51026,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 879 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51046,11 +51048,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 880 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51068,11 +51070,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 881 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51090,11 +51092,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 882 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51112,11 +51114,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 883 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51134,11 +51136,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 884 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51156,11 +51158,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 885 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51178,11 +51180,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 886 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51200,11 +51202,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 887 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51222,11 +51224,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 888 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51244,11 +51246,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 889 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51266,11 +51268,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 890 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51288,11 +51290,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 891 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51310,11 +51312,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 892 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51332,11 +51334,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 893 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51354,11 +51356,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 894 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51376,11 +51378,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 895 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51398,11 +51400,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 896 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51420,11 +51422,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 897 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51442,11 +51444,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 898 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51464,11 +51466,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 899 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51479,7 +51481,7 @@ void run_test_batch_800_to_900() {
     }
 }
 
-void run_test_batch_900_to_1000() {
+void run_test_batch_900_to_1000(TestStats& stats) {
     { // Test Case 900
         ControlStatus cs = { 0, 2, 1, 0, 7, 9, 49, 5 };
         int computed_passes = 0;
@@ -51489,11 +51491,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 900 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51511,11 +51513,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 901 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51533,11 +51535,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 902 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51555,11 +51557,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 903 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51577,11 +51579,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 904 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51599,11 +51601,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 905 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51621,11 +51623,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 906 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51643,11 +51645,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 907 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51665,11 +51667,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 908 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51687,11 +51689,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 909 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51709,11 +51711,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 910 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51731,11 +51733,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 911 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51753,11 +51755,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 912 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51775,11 +51777,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 913 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51797,11 +51799,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 914 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51819,11 +51821,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 915 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51841,11 +51843,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 916 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51863,11 +51865,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 917 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51885,11 +51887,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 918 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51907,11 +51909,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 919 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51929,11 +51931,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 920 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51951,11 +51953,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 921 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51973,11 +51975,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 922 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -51995,11 +51997,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 923 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52017,11 +52019,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 924 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52039,11 +52041,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 925 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52061,11 +52063,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 926 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52083,11 +52085,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 927 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52105,11 +52107,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 928 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52127,11 +52129,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 929 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52149,11 +52151,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 930 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52171,11 +52173,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 931 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52193,11 +52195,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 932 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52215,11 +52217,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 933 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52237,11 +52239,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 934 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52259,11 +52261,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 935 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52281,11 +52283,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 936 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52303,11 +52305,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 937 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52325,11 +52327,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 938 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52347,11 +52349,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 939 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52369,11 +52371,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 940 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52391,11 +52393,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 941 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52413,11 +52415,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 942 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52435,11 +52437,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 943 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52457,11 +52459,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 944 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52479,11 +52481,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 945 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52501,11 +52503,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 946 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52523,11 +52525,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 947 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52545,11 +52547,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 948 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52567,11 +52569,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 949 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52589,11 +52591,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 950 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52611,11 +52613,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 951 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52633,11 +52635,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 952 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52655,11 +52657,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 953 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52677,11 +52679,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 954 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52699,11 +52701,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 955 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52721,11 +52723,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 956 << " (Expected Passes: " << 12 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52743,11 +52745,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 957 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52765,11 +52767,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 958 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52787,11 +52789,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 959 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52809,11 +52811,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 960 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52831,11 +52833,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 961 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52853,11 +52855,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 962 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52875,11 +52877,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 963 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52897,11 +52899,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 964 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52919,11 +52921,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 965 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52941,11 +52943,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 966 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52963,11 +52965,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 967 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -52985,11 +52987,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 968 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53007,11 +53009,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 969 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53029,11 +53031,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 970 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53051,11 +53053,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 971 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53073,11 +53075,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 972 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53095,11 +53097,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 973 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53117,11 +53119,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 974 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53139,11 +53141,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 975 << " (Expected Passes: " << 5 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53161,11 +53163,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 976 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53183,11 +53185,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 977 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53205,11 +53207,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 978 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53227,11 +53229,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 979 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53249,11 +53251,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 980 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53271,11 +53273,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 981 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53293,11 +53295,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 982 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53315,11 +53317,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 983 << " (Expected Passes: " << 7 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53337,11 +53339,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 984 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53359,11 +53361,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 985 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53381,11 +53383,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 986 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53403,11 +53405,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 13) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 987 << " (Expected Passes: " << 13 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53425,11 +53427,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 988 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53447,11 +53449,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 989 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53469,11 +53471,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 990 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53491,11 +53493,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 991 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53513,11 +53515,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 992 << " (Expected Passes: " << 11 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53535,11 +53537,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 993 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53557,11 +53559,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 994 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53579,11 +53581,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 995 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53601,11 +53603,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 996 << " (Expected Passes: " << 8 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53623,11 +53625,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 997 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53645,11 +53647,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 998 << " (Expected Passes: " << 9 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53667,11 +53669,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats.total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Control Mismatch in Test " << 999 << " (Expected Passes: " << 10 << ", Got: " << computed_passes << ")\n";
         }
         int expected_d_s = (cs.control_active > 0 && cs.coverage_mapped > 0) ? 1 : 0;
@@ -53682,18 +53684,50 @@ void run_test_batch_900_to_1000() {
     }
 }
 
-void run_all_chaos_tests() {
-    run_test_batch_0_to_100();
-    run_test_batch_100_to_200();
-    run_test_batch_200_to_300();
-    run_test_batch_300_to_400();
-    run_test_batch_400_to_500();
-    run_test_batch_500_to_600();
-    run_test_batch_600_to_700();
-    run_test_batch_700_to_800();
-    run_test_batch_800_to_900();
-    run_test_batch_900_to_1000();
+
+typedef void (*test_batch_fn_t)(TestStats&);
+static const test_batch_fn_t g_test_batches[] = {
+
+    run_test_batch_0_to_100,
+    run_test_batch_100_to_200,
+    run_test_batch_200_to_300,
+    run_test_batch_300_to_400,
+    run_test_batch_400_to_500,
+    run_test_batch_500_to_600,
+    run_test_batch_600_to_700,
+    run_test_batch_700_to_800,
+    run_test_batch_800_to_900,
+    run_test_batch_900_to_1000,
+};
+
+void worker_thread_func(int thread_id, int num_threads, TestStats& stats) {
+    pin_current_thread(thread_id);
+    for (int b = thread_id * 100; b < NUM_TEST_CASES; b += num_threads * 100) {
+        g_test_batches[b / 100](stats);
+        paced_sleep(1);
+    }
 }
+
+void run_all_chaos_tests() {
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 10) num_threads = 10; // 10 batches total (NUM_TEST_CASES = 1000)
+
+    std::vector<std::thread> threads;
+    std::vector<TestStats> thread_stats(num_threads, TestStats{0, 0, 0});
+
+    for (int t = 0; t < num_threads; t++) {
+        threads.emplace_back(worker_thread_func, t, num_threads, std::ref(thread_stats[t]));
+    }
+
+    for (int t = 0; t < num_threads; t++) {
+        threads[t].join();
+        g_stats.total += thread_stats[t].total;
+        g_stats.passed += thread_stats[t].passed;
+        g_stats.failed += thread_stats[t].failed;
+    }
+}
+
 
 int main() {
     std::cout << "==================================================\n";

@@ -12,6 +12,17 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+#include "../compute_balancer.h"
+
+#if defined(_WIN32)
+typedef HANDLE thread_t;
+#define thread_create(t, fn, arg) (*t = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)fn, arg, 0, NULL), *t != NULL)
+#define thread_join(t) (WaitForSingleObject(t, INFINITE), CloseHandle(t))
+#else
+typedef pthread_t thread_t;
+#define thread_create(t, fn, arg) (pthread_create(t, NULL, fn, arg) == 0)
+#define thread_join(t) pthread_join(t)
+#endif
 
 #define NUM_INVARIANTS 4500
 #define NUM_TEST_CASES 500
@@ -31677,7 +31688,7 @@ static const invariant_check_t g_invariant_checks[NUM_INVARIANTS] = {
     check_invariant_4498,
     check_invariant_4499,
 };
-void run_test_batch_0_to_100(ring_buffer_t *rb) {
+void run_test_batch_0_to_100(ring_buffer_t *rb, test_stats_t *stats) {
     { // Test Case 0
         telemetry_event_t ev = { 380, 84, 99, 334, 328, 390, 40, 4 };
         push_telemetry(rb, &ev);
@@ -31690,11 +31701,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 0, 10, computed_fails);
         }
         int d_a = 1;
@@ -31719,11 +31730,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 1, 10, computed_fails);
         }
         int d_a = 1;
@@ -31748,11 +31759,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 2, 9, computed_fails);
         }
         int d_a = 1;
@@ -31777,11 +31788,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 3, 8, computed_fails);
         }
         int d_a = 1;
@@ -31806,11 +31817,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 4, 9, computed_fails);
         }
         int d_a = 1;
@@ -31835,11 +31846,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 5, 9, computed_fails);
         }
         int d_a = 1;
@@ -31864,11 +31875,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 6, 9, computed_fails);
         }
         int d_a = 1;
@@ -31893,11 +31904,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 7, 8, computed_fails);
         }
         int d_a = 1;
@@ -31922,11 +31933,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 8, 8, computed_fails);
         }
         int d_a = 1;
@@ -31951,11 +31962,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 9, 10, computed_fails);
         }
         int d_a = 1;
@@ -31980,11 +31991,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 10, 10, computed_fails);
         }
         int d_a = 1;
@@ -32009,11 +32020,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 11, 10, computed_fails);
         }
         int d_a = 1;
@@ -32038,11 +32049,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 12, 8, computed_fails);
         }
         int d_a = 1;
@@ -32067,11 +32078,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 13, 8, computed_fails);
         }
         int d_a = 1;
@@ -32096,11 +32107,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 14, 9, computed_fails);
         }
         int d_a = 1;
@@ -32125,11 +32136,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 15, 6, computed_fails);
         }
         int d_a = 1;
@@ -32154,11 +32165,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 16, 7, computed_fails);
         }
         int d_a = 1;
@@ -32183,11 +32194,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 17, 9, computed_fails);
         }
         int d_a = 1;
@@ -32212,11 +32223,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 18, 8, computed_fails);
         }
         int d_a = 1;
@@ -32241,11 +32252,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 19, 7, computed_fails);
         }
         int d_a = 1;
@@ -32270,11 +32281,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 20, 10, computed_fails);
         }
         int d_a = 1;
@@ -32299,11 +32310,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 21, 8, computed_fails);
         }
         int d_a = 1;
@@ -32328,11 +32339,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 22, 9, computed_fails);
         }
         int d_a = 1;
@@ -32357,11 +32368,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 23, 6, computed_fails);
         }
         int d_a = 1;
@@ -32386,11 +32397,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 24, 8, computed_fails);
         }
         int d_a = 1;
@@ -32415,11 +32426,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 25, 6, computed_fails);
         }
         int d_a = 1;
@@ -32444,11 +32455,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 26, 7, computed_fails);
         }
         int d_a = 1;
@@ -32473,11 +32484,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 27, 10, computed_fails);
         }
         int d_a = 1;
@@ -32502,11 +32513,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 28, 8, computed_fails);
         }
         int d_a = 1;
@@ -32531,11 +32542,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 29, 9, computed_fails);
         }
         int d_a = 1;
@@ -32560,11 +32571,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 30, 8, computed_fails);
         }
         int d_a = 1;
@@ -32589,11 +32600,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 31, 6, computed_fails);
         }
         int d_a = 1;
@@ -32618,11 +32629,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 32, 6, computed_fails);
         }
         int d_a = 1;
@@ -32647,11 +32658,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 33, 7, computed_fails);
         }
         int d_a = 1;
@@ -32676,11 +32687,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 34, 6, computed_fails);
         }
         int d_a = 1;
@@ -32705,11 +32716,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 35, 5, computed_fails);
         }
         int d_a = 1;
@@ -32734,11 +32745,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 36, 10, computed_fails);
         }
         int d_a = 1;
@@ -32763,11 +32774,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 37, 9, computed_fails);
         }
         int d_a = 1;
@@ -32792,11 +32803,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 38, 7, computed_fails);
         }
         int d_a = 1;
@@ -32821,11 +32832,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 39, 7, computed_fails);
         }
         int d_a = 1;
@@ -32850,11 +32861,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 40, 9, computed_fails);
         }
         int d_a = 1;
@@ -32879,11 +32890,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 41, 6, computed_fails);
         }
         int d_a = 1;
@@ -32908,11 +32919,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 42, 5, computed_fails);
         }
         int d_a = 1;
@@ -32937,11 +32948,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 43, 4, computed_fails);
         }
         int d_a = 1;
@@ -32966,11 +32977,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 44, 7, computed_fails);
         }
         int d_a = 1;
@@ -32995,11 +33006,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 45, 10, computed_fails);
         }
         int d_a = 1;
@@ -33024,11 +33035,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 46, 9, computed_fails);
         }
         int d_a = 1;
@@ -33053,11 +33064,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 47, 9, computed_fails);
         }
         int d_a = 1;
@@ -33082,11 +33093,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 48, 8, computed_fails);
         }
         int d_a = 1;
@@ -33111,11 +33122,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 49, 7, computed_fails);
         }
         int d_a = 1;
@@ -33140,11 +33151,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 50, 7, computed_fails);
         }
         int d_a = 1;
@@ -33169,11 +33180,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 51, 6, computed_fails);
         }
         int d_a = 1;
@@ -33198,11 +33209,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 52, 7, computed_fails);
         }
         int d_a = 1;
@@ -33227,11 +33238,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 53, 6, computed_fails);
         }
         int d_a = 1;
@@ -33256,11 +33267,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 54, 10, computed_fails);
         }
         int d_a = 1;
@@ -33285,11 +33296,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 55, 7, computed_fails);
         }
         int d_a = 1;
@@ -33314,11 +33325,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 56, 7, computed_fails);
         }
         int d_a = 1;
@@ -33343,11 +33354,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 57, 5, computed_fails);
         }
         int d_a = 1;
@@ -33372,11 +33383,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 58, 5, computed_fails);
         }
         int d_a = 1;
@@ -33401,11 +33412,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 59, 6, computed_fails);
         }
         int d_a = 1;
@@ -33430,11 +33441,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 60, 7, computed_fails);
         }
         int d_a = 1;
@@ -33459,11 +33470,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 61, 6, computed_fails);
         }
         int d_a = 1;
@@ -33488,11 +33499,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 62, 6, computed_fails);
         }
         int d_a = 1;
@@ -33517,11 +33528,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 63, 10, computed_fails);
         }
         int d_a = 1;
@@ -33546,11 +33557,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 64, 7, computed_fails);
         }
         int d_a = 1;
@@ -33575,11 +33586,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 65, 8, computed_fails);
         }
         int d_a = 1;
@@ -33604,11 +33615,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 66, 7, computed_fails);
         }
         int d_a = 1;
@@ -33633,11 +33644,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 67, 6, computed_fails);
         }
         int d_a = 1;
@@ -33662,11 +33673,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 68, 7, computed_fails);
         }
         int d_a = 1;
@@ -33691,11 +33702,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 69, 5, computed_fails);
         }
         int d_a = 1;
@@ -33720,11 +33731,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 70, 7, computed_fails);
         }
         int d_a = 1;
@@ -33749,11 +33760,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 71, 4, computed_fails);
         }
         int d_a = 1;
@@ -33778,11 +33789,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 72, 10, computed_fails);
         }
         int d_a = 1;
@@ -33807,11 +33818,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 73, 8, computed_fails);
         }
         int d_a = 1;
@@ -33836,11 +33847,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 74, 8, computed_fails);
         }
         int d_a = 1;
@@ -33865,11 +33876,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 75, 6, computed_fails);
         }
         int d_a = 1;
@@ -33894,11 +33905,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 76, 7, computed_fails);
         }
         int d_a = 1;
@@ -33923,11 +33934,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 77, 5, computed_fails);
         }
         int d_a = 1;
@@ -33952,11 +33963,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 78, 5, computed_fails);
         }
         int d_a = 1;
@@ -33981,11 +33992,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 79, 4, computed_fails);
         }
         int d_a = 1;
@@ -34010,11 +34021,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 80, 10, computed_fails);
         }
         int d_a = 1;
@@ -34039,11 +34050,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 81, 10, computed_fails);
         }
         int d_a = 1;
@@ -34068,11 +34079,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 82, 10, computed_fails);
         }
         int d_a = 1;
@@ -34097,11 +34108,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 83, 8, computed_fails);
         }
         int d_a = 1;
@@ -34126,11 +34137,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 84, 9, computed_fails);
         }
         int d_a = 1;
@@ -34155,11 +34166,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 85, 9, computed_fails);
         }
         int d_a = 1;
@@ -34184,11 +34195,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 86, 7, computed_fails);
         }
         int d_a = 1;
@@ -34213,11 +34224,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 87, 7, computed_fails);
         }
         int d_a = 1;
@@ -34242,11 +34253,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 88, 9, computed_fails);
         }
         int d_a = 1;
@@ -34271,11 +34282,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 89, 8, computed_fails);
         }
         int d_a = 1;
@@ -34300,11 +34311,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 90, 10, computed_fails);
         }
         int d_a = 1;
@@ -34329,11 +34340,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 91, 10, computed_fails);
         }
         int d_a = 1;
@@ -34358,11 +34369,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 92, 8, computed_fails);
         }
         int d_a = 1;
@@ -34387,11 +34398,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 93, 9, computed_fails);
         }
         int d_a = 1;
@@ -34416,11 +34427,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 94, 8, computed_fails);
         }
         int d_a = 1;
@@ -34445,11 +34456,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 95, 8, computed_fails);
         }
         int d_a = 1;
@@ -34474,11 +34485,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 96, 7, computed_fails);
         }
         int d_a = 1;
@@ -34503,11 +34514,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 97, 6, computed_fails);
         }
         int d_a = 1;
@@ -34532,11 +34543,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 98, 8, computed_fails);
         }
         int d_a = 1;
@@ -34561,11 +34572,11 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 99, 10, computed_fails);
         }
         int d_a = 1;
@@ -34580,7 +34591,7 @@ void run_test_batch_0_to_100(ring_buffer_t *rb) {
     }
 }
 
-void run_test_batch_100_to_200(ring_buffer_t *rb) {
+void run_test_batch_100_to_200(ring_buffer_t *rb, test_stats_t *stats) {
     { // Test Case 100
         telemetry_event_t ev = { 129, 94, 99, 353, 301, 576, 24, 18 };
         push_telemetry(rb, &ev);
@@ -34593,11 +34604,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 100, 9, computed_fails);
         }
         int d_a = 1;
@@ -34622,11 +34633,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 101, 9, computed_fails);
         }
         int d_a = 1;
@@ -34651,11 +34662,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 102, 8, computed_fails);
         }
         int d_a = 1;
@@ -34680,11 +34691,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 103, 6, computed_fails);
         }
         int d_a = 1;
@@ -34709,11 +34720,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 104, 8, computed_fails);
         }
         int d_a = 1;
@@ -34738,11 +34749,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 105, 7, computed_fails);
         }
         int d_a = 1;
@@ -34767,11 +34778,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 106, 6, computed_fails);
         }
         int d_a = 1;
@@ -34796,11 +34807,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 107, 5, computed_fails);
         }
         int d_a = 1;
@@ -34825,11 +34836,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 108, 9, computed_fails);
         }
         int d_a = 1;
@@ -34854,11 +34865,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 109, 8, computed_fails);
         }
         int d_a = 1;
@@ -34883,11 +34894,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 110, 8, computed_fails);
         }
         int d_a = 1;
@@ -34912,11 +34923,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 111, 8, computed_fails);
         }
         int d_a = 1;
@@ -34941,11 +34952,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 112, 7, computed_fails);
         }
         int d_a = 1;
@@ -34970,11 +34981,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 113, 6, computed_fails);
         }
         int d_a = 1;
@@ -34999,11 +35010,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 114, 6, computed_fails);
         }
         int d_a = 1;
@@ -35028,11 +35039,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 115, 6, computed_fails);
         }
         int d_a = 1;
@@ -35057,11 +35068,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 116, 8, computed_fails);
         }
         int d_a = 1;
@@ -35086,11 +35097,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 117, 8, computed_fails);
         }
         int d_a = 1;
@@ -35115,11 +35126,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 118, 9, computed_fails);
         }
         int d_a = 1;
@@ -35144,11 +35155,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 119, 7, computed_fails);
         }
         int d_a = 1;
@@ -35173,11 +35184,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 120, 8, computed_fails);
         }
         int d_a = 1;
@@ -35202,11 +35213,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 121, 6, computed_fails);
         }
         int d_a = 1;
@@ -35231,11 +35242,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 122, 6, computed_fails);
         }
         int d_a = 1;
@@ -35260,11 +35271,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 123, 6, computed_fails);
         }
         int d_a = 1;
@@ -35289,11 +35300,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 124, 7, computed_fails);
         }
         int d_a = 1;
@@ -35318,11 +35329,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 125, 6, computed_fails);
         }
         int d_a = 1;
@@ -35347,11 +35358,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 126, 8, computed_fails);
         }
         int d_a = 1;
@@ -35376,11 +35387,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 127, 10, computed_fails);
         }
         int d_a = 1;
@@ -35405,11 +35416,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 128, 8, computed_fails);
         }
         int d_a = 1;
@@ -35434,11 +35445,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 129, 7, computed_fails);
         }
         int d_a = 1;
@@ -35463,11 +35474,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 130, 7, computed_fails);
         }
         int d_a = 1;
@@ -35492,11 +35503,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 131, 7, computed_fails);
         }
         int d_a = 1;
@@ -35521,11 +35532,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 132, 6, computed_fails);
         }
         int d_a = 1;
@@ -35550,11 +35561,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 133, 6, computed_fails);
         }
         int d_a = 1;
@@ -35579,11 +35590,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 134, 5, computed_fails);
         }
         int d_a = 1;
@@ -35608,11 +35619,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 135, 9, computed_fails);
         }
         int d_a = 1;
@@ -35637,11 +35648,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 136, 8, computed_fails);
         }
         int d_a = 1;
@@ -35666,11 +35677,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 137, 7, computed_fails);
         }
         int d_a = 1;
@@ -35695,11 +35706,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 138, 7, computed_fails);
         }
         int d_a = 1;
@@ -35724,11 +35735,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 139, 6, computed_fails);
         }
         int d_a = 1;
@@ -35753,11 +35764,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 140, 8, computed_fails);
         }
         int d_a = 1;
@@ -35782,11 +35793,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 141, 5, computed_fails);
         }
         int d_a = 1;
@@ -35811,11 +35822,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 142, 5, computed_fails);
         }
         int d_a = 1;
@@ -35840,11 +35851,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 3) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 143, 3, computed_fails);
         }
         int d_a = 1;
@@ -35869,11 +35880,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 144, 10, computed_fails);
         }
         int d_a = 1;
@@ -35898,11 +35909,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 145, 9, computed_fails);
         }
         int d_a = 1;
@@ -35927,11 +35938,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 146, 6, computed_fails);
         }
         int d_a = 1;
@@ -35956,11 +35967,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 147, 7, computed_fails);
         }
         int d_a = 1;
@@ -35985,11 +35996,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 148, 8, computed_fails);
         }
         int d_a = 1;
@@ -36014,11 +36025,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 149, 6, computed_fails);
         }
         int d_a = 1;
@@ -36043,11 +36054,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 150, 6, computed_fails);
         }
         int d_a = 1;
@@ -36072,11 +36083,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 151, 6, computed_fails);
         }
         int d_a = 1;
@@ -36101,11 +36112,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 152, 7, computed_fails);
         }
         int d_a = 1;
@@ -36130,11 +36141,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 153, 9, computed_fails);
         }
         int d_a = 1;
@@ -36159,11 +36170,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 154, 8, computed_fails);
         }
         int d_a = 1;
@@ -36188,11 +36199,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 155, 6, computed_fails);
         }
         int d_a = 1;
@@ -36217,11 +36228,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 156, 7, computed_fails);
         }
         int d_a = 1;
@@ -36246,11 +36257,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 157, 6, computed_fails);
         }
         int d_a = 1;
@@ -36275,11 +36286,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 158, 6, computed_fails);
         }
         int d_a = 1;
@@ -36304,11 +36315,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 159, 6, computed_fails);
         }
         int d_a = 1;
@@ -36333,11 +36344,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 160, 9, computed_fails);
         }
         int d_a = 1;
@@ -36362,11 +36373,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 161, 9, computed_fails);
         }
         int d_a = 1;
@@ -36391,11 +36402,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 162, 10, computed_fails);
         }
         int d_a = 1;
@@ -36420,11 +36431,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 163, 9, computed_fails);
         }
         int d_a = 1;
@@ -36449,11 +36460,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 164, 9, computed_fails);
         }
         int d_a = 1;
@@ -36478,11 +36489,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 165, 9, computed_fails);
         }
         int d_a = 1;
@@ -36507,11 +36518,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 166, 9, computed_fails);
         }
         int d_a = 1;
@@ -36536,11 +36547,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 167, 5, computed_fails);
         }
         int d_a = 1;
@@ -36565,11 +36576,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 168, 8, computed_fails);
         }
         int d_a = 1;
@@ -36594,11 +36605,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 169, 8, computed_fails);
         }
         int d_a = 1;
@@ -36623,11 +36634,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 170, 10, computed_fails);
         }
         int d_a = 1;
@@ -36652,11 +36663,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 171, 10, computed_fails);
         }
         int d_a = 1;
@@ -36681,11 +36692,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 172, 10, computed_fails);
         }
         int d_a = 1;
@@ -36710,11 +36721,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 173, 10, computed_fails);
         }
         int d_a = 1;
@@ -36739,11 +36750,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 174, 9, computed_fails);
         }
         int d_a = 1;
@@ -36768,11 +36779,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 175, 8, computed_fails);
         }
         int d_a = 1;
@@ -36797,11 +36808,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 176, 7, computed_fails);
         }
         int d_a = 1;
@@ -36826,11 +36837,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 177, 6, computed_fails);
         }
         int d_a = 1;
@@ -36855,11 +36866,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 178, 9, computed_fails);
         }
         int d_a = 1;
@@ -36884,11 +36895,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 179, 8, computed_fails);
         }
         int d_a = 1;
@@ -36913,11 +36924,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 180, 10, computed_fails);
         }
         int d_a = 1;
@@ -36942,11 +36953,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 181, 9, computed_fails);
         }
         int d_a = 1;
@@ -36971,11 +36982,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 182, 10, computed_fails);
         }
         int d_a = 1;
@@ -37000,11 +37011,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 183, 7, computed_fails);
         }
         int d_a = 1;
@@ -37029,11 +37040,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 184, 8, computed_fails);
         }
         int d_a = 1;
@@ -37058,11 +37069,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 185, 8, computed_fails);
         }
         int d_a = 1;
@@ -37087,11 +37098,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 186, 6, computed_fails);
         }
         int d_a = 1;
@@ -37116,11 +37127,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 187, 7, computed_fails);
         }
         int d_a = 1;
@@ -37145,11 +37156,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 188, 7, computed_fails);
         }
         int d_a = 1;
@@ -37174,11 +37185,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 189, 10, computed_fails);
         }
         int d_a = 1;
@@ -37203,11 +37214,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 190, 10, computed_fails);
         }
         int d_a = 1;
@@ -37232,11 +37243,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 191, 7, computed_fails);
         }
         int d_a = 1;
@@ -37261,11 +37272,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 192, 7, computed_fails);
         }
         int d_a = 1;
@@ -37290,11 +37301,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 193, 6, computed_fails);
         }
         int d_a = 1;
@@ -37319,11 +37330,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 194, 6, computed_fails);
         }
         int d_a = 1;
@@ -37348,11 +37359,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 195, 5, computed_fails);
         }
         int d_a = 1;
@@ -37377,11 +37388,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 196, 6, computed_fails);
         }
         int d_a = 1;
@@ -37406,11 +37417,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 197, 7, computed_fails);
         }
         int d_a = 1;
@@ -37435,11 +37446,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 198, 9, computed_fails);
         }
         int d_a = 1;
@@ -37464,11 +37475,11 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 199, 9, computed_fails);
         }
         int d_a = 1;
@@ -37483,7 +37494,7 @@ void run_test_batch_100_to_200(ring_buffer_t *rb) {
     }
 }
 
-void run_test_batch_200_to_300(ring_buffer_t *rb) {
+void run_test_batch_200_to_300(ring_buffer_t *rb, test_stats_t *stats) {
     { // Test Case 200
         telemetry_event_t ev = { 319, 143, 99, 178, 161, 514, 53, 24 };
         push_telemetry(rb, &ev);
@@ -37496,11 +37507,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 200, 9, computed_fails);
         }
         int d_a = 1;
@@ -37525,11 +37536,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 201, 7, computed_fails);
         }
         int d_a = 1;
@@ -37554,11 +37565,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 202, 7, computed_fails);
         }
         int d_a = 1;
@@ -37583,11 +37594,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 203, 4, computed_fails);
         }
         int d_a = 1;
@@ -37612,11 +37623,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 204, 7, computed_fails);
         }
         int d_a = 1;
@@ -37641,11 +37652,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 205, 6, computed_fails);
         }
         int d_a = 1;
@@ -37670,11 +37681,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 206, 5, computed_fails);
         }
         int d_a = 1;
@@ -37699,11 +37710,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 207, 9, computed_fails);
         }
         int d_a = 1;
@@ -37728,11 +37739,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 208, 9, computed_fails);
         }
         int d_a = 1;
@@ -37757,11 +37768,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 209, 9, computed_fails);
         }
         int d_a = 1;
@@ -37786,11 +37797,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 210, 7, computed_fails);
         }
         int d_a = 1;
@@ -37815,11 +37826,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 211, 6, computed_fails);
         }
         int d_a = 1;
@@ -37844,11 +37855,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 212, 7, computed_fails);
         }
         int d_a = 1;
@@ -37873,11 +37884,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 213, 5, computed_fails);
         }
         int d_a = 1;
@@ -37902,11 +37913,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 214, 5, computed_fails);
         }
         int d_a = 1;
@@ -37931,11 +37942,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 215, 6, computed_fails);
         }
         int d_a = 1;
@@ -37960,11 +37971,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 216, 10, computed_fails);
         }
         int d_a = 1;
@@ -37989,11 +38000,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 217, 7, computed_fails);
         }
         int d_a = 1;
@@ -38018,11 +38029,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 218, 7, computed_fails);
         }
         int d_a = 1;
@@ -38047,11 +38058,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 219, 9, computed_fails);
         }
         int d_a = 1;
@@ -38076,11 +38087,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 220, 8, computed_fails);
         }
         int d_a = 1;
@@ -38105,11 +38116,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 221, 5, computed_fails);
         }
         int d_a = 1;
@@ -38134,11 +38145,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 222, 6, computed_fails);
         }
         int d_a = 1;
@@ -38163,11 +38174,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 223, 6, computed_fails);
         }
         int d_a = 1;
@@ -38192,11 +38203,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 224, 7, computed_fails);
         }
         int d_a = 1;
@@ -38221,11 +38232,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 225, 10, computed_fails);
         }
         int d_a = 1;
@@ -38250,11 +38261,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 226, 9, computed_fails);
         }
         int d_a = 1;
@@ -38279,11 +38290,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 227, 9, computed_fails);
         }
         int d_a = 1;
@@ -38308,11 +38319,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 228, 7, computed_fails);
         }
         int d_a = 1;
@@ -38337,11 +38348,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 229, 7, computed_fails);
         }
         int d_a = 1;
@@ -38366,11 +38377,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 230, 7, computed_fails);
         }
         int d_a = 1;
@@ -38395,11 +38406,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 231, 4, computed_fails);
         }
         int d_a = 1;
@@ -38424,11 +38435,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 232, 6, computed_fails);
         }
         int d_a = 1;
@@ -38453,11 +38464,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 233, 6, computed_fails);
         }
         int d_a = 1;
@@ -38482,11 +38493,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 234, 9, computed_fails);
         }
         int d_a = 1;
@@ -38511,11 +38522,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 235, 7, computed_fails);
         }
         int d_a = 1;
@@ -38540,11 +38551,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 236, 8, computed_fails);
         }
         int d_a = 1;
@@ -38569,11 +38580,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 237, 7, computed_fails);
         }
         int d_a = 1;
@@ -38598,11 +38609,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 238, 7, computed_fails);
         }
         int d_a = 1;
@@ -38627,11 +38638,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 239, 7, computed_fails);
         }
         int d_a = 1;
@@ -38656,11 +38667,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 240, 9, computed_fails);
         }
         int d_a = 1;
@@ -38685,11 +38696,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 241, 8, computed_fails);
         }
         int d_a = 1;
@@ -38714,11 +38725,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 242, 7, computed_fails);
         }
         int d_a = 1;
@@ -38743,11 +38754,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 243, 10, computed_fails);
         }
         int d_a = 1;
@@ -38772,11 +38783,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 244, 10, computed_fails);
         }
         int d_a = 1;
@@ -38801,11 +38812,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 245, 10, computed_fails);
         }
         int d_a = 1;
@@ -38830,11 +38841,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 246, 10, computed_fails);
         }
         int d_a = 1;
@@ -38859,11 +38870,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 247, 8, computed_fails);
         }
         int d_a = 1;
@@ -38888,11 +38899,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 248, 9, computed_fails);
         }
         int d_a = 1;
@@ -38917,11 +38928,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 249, 6, computed_fails);
         }
         int d_a = 1;
@@ -38946,11 +38957,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 250, 8, computed_fails);
         }
         int d_a = 1;
@@ -38975,11 +38986,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 251, 5, computed_fails);
         }
         int d_a = 1;
@@ -39004,11 +39015,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 252, 10, computed_fails);
         }
         int d_a = 1;
@@ -39033,11 +39044,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 253, 9, computed_fails);
         }
         int d_a = 1;
@@ -39062,11 +39073,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 254, 9, computed_fails);
         }
         int d_a = 1;
@@ -39091,11 +39102,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 255, 8, computed_fails);
         }
         int d_a = 1;
@@ -39120,11 +39131,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 256, 9, computed_fails);
         }
         int d_a = 1;
@@ -39149,11 +39160,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 257, 7, computed_fails);
         }
         int d_a = 1;
@@ -39178,11 +39189,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 258, 8, computed_fails);
         }
         int d_a = 1;
@@ -39207,11 +39218,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 259, 6, computed_fails);
         }
         int d_a = 1;
@@ -39236,11 +39247,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 260, 8, computed_fails);
         }
         int d_a = 1;
@@ -39265,11 +39276,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 261, 10, computed_fails);
         }
         int d_a = 1;
@@ -39294,11 +39305,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 262, 10, computed_fails);
         }
         int d_a = 1;
@@ -39323,11 +39334,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 263, 7, computed_fails);
         }
         int d_a = 1;
@@ -39352,11 +39363,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 264, 10, computed_fails);
         }
         int d_a = 1;
@@ -39381,11 +39392,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 265, 8, computed_fails);
         }
         int d_a = 1;
@@ -39410,11 +39421,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 266, 7, computed_fails);
         }
         int d_a = 1;
@@ -39439,11 +39450,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 267, 7, computed_fails);
         }
         int d_a = 1;
@@ -39468,11 +39479,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 268, 7, computed_fails);
         }
         int d_a = 1;
@@ -39497,11 +39508,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 269, 5, computed_fails);
         }
         int d_a = 1;
@@ -39526,11 +39537,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 270, 10, computed_fails);
         }
         int d_a = 1;
@@ -39555,11 +39566,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 271, 10, computed_fails);
         }
         int d_a = 1;
@@ -39584,11 +39595,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 272, 10, computed_fails);
         }
         int d_a = 1;
@@ -39613,11 +39624,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 273, 7, computed_fails);
         }
         int d_a = 1;
@@ -39642,11 +39653,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 274, 8, computed_fails);
         }
         int d_a = 1;
@@ -39671,11 +39682,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 275, 6, computed_fails);
         }
         int d_a = 1;
@@ -39700,11 +39711,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 276, 6, computed_fails);
         }
         int d_a = 1;
@@ -39729,11 +39740,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 277, 6, computed_fails);
         }
         int d_a = 1;
@@ -39758,11 +39769,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 278, 6, computed_fails);
         }
         int d_a = 1;
@@ -39787,11 +39798,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 279, 8, computed_fails);
         }
         int d_a = 1;
@@ -39816,11 +39827,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 280, 10, computed_fails);
         }
         int d_a = 1;
@@ -39845,11 +39856,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 281, 6, computed_fails);
         }
         int d_a = 1;
@@ -39874,11 +39885,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 282, 6, computed_fails);
         }
         int d_a = 1;
@@ -39903,11 +39914,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 283, 7, computed_fails);
         }
         int d_a = 1;
@@ -39932,11 +39943,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 284, 7, computed_fails);
         }
         int d_a = 1;
@@ -39961,11 +39972,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 285, 6, computed_fails);
         }
         int d_a = 1;
@@ -39990,11 +40001,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 286, 6, computed_fails);
         }
         int d_a = 1;
@@ -40019,11 +40030,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 287, 6, computed_fails);
         }
         int d_a = 1;
@@ -40048,11 +40059,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 288, 10, computed_fails);
         }
         int d_a = 1;
@@ -40077,11 +40088,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 289, 9, computed_fails);
         }
         int d_a = 1;
@@ -40106,11 +40117,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 290, 7, computed_fails);
         }
         int d_a = 1;
@@ -40135,11 +40146,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 291, 5, computed_fails);
         }
         int d_a = 1;
@@ -40164,11 +40175,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 292, 8, computed_fails);
         }
         int d_a = 1;
@@ -40193,11 +40204,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 293, 6, computed_fails);
         }
         int d_a = 1;
@@ -40222,11 +40233,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 294, 6, computed_fails);
         }
         int d_a = 1;
@@ -40251,11 +40262,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 295, 6, computed_fails);
         }
         int d_a = 1;
@@ -40280,11 +40291,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 296, 6, computed_fails);
         }
         int d_a = 1;
@@ -40309,11 +40320,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 297, 10, computed_fails);
         }
         int d_a = 1;
@@ -40338,11 +40349,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 298, 9, computed_fails);
         }
         int d_a = 1;
@@ -40367,11 +40378,11 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 299, 8, computed_fails);
         }
         int d_a = 1;
@@ -40386,7 +40397,7 @@ void run_test_batch_200_to_300(ring_buffer_t *rb) {
     }
 }
 
-void run_test_batch_300_to_400(ring_buffer_t *rb) {
+void run_test_batch_300_to_400(ring_buffer_t *rb, test_stats_t *stats) {
     { // Test Case 300
         telemetry_event_t ev = { 101, 116, 99, 374, 268, 220, 29, 17 };
         push_telemetry(rb, &ev);
@@ -40399,11 +40410,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 300, 8, computed_fails);
         }
         int d_a = 1;
@@ -40428,11 +40439,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 301, 7, computed_fails);
         }
         int d_a = 1;
@@ -40457,11 +40468,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 302, 6, computed_fails);
         }
         int d_a = 1;
@@ -40486,11 +40497,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 303, 5, computed_fails);
         }
         int d_a = 1;
@@ -40515,11 +40526,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 304, 7, computed_fails);
         }
         int d_a = 1;
@@ -40544,11 +40555,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 305, 6, computed_fails);
         }
         int d_a = 1;
@@ -40573,11 +40584,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 306, 10, computed_fails);
         }
         int d_a = 1;
@@ -40602,11 +40613,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 307, 10, computed_fails);
         }
         int d_a = 1;
@@ -40631,11 +40642,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 308, 8, computed_fails);
         }
         int d_a = 1;
@@ -40660,11 +40671,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 309, 7, computed_fails);
         }
         int d_a = 1;
@@ -40689,11 +40700,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 310, 7, computed_fails);
         }
         int d_a = 1;
@@ -40718,11 +40729,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 311, 6, computed_fails);
         }
         int d_a = 1;
@@ -40747,11 +40758,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 312, 7, computed_fails);
         }
         int d_a = 1;
@@ -40776,11 +40787,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 313, 6, computed_fails);
         }
         int d_a = 1;
@@ -40805,11 +40816,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 314, 6, computed_fails);
         }
         int d_a = 1;
@@ -40834,11 +40845,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 315, 10, computed_fails);
         }
         int d_a = 1;
@@ -40863,11 +40874,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 316, 8, computed_fails);
         }
         int d_a = 1;
@@ -40892,11 +40903,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 317, 9, computed_fails);
         }
         int d_a = 1;
@@ -40921,11 +40932,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 318, 6, computed_fails);
         }
         int d_a = 1;
@@ -40950,11 +40961,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 319, 7, computed_fails);
         }
         int d_a = 1;
@@ -40979,11 +40990,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 320, 10, computed_fails);
         }
         int d_a = 1;
@@ -41008,11 +41019,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 321, 8, computed_fails);
         }
         int d_a = 1;
@@ -41037,11 +41048,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 322, 9, computed_fails);
         }
         int d_a = 1;
@@ -41066,11 +41077,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 323, 6, computed_fails);
         }
         int d_a = 1;
@@ -41095,11 +41106,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 324, 10, computed_fails);
         }
         int d_a = 1;
@@ -41124,11 +41135,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 325, 10, computed_fails);
         }
         int d_a = 1;
@@ -41153,11 +41164,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 326, 10, computed_fails);
         }
         int d_a = 1;
@@ -41182,11 +41193,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 327, 9, computed_fails);
         }
         int d_a = 1;
@@ -41211,11 +41222,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 328, 9, computed_fails);
         }
         int d_a = 1;
@@ -41240,11 +41251,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 329, 9, computed_fails);
         }
         int d_a = 1;
@@ -41269,11 +41280,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 330, 8, computed_fails);
         }
         int d_a = 1;
@@ -41298,11 +41309,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 331, 5, computed_fails);
         }
         int d_a = 1;
@@ -41327,11 +41338,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 332, 8, computed_fails);
         }
         int d_a = 1;
@@ -41356,11 +41367,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 333, 10, computed_fails);
         }
         int d_a = 1;
@@ -41385,11 +41396,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 334, 8, computed_fails);
         }
         int d_a = 1;
@@ -41414,11 +41425,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 335, 7, computed_fails);
         }
         int d_a = 1;
@@ -41443,11 +41454,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 336, 9, computed_fails);
         }
         int d_a = 1;
@@ -41472,11 +41483,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 337, 8, computed_fails);
         }
         int d_a = 1;
@@ -41501,11 +41512,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 338, 6, computed_fails);
         }
         int d_a = 1;
@@ -41530,11 +41541,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 339, 8, computed_fails);
         }
         int d_a = 1;
@@ -41559,11 +41570,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 340, 8, computed_fails);
         }
         int d_a = 1;
@@ -41588,11 +41599,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 341, 6, computed_fails);
         }
         int d_a = 1;
@@ -41617,11 +41628,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 342, 9, computed_fails);
         }
         int d_a = 1;
@@ -41646,11 +41657,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 343, 10, computed_fails);
         }
         int d_a = 1;
@@ -41675,11 +41686,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 344, 10, computed_fails);
         }
         int d_a = 1;
@@ -41704,11 +41715,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 345, 8, computed_fails);
         }
         int d_a = 1;
@@ -41733,11 +41744,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 346, 7, computed_fails);
         }
         int d_a = 1;
@@ -41762,11 +41773,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 347, 6, computed_fails);
         }
         int d_a = 1;
@@ -41791,11 +41802,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 348, 8, computed_fails);
         }
         int d_a = 1;
@@ -41820,11 +41831,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 349, 7, computed_fails);
         }
         int d_a = 1;
@@ -41849,11 +41860,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 350, 7, computed_fails);
         }
         int d_a = 1;
@@ -41878,11 +41889,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 351, 10, computed_fails);
         }
         int d_a = 1;
@@ -41907,11 +41918,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 352, 7, computed_fails);
         }
         int d_a = 1;
@@ -41936,11 +41947,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 353, 5, computed_fails);
         }
         int d_a = 1;
@@ -41965,11 +41976,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 354, 6, computed_fails);
         }
         int d_a = 1;
@@ -41994,11 +42005,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 355, 4, computed_fails);
         }
         int d_a = 1;
@@ -42023,11 +42034,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 356, 6, computed_fails);
         }
         int d_a = 1;
@@ -42052,11 +42063,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 357, 5, computed_fails);
         }
         int d_a = 1;
@@ -42081,11 +42092,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 358, 5, computed_fails);
         }
         int d_a = 1;
@@ -42110,11 +42121,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 359, 4, computed_fails);
         }
         int d_a = 1;
@@ -42139,11 +42150,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 360, 9, computed_fails);
         }
         int d_a = 1;
@@ -42168,11 +42179,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 361, 9, computed_fails);
         }
         int d_a = 1;
@@ -42197,11 +42208,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 362, 8, computed_fails);
         }
         int d_a = 1;
@@ -42226,11 +42237,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 363, 8, computed_fails);
         }
         int d_a = 1;
@@ -42255,11 +42266,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 364, 7, computed_fails);
         }
         int d_a = 1;
@@ -42284,11 +42295,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 365, 5, computed_fails);
         }
         int d_a = 1;
@@ -42313,11 +42324,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 366, 5, computed_fails);
         }
         int d_a = 1;
@@ -42342,11 +42353,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 367, 4, computed_fails);
         }
         int d_a = 1;
@@ -42371,11 +42382,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 368, 6, computed_fails);
         }
         int d_a = 1;
@@ -42400,11 +42411,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 369, 10, computed_fails);
         }
         int d_a = 1;
@@ -42429,11 +42440,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 370, 9, computed_fails);
         }
         int d_a = 1;
@@ -42458,11 +42469,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 371, 8, computed_fails);
         }
         int d_a = 1;
@@ -42487,11 +42498,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 372, 8, computed_fails);
         }
         int d_a = 1;
@@ -42516,11 +42527,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 373, 6, computed_fails);
         }
         int d_a = 1;
@@ -42545,11 +42556,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 374, 6, computed_fails);
         }
         int d_a = 1;
@@ -42574,11 +42585,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 375, 6, computed_fails);
         }
         int d_a = 1;
@@ -42603,11 +42614,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 376, 7, computed_fails);
         }
         int d_a = 1;
@@ -42632,11 +42643,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 377, 6, computed_fails);
         }
         int d_a = 1;
@@ -42661,11 +42672,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 378, 8, computed_fails);
         }
         int d_a = 1;
@@ -42690,11 +42701,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 379, 9, computed_fails);
         }
         int d_a = 1;
@@ -42719,11 +42730,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 380, 9, computed_fails);
         }
         int d_a = 1;
@@ -42748,11 +42759,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 381, 7, computed_fails);
         }
         int d_a = 1;
@@ -42777,11 +42788,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 382, 6, computed_fails);
         }
         int d_a = 1;
@@ -42806,11 +42817,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 383, 4, computed_fails);
         }
         int d_a = 1;
@@ -42835,11 +42846,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 384, 7, computed_fails);
         }
         int d_a = 1;
@@ -42864,11 +42875,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 385, 5, computed_fails);
         }
         int d_a = 1;
@@ -42893,11 +42904,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 386, 6, computed_fails);
         }
         int d_a = 1;
@@ -42922,11 +42933,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 387, 9, computed_fails);
         }
         int d_a = 1;
@@ -42951,11 +42962,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 388, 10, computed_fails);
         }
         int d_a = 1;
@@ -42980,11 +42991,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 389, 9, computed_fails);
         }
         int d_a = 1;
@@ -43009,11 +43020,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 390, 8, computed_fails);
         }
         int d_a = 1;
@@ -43038,11 +43049,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 391, 6, computed_fails);
         }
         int d_a = 1;
@@ -43067,11 +43078,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 392, 6, computed_fails);
         }
         int d_a = 1;
@@ -43096,11 +43107,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 393, 5, computed_fails);
         }
         int d_a = 1;
@@ -43125,11 +43136,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 394, 6, computed_fails);
         }
         int d_a = 1;
@@ -43154,11 +43165,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 395, 6, computed_fails);
         }
         int d_a = 1;
@@ -43183,11 +43194,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 396, 9, computed_fails);
         }
         int d_a = 1;
@@ -43212,11 +43223,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 397, 7, computed_fails);
         }
         int d_a = 1;
@@ -43241,11 +43252,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 398, 7, computed_fails);
         }
         int d_a = 1;
@@ -43270,11 +43281,11 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 399, 6, computed_fails);
         }
         int d_a = 1;
@@ -43289,7 +43300,7 @@ void run_test_batch_300_to_400(ring_buffer_t *rb) {
     }
 }
 
-void run_test_batch_400_to_500(ring_buffer_t *rb) {
+void run_test_batch_400_to_500(ring_buffer_t *rb, test_stats_t *stats) {
     { // Test Case 400
         telemetry_event_t ev = { 208, 116, 99, 158, 582, 429, 37, 13 };
         push_telemetry(rb, &ev);
@@ -43302,11 +43313,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 400, 10, computed_fails);
         }
         int d_a = 1;
@@ -43331,11 +43342,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 401, 9, computed_fails);
         }
         int d_a = 1;
@@ -43360,11 +43371,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 402, 9, computed_fails);
         }
         int d_a = 1;
@@ -43389,11 +43400,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 403, 8, computed_fails);
         }
         int d_a = 1;
@@ -43418,11 +43429,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 404, 9, computed_fails);
         }
         int d_a = 1;
@@ -43447,11 +43458,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 405, 10, computed_fails);
         }
         int d_a = 1;
@@ -43476,11 +43487,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 406, 10, computed_fails);
         }
         int d_a = 1;
@@ -43505,11 +43516,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 407, 7, computed_fails);
         }
         int d_a = 1;
@@ -43534,11 +43545,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 408, 9, computed_fails);
         }
         int d_a = 1;
@@ -43563,11 +43574,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 409, 8, computed_fails);
         }
         int d_a = 1;
@@ -43592,11 +43603,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 410, 9, computed_fails);
         }
         int d_a = 1;
@@ -43621,11 +43632,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 411, 8, computed_fails);
         }
         int d_a = 1;
@@ -43650,11 +43661,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 412, 8, computed_fails);
         }
         int d_a = 1;
@@ -43679,11 +43690,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 413, 6, computed_fails);
         }
         int d_a = 1;
@@ -43708,11 +43719,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 414, 10, computed_fails);
         }
         int d_a = 1;
@@ -43737,11 +43748,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 415, 9, computed_fails);
         }
         int d_a = 1;
@@ -43766,11 +43777,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 416, 8, computed_fails);
         }
         int d_a = 1;
@@ -43795,11 +43806,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 417, 8, computed_fails);
         }
         int d_a = 1;
@@ -43824,11 +43835,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 418, 7, computed_fails);
         }
         int d_a = 1;
@@ -43853,11 +43864,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 419, 7, computed_fails);
         }
         int d_a = 1;
@@ -43882,11 +43893,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 420, 9, computed_fails);
         }
         int d_a = 1;
@@ -43911,11 +43922,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 421, 5, computed_fails);
         }
         int d_a = 1;
@@ -43940,11 +43951,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 422, 8, computed_fails);
         }
         int d_a = 1;
@@ -43969,11 +43980,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 423, 9, computed_fails);
         }
         int d_a = 1;
@@ -43998,11 +44009,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 424, 8, computed_fails);
         }
         int d_a = 1;
@@ -44027,11 +44038,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 425, 9, computed_fails);
         }
         int d_a = 1;
@@ -44056,11 +44067,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 426, 7, computed_fails);
         }
         int d_a = 1;
@@ -44085,11 +44096,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 427, 7, computed_fails);
         }
         int d_a = 1;
@@ -44114,11 +44125,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 428, 8, computed_fails);
         }
         int d_a = 1;
@@ -44143,11 +44154,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 429, 5, computed_fails);
         }
         int d_a = 1;
@@ -44172,11 +44183,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 430, 7, computed_fails);
         }
         int d_a = 1;
@@ -44201,11 +44212,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 431, 7, computed_fails);
         }
         int d_a = 1;
@@ -44230,11 +44241,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 432, 10, computed_fails);
         }
         int d_a = 1;
@@ -44259,11 +44270,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 433, 10, computed_fails);
         }
         int d_a = 1;
@@ -44288,11 +44299,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 434, 9, computed_fails);
         }
         int d_a = 1;
@@ -44317,11 +44328,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 435, 7, computed_fails);
         }
         int d_a = 1;
@@ -44346,11 +44357,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 436, 7, computed_fails);
         }
         int d_a = 1;
@@ -44375,11 +44386,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 437, 6, computed_fails);
         }
         int d_a = 1;
@@ -44404,11 +44415,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 438, 8, computed_fails);
         }
         int d_a = 1;
@@ -44433,11 +44444,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 439, 5, computed_fails);
         }
         int d_a = 1;
@@ -44462,11 +44473,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 440, 7, computed_fails);
         }
         int d_a = 1;
@@ -44491,11 +44502,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 441, 9, computed_fails);
         }
         int d_a = 1;
@@ -44520,11 +44531,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 442, 8, computed_fails);
         }
         int d_a = 1;
@@ -44549,11 +44560,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 443, 9, computed_fails);
         }
         int d_a = 1;
@@ -44578,11 +44589,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 444, 7, computed_fails);
         }
         int d_a = 1;
@@ -44607,11 +44618,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 445, 6, computed_fails);
         }
         int d_a = 1;
@@ -44636,11 +44647,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 446, 8, computed_fails);
         }
         int d_a = 1;
@@ -44665,11 +44676,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 447, 4, computed_fails);
         }
         int d_a = 1;
@@ -44694,11 +44705,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 448, 7, computed_fails);
         }
         int d_a = 1;
@@ -44723,11 +44734,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 449, 6, computed_fails);
         }
         int d_a = 1;
@@ -44752,11 +44763,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 450, 10, computed_fails);
         }
         int d_a = 1;
@@ -44781,11 +44792,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 451, 10, computed_fails);
         }
         int d_a = 1;
@@ -44810,11 +44821,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 452, 10, computed_fails);
         }
         int d_a = 1;
@@ -44839,11 +44850,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 453, 7, computed_fails);
         }
         int d_a = 1;
@@ -44868,11 +44879,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 454, 9, computed_fails);
         }
         int d_a = 1;
@@ -44897,11 +44908,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 455, 8, computed_fails);
         }
         int d_a = 1;
@@ -44926,11 +44937,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 456, 9, computed_fails);
         }
         int d_a = 1;
@@ -44955,11 +44966,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 457, 5, computed_fails);
         }
         int d_a = 1;
@@ -44984,11 +44995,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 458, 9, computed_fails);
         }
         int d_a = 1;
@@ -45013,11 +45024,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 459, 9, computed_fails);
         }
         int d_a = 1;
@@ -45042,11 +45053,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 460, 8, computed_fails);
         }
         int d_a = 1;
@@ -45071,11 +45082,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 461, 8, computed_fails);
         }
         int d_a = 1;
@@ -45100,11 +45111,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 462, 9, computed_fails);
         }
         int d_a = 1;
@@ -45129,11 +45140,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 463, 7, computed_fails);
         }
         int d_a = 1;
@@ -45158,11 +45169,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 464, 8, computed_fails);
         }
         int d_a = 1;
@@ -45187,11 +45198,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 465, 7, computed_fails);
         }
         int d_a = 1;
@@ -45216,11 +45227,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 466, 8, computed_fails);
         }
         int d_a = 1;
@@ -45245,11 +45256,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 467, 6, computed_fails);
         }
         int d_a = 1;
@@ -45274,11 +45285,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 468, 10, computed_fails);
         }
         int d_a = 1;
@@ -45303,11 +45314,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 469, 10, computed_fails);
         }
         int d_a = 1;
@@ -45332,11 +45343,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 470, 10, computed_fails);
         }
         int d_a = 1;
@@ -45361,11 +45372,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 471, 8, computed_fails);
         }
         int d_a = 1;
@@ -45390,11 +45401,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 472, 8, computed_fails);
         }
         int d_a = 1;
@@ -45419,11 +45430,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 473, 7, computed_fails);
         }
         int d_a = 1;
@@ -45448,11 +45459,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 474, 7, computed_fails);
         }
         int d_a = 1;
@@ -45477,11 +45488,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 475, 6, computed_fails);
         }
         int d_a = 1;
@@ -45506,11 +45517,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 476, 8, computed_fails);
         }
         int d_a = 1;
@@ -45535,11 +45546,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 477, 9, computed_fails);
         }
         int d_a = 1;
@@ -45564,11 +45575,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 478, 8, computed_fails);
         }
         int d_a = 1;
@@ -45593,11 +45604,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 479, 6, computed_fails);
         }
         int d_a = 1;
@@ -45622,11 +45633,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 480, 9, computed_fails);
         }
         int d_a = 1;
@@ -45651,11 +45662,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 481, 8, computed_fails);
         }
         int d_a = 1;
@@ -45680,11 +45691,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 482, 6, computed_fails);
         }
         int d_a = 1;
@@ -45709,11 +45720,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 483, 5, computed_fails);
         }
         int d_a = 1;
@@ -45738,11 +45749,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 484, 5, computed_fails);
         }
         int d_a = 1;
@@ -45767,11 +45778,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 485, 4, computed_fails);
         }
         int d_a = 1;
@@ -45796,11 +45807,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 486, 9, computed_fails);
         }
         int d_a = 1;
@@ -45825,11 +45836,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 487, 9, computed_fails);
         }
         int d_a = 1;
@@ -45854,11 +45865,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 488, 6, computed_fails);
         }
         int d_a = 1;
@@ -45883,11 +45894,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 489, 9, computed_fails);
         }
         int d_a = 1;
@@ -45912,11 +45923,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 490, 7, computed_fails);
         }
         int d_a = 1;
@@ -45941,11 +45952,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 491, 6, computed_fails);
         }
         int d_a = 1;
@@ -45970,11 +45981,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 492, 5, computed_fails);
         }
         int d_a = 1;
@@ -45999,11 +46010,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 493, 7, computed_fails);
         }
         int d_a = 1;
@@ -46028,11 +46039,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 494, 7, computed_fails);
         }
         int d_a = 1;
@@ -46057,11 +46068,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 495, 10, computed_fails);
         }
         int d_a = 1;
@@ -46086,11 +46097,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 496, 7, computed_fails);
         }
         int d_a = 1;
@@ -46115,11 +46126,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 497, 8, computed_fails);
         }
         int d_a = 1;
@@ -46144,11 +46155,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 498, 8, computed_fails);
         }
         int d_a = 1;
@@ -46173,11 +46184,11 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
                 computed_fails++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_fails == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Telemetry Mismatch in Test %d (Expected Fails: %d, Computed: %d)\n", 499, 7, computed_fails);
         }
         int d_a = 1;
@@ -46192,13 +46203,76 @@ void run_test_batch_400_to_500(ring_buffer_t *rb) {
     }
 }
 
-void run_all_telemetry_tests(ring_buffer_t *rb) {
-    run_test_batch_0_to_100(rb);
-    run_test_batch_100_to_200(rb);
-    run_test_batch_200_to_300(rb);
-    run_test_batch_300_to_400(rb);
-    run_test_batch_400_to_500(rb);
+
+typedef void (*test_batch_fn_t)(ring_buffer_t*, test_stats_t*);
+static const test_batch_fn_t g_test_batches[] = {
+
+    run_test_batch_0_to_100,
+    run_test_batch_100_to_200,
+    run_test_batch_200_to_300,
+    run_test_batch_300_to_400,
+    run_test_batch_400_to_500,
+};
+
+typedef struct {
+    int thread_id;
+    test_stats_t stats;
+} thread_arg_t;
+
+#if defined(_WIN32)
+DWORD WINAPI worker_thread_func(LPVOID lpParam) {
+    thread_arg_t* arg = (thread_arg_t*)lpParam;
+    pin_current_thread(arg->thread_id);
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 5) num_threads = 5; // 5 batches total (NUM_TESTS = 500)
+    ring_buffer_t rb;
+    init_ring_buffer(&rb);
+    for (int b = arg->thread_id * 100; b < NUM_TEST_CASES; b += num_threads * 100) {
+        g_test_batches[b / 100](&rb, &arg->stats);
+        paced_sleep(1);
+    }
+    return 0;
 }
+#else
+void* worker_thread_func(void* lpParam) {
+    thread_arg_t* arg = (thread_arg_t*)lpParam;
+    pin_current_thread(arg->thread_id);
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 5) num_threads = 5;
+    ring_buffer_t rb;
+    init_ring_buffer(&rb);
+    for (int b = arg->thread_id * 100; b < NUM_TEST_CASES; b += num_threads * 100) {
+        g_test_batches[b / 100](&rb, &arg->stats);
+        paced_sleep(1);
+    }
+    return NULL;
+}
+#endif
+
+void run_all_telemetry_tests() {
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 5) num_threads = 5;
+
+    thread_arg_t args[5];
+    thread_t threads[5];
+
+    for (int t = 0; t < num_threads; t++) {
+        args[t].thread_id = t;
+        memset(&args[t].stats, 0, sizeof(test_stats_t));
+        thread_create(&threads[t], worker_thread_func, &args[t]);
+    }
+
+    for (int t = 0; t < num_threads; t++) {
+        thread_join(threads[t]);
+        g_stats.total += args[t].stats.total;
+        g_stats.passed += args[t].stats.passed;
+        g_stats.failed += args[t].stats.failed;
+    }
+}
+
 
 int main() {
     printf("==================================================\n");
@@ -46206,11 +46280,8 @@ int main() {
     printf("Target Engine: C Telemetry Collector (Emulated eBPF + Assembly)\n");
     printf("==================================================\n\n");
 
-    ring_buffer_t rb;
-    init_ring_buffer(&rb);
-
     printf("[1/2] Running %d Invariant Telemetry Assertions...\n", NUM_TEST_CASES);
-    run_all_telemetry_tests(&rb);
+    run_all_telemetry_tests();
     printf("      Assertions Run: %u\n", g_stats.total);
     printf("      Passed: %u | Failed: %u\n", g_stats.passed, g_stats.failed);
     

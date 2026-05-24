@@ -13,6 +13,8 @@
 #include <cmath>
 #include <stdint.h>
 #include <stdlib.h>
+#include <thread>
+#include "../compute_balancer.h"
 
 #define NUM_NODES 16
 #define NUM_TESTS 1000
@@ -13677,7 +13679,7 @@ void print_wave_profile(const WaveSim *sim) {
     std::cout << "  +----------------------------------------+\n";
 }
 
-void run_test_batch_0_to_100() {
+void run_test_batch_0_to_100(TestStats& stats) {
     { // Test Case 0
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -13687,11 +13689,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 0 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13701,7 +13703,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 0 << "\n";
             }
         }
@@ -13728,11 +13730,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 1 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13742,7 +13744,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 1 << "\n";
             }
         }
@@ -13769,11 +13771,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 2 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13783,7 +13785,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 2 << "\n";
             }
         }
@@ -13810,11 +13812,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 3 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13824,7 +13826,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 3 << "\n";
             }
         }
@@ -13851,11 +13853,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 4 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13865,7 +13867,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 4 << "\n";
             }
         }
@@ -13892,11 +13894,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 5 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13906,7 +13908,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 5 << "\n";
             }
         }
@@ -13933,11 +13935,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 6 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13947,7 +13949,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 6 << "\n";
             }
         }
@@ -13974,11 +13976,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 7 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -13988,7 +13990,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 7 << "\n";
             }
         }
@@ -14015,11 +14017,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 8 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14029,7 +14031,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 8 << "\n";
             }
         }
@@ -14056,11 +14058,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 9 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14070,7 +14072,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 9 << "\n";
             }
         }
@@ -14097,11 +14099,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 10 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14111,7 +14113,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 10 << "\n";
             }
         }
@@ -14138,11 +14140,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 11 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14152,7 +14154,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 11 << "\n";
             }
         }
@@ -14179,11 +14181,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 12 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14193,7 +14195,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 12 << "\n";
             }
         }
@@ -14220,11 +14222,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 13 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14234,7 +14236,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 13 << "\n";
             }
         }
@@ -14261,11 +14263,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 14 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14275,7 +14277,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 14 << "\n";
             }
         }
@@ -14302,11 +14304,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 15 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14316,7 +14318,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 15 << "\n";
             }
         }
@@ -14343,11 +14345,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 16 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14357,7 +14359,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 16 << "\n";
             }
         }
@@ -14384,11 +14386,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 17 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14398,7 +14400,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 17 << "\n";
             }
         }
@@ -14425,11 +14427,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 18 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14439,7 +14441,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 18 << "\n";
             }
         }
@@ -14466,11 +14468,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 19 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14480,7 +14482,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 19 << "\n";
             }
         }
@@ -14507,11 +14509,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 20 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14521,7 +14523,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 20 << "\n";
             }
         }
@@ -14548,11 +14550,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 21 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14562,7 +14564,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 21 << "\n";
             }
         }
@@ -14589,11 +14591,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 22 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14603,7 +14605,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 22 << "\n";
             }
         }
@@ -14630,11 +14632,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 23 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14644,7 +14646,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 23 << "\n";
             }
         }
@@ -14671,11 +14673,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 24 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14685,7 +14687,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 24 << "\n";
             }
         }
@@ -14712,11 +14714,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 25 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14726,7 +14728,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 25 << "\n";
             }
         }
@@ -14753,11 +14755,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 26 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14767,7 +14769,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 26 << "\n";
             }
         }
@@ -14794,11 +14796,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 27 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14808,7 +14810,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 27 << "\n";
             }
         }
@@ -14835,11 +14837,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 28 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14849,7 +14851,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 28 << "\n";
             }
         }
@@ -14876,11 +14878,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 29 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14890,7 +14892,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 29 << "\n";
             }
         }
@@ -14917,11 +14919,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 30 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14931,7 +14933,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 30 << "\n";
             }
         }
@@ -14958,11 +14960,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 31 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -14972,7 +14974,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 31 << "\n";
             }
         }
@@ -14999,11 +15001,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 32 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15013,7 +15015,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 32 << "\n";
             }
         }
@@ -15040,11 +15042,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 33 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15054,7 +15056,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 33 << "\n";
             }
         }
@@ -15081,11 +15083,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 34 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15095,7 +15097,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 34 << "\n";
             }
         }
@@ -15122,11 +15124,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 35 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15136,7 +15138,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 35 << "\n";
             }
         }
@@ -15163,11 +15165,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 36 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15177,7 +15179,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 36 << "\n";
             }
         }
@@ -15204,11 +15206,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 37 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15218,7 +15220,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 37 << "\n";
             }
         }
@@ -15245,11 +15247,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 38 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15259,7 +15261,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 38 << "\n";
             }
         }
@@ -15286,11 +15288,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 39 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15300,7 +15302,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 39 << "\n";
             }
         }
@@ -15327,11 +15329,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 40 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15341,7 +15343,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 40 << "\n";
             }
         }
@@ -15368,11 +15370,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 41 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15382,7 +15384,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 41 << "\n";
             }
         }
@@ -15409,11 +15411,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 42 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15423,7 +15425,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 42 << "\n";
             }
         }
@@ -15450,11 +15452,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 43 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15464,7 +15466,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 43 << "\n";
             }
         }
@@ -15491,11 +15493,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 44 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15505,7 +15507,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 44 << "\n";
             }
         }
@@ -15532,11 +15534,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 45 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15546,7 +15548,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 45 << "\n";
             }
         }
@@ -15573,11 +15575,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 46 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15587,7 +15589,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 46 << "\n";
             }
         }
@@ -15614,11 +15616,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 47 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15628,7 +15630,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 47 << "\n";
             }
         }
@@ -15655,11 +15657,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 48 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15669,7 +15671,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 48 << "\n";
             }
         }
@@ -15696,11 +15698,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 49 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15710,7 +15712,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 49 << "\n";
             }
         }
@@ -15737,11 +15739,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 50 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15751,7 +15753,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 50 << "\n";
             }
         }
@@ -15778,11 +15780,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 51 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15792,7 +15794,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 51 << "\n";
             }
         }
@@ -15819,11 +15821,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 52 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15833,7 +15835,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 52 << "\n";
             }
         }
@@ -15860,11 +15862,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 53 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15874,7 +15876,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 53 << "\n";
             }
         }
@@ -15901,11 +15903,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 54 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15915,7 +15917,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 54 << "\n";
             }
         }
@@ -15942,11 +15944,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 55 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15956,7 +15958,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 55 << "\n";
             }
         }
@@ -15983,11 +15985,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 56 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -15997,7 +15999,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 56 << "\n";
             }
         }
@@ -16024,11 +16026,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 57 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16038,7 +16040,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 57 << "\n";
             }
         }
@@ -16065,11 +16067,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 58 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16079,7 +16081,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 58 << "\n";
             }
         }
@@ -16106,11 +16108,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 59 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16120,7 +16122,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 59 << "\n";
             }
         }
@@ -16147,11 +16149,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 60 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16161,7 +16163,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 60 << "\n";
             }
         }
@@ -16188,11 +16190,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 61 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16202,7 +16204,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 61 << "\n";
             }
         }
@@ -16229,11 +16231,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 62 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16243,7 +16245,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 62 << "\n";
             }
         }
@@ -16270,11 +16272,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 63 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16284,7 +16286,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 63 << "\n";
             }
         }
@@ -16311,11 +16313,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 64 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16325,7 +16327,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 64 << "\n";
             }
         }
@@ -16352,11 +16354,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 65 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16366,7 +16368,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 65 << "\n";
             }
         }
@@ -16393,11 +16395,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 66 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16407,7 +16409,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 66 << "\n";
             }
         }
@@ -16434,11 +16436,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 67 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16448,7 +16450,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 67 << "\n";
             }
         }
@@ -16475,11 +16477,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 68 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16489,7 +16491,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 68 << "\n";
             }
         }
@@ -16516,11 +16518,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 69 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16530,7 +16532,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 69 << "\n";
             }
         }
@@ -16557,11 +16559,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 70 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16571,7 +16573,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 70 << "\n";
             }
         }
@@ -16598,11 +16600,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 71 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16612,7 +16614,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 71 << "\n";
             }
         }
@@ -16639,11 +16641,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 72 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16653,7 +16655,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 72 << "\n";
             }
         }
@@ -16680,11 +16682,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 73 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16694,7 +16696,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 73 << "\n";
             }
         }
@@ -16721,11 +16723,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 74 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16735,7 +16737,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 74 << "\n";
             }
         }
@@ -16762,11 +16764,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 75 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16776,7 +16778,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 75 << "\n";
             }
         }
@@ -16803,11 +16805,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 76 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16817,7 +16819,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 76 << "\n";
             }
         }
@@ -16844,11 +16846,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 77 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16858,7 +16860,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 77 << "\n";
             }
         }
@@ -16885,11 +16887,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 78 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16899,7 +16901,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 78 << "\n";
             }
         }
@@ -16926,11 +16928,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 79 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16940,7 +16942,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 79 << "\n";
             }
         }
@@ -16967,11 +16969,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 80 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -16981,7 +16983,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 80 << "\n";
             }
         }
@@ -17008,11 +17010,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 81 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17022,7 +17024,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 81 << "\n";
             }
         }
@@ -17049,11 +17051,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 82 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17063,7 +17065,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 82 << "\n";
             }
         }
@@ -17090,11 +17092,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 83 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17104,7 +17106,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 83 << "\n";
             }
         }
@@ -17131,11 +17133,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 84 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17145,7 +17147,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 84 << "\n";
             }
         }
@@ -17172,11 +17174,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 85 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17186,7 +17188,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 85 << "\n";
             }
         }
@@ -17213,11 +17215,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 86 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17227,7 +17229,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 86 << "\n";
             }
         }
@@ -17254,11 +17256,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 87 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17268,7 +17270,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 87 << "\n";
             }
         }
@@ -17295,11 +17297,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 88 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17309,7 +17311,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 88 << "\n";
             }
         }
@@ -17336,11 +17338,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 89 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17350,7 +17352,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 89 << "\n";
             }
         }
@@ -17377,11 +17379,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 90 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17391,7 +17393,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 90 << "\n";
             }
         }
@@ -17418,11 +17420,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 91 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17432,7 +17434,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 91 << "\n";
             }
         }
@@ -17459,11 +17461,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 92 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17473,7 +17475,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 92 << "\n";
             }
         }
@@ -17500,11 +17502,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 93 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17514,7 +17516,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 93 << "\n";
             }
         }
@@ -17541,11 +17543,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 94 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17555,7 +17557,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 94 << "\n";
             }
         }
@@ -17582,11 +17584,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 95 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17596,7 +17598,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 95 << "\n";
             }
         }
@@ -17623,11 +17625,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 96 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17637,7 +17639,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 96 << "\n";
             }
         }
@@ -17664,11 +17666,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 97 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17678,7 +17680,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 97 << "\n";
             }
         }
@@ -17705,11 +17707,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 98 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17719,7 +17721,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 98 << "\n";
             }
         }
@@ -17746,11 +17748,11 @@ void run_test_batch_0_to_100() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 99 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17760,7 +17762,7 @@ void run_test_batch_0_to_100() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 99 << "\n";
             }
         }
@@ -17780,7 +17782,7 @@ void run_test_batch_0_to_100() {
     }
 }
 
-void run_test_batch_100_to_200() {
+void run_test_batch_100_to_200(TestStats& stats) {
     { // Test Case 100
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -17790,11 +17792,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 100 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17804,7 +17806,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 100 << "\n";
             }
         }
@@ -17831,11 +17833,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 101 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17845,7 +17847,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 101 << "\n";
             }
         }
@@ -17872,11 +17874,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 102 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17886,7 +17888,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 102 << "\n";
             }
         }
@@ -17913,11 +17915,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 103 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17927,7 +17929,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 103 << "\n";
             }
         }
@@ -17954,11 +17956,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 104 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -17968,7 +17970,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 104 << "\n";
             }
         }
@@ -17995,11 +17997,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 105 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18009,7 +18011,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 105 << "\n";
             }
         }
@@ -18036,11 +18038,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 106 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18050,7 +18052,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 106 << "\n";
             }
         }
@@ -18077,11 +18079,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 107 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18091,7 +18093,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 107 << "\n";
             }
         }
@@ -18118,11 +18120,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 108 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18132,7 +18134,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 108 << "\n";
             }
         }
@@ -18159,11 +18161,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 109 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18173,7 +18175,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 109 << "\n";
             }
         }
@@ -18200,11 +18202,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 110 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18214,7 +18216,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 110 << "\n";
             }
         }
@@ -18241,11 +18243,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 111 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18255,7 +18257,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 111 << "\n";
             }
         }
@@ -18282,11 +18284,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 112 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18296,7 +18298,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 112 << "\n";
             }
         }
@@ -18323,11 +18325,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 113 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18337,7 +18339,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 113 << "\n";
             }
         }
@@ -18364,11 +18366,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 114 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18378,7 +18380,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 114 << "\n";
             }
         }
@@ -18405,11 +18407,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 115 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18419,7 +18421,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 115 << "\n";
             }
         }
@@ -18446,11 +18448,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 116 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18460,7 +18462,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 116 << "\n";
             }
         }
@@ -18487,11 +18489,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 117 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18501,7 +18503,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 117 << "\n";
             }
         }
@@ -18528,11 +18530,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 118 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18542,7 +18544,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 118 << "\n";
             }
         }
@@ -18569,11 +18571,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 119 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18583,7 +18585,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 119 << "\n";
             }
         }
@@ -18610,11 +18612,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 120 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18624,7 +18626,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 120 << "\n";
             }
         }
@@ -18651,11 +18653,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 121 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18665,7 +18667,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 121 << "\n";
             }
         }
@@ -18692,11 +18694,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 122 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18706,7 +18708,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 122 << "\n";
             }
         }
@@ -18733,11 +18735,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 123 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18747,7 +18749,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 123 << "\n";
             }
         }
@@ -18774,11 +18776,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 124 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18788,7 +18790,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 124 << "\n";
             }
         }
@@ -18815,11 +18817,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 125 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18829,7 +18831,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 125 << "\n";
             }
         }
@@ -18856,11 +18858,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 126 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18870,7 +18872,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 126 << "\n";
             }
         }
@@ -18897,11 +18899,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 127 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18911,7 +18913,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 127 << "\n";
             }
         }
@@ -18938,11 +18940,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 128 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18952,7 +18954,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 128 << "\n";
             }
         }
@@ -18979,11 +18981,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 129 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -18993,7 +18995,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 129 << "\n";
             }
         }
@@ -19020,11 +19022,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 130 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19034,7 +19036,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 130 << "\n";
             }
         }
@@ -19061,11 +19063,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 131 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19075,7 +19077,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 131 << "\n";
             }
         }
@@ -19102,11 +19104,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 132 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19116,7 +19118,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 132 << "\n";
             }
         }
@@ -19143,11 +19145,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 133 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19157,7 +19159,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 133 << "\n";
             }
         }
@@ -19184,11 +19186,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 134 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19198,7 +19200,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 134 << "\n";
             }
         }
@@ -19225,11 +19227,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 135 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19239,7 +19241,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 135 << "\n";
             }
         }
@@ -19266,11 +19268,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 136 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19280,7 +19282,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 136 << "\n";
             }
         }
@@ -19307,11 +19309,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 137 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19321,7 +19323,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 137 << "\n";
             }
         }
@@ -19348,11 +19350,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 138 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19362,7 +19364,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 138 << "\n";
             }
         }
@@ -19389,11 +19391,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 139 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19403,7 +19405,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 139 << "\n";
             }
         }
@@ -19430,11 +19432,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 140 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19444,7 +19446,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 140 << "\n";
             }
         }
@@ -19471,11 +19473,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 141 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19485,7 +19487,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 141 << "\n";
             }
         }
@@ -19512,11 +19514,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 142 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19526,7 +19528,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 142 << "\n";
             }
         }
@@ -19553,11 +19555,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 143 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19567,7 +19569,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 143 << "\n";
             }
         }
@@ -19594,11 +19596,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 144 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19608,7 +19610,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 144 << "\n";
             }
         }
@@ -19635,11 +19637,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 145 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19649,7 +19651,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 145 << "\n";
             }
         }
@@ -19676,11 +19678,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 146 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19690,7 +19692,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 146 << "\n";
             }
         }
@@ -19717,11 +19719,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 147 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19731,7 +19733,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 147 << "\n";
             }
         }
@@ -19758,11 +19760,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 148 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19772,7 +19774,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 148 << "\n";
             }
         }
@@ -19799,11 +19801,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 149 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19813,7 +19815,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 149 << "\n";
             }
         }
@@ -19840,11 +19842,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 150 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19854,7 +19856,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 150 << "\n";
             }
         }
@@ -19881,11 +19883,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 151 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19895,7 +19897,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 151 << "\n";
             }
         }
@@ -19922,11 +19924,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 152 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19936,7 +19938,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 152 << "\n";
             }
         }
@@ -19963,11 +19965,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 153 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -19977,7 +19979,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 153 << "\n";
             }
         }
@@ -20004,11 +20006,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 154 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20018,7 +20020,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 154 << "\n";
             }
         }
@@ -20045,11 +20047,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 155 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20059,7 +20061,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 155 << "\n";
             }
         }
@@ -20086,11 +20088,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 156 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20100,7 +20102,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 156 << "\n";
             }
         }
@@ -20127,11 +20129,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 157 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20141,7 +20143,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 157 << "\n";
             }
         }
@@ -20168,11 +20170,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 158 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20182,7 +20184,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 158 << "\n";
             }
         }
@@ -20209,11 +20211,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 159 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20223,7 +20225,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 159 << "\n";
             }
         }
@@ -20250,11 +20252,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 160 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20264,7 +20266,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 160 << "\n";
             }
         }
@@ -20291,11 +20293,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 161 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20305,7 +20307,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 161 << "\n";
             }
         }
@@ -20332,11 +20334,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 162 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20346,7 +20348,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 162 << "\n";
             }
         }
@@ -20373,11 +20375,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 163 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20387,7 +20389,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 163 << "\n";
             }
         }
@@ -20414,11 +20416,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 164 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20428,7 +20430,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 164 << "\n";
             }
         }
@@ -20455,11 +20457,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 165 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20469,7 +20471,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 165 << "\n";
             }
         }
@@ -20496,11 +20498,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 166 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20510,7 +20512,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 166 << "\n";
             }
         }
@@ -20537,11 +20539,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 167 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20551,7 +20553,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 167 << "\n";
             }
         }
@@ -20578,11 +20580,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 168 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20592,7 +20594,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 168 << "\n";
             }
         }
@@ -20619,11 +20621,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 169 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20633,7 +20635,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 169 << "\n";
             }
         }
@@ -20660,11 +20662,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 170 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20674,7 +20676,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 170 << "\n";
             }
         }
@@ -20701,11 +20703,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 171 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20715,7 +20717,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 171 << "\n";
             }
         }
@@ -20742,11 +20744,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 172 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20756,7 +20758,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 172 << "\n";
             }
         }
@@ -20783,11 +20785,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 173 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20797,7 +20799,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 173 << "\n";
             }
         }
@@ -20824,11 +20826,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 174 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20838,7 +20840,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 174 << "\n";
             }
         }
@@ -20865,11 +20867,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 175 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20879,7 +20881,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 175 << "\n";
             }
         }
@@ -20906,11 +20908,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 176 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20920,7 +20922,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 176 << "\n";
             }
         }
@@ -20947,11 +20949,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 177 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -20961,7 +20963,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 177 << "\n";
             }
         }
@@ -20988,11 +20990,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 178 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21002,7 +21004,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 178 << "\n";
             }
         }
@@ -21029,11 +21031,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 179 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21043,7 +21045,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 179 << "\n";
             }
         }
@@ -21070,11 +21072,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 180 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21084,7 +21086,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 180 << "\n";
             }
         }
@@ -21111,11 +21113,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 181 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21125,7 +21127,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 181 << "\n";
             }
         }
@@ -21152,11 +21154,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 182 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21166,7 +21168,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 182 << "\n";
             }
         }
@@ -21193,11 +21195,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 183 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21207,7 +21209,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 183 << "\n";
             }
         }
@@ -21234,11 +21236,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 184 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21248,7 +21250,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 184 << "\n";
             }
         }
@@ -21275,11 +21277,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 185 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21289,7 +21291,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 185 << "\n";
             }
         }
@@ -21316,11 +21318,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 186 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21330,7 +21332,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 186 << "\n";
             }
         }
@@ -21357,11 +21359,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 187 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21371,7 +21373,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 187 << "\n";
             }
         }
@@ -21398,11 +21400,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 188 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21412,7 +21414,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 188 << "\n";
             }
         }
@@ -21439,11 +21441,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 189 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21453,7 +21455,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 189 << "\n";
             }
         }
@@ -21480,11 +21482,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 190 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21494,7 +21496,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 190 << "\n";
             }
         }
@@ -21521,11 +21523,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 191 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21535,7 +21537,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 191 << "\n";
             }
         }
@@ -21562,11 +21564,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 192 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21576,7 +21578,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 192 << "\n";
             }
         }
@@ -21603,11 +21605,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 193 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21617,7 +21619,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 193 << "\n";
             }
         }
@@ -21644,11 +21646,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 194 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21658,7 +21660,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 194 << "\n";
             }
         }
@@ -21685,11 +21687,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 195 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21699,7 +21701,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 195 << "\n";
             }
         }
@@ -21726,11 +21728,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 196 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21740,7 +21742,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 196 << "\n";
             }
         }
@@ -21767,11 +21769,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 197 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21781,7 +21783,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 197 << "\n";
             }
         }
@@ -21808,11 +21810,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 198 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21822,7 +21824,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 198 << "\n";
             }
         }
@@ -21849,11 +21851,11 @@ void run_test_batch_100_to_200() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 199 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21863,7 +21865,7 @@ void run_test_batch_100_to_200() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 199 << "\n";
             }
         }
@@ -21883,7 +21885,7 @@ void run_test_batch_100_to_200() {
     }
 }
 
-void run_test_batch_200_to_300() {
+void run_test_batch_200_to_300(TestStats& stats) {
     { // Test Case 200
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -21893,11 +21895,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 200 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21907,7 +21909,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 200 << "\n";
             }
         }
@@ -21934,11 +21936,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 201 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21948,7 +21950,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 201 << "\n";
             }
         }
@@ -21975,11 +21977,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 202 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -21989,7 +21991,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 202 << "\n";
             }
         }
@@ -22016,11 +22018,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 203 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22030,7 +22032,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 203 << "\n";
             }
         }
@@ -22057,11 +22059,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 204 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22071,7 +22073,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 204 << "\n";
             }
         }
@@ -22098,11 +22100,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 205 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22112,7 +22114,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 205 << "\n";
             }
         }
@@ -22139,11 +22141,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 206 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22153,7 +22155,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 206 << "\n";
             }
         }
@@ -22180,11 +22182,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 207 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22194,7 +22196,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 207 << "\n";
             }
         }
@@ -22221,11 +22223,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 208 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22235,7 +22237,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 208 << "\n";
             }
         }
@@ -22262,11 +22264,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 209 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22276,7 +22278,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 209 << "\n";
             }
         }
@@ -22303,11 +22305,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 210 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22317,7 +22319,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 210 << "\n";
             }
         }
@@ -22344,11 +22346,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 211 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22358,7 +22360,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 211 << "\n";
             }
         }
@@ -22385,11 +22387,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 212 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22399,7 +22401,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 212 << "\n";
             }
         }
@@ -22426,11 +22428,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 213 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22440,7 +22442,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 213 << "\n";
             }
         }
@@ -22467,11 +22469,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 214 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22481,7 +22483,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 214 << "\n";
             }
         }
@@ -22508,11 +22510,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 215 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22522,7 +22524,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 215 << "\n";
             }
         }
@@ -22549,11 +22551,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 216 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22563,7 +22565,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 216 << "\n";
             }
         }
@@ -22590,11 +22592,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 217 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22604,7 +22606,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 217 << "\n";
             }
         }
@@ -22631,11 +22633,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 218 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22645,7 +22647,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 218 << "\n";
             }
         }
@@ -22672,11 +22674,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 219 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22686,7 +22688,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 219 << "\n";
             }
         }
@@ -22713,11 +22715,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 220 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22727,7 +22729,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 220 << "\n";
             }
         }
@@ -22754,11 +22756,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 221 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22768,7 +22770,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 221 << "\n";
             }
         }
@@ -22795,11 +22797,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 222 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22809,7 +22811,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 222 << "\n";
             }
         }
@@ -22836,11 +22838,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 223 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22850,7 +22852,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 223 << "\n";
             }
         }
@@ -22877,11 +22879,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 224 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22891,7 +22893,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 224 << "\n";
             }
         }
@@ -22918,11 +22920,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 225 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22932,7 +22934,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 225 << "\n";
             }
         }
@@ -22959,11 +22961,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 226 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -22973,7 +22975,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 226 << "\n";
             }
         }
@@ -23000,11 +23002,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 227 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23014,7 +23016,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 227 << "\n";
             }
         }
@@ -23041,11 +23043,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 228 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23055,7 +23057,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 228 << "\n";
             }
         }
@@ -23082,11 +23084,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 229 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23096,7 +23098,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 229 << "\n";
             }
         }
@@ -23123,11 +23125,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 230 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23137,7 +23139,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 230 << "\n";
             }
         }
@@ -23164,11 +23166,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 231 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23178,7 +23180,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 231 << "\n";
             }
         }
@@ -23205,11 +23207,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 232 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23219,7 +23221,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 232 << "\n";
             }
         }
@@ -23246,11 +23248,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 233 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23260,7 +23262,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 233 << "\n";
             }
         }
@@ -23287,11 +23289,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 234 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23301,7 +23303,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 234 << "\n";
             }
         }
@@ -23328,11 +23330,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 235 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23342,7 +23344,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 235 << "\n";
             }
         }
@@ -23369,11 +23371,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 236 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23383,7 +23385,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 236 << "\n";
             }
         }
@@ -23410,11 +23412,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 237 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23424,7 +23426,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 237 << "\n";
             }
         }
@@ -23451,11 +23453,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 238 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23465,7 +23467,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 238 << "\n";
             }
         }
@@ -23492,11 +23494,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 239 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23506,7 +23508,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 239 << "\n";
             }
         }
@@ -23533,11 +23535,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 240 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23547,7 +23549,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 240 << "\n";
             }
         }
@@ -23574,11 +23576,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 241 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23588,7 +23590,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 241 << "\n";
             }
         }
@@ -23615,11 +23617,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 242 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23629,7 +23631,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 242 << "\n";
             }
         }
@@ -23656,11 +23658,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 243 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23670,7 +23672,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 243 << "\n";
             }
         }
@@ -23697,11 +23699,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 244 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23711,7 +23713,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 244 << "\n";
             }
         }
@@ -23738,11 +23740,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 245 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23752,7 +23754,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 245 << "\n";
             }
         }
@@ -23779,11 +23781,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 246 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23793,7 +23795,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 246 << "\n";
             }
         }
@@ -23820,11 +23822,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 247 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23834,7 +23836,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 247 << "\n";
             }
         }
@@ -23861,11 +23863,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 248 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23875,7 +23877,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 248 << "\n";
             }
         }
@@ -23902,11 +23904,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 249 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23916,7 +23918,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 249 << "\n";
             }
         }
@@ -23943,11 +23945,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 250 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23957,7 +23959,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 250 << "\n";
             }
         }
@@ -23984,11 +23986,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 251 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -23998,7 +24000,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 251 << "\n";
             }
         }
@@ -24025,11 +24027,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 252 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24039,7 +24041,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 252 << "\n";
             }
         }
@@ -24066,11 +24068,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 253 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24080,7 +24082,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 253 << "\n";
             }
         }
@@ -24107,11 +24109,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 254 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24121,7 +24123,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 254 << "\n";
             }
         }
@@ -24148,11 +24150,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 255 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24162,7 +24164,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 255 << "\n";
             }
         }
@@ -24189,11 +24191,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 256 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24203,7 +24205,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 256 << "\n";
             }
         }
@@ -24230,11 +24232,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 257 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24244,7 +24246,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 257 << "\n";
             }
         }
@@ -24271,11 +24273,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 258 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24285,7 +24287,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 258 << "\n";
             }
         }
@@ -24312,11 +24314,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 259 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24326,7 +24328,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 259 << "\n";
             }
         }
@@ -24353,11 +24355,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 260 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24367,7 +24369,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 260 << "\n";
             }
         }
@@ -24394,11 +24396,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 261 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24408,7 +24410,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 261 << "\n";
             }
         }
@@ -24435,11 +24437,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 262 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24449,7 +24451,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 262 << "\n";
             }
         }
@@ -24476,11 +24478,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 263 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24490,7 +24492,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 263 << "\n";
             }
         }
@@ -24517,11 +24519,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 264 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24531,7 +24533,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 264 << "\n";
             }
         }
@@ -24558,11 +24560,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 265 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24572,7 +24574,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 265 << "\n";
             }
         }
@@ -24599,11 +24601,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 266 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24613,7 +24615,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 266 << "\n";
             }
         }
@@ -24640,11 +24642,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 267 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24654,7 +24656,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 267 << "\n";
             }
         }
@@ -24681,11 +24683,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 268 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24695,7 +24697,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 268 << "\n";
             }
         }
@@ -24722,11 +24724,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 269 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24736,7 +24738,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 269 << "\n";
             }
         }
@@ -24763,11 +24765,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 270 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24777,7 +24779,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 270 << "\n";
             }
         }
@@ -24804,11 +24806,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 271 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24818,7 +24820,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 271 << "\n";
             }
         }
@@ -24845,11 +24847,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 272 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24859,7 +24861,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 272 << "\n";
             }
         }
@@ -24886,11 +24888,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 273 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24900,7 +24902,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 273 << "\n";
             }
         }
@@ -24927,11 +24929,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 274 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24941,7 +24943,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 274 << "\n";
             }
         }
@@ -24968,11 +24970,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 275 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -24982,7 +24984,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 275 << "\n";
             }
         }
@@ -25009,11 +25011,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 276 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25023,7 +25025,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 276 << "\n";
             }
         }
@@ -25050,11 +25052,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 277 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25064,7 +25066,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 277 << "\n";
             }
         }
@@ -25091,11 +25093,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 278 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25105,7 +25107,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 278 << "\n";
             }
         }
@@ -25132,11 +25134,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 279 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25146,7 +25148,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 279 << "\n";
             }
         }
@@ -25173,11 +25175,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 280 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25187,7 +25189,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 280 << "\n";
             }
         }
@@ -25214,11 +25216,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 281 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25228,7 +25230,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 281 << "\n";
             }
         }
@@ -25255,11 +25257,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 282 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25269,7 +25271,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 282 << "\n";
             }
         }
@@ -25296,11 +25298,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 283 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25310,7 +25312,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 283 << "\n";
             }
         }
@@ -25337,11 +25339,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 284 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25351,7 +25353,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 284 << "\n";
             }
         }
@@ -25378,11 +25380,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 285 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25392,7 +25394,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 285 << "\n";
             }
         }
@@ -25419,11 +25421,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 286 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25433,7 +25435,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 286 << "\n";
             }
         }
@@ -25460,11 +25462,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 287 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25474,7 +25476,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 287 << "\n";
             }
         }
@@ -25501,11 +25503,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 288 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25515,7 +25517,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 288 << "\n";
             }
         }
@@ -25542,11 +25544,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 289 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25556,7 +25558,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 289 << "\n";
             }
         }
@@ -25583,11 +25585,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 290 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25597,7 +25599,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 290 << "\n";
             }
         }
@@ -25624,11 +25626,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 291 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25638,7 +25640,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 291 << "\n";
             }
         }
@@ -25665,11 +25667,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 292 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25679,7 +25681,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 292 << "\n";
             }
         }
@@ -25706,11 +25708,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 293 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25720,7 +25722,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 293 << "\n";
             }
         }
@@ -25747,11 +25749,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 294 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25761,7 +25763,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 294 << "\n";
             }
         }
@@ -25788,11 +25790,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 295 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25802,7 +25804,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 295 << "\n";
             }
         }
@@ -25829,11 +25831,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 296 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25843,7 +25845,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 296 << "\n";
             }
         }
@@ -25870,11 +25872,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 297 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25884,7 +25886,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 297 << "\n";
             }
         }
@@ -25911,11 +25913,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 298 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25925,7 +25927,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 298 << "\n";
             }
         }
@@ -25952,11 +25954,11 @@ void run_test_batch_200_to_300() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 299 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -25966,7 +25968,7 @@ void run_test_batch_200_to_300() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 299 << "\n";
             }
         }
@@ -25986,7 +25988,7 @@ void run_test_batch_200_to_300() {
     }
 }
 
-void run_test_batch_300_to_400() {
+void run_test_batch_300_to_400(TestStats& stats) {
     { // Test Case 300
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -25996,11 +25998,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 300 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26010,7 +26012,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 300 << "\n";
             }
         }
@@ -26037,11 +26039,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 301 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26051,7 +26053,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 301 << "\n";
             }
         }
@@ -26078,11 +26080,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 302 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26092,7 +26094,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 302 << "\n";
             }
         }
@@ -26119,11 +26121,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 303 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26133,7 +26135,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 303 << "\n";
             }
         }
@@ -26160,11 +26162,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 304 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26174,7 +26176,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 304 << "\n";
             }
         }
@@ -26201,11 +26203,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 305 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26215,7 +26217,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 305 << "\n";
             }
         }
@@ -26242,11 +26244,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 306 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26256,7 +26258,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 306 << "\n";
             }
         }
@@ -26283,11 +26285,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 307 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26297,7 +26299,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 307 << "\n";
             }
         }
@@ -26324,11 +26326,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 308 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26338,7 +26340,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 308 << "\n";
             }
         }
@@ -26365,11 +26367,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 309 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26379,7 +26381,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 309 << "\n";
             }
         }
@@ -26406,11 +26408,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 310 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26420,7 +26422,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 310 << "\n";
             }
         }
@@ -26447,11 +26449,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 311 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26461,7 +26463,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 311 << "\n";
             }
         }
@@ -26488,11 +26490,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 312 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26502,7 +26504,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 312 << "\n";
             }
         }
@@ -26529,11 +26531,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 313 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26543,7 +26545,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 313 << "\n";
             }
         }
@@ -26570,11 +26572,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 314 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26584,7 +26586,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 314 << "\n";
             }
         }
@@ -26611,11 +26613,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 315 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26625,7 +26627,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 315 << "\n";
             }
         }
@@ -26652,11 +26654,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 316 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26666,7 +26668,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 316 << "\n";
             }
         }
@@ -26693,11 +26695,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 317 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26707,7 +26709,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 317 << "\n";
             }
         }
@@ -26734,11 +26736,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 318 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26748,7 +26750,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 318 << "\n";
             }
         }
@@ -26775,11 +26777,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 319 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26789,7 +26791,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 319 << "\n";
             }
         }
@@ -26816,11 +26818,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 320 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26830,7 +26832,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 320 << "\n";
             }
         }
@@ -26857,11 +26859,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 321 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26871,7 +26873,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 321 << "\n";
             }
         }
@@ -26898,11 +26900,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 322 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26912,7 +26914,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 322 << "\n";
             }
         }
@@ -26939,11 +26941,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 323 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26953,7 +26955,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 323 << "\n";
             }
         }
@@ -26980,11 +26982,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 324 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -26994,7 +26996,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 324 << "\n";
             }
         }
@@ -27021,11 +27023,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 325 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27035,7 +27037,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 325 << "\n";
             }
         }
@@ -27062,11 +27064,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 326 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27076,7 +27078,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 326 << "\n";
             }
         }
@@ -27103,11 +27105,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 327 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27117,7 +27119,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 327 << "\n";
             }
         }
@@ -27144,11 +27146,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 328 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27158,7 +27160,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 328 << "\n";
             }
         }
@@ -27185,11 +27187,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 329 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27199,7 +27201,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 329 << "\n";
             }
         }
@@ -27226,11 +27228,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 330 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27240,7 +27242,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 330 << "\n";
             }
         }
@@ -27267,11 +27269,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 331 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27281,7 +27283,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 331 << "\n";
             }
         }
@@ -27308,11 +27310,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 332 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27322,7 +27324,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 332 << "\n";
             }
         }
@@ -27349,11 +27351,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 333 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27363,7 +27365,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 333 << "\n";
             }
         }
@@ -27390,11 +27392,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 334 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27404,7 +27406,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 334 << "\n";
             }
         }
@@ -27431,11 +27433,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 335 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27445,7 +27447,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 335 << "\n";
             }
         }
@@ -27472,11 +27474,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 336 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27486,7 +27488,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 336 << "\n";
             }
         }
@@ -27513,11 +27515,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 337 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27527,7 +27529,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 337 << "\n";
             }
         }
@@ -27554,11 +27556,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 338 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27568,7 +27570,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 338 << "\n";
             }
         }
@@ -27595,11 +27597,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 339 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27609,7 +27611,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 339 << "\n";
             }
         }
@@ -27636,11 +27638,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 340 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27650,7 +27652,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 340 << "\n";
             }
         }
@@ -27677,11 +27679,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 341 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27691,7 +27693,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 341 << "\n";
             }
         }
@@ -27718,11 +27720,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 342 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27732,7 +27734,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 342 << "\n";
             }
         }
@@ -27759,11 +27761,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 343 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27773,7 +27775,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 343 << "\n";
             }
         }
@@ -27800,11 +27802,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 344 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27814,7 +27816,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 344 << "\n";
             }
         }
@@ -27841,11 +27843,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 345 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27855,7 +27857,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 345 << "\n";
             }
         }
@@ -27882,11 +27884,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 346 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27896,7 +27898,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 346 << "\n";
             }
         }
@@ -27923,11 +27925,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 347 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27937,7 +27939,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 347 << "\n";
             }
         }
@@ -27964,11 +27966,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 348 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -27978,7 +27980,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 348 << "\n";
             }
         }
@@ -28005,11 +28007,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 349 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28019,7 +28021,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 349 << "\n";
             }
         }
@@ -28046,11 +28048,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 350 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28060,7 +28062,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 350 << "\n";
             }
         }
@@ -28087,11 +28089,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 351 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28101,7 +28103,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 351 << "\n";
             }
         }
@@ -28128,11 +28130,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 352 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28142,7 +28144,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 352 << "\n";
             }
         }
@@ -28169,11 +28171,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 353 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28183,7 +28185,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 353 << "\n";
             }
         }
@@ -28210,11 +28212,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 354 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28224,7 +28226,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 354 << "\n";
             }
         }
@@ -28251,11 +28253,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 355 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28265,7 +28267,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 355 << "\n";
             }
         }
@@ -28292,11 +28294,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 356 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28306,7 +28308,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 356 << "\n";
             }
         }
@@ -28333,11 +28335,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 357 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28347,7 +28349,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 357 << "\n";
             }
         }
@@ -28374,11 +28376,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 358 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28388,7 +28390,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 358 << "\n";
             }
         }
@@ -28415,11 +28417,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 359 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28429,7 +28431,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 359 << "\n";
             }
         }
@@ -28456,11 +28458,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 360 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28470,7 +28472,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 360 << "\n";
             }
         }
@@ -28497,11 +28499,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 361 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28511,7 +28513,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 361 << "\n";
             }
         }
@@ -28538,11 +28540,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 362 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28552,7 +28554,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 362 << "\n";
             }
         }
@@ -28579,11 +28581,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 363 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28593,7 +28595,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 363 << "\n";
             }
         }
@@ -28620,11 +28622,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 364 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28634,7 +28636,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 364 << "\n";
             }
         }
@@ -28661,11 +28663,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 365 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28675,7 +28677,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 365 << "\n";
             }
         }
@@ -28702,11 +28704,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 366 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28716,7 +28718,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 366 << "\n";
             }
         }
@@ -28743,11 +28745,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 367 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28757,7 +28759,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 367 << "\n";
             }
         }
@@ -28784,11 +28786,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 368 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28798,7 +28800,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 368 << "\n";
             }
         }
@@ -28825,11 +28827,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 369 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28839,7 +28841,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 369 << "\n";
             }
         }
@@ -28866,11 +28868,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 370 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28880,7 +28882,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 370 << "\n";
             }
         }
@@ -28907,11 +28909,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 371 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28921,7 +28923,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 371 << "\n";
             }
         }
@@ -28948,11 +28950,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 372 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -28962,7 +28964,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 372 << "\n";
             }
         }
@@ -28989,11 +28991,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 373 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29003,7 +29005,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 373 << "\n";
             }
         }
@@ -29030,11 +29032,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 374 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29044,7 +29046,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 374 << "\n";
             }
         }
@@ -29071,11 +29073,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 375 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29085,7 +29087,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 375 << "\n";
             }
         }
@@ -29112,11 +29114,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 376 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29126,7 +29128,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 376 << "\n";
             }
         }
@@ -29153,11 +29155,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 377 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29167,7 +29169,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 377 << "\n";
             }
         }
@@ -29194,11 +29196,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 378 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29208,7 +29210,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 378 << "\n";
             }
         }
@@ -29235,11 +29237,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 379 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29249,7 +29251,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 379 << "\n";
             }
         }
@@ -29276,11 +29278,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 380 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29290,7 +29292,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 380 << "\n";
             }
         }
@@ -29317,11 +29319,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 381 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29331,7 +29333,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 381 << "\n";
             }
         }
@@ -29358,11 +29360,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 382 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29372,7 +29374,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 382 << "\n";
             }
         }
@@ -29399,11 +29401,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 383 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29413,7 +29415,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 383 << "\n";
             }
         }
@@ -29440,11 +29442,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 384 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29454,7 +29456,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 384 << "\n";
             }
         }
@@ -29481,11 +29483,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 385 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29495,7 +29497,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 385 << "\n";
             }
         }
@@ -29522,11 +29524,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 386 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29536,7 +29538,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 386 << "\n";
             }
         }
@@ -29563,11 +29565,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 387 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29577,7 +29579,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 387 << "\n";
             }
         }
@@ -29604,11 +29606,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 388 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29618,7 +29620,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 388 << "\n";
             }
         }
@@ -29645,11 +29647,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 389 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29659,7 +29661,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 389 << "\n";
             }
         }
@@ -29686,11 +29688,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 390 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29700,7 +29702,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 390 << "\n";
             }
         }
@@ -29727,11 +29729,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 391 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29741,7 +29743,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 391 << "\n";
             }
         }
@@ -29768,11 +29770,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 392 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29782,7 +29784,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 392 << "\n";
             }
         }
@@ -29809,11 +29811,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 393 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29823,7 +29825,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 393 << "\n";
             }
         }
@@ -29850,11 +29852,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 394 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29864,7 +29866,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 394 << "\n";
             }
         }
@@ -29891,11 +29893,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 395 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29905,7 +29907,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 395 << "\n";
             }
         }
@@ -29932,11 +29934,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 396 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29946,7 +29948,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 396 << "\n";
             }
         }
@@ -29973,11 +29975,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 397 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -29987,7 +29989,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 397 << "\n";
             }
         }
@@ -30014,11 +30016,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 398 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30028,7 +30030,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 398 << "\n";
             }
         }
@@ -30055,11 +30057,11 @@ void run_test_batch_300_to_400() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 399 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30069,7 +30071,7 @@ void run_test_batch_300_to_400() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 399 << "\n";
             }
         }
@@ -30089,7 +30091,7 @@ void run_test_batch_300_to_400() {
     }
 }
 
-void run_test_batch_400_to_500() {
+void run_test_batch_400_to_500(TestStats& stats) {
     { // Test Case 400
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -30099,11 +30101,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 400 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30113,7 +30115,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 400 << "\n";
             }
         }
@@ -30140,11 +30142,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 401 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30154,7 +30156,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 401 << "\n";
             }
         }
@@ -30181,11 +30183,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 402 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30195,7 +30197,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 402 << "\n";
             }
         }
@@ -30222,11 +30224,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 403 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30236,7 +30238,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 403 << "\n";
             }
         }
@@ -30263,11 +30265,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 404 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30277,7 +30279,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 404 << "\n";
             }
         }
@@ -30304,11 +30306,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 405 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30318,7 +30320,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 405 << "\n";
             }
         }
@@ -30345,11 +30347,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 406 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30359,7 +30361,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 406 << "\n";
             }
         }
@@ -30386,11 +30388,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 407 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30400,7 +30402,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 407 << "\n";
             }
         }
@@ -30427,11 +30429,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 408 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30441,7 +30443,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 408 << "\n";
             }
         }
@@ -30468,11 +30470,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 409 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30482,7 +30484,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 409 << "\n";
             }
         }
@@ -30509,11 +30511,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 410 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30523,7 +30525,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 410 << "\n";
             }
         }
@@ -30550,11 +30552,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 411 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30564,7 +30566,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 411 << "\n";
             }
         }
@@ -30591,11 +30593,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 412 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30605,7 +30607,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 412 << "\n";
             }
         }
@@ -30632,11 +30634,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 413 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30646,7 +30648,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 413 << "\n";
             }
         }
@@ -30673,11 +30675,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 414 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30687,7 +30689,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 414 << "\n";
             }
         }
@@ -30714,11 +30716,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 415 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30728,7 +30730,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 415 << "\n";
             }
         }
@@ -30755,11 +30757,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 416 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30769,7 +30771,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 416 << "\n";
             }
         }
@@ -30796,11 +30798,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 417 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30810,7 +30812,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 417 << "\n";
             }
         }
@@ -30837,11 +30839,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 418 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30851,7 +30853,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 418 << "\n";
             }
         }
@@ -30878,11 +30880,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 419 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30892,7 +30894,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 419 << "\n";
             }
         }
@@ -30919,11 +30921,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 420 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30933,7 +30935,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 420 << "\n";
             }
         }
@@ -30960,11 +30962,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 421 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -30974,7 +30976,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 421 << "\n";
             }
         }
@@ -31001,11 +31003,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 422 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31015,7 +31017,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 422 << "\n";
             }
         }
@@ -31042,11 +31044,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 423 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31056,7 +31058,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 423 << "\n";
             }
         }
@@ -31083,11 +31085,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 424 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31097,7 +31099,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 424 << "\n";
             }
         }
@@ -31124,11 +31126,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 425 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31138,7 +31140,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 425 << "\n";
             }
         }
@@ -31165,11 +31167,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 426 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31179,7 +31181,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 426 << "\n";
             }
         }
@@ -31206,11 +31208,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 427 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31220,7 +31222,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 427 << "\n";
             }
         }
@@ -31247,11 +31249,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 428 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31261,7 +31263,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 428 << "\n";
             }
         }
@@ -31288,11 +31290,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 429 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31302,7 +31304,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 429 << "\n";
             }
         }
@@ -31329,11 +31331,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 430 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31343,7 +31345,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 430 << "\n";
             }
         }
@@ -31370,11 +31372,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 431 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31384,7 +31386,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 431 << "\n";
             }
         }
@@ -31411,11 +31413,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 432 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31425,7 +31427,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 432 << "\n";
             }
         }
@@ -31452,11 +31454,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 433 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31466,7 +31468,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 433 << "\n";
             }
         }
@@ -31493,11 +31495,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 434 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31507,7 +31509,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 434 << "\n";
             }
         }
@@ -31534,11 +31536,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 435 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31548,7 +31550,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 435 << "\n";
             }
         }
@@ -31575,11 +31577,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 436 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31589,7 +31591,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 436 << "\n";
             }
         }
@@ -31616,11 +31618,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 437 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31630,7 +31632,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 437 << "\n";
             }
         }
@@ -31657,11 +31659,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 438 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31671,7 +31673,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 438 << "\n";
             }
         }
@@ -31698,11 +31700,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 439 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31712,7 +31714,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 439 << "\n";
             }
         }
@@ -31739,11 +31741,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 440 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31753,7 +31755,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 440 << "\n";
             }
         }
@@ -31780,11 +31782,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 441 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31794,7 +31796,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 441 << "\n";
             }
         }
@@ -31821,11 +31823,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 442 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31835,7 +31837,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 442 << "\n";
             }
         }
@@ -31862,11 +31864,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 443 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31876,7 +31878,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 443 << "\n";
             }
         }
@@ -31903,11 +31905,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 444 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31917,7 +31919,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 444 << "\n";
             }
         }
@@ -31944,11 +31946,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 445 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31958,7 +31960,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 445 << "\n";
             }
         }
@@ -31985,11 +31987,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 446 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -31999,7 +32001,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 446 << "\n";
             }
         }
@@ -32026,11 +32028,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 447 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32040,7 +32042,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 447 << "\n";
             }
         }
@@ -32067,11 +32069,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 448 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32081,7 +32083,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 448 << "\n";
             }
         }
@@ -32108,11 +32110,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 449 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32122,7 +32124,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 449 << "\n";
             }
         }
@@ -32149,11 +32151,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 450 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32163,7 +32165,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 450 << "\n";
             }
         }
@@ -32190,11 +32192,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 451 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32204,7 +32206,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 451 << "\n";
             }
         }
@@ -32231,11 +32233,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 452 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32245,7 +32247,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 452 << "\n";
             }
         }
@@ -32272,11 +32274,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 453 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32286,7 +32288,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 453 << "\n";
             }
         }
@@ -32313,11 +32315,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 454 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32327,7 +32329,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 454 << "\n";
             }
         }
@@ -32354,11 +32356,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 455 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32368,7 +32370,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 455 << "\n";
             }
         }
@@ -32395,11 +32397,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 456 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32409,7 +32411,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 456 << "\n";
             }
         }
@@ -32436,11 +32438,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 457 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32450,7 +32452,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 457 << "\n";
             }
         }
@@ -32477,11 +32479,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 458 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32491,7 +32493,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 458 << "\n";
             }
         }
@@ -32518,11 +32520,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 459 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32532,7 +32534,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 459 << "\n";
             }
         }
@@ -32559,11 +32561,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 460 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32573,7 +32575,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 460 << "\n";
             }
         }
@@ -32600,11 +32602,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 461 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32614,7 +32616,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 461 << "\n";
             }
         }
@@ -32641,11 +32643,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 462 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32655,7 +32657,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 462 << "\n";
             }
         }
@@ -32682,11 +32684,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 463 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32696,7 +32698,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 463 << "\n";
             }
         }
@@ -32723,11 +32725,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 464 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32737,7 +32739,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 464 << "\n";
             }
         }
@@ -32764,11 +32766,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 465 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32778,7 +32780,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 465 << "\n";
             }
         }
@@ -32805,11 +32807,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 466 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32819,7 +32821,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 466 << "\n";
             }
         }
@@ -32846,11 +32848,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 467 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32860,7 +32862,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 467 << "\n";
             }
         }
@@ -32887,11 +32889,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 468 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32901,7 +32903,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 468 << "\n";
             }
         }
@@ -32928,11 +32930,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 469 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32942,7 +32944,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 469 << "\n";
             }
         }
@@ -32969,11 +32971,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 470 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -32983,7 +32985,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 470 << "\n";
             }
         }
@@ -33010,11 +33012,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 471 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33024,7 +33026,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 471 << "\n";
             }
         }
@@ -33051,11 +33053,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 472 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33065,7 +33067,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 472 << "\n";
             }
         }
@@ -33092,11 +33094,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 473 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33106,7 +33108,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 473 << "\n";
             }
         }
@@ -33133,11 +33135,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 474 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33147,7 +33149,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 474 << "\n";
             }
         }
@@ -33174,11 +33176,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 475 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33188,7 +33190,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 475 << "\n";
             }
         }
@@ -33215,11 +33217,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 476 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33229,7 +33231,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 476 << "\n";
             }
         }
@@ -33256,11 +33258,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 477 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33270,7 +33272,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 477 << "\n";
             }
         }
@@ -33297,11 +33299,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 478 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33311,7 +33313,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 478 << "\n";
             }
         }
@@ -33338,11 +33340,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 479 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33352,7 +33354,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 479 << "\n";
             }
         }
@@ -33379,11 +33381,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 480 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33393,7 +33395,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 480 << "\n";
             }
         }
@@ -33420,11 +33422,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 481 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33434,7 +33436,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 481 << "\n";
             }
         }
@@ -33461,11 +33463,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 482 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33475,7 +33477,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 482 << "\n";
             }
         }
@@ -33502,11 +33504,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 483 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33516,7 +33518,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 483 << "\n";
             }
         }
@@ -33543,11 +33545,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 484 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33557,7 +33559,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 484 << "\n";
             }
         }
@@ -33584,11 +33586,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 485 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33598,7 +33600,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 485 << "\n";
             }
         }
@@ -33625,11 +33627,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 486 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33639,7 +33641,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 486 << "\n";
             }
         }
@@ -33666,11 +33668,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 487 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33680,7 +33682,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 487 << "\n";
             }
         }
@@ -33707,11 +33709,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 488 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33721,7 +33723,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 488 << "\n";
             }
         }
@@ -33748,11 +33750,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 489 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33762,7 +33764,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 489 << "\n";
             }
         }
@@ -33789,11 +33791,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 490 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33803,7 +33805,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 490 << "\n";
             }
         }
@@ -33830,11 +33832,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 491 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33844,7 +33846,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 491 << "\n";
             }
         }
@@ -33871,11 +33873,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 492 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33885,7 +33887,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 492 << "\n";
             }
         }
@@ -33912,11 +33914,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 493 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33926,7 +33928,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 493 << "\n";
             }
         }
@@ -33953,11 +33955,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 494 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -33967,7 +33969,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 494 << "\n";
             }
         }
@@ -33994,11 +33996,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 495 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34008,7 +34010,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 495 << "\n";
             }
         }
@@ -34035,11 +34037,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 496 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34049,7 +34051,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 496 << "\n";
             }
         }
@@ -34076,11 +34078,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 497 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34090,7 +34092,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 497 << "\n";
             }
         }
@@ -34117,11 +34119,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 498 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34131,7 +34133,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 498 << "\n";
             }
         }
@@ -34158,11 +34160,11 @@ void run_test_batch_400_to_500() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 499 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34172,7 +34174,7 @@ void run_test_batch_400_to_500() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 499 << "\n";
             }
         }
@@ -34192,7 +34194,7 @@ void run_test_batch_400_to_500() {
     }
 }
 
-void run_test_batch_500_to_600() {
+void run_test_batch_500_to_600(TestStats& stats) {
     { // Test Case 500
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -34202,11 +34204,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 500 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34216,7 +34218,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 500 << "\n";
             }
         }
@@ -34243,11 +34245,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 501 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34257,7 +34259,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 501 << "\n";
             }
         }
@@ -34284,11 +34286,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 502 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34298,7 +34300,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 502 << "\n";
             }
         }
@@ -34325,11 +34327,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 503 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34339,7 +34341,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 503 << "\n";
             }
         }
@@ -34366,11 +34368,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 504 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34380,7 +34382,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 504 << "\n";
             }
         }
@@ -34407,11 +34409,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 505 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34421,7 +34423,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 505 << "\n";
             }
         }
@@ -34448,11 +34450,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 506 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34462,7 +34464,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 506 << "\n";
             }
         }
@@ -34489,11 +34491,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 507 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34503,7 +34505,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 507 << "\n";
             }
         }
@@ -34530,11 +34532,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 508 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34544,7 +34546,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 508 << "\n";
             }
         }
@@ -34571,11 +34573,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 509 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34585,7 +34587,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 509 << "\n";
             }
         }
@@ -34612,11 +34614,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 510 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34626,7 +34628,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 510 << "\n";
             }
         }
@@ -34653,11 +34655,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 511 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34667,7 +34669,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 511 << "\n";
             }
         }
@@ -34694,11 +34696,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 512 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34708,7 +34710,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 512 << "\n";
             }
         }
@@ -34735,11 +34737,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 513 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34749,7 +34751,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 513 << "\n";
             }
         }
@@ -34776,11 +34778,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 514 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34790,7 +34792,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 514 << "\n";
             }
         }
@@ -34817,11 +34819,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 515 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34831,7 +34833,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 515 << "\n";
             }
         }
@@ -34858,11 +34860,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 516 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34872,7 +34874,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 516 << "\n";
             }
         }
@@ -34899,11 +34901,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 517 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34913,7 +34915,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 517 << "\n";
             }
         }
@@ -34940,11 +34942,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 518 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34954,7 +34956,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 518 << "\n";
             }
         }
@@ -34981,11 +34983,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 519 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -34995,7 +34997,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 519 << "\n";
             }
         }
@@ -35022,11 +35024,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 520 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35036,7 +35038,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 520 << "\n";
             }
         }
@@ -35063,11 +35065,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 521 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35077,7 +35079,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 521 << "\n";
             }
         }
@@ -35104,11 +35106,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 522 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35118,7 +35120,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 522 << "\n";
             }
         }
@@ -35145,11 +35147,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 523 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35159,7 +35161,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 523 << "\n";
             }
         }
@@ -35186,11 +35188,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 524 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35200,7 +35202,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 524 << "\n";
             }
         }
@@ -35227,11 +35229,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 525 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35241,7 +35243,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 525 << "\n";
             }
         }
@@ -35268,11 +35270,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 526 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35282,7 +35284,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 526 << "\n";
             }
         }
@@ -35309,11 +35311,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 527 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35323,7 +35325,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 527 << "\n";
             }
         }
@@ -35350,11 +35352,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 528 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35364,7 +35366,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 528 << "\n";
             }
         }
@@ -35391,11 +35393,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 529 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35405,7 +35407,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 529 << "\n";
             }
         }
@@ -35432,11 +35434,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 530 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35446,7 +35448,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 530 << "\n";
             }
         }
@@ -35473,11 +35475,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 531 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35487,7 +35489,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 531 << "\n";
             }
         }
@@ -35514,11 +35516,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 532 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35528,7 +35530,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 532 << "\n";
             }
         }
@@ -35555,11 +35557,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 533 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35569,7 +35571,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 533 << "\n";
             }
         }
@@ -35596,11 +35598,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 534 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35610,7 +35612,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 534 << "\n";
             }
         }
@@ -35637,11 +35639,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 535 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35651,7 +35653,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 535 << "\n";
             }
         }
@@ -35678,11 +35680,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 536 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35692,7 +35694,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 536 << "\n";
             }
         }
@@ -35719,11 +35721,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 537 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35733,7 +35735,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 537 << "\n";
             }
         }
@@ -35760,11 +35762,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 538 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35774,7 +35776,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 538 << "\n";
             }
         }
@@ -35801,11 +35803,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 539 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35815,7 +35817,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 539 << "\n";
             }
         }
@@ -35842,11 +35844,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 540 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35856,7 +35858,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 540 << "\n";
             }
         }
@@ -35883,11 +35885,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 541 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35897,7 +35899,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 541 << "\n";
             }
         }
@@ -35924,11 +35926,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 542 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35938,7 +35940,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 542 << "\n";
             }
         }
@@ -35965,11 +35967,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 543 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -35979,7 +35981,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 543 << "\n";
             }
         }
@@ -36006,11 +36008,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 544 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36020,7 +36022,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 544 << "\n";
             }
         }
@@ -36047,11 +36049,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 545 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36061,7 +36063,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 545 << "\n";
             }
         }
@@ -36088,11 +36090,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 546 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36102,7 +36104,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 546 << "\n";
             }
         }
@@ -36129,11 +36131,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 547 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36143,7 +36145,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 547 << "\n";
             }
         }
@@ -36170,11 +36172,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 548 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36184,7 +36186,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 548 << "\n";
             }
         }
@@ -36211,11 +36213,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 549 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36225,7 +36227,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 549 << "\n";
             }
         }
@@ -36252,11 +36254,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 550 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36266,7 +36268,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 550 << "\n";
             }
         }
@@ -36293,11 +36295,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 551 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36307,7 +36309,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 551 << "\n";
             }
         }
@@ -36334,11 +36336,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 552 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36348,7 +36350,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 552 << "\n";
             }
         }
@@ -36375,11 +36377,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 553 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36389,7 +36391,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 553 << "\n";
             }
         }
@@ -36416,11 +36418,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 554 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36430,7 +36432,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 554 << "\n";
             }
         }
@@ -36457,11 +36459,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 555 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36471,7 +36473,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 555 << "\n";
             }
         }
@@ -36498,11 +36500,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 556 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36512,7 +36514,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 556 << "\n";
             }
         }
@@ -36539,11 +36541,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 557 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36553,7 +36555,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 557 << "\n";
             }
         }
@@ -36580,11 +36582,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 558 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36594,7 +36596,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 558 << "\n";
             }
         }
@@ -36621,11 +36623,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 559 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36635,7 +36637,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 559 << "\n";
             }
         }
@@ -36662,11 +36664,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 560 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36676,7 +36678,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 560 << "\n";
             }
         }
@@ -36703,11 +36705,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 561 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36717,7 +36719,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 561 << "\n";
             }
         }
@@ -36744,11 +36746,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 562 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36758,7 +36760,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 562 << "\n";
             }
         }
@@ -36785,11 +36787,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 563 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36799,7 +36801,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 563 << "\n";
             }
         }
@@ -36826,11 +36828,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 564 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36840,7 +36842,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 564 << "\n";
             }
         }
@@ -36867,11 +36869,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 565 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36881,7 +36883,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 565 << "\n";
             }
         }
@@ -36908,11 +36910,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 566 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36922,7 +36924,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 566 << "\n";
             }
         }
@@ -36949,11 +36951,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 567 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -36963,7 +36965,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 567 << "\n";
             }
         }
@@ -36990,11 +36992,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 568 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37004,7 +37006,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 568 << "\n";
             }
         }
@@ -37031,11 +37033,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 569 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37045,7 +37047,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 569 << "\n";
             }
         }
@@ -37072,11 +37074,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 570 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37086,7 +37088,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 570 << "\n";
             }
         }
@@ -37113,11 +37115,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 571 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37127,7 +37129,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 571 << "\n";
             }
         }
@@ -37154,11 +37156,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 572 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37168,7 +37170,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 572 << "\n";
             }
         }
@@ -37195,11 +37197,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 573 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37209,7 +37211,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 573 << "\n";
             }
         }
@@ -37236,11 +37238,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 574 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37250,7 +37252,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 574 << "\n";
             }
         }
@@ -37277,11 +37279,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 575 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37291,7 +37293,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 575 << "\n";
             }
         }
@@ -37318,11 +37320,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 576 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37332,7 +37334,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 576 << "\n";
             }
         }
@@ -37359,11 +37361,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 577 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37373,7 +37375,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 577 << "\n";
             }
         }
@@ -37400,11 +37402,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 578 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37414,7 +37416,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 578 << "\n";
             }
         }
@@ -37441,11 +37443,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 579 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37455,7 +37457,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 579 << "\n";
             }
         }
@@ -37482,11 +37484,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 580 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37496,7 +37498,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 580 << "\n";
             }
         }
@@ -37523,11 +37525,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 581 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37537,7 +37539,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 581 << "\n";
             }
         }
@@ -37564,11 +37566,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 582 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37578,7 +37580,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 582 << "\n";
             }
         }
@@ -37605,11 +37607,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 583 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37619,7 +37621,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 583 << "\n";
             }
         }
@@ -37646,11 +37648,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 584 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37660,7 +37662,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 584 << "\n";
             }
         }
@@ -37687,11 +37689,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 585 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37701,7 +37703,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 585 << "\n";
             }
         }
@@ -37728,11 +37730,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 586 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37742,7 +37744,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 586 << "\n";
             }
         }
@@ -37769,11 +37771,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 587 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37783,7 +37785,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 587 << "\n";
             }
         }
@@ -37810,11 +37812,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 588 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37824,7 +37826,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 588 << "\n";
             }
         }
@@ -37851,11 +37853,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 589 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37865,7 +37867,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 589 << "\n";
             }
         }
@@ -37892,11 +37894,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 590 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37906,7 +37908,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 590 << "\n";
             }
         }
@@ -37933,11 +37935,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 591 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37947,7 +37949,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 591 << "\n";
             }
         }
@@ -37974,11 +37976,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 592 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -37988,7 +37990,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 592 << "\n";
             }
         }
@@ -38015,11 +38017,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 593 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38029,7 +38031,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 593 << "\n";
             }
         }
@@ -38056,11 +38058,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 594 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38070,7 +38072,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 594 << "\n";
             }
         }
@@ -38097,11 +38099,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 595 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38111,7 +38113,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 595 << "\n";
             }
         }
@@ -38138,11 +38140,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 596 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38152,7 +38154,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 596 << "\n";
             }
         }
@@ -38179,11 +38181,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 597 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38193,7 +38195,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 597 << "\n";
             }
         }
@@ -38220,11 +38222,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 598 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38234,7 +38236,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 598 << "\n";
             }
         }
@@ -38261,11 +38263,11 @@ void run_test_batch_500_to_600() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 599 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38275,7 +38277,7 @@ void run_test_batch_500_to_600() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 599 << "\n";
             }
         }
@@ -38295,7 +38297,7 @@ void run_test_batch_500_to_600() {
     }
 }
 
-void run_test_batch_600_to_700() {
+void run_test_batch_600_to_700(TestStats& stats) {
     { // Test Case 600
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -38305,11 +38307,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 600 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38319,7 +38321,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 600 << "\n";
             }
         }
@@ -38346,11 +38348,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 601 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38360,7 +38362,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 601 << "\n";
             }
         }
@@ -38387,11 +38389,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 602 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38401,7 +38403,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 602 << "\n";
             }
         }
@@ -38428,11 +38430,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 603 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38442,7 +38444,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 603 << "\n";
             }
         }
@@ -38469,11 +38471,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 604 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38483,7 +38485,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 604 << "\n";
             }
         }
@@ -38510,11 +38512,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 605 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38524,7 +38526,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 605 << "\n";
             }
         }
@@ -38551,11 +38553,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 606 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38565,7 +38567,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 606 << "\n";
             }
         }
@@ -38592,11 +38594,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 607 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38606,7 +38608,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 607 << "\n";
             }
         }
@@ -38633,11 +38635,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 608 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38647,7 +38649,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 608 << "\n";
             }
         }
@@ -38674,11 +38676,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 609 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38688,7 +38690,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 609 << "\n";
             }
         }
@@ -38715,11 +38717,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 610 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38729,7 +38731,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 610 << "\n";
             }
         }
@@ -38756,11 +38758,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 611 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38770,7 +38772,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 611 << "\n";
             }
         }
@@ -38797,11 +38799,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 612 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38811,7 +38813,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 612 << "\n";
             }
         }
@@ -38838,11 +38840,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 613 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38852,7 +38854,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 613 << "\n";
             }
         }
@@ -38879,11 +38881,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 614 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38893,7 +38895,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 614 << "\n";
             }
         }
@@ -38920,11 +38922,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 615 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38934,7 +38936,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 615 << "\n";
             }
         }
@@ -38961,11 +38963,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 616 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -38975,7 +38977,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 616 << "\n";
             }
         }
@@ -39002,11 +39004,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 617 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39016,7 +39018,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 617 << "\n";
             }
         }
@@ -39043,11 +39045,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 618 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39057,7 +39059,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 618 << "\n";
             }
         }
@@ -39084,11 +39086,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 619 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39098,7 +39100,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 619 << "\n";
             }
         }
@@ -39125,11 +39127,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 620 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39139,7 +39141,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 620 << "\n";
             }
         }
@@ -39166,11 +39168,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 621 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39180,7 +39182,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 621 << "\n";
             }
         }
@@ -39207,11 +39209,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 622 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39221,7 +39223,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 622 << "\n";
             }
         }
@@ -39248,11 +39250,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 623 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39262,7 +39264,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 623 << "\n";
             }
         }
@@ -39289,11 +39291,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 624 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39303,7 +39305,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 624 << "\n";
             }
         }
@@ -39330,11 +39332,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 625 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39344,7 +39346,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 625 << "\n";
             }
         }
@@ -39371,11 +39373,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 626 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39385,7 +39387,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 626 << "\n";
             }
         }
@@ -39412,11 +39414,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 627 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39426,7 +39428,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 627 << "\n";
             }
         }
@@ -39453,11 +39455,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 628 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39467,7 +39469,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 628 << "\n";
             }
         }
@@ -39494,11 +39496,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 629 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39508,7 +39510,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 629 << "\n";
             }
         }
@@ -39535,11 +39537,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 630 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39549,7 +39551,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 630 << "\n";
             }
         }
@@ -39576,11 +39578,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 631 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39590,7 +39592,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 631 << "\n";
             }
         }
@@ -39617,11 +39619,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 632 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39631,7 +39633,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 632 << "\n";
             }
         }
@@ -39658,11 +39660,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 633 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39672,7 +39674,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 633 << "\n";
             }
         }
@@ -39699,11 +39701,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 634 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39713,7 +39715,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 634 << "\n";
             }
         }
@@ -39740,11 +39742,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 635 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39754,7 +39756,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 635 << "\n";
             }
         }
@@ -39781,11 +39783,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 636 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39795,7 +39797,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 636 << "\n";
             }
         }
@@ -39822,11 +39824,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 637 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39836,7 +39838,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 637 << "\n";
             }
         }
@@ -39863,11 +39865,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 638 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39877,7 +39879,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 638 << "\n";
             }
         }
@@ -39904,11 +39906,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 639 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39918,7 +39920,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 639 << "\n";
             }
         }
@@ -39945,11 +39947,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 640 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -39959,7 +39961,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 640 << "\n";
             }
         }
@@ -39986,11 +39988,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 641 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40000,7 +40002,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 641 << "\n";
             }
         }
@@ -40027,11 +40029,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 642 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40041,7 +40043,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 642 << "\n";
             }
         }
@@ -40068,11 +40070,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 643 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40082,7 +40084,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 643 << "\n";
             }
         }
@@ -40109,11 +40111,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 644 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40123,7 +40125,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 644 << "\n";
             }
         }
@@ -40150,11 +40152,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 645 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40164,7 +40166,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 645 << "\n";
             }
         }
@@ -40191,11 +40193,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 646 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40205,7 +40207,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 646 << "\n";
             }
         }
@@ -40232,11 +40234,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 647 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40246,7 +40248,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 647 << "\n";
             }
         }
@@ -40273,11 +40275,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 648 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40287,7 +40289,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 648 << "\n";
             }
         }
@@ -40314,11 +40316,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 649 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40328,7 +40330,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 649 << "\n";
             }
         }
@@ -40355,11 +40357,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 650 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40369,7 +40371,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 650 << "\n";
             }
         }
@@ -40396,11 +40398,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 651 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40410,7 +40412,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 651 << "\n";
             }
         }
@@ -40437,11 +40439,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 652 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40451,7 +40453,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 652 << "\n";
             }
         }
@@ -40478,11 +40480,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 653 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40492,7 +40494,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 653 << "\n";
             }
         }
@@ -40519,11 +40521,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 654 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40533,7 +40535,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 654 << "\n";
             }
         }
@@ -40560,11 +40562,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 655 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40574,7 +40576,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 655 << "\n";
             }
         }
@@ -40601,11 +40603,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 656 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40615,7 +40617,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 656 << "\n";
             }
         }
@@ -40642,11 +40644,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 657 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40656,7 +40658,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 657 << "\n";
             }
         }
@@ -40683,11 +40685,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 658 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40697,7 +40699,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 658 << "\n";
             }
         }
@@ -40724,11 +40726,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 659 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40738,7 +40740,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 659 << "\n";
             }
         }
@@ -40765,11 +40767,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 660 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40779,7 +40781,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 660 << "\n";
             }
         }
@@ -40806,11 +40808,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 661 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40820,7 +40822,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 661 << "\n";
             }
         }
@@ -40847,11 +40849,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 662 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40861,7 +40863,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 662 << "\n";
             }
         }
@@ -40888,11 +40890,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 663 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40902,7 +40904,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 663 << "\n";
             }
         }
@@ -40929,11 +40931,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 664 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40943,7 +40945,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 664 << "\n";
             }
         }
@@ -40970,11 +40972,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 665 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -40984,7 +40986,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 665 << "\n";
             }
         }
@@ -41011,11 +41013,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 666 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41025,7 +41027,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 666 << "\n";
             }
         }
@@ -41052,11 +41054,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 667 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41066,7 +41068,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 667 << "\n";
             }
         }
@@ -41093,11 +41095,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 668 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41107,7 +41109,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 668 << "\n";
             }
         }
@@ -41134,11 +41136,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 669 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41148,7 +41150,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 669 << "\n";
             }
         }
@@ -41175,11 +41177,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 670 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41189,7 +41191,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 670 << "\n";
             }
         }
@@ -41216,11 +41218,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 671 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41230,7 +41232,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 671 << "\n";
             }
         }
@@ -41257,11 +41259,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 672 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41271,7 +41273,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 672 << "\n";
             }
         }
@@ -41298,11 +41300,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 673 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41312,7 +41314,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 673 << "\n";
             }
         }
@@ -41339,11 +41341,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 674 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41353,7 +41355,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 674 << "\n";
             }
         }
@@ -41380,11 +41382,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 675 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41394,7 +41396,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 675 << "\n";
             }
         }
@@ -41421,11 +41423,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 676 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41435,7 +41437,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 676 << "\n";
             }
         }
@@ -41462,11 +41464,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 677 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41476,7 +41478,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 677 << "\n";
             }
         }
@@ -41503,11 +41505,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 678 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41517,7 +41519,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 678 << "\n";
             }
         }
@@ -41544,11 +41546,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 679 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41558,7 +41560,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 679 << "\n";
             }
         }
@@ -41585,11 +41587,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 680 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41599,7 +41601,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 680 << "\n";
             }
         }
@@ -41626,11 +41628,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 681 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41640,7 +41642,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 681 << "\n";
             }
         }
@@ -41667,11 +41669,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 682 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41681,7 +41683,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 682 << "\n";
             }
         }
@@ -41708,11 +41710,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 683 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41722,7 +41724,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 683 << "\n";
             }
         }
@@ -41749,11 +41751,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 684 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41763,7 +41765,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 684 << "\n";
             }
         }
@@ -41790,11 +41792,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 685 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41804,7 +41806,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 685 << "\n";
             }
         }
@@ -41831,11 +41833,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 686 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41845,7 +41847,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 686 << "\n";
             }
         }
@@ -41872,11 +41874,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 687 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41886,7 +41888,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 687 << "\n";
             }
         }
@@ -41913,11 +41915,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 688 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41927,7 +41929,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 688 << "\n";
             }
         }
@@ -41954,11 +41956,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 689 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -41968,7 +41970,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 689 << "\n";
             }
         }
@@ -41995,11 +41997,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 690 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42009,7 +42011,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 690 << "\n";
             }
         }
@@ -42036,11 +42038,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 691 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42050,7 +42052,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 691 << "\n";
             }
         }
@@ -42077,11 +42079,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 692 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42091,7 +42093,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 692 << "\n";
             }
         }
@@ -42118,11 +42120,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 693 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42132,7 +42134,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 693 << "\n";
             }
         }
@@ -42159,11 +42161,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 694 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42173,7 +42175,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 694 << "\n";
             }
         }
@@ -42200,11 +42202,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 695 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42214,7 +42216,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 695 << "\n";
             }
         }
@@ -42241,11 +42243,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 696 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42255,7 +42257,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 696 << "\n";
             }
         }
@@ -42282,11 +42284,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 697 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42296,7 +42298,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 697 << "\n";
             }
         }
@@ -42323,11 +42325,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 698 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42337,7 +42339,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 698 << "\n";
             }
         }
@@ -42364,11 +42366,11 @@ void run_test_batch_600_to_700() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 699 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42378,7 +42380,7 @@ void run_test_batch_600_to_700() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 699 << "\n";
             }
         }
@@ -42398,7 +42400,7 @@ void run_test_batch_600_to_700() {
     }
 }
 
-void run_test_batch_700_to_800() {
+void run_test_batch_700_to_800(TestStats& stats) {
     { // Test Case 700
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -42408,11 +42410,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 700 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42422,7 +42424,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 700 << "\n";
             }
         }
@@ -42449,11 +42451,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 701 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42463,7 +42465,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 701 << "\n";
             }
         }
@@ -42490,11 +42492,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 702 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42504,7 +42506,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 702 << "\n";
             }
         }
@@ -42531,11 +42533,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 703 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42545,7 +42547,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 703 << "\n";
             }
         }
@@ -42572,11 +42574,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 704 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42586,7 +42588,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 704 << "\n";
             }
         }
@@ -42613,11 +42615,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 705 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42627,7 +42629,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 705 << "\n";
             }
         }
@@ -42654,11 +42656,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 706 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42668,7 +42670,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 706 << "\n";
             }
         }
@@ -42695,11 +42697,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 707 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42709,7 +42711,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 707 << "\n";
             }
         }
@@ -42736,11 +42738,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 708 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42750,7 +42752,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 708 << "\n";
             }
         }
@@ -42777,11 +42779,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 709 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42791,7 +42793,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 709 << "\n";
             }
         }
@@ -42818,11 +42820,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 710 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42832,7 +42834,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 710 << "\n";
             }
         }
@@ -42859,11 +42861,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 711 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42873,7 +42875,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 711 << "\n";
             }
         }
@@ -42900,11 +42902,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 712 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42914,7 +42916,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 712 << "\n";
             }
         }
@@ -42941,11 +42943,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 713 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42955,7 +42957,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 713 << "\n";
             }
         }
@@ -42982,11 +42984,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 714 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -42996,7 +42998,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 714 << "\n";
             }
         }
@@ -43023,11 +43025,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 715 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43037,7 +43039,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 715 << "\n";
             }
         }
@@ -43064,11 +43066,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 716 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43078,7 +43080,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 716 << "\n";
             }
         }
@@ -43105,11 +43107,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 717 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43119,7 +43121,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 717 << "\n";
             }
         }
@@ -43146,11 +43148,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 718 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43160,7 +43162,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 718 << "\n";
             }
         }
@@ -43187,11 +43189,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 719 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43201,7 +43203,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 719 << "\n";
             }
         }
@@ -43228,11 +43230,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 720 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43242,7 +43244,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 720 << "\n";
             }
         }
@@ -43269,11 +43271,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 721 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43283,7 +43285,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 721 << "\n";
             }
         }
@@ -43310,11 +43312,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 722 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43324,7 +43326,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 722 << "\n";
             }
         }
@@ -43351,11 +43353,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 723 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43365,7 +43367,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 723 << "\n";
             }
         }
@@ -43392,11 +43394,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 724 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43406,7 +43408,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 724 << "\n";
             }
         }
@@ -43433,11 +43435,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 725 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43447,7 +43449,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 725 << "\n";
             }
         }
@@ -43474,11 +43476,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 726 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43488,7 +43490,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 726 << "\n";
             }
         }
@@ -43515,11 +43517,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 727 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43529,7 +43531,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 727 << "\n";
             }
         }
@@ -43556,11 +43558,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 728 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43570,7 +43572,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 728 << "\n";
             }
         }
@@ -43597,11 +43599,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 729 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43611,7 +43613,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 729 << "\n";
             }
         }
@@ -43638,11 +43640,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 730 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43652,7 +43654,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 730 << "\n";
             }
         }
@@ -43679,11 +43681,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 731 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43693,7 +43695,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 731 << "\n";
             }
         }
@@ -43720,11 +43722,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 732 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43734,7 +43736,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 732 << "\n";
             }
         }
@@ -43761,11 +43763,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 733 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43775,7 +43777,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 733 << "\n";
             }
         }
@@ -43802,11 +43804,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 734 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43816,7 +43818,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 734 << "\n";
             }
         }
@@ -43843,11 +43845,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 735 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43857,7 +43859,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 735 << "\n";
             }
         }
@@ -43884,11 +43886,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 736 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43898,7 +43900,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 736 << "\n";
             }
         }
@@ -43925,11 +43927,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 737 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43939,7 +43941,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 737 << "\n";
             }
         }
@@ -43966,11 +43968,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 738 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -43980,7 +43982,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 738 << "\n";
             }
         }
@@ -44007,11 +44009,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 739 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44021,7 +44023,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 739 << "\n";
             }
         }
@@ -44048,11 +44050,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 740 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44062,7 +44064,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 740 << "\n";
             }
         }
@@ -44089,11 +44091,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 741 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44103,7 +44105,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 741 << "\n";
             }
         }
@@ -44130,11 +44132,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 742 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44144,7 +44146,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 742 << "\n";
             }
         }
@@ -44171,11 +44173,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 743 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44185,7 +44187,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 743 << "\n";
             }
         }
@@ -44212,11 +44214,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 744 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44226,7 +44228,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 744 << "\n";
             }
         }
@@ -44253,11 +44255,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 745 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44267,7 +44269,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 745 << "\n";
             }
         }
@@ -44294,11 +44296,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 746 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44308,7 +44310,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 746 << "\n";
             }
         }
@@ -44335,11 +44337,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 747 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44349,7 +44351,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 747 << "\n";
             }
         }
@@ -44376,11 +44378,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 748 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44390,7 +44392,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 748 << "\n";
             }
         }
@@ -44417,11 +44419,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 749 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44431,7 +44433,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 749 << "\n";
             }
         }
@@ -44458,11 +44460,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 750 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44472,7 +44474,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 750 << "\n";
             }
         }
@@ -44499,11 +44501,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 751 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44513,7 +44515,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 751 << "\n";
             }
         }
@@ -44540,11 +44542,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 752 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44554,7 +44556,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 752 << "\n";
             }
         }
@@ -44581,11 +44583,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 753 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44595,7 +44597,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 753 << "\n";
             }
         }
@@ -44622,11 +44624,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 754 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44636,7 +44638,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 754 << "\n";
             }
         }
@@ -44663,11 +44665,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 755 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44677,7 +44679,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 755 << "\n";
             }
         }
@@ -44704,11 +44706,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 756 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44718,7 +44720,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 756 << "\n";
             }
         }
@@ -44745,11 +44747,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 757 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44759,7 +44761,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 757 << "\n";
             }
         }
@@ -44786,11 +44788,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 758 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44800,7 +44802,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 758 << "\n";
             }
         }
@@ -44827,11 +44829,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 759 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44841,7 +44843,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 759 << "\n";
             }
         }
@@ -44868,11 +44870,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 760 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44882,7 +44884,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 760 << "\n";
             }
         }
@@ -44909,11 +44911,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 761 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44923,7 +44925,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 761 << "\n";
             }
         }
@@ -44950,11 +44952,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 762 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -44964,7 +44966,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 762 << "\n";
             }
         }
@@ -44991,11 +44993,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 763 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45005,7 +45007,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 763 << "\n";
             }
         }
@@ -45032,11 +45034,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 764 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45046,7 +45048,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 764 << "\n";
             }
         }
@@ -45073,11 +45075,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 765 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45087,7 +45089,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 765 << "\n";
             }
         }
@@ -45114,11 +45116,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 766 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45128,7 +45130,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 766 << "\n";
             }
         }
@@ -45155,11 +45157,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 767 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45169,7 +45171,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 767 << "\n";
             }
         }
@@ -45196,11 +45198,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 768 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45210,7 +45212,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 768 << "\n";
             }
         }
@@ -45237,11 +45239,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 769 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45251,7 +45253,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 769 << "\n";
             }
         }
@@ -45278,11 +45280,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 770 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45292,7 +45294,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 770 << "\n";
             }
         }
@@ -45319,11 +45321,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 771 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45333,7 +45335,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 771 << "\n";
             }
         }
@@ -45360,11 +45362,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 772 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45374,7 +45376,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 772 << "\n";
             }
         }
@@ -45401,11 +45403,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 773 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45415,7 +45417,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 773 << "\n";
             }
         }
@@ -45442,11 +45444,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 774 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45456,7 +45458,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 774 << "\n";
             }
         }
@@ -45483,11 +45485,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 775 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45497,7 +45499,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 775 << "\n";
             }
         }
@@ -45524,11 +45526,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 776 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45538,7 +45540,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 776 << "\n";
             }
         }
@@ -45565,11 +45567,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 777 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45579,7 +45581,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 777 << "\n";
             }
         }
@@ -45606,11 +45608,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 778 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45620,7 +45622,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 778 << "\n";
             }
         }
@@ -45647,11 +45649,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 779 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45661,7 +45663,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 779 << "\n";
             }
         }
@@ -45688,11 +45690,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 780 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45702,7 +45704,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 780 << "\n";
             }
         }
@@ -45729,11 +45731,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 781 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45743,7 +45745,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 781 << "\n";
             }
         }
@@ -45770,11 +45772,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 782 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45784,7 +45786,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 782 << "\n";
             }
         }
@@ -45811,11 +45813,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 783 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45825,7 +45827,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 783 << "\n";
             }
         }
@@ -45852,11 +45854,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 784 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45866,7 +45868,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 784 << "\n";
             }
         }
@@ -45893,11 +45895,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 785 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45907,7 +45909,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 785 << "\n";
             }
         }
@@ -45934,11 +45936,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 786 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45948,7 +45950,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 786 << "\n";
             }
         }
@@ -45975,11 +45977,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 787 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -45989,7 +45991,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 787 << "\n";
             }
         }
@@ -46016,11 +46018,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 788 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46030,7 +46032,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 788 << "\n";
             }
         }
@@ -46057,11 +46059,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 789 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46071,7 +46073,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 789 << "\n";
             }
         }
@@ -46098,11 +46100,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 790 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46112,7 +46114,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 790 << "\n";
             }
         }
@@ -46139,11 +46141,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 791 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46153,7 +46155,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 791 << "\n";
             }
         }
@@ -46180,11 +46182,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 792 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46194,7 +46196,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 792 << "\n";
             }
         }
@@ -46221,11 +46223,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 793 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46235,7 +46237,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 793 << "\n";
             }
         }
@@ -46262,11 +46264,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 794 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46276,7 +46278,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 794 << "\n";
             }
         }
@@ -46303,11 +46305,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 795 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46317,7 +46319,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 795 << "\n";
             }
         }
@@ -46344,11 +46346,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 796 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46358,7 +46360,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 796 << "\n";
             }
         }
@@ -46385,11 +46387,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 797 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46399,7 +46401,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 797 << "\n";
             }
         }
@@ -46426,11 +46428,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 798 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46440,7 +46442,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 798 << "\n";
             }
         }
@@ -46467,11 +46469,11 @@ void run_test_batch_700_to_800() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 799 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46481,7 +46483,7 @@ void run_test_batch_700_to_800() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 799 << "\n";
             }
         }
@@ -46501,7 +46503,7 @@ void run_test_batch_700_to_800() {
     }
 }
 
-void run_test_batch_800_to_900() {
+void run_test_batch_800_to_900(TestStats& stats) {
     { // Test Case 800
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -46511,11 +46513,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 800 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46525,7 +46527,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 800 << "\n";
             }
         }
@@ -46552,11 +46554,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 801 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46566,7 +46568,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 801 << "\n";
             }
         }
@@ -46593,11 +46595,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 802 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46607,7 +46609,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 802 << "\n";
             }
         }
@@ -46634,11 +46636,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 803 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46648,7 +46650,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 803 << "\n";
             }
         }
@@ -46675,11 +46677,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 804 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46689,7 +46691,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 804 << "\n";
             }
         }
@@ -46716,11 +46718,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 805 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46730,7 +46732,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 805 << "\n";
             }
         }
@@ -46757,11 +46759,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 806 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46771,7 +46773,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 806 << "\n";
             }
         }
@@ -46798,11 +46800,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 807 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46812,7 +46814,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 807 << "\n";
             }
         }
@@ -46839,11 +46841,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 808 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46853,7 +46855,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 808 << "\n";
             }
         }
@@ -46880,11 +46882,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 809 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46894,7 +46896,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 809 << "\n";
             }
         }
@@ -46921,11 +46923,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 810 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46935,7 +46937,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 810 << "\n";
             }
         }
@@ -46962,11 +46964,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 811 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -46976,7 +46978,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 811 << "\n";
             }
         }
@@ -47003,11 +47005,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 812 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47017,7 +47019,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 812 << "\n";
             }
         }
@@ -47044,11 +47046,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 813 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47058,7 +47060,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 813 << "\n";
             }
         }
@@ -47085,11 +47087,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 814 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47099,7 +47101,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 814 << "\n";
             }
         }
@@ -47126,11 +47128,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 815 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47140,7 +47142,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 815 << "\n";
             }
         }
@@ -47167,11 +47169,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 816 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47181,7 +47183,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 816 << "\n";
             }
         }
@@ -47208,11 +47210,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 817 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47222,7 +47224,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 817 << "\n";
             }
         }
@@ -47249,11 +47251,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 818 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47263,7 +47265,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 818 << "\n";
             }
         }
@@ -47290,11 +47292,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 819 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47304,7 +47306,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 819 << "\n";
             }
         }
@@ -47331,11 +47333,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 820 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47345,7 +47347,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 820 << "\n";
             }
         }
@@ -47372,11 +47374,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 821 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47386,7 +47388,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 821 << "\n";
             }
         }
@@ -47413,11 +47415,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 822 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47427,7 +47429,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 822 << "\n";
             }
         }
@@ -47454,11 +47456,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 823 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47468,7 +47470,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 823 << "\n";
             }
         }
@@ -47495,11 +47497,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 824 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47509,7 +47511,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 824 << "\n";
             }
         }
@@ -47536,11 +47538,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 825 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47550,7 +47552,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 825 << "\n";
             }
         }
@@ -47577,11 +47579,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 826 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47591,7 +47593,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 826 << "\n";
             }
         }
@@ -47618,11 +47620,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 827 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47632,7 +47634,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 827 << "\n";
             }
         }
@@ -47659,11 +47661,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 828 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47673,7 +47675,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 828 << "\n";
             }
         }
@@ -47700,11 +47702,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 829 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47714,7 +47716,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 829 << "\n";
             }
         }
@@ -47741,11 +47743,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 830 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47755,7 +47757,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 830 << "\n";
             }
         }
@@ -47782,11 +47784,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 831 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47796,7 +47798,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 831 << "\n";
             }
         }
@@ -47823,11 +47825,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 832 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47837,7 +47839,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 832 << "\n";
             }
         }
@@ -47864,11 +47866,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 833 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47878,7 +47880,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 833 << "\n";
             }
         }
@@ -47905,11 +47907,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 834 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47919,7 +47921,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 834 << "\n";
             }
         }
@@ -47946,11 +47948,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 835 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -47960,7 +47962,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 835 << "\n";
             }
         }
@@ -47987,11 +47989,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 836 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48001,7 +48003,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 836 << "\n";
             }
         }
@@ -48028,11 +48030,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 837 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48042,7 +48044,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 837 << "\n";
             }
         }
@@ -48069,11 +48071,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 838 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48083,7 +48085,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 838 << "\n";
             }
         }
@@ -48110,11 +48112,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 839 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48124,7 +48126,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 839 << "\n";
             }
         }
@@ -48151,11 +48153,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 840 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48165,7 +48167,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 840 << "\n";
             }
         }
@@ -48192,11 +48194,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 841 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48206,7 +48208,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 841 << "\n";
             }
         }
@@ -48233,11 +48235,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 842 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48247,7 +48249,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 842 << "\n";
             }
         }
@@ -48274,11 +48276,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 843 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48288,7 +48290,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 843 << "\n";
             }
         }
@@ -48315,11 +48317,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 844 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48329,7 +48331,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 844 << "\n";
             }
         }
@@ -48356,11 +48358,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 845 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48370,7 +48372,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 845 << "\n";
             }
         }
@@ -48397,11 +48399,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 846 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48411,7 +48413,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 846 << "\n";
             }
         }
@@ -48438,11 +48440,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 847 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48452,7 +48454,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 847 << "\n";
             }
         }
@@ -48479,11 +48481,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 848 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48493,7 +48495,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 848 << "\n";
             }
         }
@@ -48520,11 +48522,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 849 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48534,7 +48536,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 849 << "\n";
             }
         }
@@ -48561,11 +48563,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 850 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48575,7 +48577,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 850 << "\n";
             }
         }
@@ -48602,11 +48604,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 851 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48616,7 +48618,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 851 << "\n";
             }
         }
@@ -48643,11 +48645,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 852 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48657,7 +48659,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 852 << "\n";
             }
         }
@@ -48684,11 +48686,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 853 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48698,7 +48700,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 853 << "\n";
             }
         }
@@ -48725,11 +48727,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 854 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48739,7 +48741,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 854 << "\n";
             }
         }
@@ -48766,11 +48768,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 855 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48780,7 +48782,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 855 << "\n";
             }
         }
@@ -48807,11 +48809,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 856 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48821,7 +48823,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 856 << "\n";
             }
         }
@@ -48848,11 +48850,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 857 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48862,7 +48864,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 857 << "\n";
             }
         }
@@ -48889,11 +48891,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 858 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48903,7 +48905,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 858 << "\n";
             }
         }
@@ -48930,11 +48932,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 859 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48944,7 +48946,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 859 << "\n";
             }
         }
@@ -48971,11 +48973,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 860 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -48985,7 +48987,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 860 << "\n";
             }
         }
@@ -49012,11 +49014,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 861 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49026,7 +49028,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 861 << "\n";
             }
         }
@@ -49053,11 +49055,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 862 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49067,7 +49069,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 862 << "\n";
             }
         }
@@ -49094,11 +49096,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 863 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49108,7 +49110,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 863 << "\n";
             }
         }
@@ -49135,11 +49137,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 864 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49149,7 +49151,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 864 << "\n";
             }
         }
@@ -49176,11 +49178,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 865 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49190,7 +49192,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 865 << "\n";
             }
         }
@@ -49217,11 +49219,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 866 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49231,7 +49233,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 866 << "\n";
             }
         }
@@ -49258,11 +49260,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 867 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49272,7 +49274,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 867 << "\n";
             }
         }
@@ -49299,11 +49301,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 868 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49313,7 +49315,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 868 << "\n";
             }
         }
@@ -49340,11 +49342,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 869 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49354,7 +49356,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 869 << "\n";
             }
         }
@@ -49381,11 +49383,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 870 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49395,7 +49397,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 870 << "\n";
             }
         }
@@ -49422,11 +49424,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 871 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49436,7 +49438,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 871 << "\n";
             }
         }
@@ -49463,11 +49465,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 872 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49477,7 +49479,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 872 << "\n";
             }
         }
@@ -49504,11 +49506,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 873 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49518,7 +49520,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 873 << "\n";
             }
         }
@@ -49545,11 +49547,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 874 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49559,7 +49561,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 874 << "\n";
             }
         }
@@ -49586,11 +49588,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 875 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49600,7 +49602,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 875 << "\n";
             }
         }
@@ -49627,11 +49629,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 876 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49641,7 +49643,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 876 << "\n";
             }
         }
@@ -49668,11 +49670,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 877 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49682,7 +49684,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 877 << "\n";
             }
         }
@@ -49709,11 +49711,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 878 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49723,7 +49725,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 878 << "\n";
             }
         }
@@ -49750,11 +49752,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 879 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49764,7 +49766,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 879 << "\n";
             }
         }
@@ -49791,11 +49793,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 880 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49805,7 +49807,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 880 << "\n";
             }
         }
@@ -49832,11 +49834,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 881 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49846,7 +49848,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 881 << "\n";
             }
         }
@@ -49873,11 +49875,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 882 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49887,7 +49889,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 882 << "\n";
             }
         }
@@ -49914,11 +49916,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 883 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49928,7 +49930,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 883 << "\n";
             }
         }
@@ -49955,11 +49957,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 884 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -49969,7 +49971,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 884 << "\n";
             }
         }
@@ -49996,11 +49998,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 885 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50010,7 +50012,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 885 << "\n";
             }
         }
@@ -50037,11 +50039,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 886 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50051,7 +50053,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 886 << "\n";
             }
         }
@@ -50078,11 +50080,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 887 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50092,7 +50094,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 887 << "\n";
             }
         }
@@ -50119,11 +50121,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 888 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50133,7 +50135,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 888 << "\n";
             }
         }
@@ -50160,11 +50162,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 889 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50174,7 +50176,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 889 << "\n";
             }
         }
@@ -50201,11 +50203,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 890 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50215,7 +50217,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 890 << "\n";
             }
         }
@@ -50242,11 +50244,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 891 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50256,7 +50258,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 891 << "\n";
             }
         }
@@ -50283,11 +50285,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 892 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50297,7 +50299,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 892 << "\n";
             }
         }
@@ -50324,11 +50326,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 893 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50338,7 +50340,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 893 << "\n";
             }
         }
@@ -50365,11 +50367,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 894 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50379,7 +50381,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 894 << "\n";
             }
         }
@@ -50406,11 +50408,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 895 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50420,7 +50422,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 895 << "\n";
             }
         }
@@ -50447,11 +50449,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 896 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50461,7 +50463,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 896 << "\n";
             }
         }
@@ -50488,11 +50490,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 897 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50502,7 +50504,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 897 << "\n";
             }
         }
@@ -50529,11 +50531,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 898 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50543,7 +50545,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 898 << "\n";
             }
         }
@@ -50570,11 +50572,11 @@ void run_test_batch_800_to_900() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 899 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50584,7 +50586,7 @@ void run_test_batch_800_to_900() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 899 << "\n";
             }
         }
@@ -50604,7 +50606,7 @@ void run_test_batch_800_to_900() {
     }
 }
 
-void run_test_batch_900_to_1000() {
+void run_test_batch_900_to_1000(TestStats& stats) {
     { // Test Case 900
         const uint16_t adj[16] = { 0x2U, 0x4U, 0x8U, 0x10U, 0x20U, 0x40U, 0x80U, 0x100U, 0x200U, 0x400U, 0x800U, 0x1000U, 0x2000U, 0x4000U, 0x8000U, 0x0U };
         const uint16_t expected[16] = { 0xFFFFU, 0xFFFEU, 0xFFFCU, 0xFFF8U, 0xFFF0U, 0xFFE0U, 0xFFC0U, 0xFF80U, 0xFF00U, 0xFE00U, 0xFC00U, 0xF800U, 0xF000U, 0xE000U, 0xC000U, 0x8000U };
@@ -50614,11 +50616,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 900 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50628,7 +50630,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 900 << "\n";
             }
         }
@@ -50655,11 +50657,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 901 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50669,7 +50671,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 901 << "\n";
             }
         }
@@ -50696,11 +50698,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 902 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50710,7 +50712,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 902 << "\n";
             }
         }
@@ -50737,11 +50739,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 903 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50751,7 +50753,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 903 << "\n";
             }
         }
@@ -50778,11 +50780,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 904 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50792,7 +50794,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 904 << "\n";
             }
         }
@@ -50819,11 +50821,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 905 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50833,7 +50835,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 905 << "\n";
             }
         }
@@ -50860,11 +50862,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 906 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50874,7 +50876,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 906 << "\n";
             }
         }
@@ -50901,11 +50903,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 907 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50915,7 +50917,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 907 << "\n";
             }
         }
@@ -50942,11 +50944,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 908 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50956,7 +50958,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 908 << "\n";
             }
         }
@@ -50983,11 +50985,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 909 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -50997,7 +50999,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 909 << "\n";
             }
         }
@@ -51024,11 +51026,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 910 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51038,7 +51040,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 910 << "\n";
             }
         }
@@ -51065,11 +51067,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 911 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51079,7 +51081,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 911 << "\n";
             }
         }
@@ -51106,11 +51108,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 912 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51120,7 +51122,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 912 << "\n";
             }
         }
@@ -51147,11 +51149,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 913 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51161,7 +51163,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 913 << "\n";
             }
         }
@@ -51188,11 +51190,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 914 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51202,7 +51204,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 914 << "\n";
             }
         }
@@ -51229,11 +51231,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 915 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51243,7 +51245,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 915 << "\n";
             }
         }
@@ -51270,11 +51272,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 916 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51284,7 +51286,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 916 << "\n";
             }
         }
@@ -51311,11 +51313,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 917 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51325,7 +51327,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 917 << "\n";
             }
         }
@@ -51352,11 +51354,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 918 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51366,7 +51368,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 918 << "\n";
             }
         }
@@ -51393,11 +51395,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 919 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51407,7 +51409,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 919 << "\n";
             }
         }
@@ -51434,11 +51436,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 920 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51448,7 +51450,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 920 << "\n";
             }
         }
@@ -51475,11 +51477,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 921 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51489,7 +51491,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 921 << "\n";
             }
         }
@@ -51516,11 +51518,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 922 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51530,7 +51532,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 922 << "\n";
             }
         }
@@ -51557,11 +51559,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 923 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51571,7 +51573,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 923 << "\n";
             }
         }
@@ -51598,11 +51600,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 924 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51612,7 +51614,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 924 << "\n";
             }
         }
@@ -51639,11 +51641,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 925 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51653,7 +51655,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 925 << "\n";
             }
         }
@@ -51680,11 +51682,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 926 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51694,7 +51696,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 926 << "\n";
             }
         }
@@ -51721,11 +51723,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 927 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51735,7 +51737,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 927 << "\n";
             }
         }
@@ -51762,11 +51764,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 928 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51776,7 +51778,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 928 << "\n";
             }
         }
@@ -51803,11 +51805,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 929 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51817,7 +51819,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 929 << "\n";
             }
         }
@@ -51844,11 +51846,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 930 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51858,7 +51860,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 930 << "\n";
             }
         }
@@ -51885,11 +51887,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 931 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51899,7 +51901,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 931 << "\n";
             }
         }
@@ -51926,11 +51928,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 932 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51940,7 +51942,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 932 << "\n";
             }
         }
@@ -51967,11 +51969,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 933 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -51981,7 +51983,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 933 << "\n";
             }
         }
@@ -52008,11 +52010,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 934 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52022,7 +52024,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 934 << "\n";
             }
         }
@@ -52049,11 +52051,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 935 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52063,7 +52065,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 935 << "\n";
             }
         }
@@ -52090,11 +52092,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 936 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52104,7 +52106,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 936 << "\n";
             }
         }
@@ -52131,11 +52133,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 937 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52145,7 +52147,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 937 << "\n";
             }
         }
@@ -52172,11 +52174,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 938 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52186,7 +52188,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 938 << "\n";
             }
         }
@@ -52213,11 +52215,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 939 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52227,7 +52229,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 939 << "\n";
             }
         }
@@ -52254,11 +52256,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 940 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52268,7 +52270,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 940 << "\n";
             }
         }
@@ -52295,11 +52297,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 941 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52309,7 +52311,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 941 << "\n";
             }
         }
@@ -52336,11 +52338,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 942 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52350,7 +52352,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 942 << "\n";
             }
         }
@@ -52377,11 +52379,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 943 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52391,7 +52393,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 943 << "\n";
             }
         }
@@ -52418,11 +52420,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 944 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52432,7 +52434,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 944 << "\n";
             }
         }
@@ -52459,11 +52461,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 945 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52473,7 +52475,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 945 << "\n";
             }
         }
@@ -52500,11 +52502,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 946 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52514,7 +52516,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 946 << "\n";
             }
         }
@@ -52541,11 +52543,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 947 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52555,7 +52557,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 947 << "\n";
             }
         }
@@ -52582,11 +52584,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 948 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52596,7 +52598,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 948 << "\n";
             }
         }
@@ -52623,11 +52625,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 949 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52637,7 +52639,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 949 << "\n";
             }
         }
@@ -52664,11 +52666,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 950 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52678,7 +52680,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 950 << "\n";
             }
         }
@@ -52705,11 +52707,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 951 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52719,7 +52721,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 951 << "\n";
             }
         }
@@ -52746,11 +52748,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 952 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52760,7 +52762,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 952 << "\n";
             }
         }
@@ -52787,11 +52789,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 953 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52801,7 +52803,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 953 << "\n";
             }
         }
@@ -52828,11 +52830,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 954 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52842,7 +52844,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 954 << "\n";
             }
         }
@@ -52869,11 +52871,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 955 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52883,7 +52885,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 955 << "\n";
             }
         }
@@ -52910,11 +52912,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 956 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52924,7 +52926,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 956 << "\n";
             }
         }
@@ -52951,11 +52953,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 957 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -52965,7 +52967,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 957 << "\n";
             }
         }
@@ -52992,11 +52994,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 958 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53006,7 +53008,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 958 << "\n";
             }
         }
@@ -53033,11 +53035,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 959 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53047,7 +53049,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 959 << "\n";
             }
         }
@@ -53074,11 +53076,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 960 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53088,7 +53090,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 960 << "\n";
             }
         }
@@ -53115,11 +53117,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 961 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53129,7 +53131,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 961 << "\n";
             }
         }
@@ -53156,11 +53158,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 962 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53170,7 +53172,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 962 << "\n";
             }
         }
@@ -53197,11 +53199,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 963 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53211,7 +53213,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 963 << "\n";
             }
         }
@@ -53238,11 +53240,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 964 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53252,7 +53254,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 964 << "\n";
             }
         }
@@ -53279,11 +53281,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 965 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53293,7 +53295,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 965 << "\n";
             }
         }
@@ -53320,11 +53322,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 966 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53334,7 +53336,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 966 << "\n";
             }
         }
@@ -53361,11 +53363,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 967 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53375,7 +53377,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 967 << "\n";
             }
         }
@@ -53402,11 +53404,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 968 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53416,7 +53418,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 968 << "\n";
             }
         }
@@ -53443,11 +53445,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 969 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53457,7 +53459,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 969 << "\n";
             }
         }
@@ -53484,11 +53486,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 970 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53498,7 +53500,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 970 << "\n";
             }
         }
@@ -53525,11 +53527,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 971 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53539,7 +53541,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 971 << "\n";
             }
         }
@@ -53566,11 +53568,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 972 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53580,7 +53582,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 972 << "\n";
             }
         }
@@ -53607,11 +53609,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 973 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53621,7 +53623,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 973 << "\n";
             }
         }
@@ -53648,11 +53650,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 974 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53662,7 +53664,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 974 << "\n";
             }
         }
@@ -53689,11 +53691,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 975 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53703,7 +53705,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 975 << "\n";
             }
         }
@@ -53730,11 +53732,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 976 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53744,7 +53746,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 976 << "\n";
             }
         }
@@ -53771,11 +53773,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 977 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53785,7 +53787,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 977 << "\n";
             }
         }
@@ -53812,11 +53814,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 978 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53826,7 +53828,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 978 << "\n";
             }
         }
@@ -53853,11 +53855,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 979 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53867,7 +53869,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 979 << "\n";
             }
         }
@@ -53894,11 +53896,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 980 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53908,7 +53910,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 980 << "\n";
             }
         }
@@ -53935,11 +53937,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 981 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53949,7 +53951,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 981 << "\n";
             }
         }
@@ -53976,11 +53978,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 982 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -53990,7 +53992,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 982 << "\n";
             }
         }
@@ -54017,11 +54019,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 983 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54031,7 +54033,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 983 << "\n";
             }
         }
@@ -54058,11 +54060,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 984 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54072,7 +54074,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 984 << "\n";
             }
         }
@@ -54099,11 +54101,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 985 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54113,7 +54115,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 985 << "\n";
             }
         }
@@ -54140,11 +54142,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 986 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54154,7 +54156,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 986 << "\n";
             }
         }
@@ -54181,11 +54183,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 987 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54195,7 +54197,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 987 << "\n";
             }
         }
@@ -54222,11 +54224,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 988 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54236,7 +54238,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 988 << "\n";
             }
         }
@@ -54263,11 +54265,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 989 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54277,7 +54279,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 989 << "\n";
             }
         }
@@ -54304,11 +54306,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 990 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54318,7 +54320,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 990 << "\n";
             }
         }
@@ -54345,11 +54347,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 991 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54359,7 +54361,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 991 << "\n";
             }
         }
@@ -54386,11 +54388,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 992 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54400,7 +54402,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 992 << "\n";
             }
         }
@@ -54427,11 +54429,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 993 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54441,7 +54443,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 993 << "\n";
             }
         }
@@ -54468,11 +54470,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 994 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54482,7 +54484,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 994 << "\n";
             }
         }
@@ -54509,11 +54511,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 995 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54523,7 +54525,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 995 << "\n";
             }
         }
@@ -54550,11 +54552,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 996 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54564,7 +54566,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 996 << "\n";
             }
         }
@@ -54591,11 +54593,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 997 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54605,7 +54607,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 997 << "\n";
             }
         }
@@ -54632,11 +54634,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 998 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54646,7 +54648,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 998 << "\n";
             }
         }
@@ -54673,11 +54675,11 @@ void run_test_batch_900_to_1000() {
         for (int i = 0; i < 16; i++) {
             if (computed[i] != expected[i]) { match = false; break; }
         }
-        g_stats.total++;
+        stats.total++;
         if (match) {
-            g_stats.passed++;
+            stats.passed++;
         } else {
-            g_stats.failed++;
+            stats.failed++;
             std::cout << "[FAIL] Reachability Mismatch in Test " << 999 << "\n";
         }
         for (int h_idx = 0; h_idx < 15; h_idx++) {
@@ -54687,7 +54689,7 @@ void run_test_batch_900_to_1000() {
             int expected_val = (computed[src] & (1 << dst)) != 0;
             int computed_val = g_audit_helpers[idx](computed);
             if (computed_val != expected_val) {
-                g_stats.failed++;
+                stats.failed++;
                 std::cout << "[FAIL] Helper audit_boundary_" << idx << " failed in Test " << 999 << "\n";
             }
         }
@@ -54707,18 +54709,50 @@ void run_test_batch_900_to_1000() {
     }
 }
 
-void run_all_reachability_tests() {
-    run_test_batch_0_to_100();
-    run_test_batch_100_to_200();
-    run_test_batch_200_to_300();
-    run_test_batch_300_to_400();
-    run_test_batch_400_to_500();
-    run_test_batch_500_to_600();
-    run_test_batch_600_to_700();
-    run_test_batch_700_to_800();
-    run_test_batch_800_to_900();
-    run_test_batch_900_to_1000();
+
+typedef void (*test_batch_fn_t)(TestStats&);
+static const test_batch_fn_t g_test_batches[] = {
+
+    run_test_batch_0_to_100,
+    run_test_batch_100_to_200,
+    run_test_batch_200_to_300,
+    run_test_batch_300_to_400,
+    run_test_batch_400_to_500,
+    run_test_batch_500_to_600,
+    run_test_batch_600_to_700,
+    run_test_batch_700_to_800,
+    run_test_batch_800_to_900,
+    run_test_batch_900_to_1000,
+};
+
+void worker_thread_func(int thread_id, int num_threads, TestStats& stats) {
+    pin_current_thread(thread_id);
+    for (int b = thread_id * 100; b < NUM_TESTS; b += num_threads * 100) {
+        g_test_batches[b / 100](stats);
+        paced_sleep(1);
+    }
 }
+
+void run_all_reachability_tests() {
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 10) num_threads = 10; // 10 batches total (NUM_TESTS = 1000)
+
+    std::vector<std::thread> threads;
+    std::vector<TestStats> thread_stats(num_threads, TestStats{0, 0, 0});
+
+    for (int t = 0; t < num_threads; t++) {
+        threads.emplace_back(worker_thread_func, t, num_threads, std::ref(thread_stats[t]));
+    }
+
+    for (int t = 0; t < num_threads; t++) {
+        threads[t].join();
+        g_stats.total += thread_stats[t].total;
+        g_stats.passed += thread_stats[t].passed;
+        g_stats.failed += thread_stats[t].failed;
+    }
+}
+
 
 int main() {
     std::cout << "==================================================\n";

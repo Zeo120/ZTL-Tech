@@ -11,6 +11,17 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+#include "../compute_balancer.h"
+
+#if defined(_WIN32)
+typedef HANDLE thread_t;
+#define thread_create(t, fn, arg) (*t = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)fn, arg, 0, NULL), *t != NULL)
+#define thread_join(t) (WaitForSingleObject(t, INFINITE), CloseHandle(t))
+#else
+typedef pthread_t thread_t;
+#define thread_create(t, fn, arg) (pthread_create(t, NULL, fn, arg) == 0)
+#define thread_join(t) pthread_join(t)
+#endif
 
 #define NUM_CONTROLS 4500
 #define NUM_TEST_CASES 1000
@@ -31635,7 +31646,7 @@ void print_wave_profile(const wave_sim_t *sim) {
     printf("  +----------------------------------------+\n");
 }
 
-void run_test_batch_0_to_100() {
+void run_test_batch_0_to_100(test_stats_t* stats) {
     { // Test Case 0
         cluster_status_t cs = { 0, 91, 249, 5, 0, 2, 6, 825 };
         int computed_passes = 0;
@@ -31645,11 +31656,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 0, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31669,11 +31680,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 1, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31693,11 +31704,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 2, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31717,11 +31728,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 3, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31741,11 +31752,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 4, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31765,11 +31776,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 5, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31789,11 +31800,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 6, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31813,11 +31824,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 7, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31837,11 +31848,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 8, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31861,11 +31872,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 9, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31885,11 +31896,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 10, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31909,11 +31920,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 11, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31933,11 +31944,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 12, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31957,11 +31968,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 13, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -31981,11 +31992,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 14, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32005,11 +32016,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 15, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32029,11 +32040,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 16, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32053,11 +32064,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 17, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32077,11 +32088,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 18, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32101,11 +32112,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 19, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32125,11 +32136,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 20, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32149,11 +32160,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 21, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32173,11 +32184,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 22, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32197,11 +32208,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 23, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32221,11 +32232,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 24, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32245,11 +32256,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 25, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32269,11 +32280,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 26, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32293,11 +32304,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 27, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32317,11 +32328,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 28, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32341,11 +32352,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 29, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32365,11 +32376,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 30, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32389,11 +32400,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 31, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32413,11 +32424,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 32, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32437,11 +32448,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 33, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32461,11 +32472,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 34, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32485,11 +32496,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 35, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32509,11 +32520,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 36, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32533,11 +32544,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 37, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32557,11 +32568,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 38, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32581,11 +32592,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 39, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32605,11 +32616,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 40, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32629,11 +32640,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 41, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32653,11 +32664,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 42, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32677,11 +32688,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 43, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32701,11 +32712,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 44, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32725,11 +32736,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 45, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32749,11 +32760,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 46, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32773,11 +32784,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 47, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32797,11 +32808,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 48, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32821,11 +32832,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 49, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32845,11 +32856,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 50, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32869,11 +32880,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 51, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32893,11 +32904,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 52, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32917,11 +32928,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 53, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32941,11 +32952,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 54, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32965,11 +32976,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 55, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -32989,11 +33000,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 56, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33013,11 +33024,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 57, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33037,11 +33048,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 58, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33061,11 +33072,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 59, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33085,11 +33096,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 60, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33109,11 +33120,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 61, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33133,11 +33144,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 62, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33157,11 +33168,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 63, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33181,11 +33192,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 64, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33205,11 +33216,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 65, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33229,11 +33240,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 66, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33253,11 +33264,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 67, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33277,11 +33288,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 68, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33301,11 +33312,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 69, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33325,11 +33336,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 70, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33349,11 +33360,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 71, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33373,11 +33384,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 72, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33397,11 +33408,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 73, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33421,11 +33432,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 74, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33445,11 +33456,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 75, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33469,11 +33480,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 76, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33493,11 +33504,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 77, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33517,11 +33528,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 78, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33541,11 +33552,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 79, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33565,11 +33576,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 80, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33589,11 +33600,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 81, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33613,11 +33624,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 82, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33637,11 +33648,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 83, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33661,11 +33672,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 84, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33685,11 +33696,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 85, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33709,11 +33720,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 86, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33733,11 +33744,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 87, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33757,11 +33768,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 88, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33781,11 +33792,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 89, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33805,11 +33816,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 90, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33829,11 +33840,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 91, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33853,11 +33864,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 92, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33877,11 +33888,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 93, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33901,11 +33912,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 94, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33925,11 +33936,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 95, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33949,11 +33960,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 96, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33973,11 +33984,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 97, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -33997,11 +34008,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 98, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34021,11 +34032,11 @@ void run_test_batch_0_to_100() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 99, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34038,7 +34049,7 @@ void run_test_batch_0_to_100() {
     }
 }
 
-void run_test_batch_100_to_200() {
+void run_test_batch_100_to_200(test_stats_t* stats) {
     { // Test Case 100
         cluster_status_t cs = { 0, 57, 105, 7, 1, 8, 7, 730 };
         int computed_passes = 0;
@@ -34048,11 +34059,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 100, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34072,11 +34083,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 101, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34096,11 +34107,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 102, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34120,11 +34131,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 103, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34144,11 +34155,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 104, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34168,11 +34179,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 105, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34192,11 +34203,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 106, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34216,11 +34227,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 107, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34240,11 +34251,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 108, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34264,11 +34275,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 109, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34288,11 +34299,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 110, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34312,11 +34323,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 111, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34336,11 +34347,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 112, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34360,11 +34371,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 113, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34384,11 +34395,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 114, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34408,11 +34419,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 115, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34432,11 +34443,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 116, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34456,11 +34467,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 117, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34480,11 +34491,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 118, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34504,11 +34515,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 119, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34528,11 +34539,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 120, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34552,11 +34563,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 121, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34576,11 +34587,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 122, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34600,11 +34611,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 123, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34624,11 +34635,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 124, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34648,11 +34659,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 125, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34672,11 +34683,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 126, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34696,11 +34707,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 127, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34720,11 +34731,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 128, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34744,11 +34755,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 129, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34768,11 +34779,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 130, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34792,11 +34803,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 131, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34816,11 +34827,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 132, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34840,11 +34851,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 133, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34864,11 +34875,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 134, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34888,11 +34899,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 135, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34912,11 +34923,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 136, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34936,11 +34947,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 137, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34960,11 +34971,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 138, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -34984,11 +34995,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 139, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35008,11 +35019,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 140, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35032,11 +35043,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 141, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35056,11 +35067,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 142, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35080,11 +35091,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 143, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35104,11 +35115,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 144, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35128,11 +35139,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 145, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35152,11 +35163,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 146, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35176,11 +35187,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 147, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35200,11 +35211,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 148, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35224,11 +35235,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 149, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35248,11 +35259,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 150, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35272,11 +35283,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 151, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35296,11 +35307,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 152, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35320,11 +35331,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 153, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35344,11 +35355,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 154, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35368,11 +35379,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 155, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35392,11 +35403,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 156, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35416,11 +35427,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 157, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35440,11 +35451,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 158, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35464,11 +35475,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 159, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35488,11 +35499,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 160, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35512,11 +35523,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 161, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35536,11 +35547,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 162, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35560,11 +35571,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 163, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35584,11 +35595,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 164, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35608,11 +35619,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 165, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35632,11 +35643,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 166, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35656,11 +35667,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 167, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35680,11 +35691,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 168, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35704,11 +35715,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 169, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35728,11 +35739,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 170, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35752,11 +35763,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 171, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35776,11 +35787,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 172, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35800,11 +35811,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 173, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35824,11 +35835,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 174, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35848,11 +35859,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 175, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35872,11 +35883,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 176, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35896,11 +35907,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 177, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35920,11 +35931,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 178, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35944,11 +35955,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 179, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35968,11 +35979,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 180, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -35992,11 +36003,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 181, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36016,11 +36027,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 182, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36040,11 +36051,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 183, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36064,11 +36075,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 184, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36088,11 +36099,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 185, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36112,11 +36123,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 186, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36136,11 +36147,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 187, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36160,11 +36171,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 188, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36184,11 +36195,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 189, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36208,11 +36219,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 190, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36232,11 +36243,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 191, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36256,11 +36267,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 192, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36280,11 +36291,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 193, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36304,11 +36315,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 194, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36328,11 +36339,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 195, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36352,11 +36363,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 196, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36376,11 +36387,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 197, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36400,11 +36411,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 198, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36424,11 +36435,11 @@ void run_test_batch_100_to_200() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 199, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36441,7 +36452,7 @@ void run_test_batch_100_to_200() {
     }
 }
 
-void run_test_batch_200_to_300() {
+void run_test_batch_200_to_300(test_stats_t* stats) {
     { // Test Case 200
         cluster_status_t cs = { 0, 54, 125, 4, 0, 5, 3, 580 };
         int computed_passes = 0;
@@ -36451,11 +36462,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 200, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36475,11 +36486,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 201, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36499,11 +36510,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 202, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36523,11 +36534,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 203, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36547,11 +36558,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 204, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36571,11 +36582,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 205, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36595,11 +36606,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 206, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36619,11 +36630,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 207, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36643,11 +36654,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 208, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36667,11 +36678,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 209, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36691,11 +36702,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 210, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36715,11 +36726,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 211, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36739,11 +36750,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 212, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36763,11 +36774,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 213, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36787,11 +36798,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 214, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36811,11 +36822,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 215, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36835,11 +36846,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 216, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36859,11 +36870,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 217, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36883,11 +36894,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 218, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36907,11 +36918,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 219, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36931,11 +36942,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 220, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36955,11 +36966,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 221, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -36979,11 +36990,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 222, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37003,11 +37014,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 223, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37027,11 +37038,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 224, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37051,11 +37062,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 225, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37075,11 +37086,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 226, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37099,11 +37110,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 227, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37123,11 +37134,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 228, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37147,11 +37158,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 229, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37171,11 +37182,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 230, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37195,11 +37206,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 231, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37219,11 +37230,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 232, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37243,11 +37254,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 233, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37267,11 +37278,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 234, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37291,11 +37302,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 235, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37315,11 +37326,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 236, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37339,11 +37350,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 237, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37363,11 +37374,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 238, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37387,11 +37398,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 239, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37411,11 +37422,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 240, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37435,11 +37446,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 241, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37459,11 +37470,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 242, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37483,11 +37494,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 243, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37507,11 +37518,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 244, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37531,11 +37542,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 245, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37555,11 +37566,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 246, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37579,11 +37590,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 247, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37603,11 +37614,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 248, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37627,11 +37638,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 249, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37651,11 +37662,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 250, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37675,11 +37686,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 251, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37699,11 +37710,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 252, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37723,11 +37734,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 253, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37747,11 +37758,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 254, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37771,11 +37782,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 255, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37795,11 +37806,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 256, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37819,11 +37830,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 257, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37843,11 +37854,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 258, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37867,11 +37878,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 259, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37891,11 +37902,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 260, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37915,11 +37926,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 261, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37939,11 +37950,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 262, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37963,11 +37974,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 263, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -37987,11 +37998,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 264, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38011,11 +38022,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 265, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38035,11 +38046,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 266, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38059,11 +38070,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 267, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38083,11 +38094,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 268, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38107,11 +38118,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 269, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38131,11 +38142,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 270, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38155,11 +38166,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 271, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38179,11 +38190,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 272, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38203,11 +38214,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 273, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38227,11 +38238,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 274, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38251,11 +38262,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 275, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38275,11 +38286,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 276, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38299,11 +38310,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 277, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38323,11 +38334,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 278, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38347,11 +38358,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 279, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38371,11 +38382,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 280, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38395,11 +38406,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 281, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38419,11 +38430,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 282, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38443,11 +38454,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 283, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38467,11 +38478,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 284, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38491,11 +38502,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 285, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38515,11 +38526,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 286, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38539,11 +38550,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 287, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38563,11 +38574,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 288, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38587,11 +38598,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 289, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38611,11 +38622,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 290, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38635,11 +38646,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 291, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38659,11 +38670,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 292, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38683,11 +38694,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 293, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38707,11 +38718,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 294, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38731,11 +38742,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 295, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38755,11 +38766,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 296, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38779,11 +38790,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 297, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38803,11 +38814,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 298, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38827,11 +38838,11 @@ void run_test_batch_200_to_300() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 299, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38844,7 +38855,7 @@ void run_test_batch_200_to_300() {
     }
 }
 
-void run_test_batch_300_to_400() {
+void run_test_batch_300_to_400(test_stats_t* stats) {
     { // Test Case 300
         cluster_status_t cs = { 0, 63, 131, 1, 1, 17, 7, 737 };
         int computed_passes = 0;
@@ -38854,11 +38865,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 300, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38878,11 +38889,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 301, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38902,11 +38913,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 302, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38926,11 +38937,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 303, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38950,11 +38961,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 304, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38974,11 +38985,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 305, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -38998,11 +39009,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 306, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39022,11 +39033,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 307, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39046,11 +39057,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 308, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39070,11 +39081,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 309, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39094,11 +39105,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 310, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39118,11 +39129,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 311, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39142,11 +39153,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 312, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39166,11 +39177,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 313, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39190,11 +39201,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 314, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39214,11 +39225,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 315, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39238,11 +39249,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 316, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39262,11 +39273,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 317, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39286,11 +39297,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 318, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39310,11 +39321,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 319, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39334,11 +39345,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 320, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39358,11 +39369,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 321, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39382,11 +39393,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 322, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39406,11 +39417,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 323, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39430,11 +39441,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 324, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39454,11 +39465,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 325, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39478,11 +39489,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 326, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39502,11 +39513,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 327, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39526,11 +39537,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 328, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39550,11 +39561,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 329, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39574,11 +39585,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 330, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39598,11 +39609,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 331, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39622,11 +39633,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 332, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39646,11 +39657,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 333, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39670,11 +39681,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 334, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39694,11 +39705,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 335, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39718,11 +39729,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 336, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39742,11 +39753,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 337, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39766,11 +39777,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 338, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39790,11 +39801,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 339, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39814,11 +39825,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 340, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39838,11 +39849,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 341, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39862,11 +39873,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 342, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39886,11 +39897,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 343, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39910,11 +39921,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 344, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39934,11 +39945,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 345, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39958,11 +39969,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 346, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -39982,11 +39993,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 347, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40006,11 +40017,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 348, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40030,11 +40041,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 349, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40054,11 +40065,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 350, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40078,11 +40089,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 351, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40102,11 +40113,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 352, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40126,11 +40137,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 353, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40150,11 +40161,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 354, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40174,11 +40185,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 355, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40198,11 +40209,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 356, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40222,11 +40233,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 357, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40246,11 +40257,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 358, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40270,11 +40281,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 359, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40294,11 +40305,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 360, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40318,11 +40329,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 361, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40342,11 +40353,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 362, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40366,11 +40377,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 363, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40390,11 +40401,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 364, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40414,11 +40425,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 365, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40438,11 +40449,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 366, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40462,11 +40473,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 367, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40486,11 +40497,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 368, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40510,11 +40521,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 369, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40534,11 +40545,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 370, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40558,11 +40569,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 371, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40582,11 +40593,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 372, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40606,11 +40617,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 373, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40630,11 +40641,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 374, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40654,11 +40665,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 375, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40678,11 +40689,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 376, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40702,11 +40713,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 377, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40726,11 +40737,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 378, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40750,11 +40761,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 379, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40774,11 +40785,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 380, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40798,11 +40809,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 381, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40822,11 +40833,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 382, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40846,11 +40857,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 383, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40870,11 +40881,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 384, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40894,11 +40905,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 385, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40918,11 +40929,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 386, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40942,11 +40953,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 387, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40966,11 +40977,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 388, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -40990,11 +41001,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 389, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41014,11 +41025,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 390, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41038,11 +41049,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 391, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41062,11 +41073,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 392, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41086,11 +41097,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 393, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41110,11 +41121,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 394, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41134,11 +41145,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 395, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41158,11 +41169,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 396, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41182,11 +41193,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 397, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41206,11 +41217,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 398, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41230,11 +41241,11 @@ void run_test_batch_300_to_400() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 399, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41247,7 +41258,7 @@ void run_test_batch_300_to_400() {
     }
 }
 
-void run_test_batch_400_to_500() {
+void run_test_batch_400_to_500(test_stats_t* stats) {
     { // Test Case 400
         cluster_status_t cs = { 0, 87, 263, 1, 1, 5, 6, 703 };
         int computed_passes = 0;
@@ -41257,11 +41268,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 400, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41281,11 +41292,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 401, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41305,11 +41316,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 402, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41329,11 +41340,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 403, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41353,11 +41364,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 404, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41377,11 +41388,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 405, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41401,11 +41412,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 406, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41425,11 +41436,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 407, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41449,11 +41460,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 408, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41473,11 +41484,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 409, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41497,11 +41508,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 410, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41521,11 +41532,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 411, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41545,11 +41556,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 412, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41569,11 +41580,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 413, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41593,11 +41604,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 414, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41617,11 +41628,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 415, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41641,11 +41652,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 416, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41665,11 +41676,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 417, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41689,11 +41700,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 3) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 418, 3, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41713,11 +41724,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 419, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41737,11 +41748,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 420, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41761,11 +41772,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 421, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41785,11 +41796,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 422, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41809,11 +41820,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 423, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41833,11 +41844,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 424, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41857,11 +41868,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 425, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41881,11 +41892,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 426, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41905,11 +41916,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 427, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41929,11 +41940,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 428, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41953,11 +41964,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 429, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -41977,11 +41988,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 430, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42001,11 +42012,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 431, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42025,11 +42036,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 432, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42049,11 +42060,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 433, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42073,11 +42084,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 434, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42097,11 +42108,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 435, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42121,11 +42132,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 436, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42145,11 +42156,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 437, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42169,11 +42180,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 438, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42193,11 +42204,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 439, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42217,11 +42228,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 440, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42241,11 +42252,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 441, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42265,11 +42276,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 442, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42289,11 +42300,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 443, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42313,11 +42324,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 444, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42337,11 +42348,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 445, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42361,11 +42372,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 446, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42385,11 +42396,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 447, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42409,11 +42420,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 448, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42433,11 +42444,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 449, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42457,11 +42468,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 3) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 450, 3, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42481,11 +42492,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 451, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42505,11 +42516,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 452, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42529,11 +42540,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 453, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42553,11 +42564,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 454, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42577,11 +42588,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 455, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42601,11 +42612,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 456, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42625,11 +42636,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 457, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42649,11 +42660,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 458, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42673,11 +42684,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 459, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42697,11 +42708,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 460, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42721,11 +42732,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 461, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42745,11 +42756,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 462, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42769,11 +42780,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 463, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42793,11 +42804,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 464, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42817,11 +42828,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 465, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42841,11 +42852,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 466, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42865,11 +42876,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 467, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42889,11 +42900,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 468, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42913,11 +42924,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 469, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42937,11 +42948,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 470, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42961,11 +42972,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 471, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -42985,11 +42996,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 472, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43009,11 +43020,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 473, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43033,11 +43044,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 474, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43057,11 +43068,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 475, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43081,11 +43092,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 476, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43105,11 +43116,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 477, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43129,11 +43140,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 478, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43153,11 +43164,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 479, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43177,11 +43188,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 480, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43201,11 +43212,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 481, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43225,11 +43236,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 482, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43249,11 +43260,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 483, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43273,11 +43284,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 484, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43297,11 +43308,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 485, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43321,11 +43332,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 486, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43345,11 +43356,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 487, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43369,11 +43380,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 488, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43393,11 +43404,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 489, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43417,11 +43428,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 490, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43441,11 +43452,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 491, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43465,11 +43476,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 492, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43489,11 +43500,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 493, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43513,11 +43524,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 494, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43537,11 +43548,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 495, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43561,11 +43572,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 496, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43585,11 +43596,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 497, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43609,11 +43620,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 498, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43633,11 +43644,11 @@ void run_test_batch_400_to_500() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 499, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43650,7 +43661,7 @@ void run_test_batch_400_to_500() {
     }
 }
 
-void run_test_batch_500_to_600() {
+void run_test_batch_500_to_600(test_stats_t* stats) {
     { // Test Case 500
         cluster_status_t cs = { 0, 151, 186, 1, 0, 2, 2, 533 };
         int computed_passes = 0;
@@ -43660,11 +43671,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 500, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43684,11 +43695,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 501, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43708,11 +43719,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 502, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43732,11 +43743,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 503, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43756,11 +43767,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 504, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43780,11 +43791,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 505, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43804,11 +43815,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 506, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43828,11 +43839,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 507, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43852,11 +43863,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 508, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43876,11 +43887,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 509, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43900,11 +43911,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 510, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43924,11 +43935,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 511, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43948,11 +43959,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 512, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43972,11 +43983,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 513, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -43996,11 +44007,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 514, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44020,11 +44031,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 515, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44044,11 +44055,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 516, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44068,11 +44079,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 517, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44092,11 +44103,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 518, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44116,11 +44127,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 519, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44140,11 +44151,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 520, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44164,11 +44175,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 521, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44188,11 +44199,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 522, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44212,11 +44223,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 523, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44236,11 +44247,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 524, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44260,11 +44271,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 525, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44284,11 +44295,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 526, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44308,11 +44319,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 527, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44332,11 +44343,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 528, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44356,11 +44367,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 529, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44380,11 +44391,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 530, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44404,11 +44415,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 531, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44428,11 +44439,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 532, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44452,11 +44463,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 533, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44476,11 +44487,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 534, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44500,11 +44511,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 535, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44524,11 +44535,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 536, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44548,11 +44559,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 537, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44572,11 +44583,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 538, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44596,11 +44607,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 539, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44620,11 +44631,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 540, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44644,11 +44655,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 541, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44668,11 +44679,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 542, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44692,11 +44703,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 543, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44716,11 +44727,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 544, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44740,11 +44751,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 545, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44764,11 +44775,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 546, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44788,11 +44799,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 547, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44812,11 +44823,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 548, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44836,11 +44847,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 549, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44860,11 +44871,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 550, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44884,11 +44895,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 551, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44908,11 +44919,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 552, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44932,11 +44943,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 553, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44956,11 +44967,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 554, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -44980,11 +44991,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 555, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45004,11 +45015,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 556, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45028,11 +45039,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 557, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45052,11 +45063,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 558, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45076,11 +45087,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 559, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45100,11 +45111,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 560, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45124,11 +45135,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 561, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45148,11 +45159,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 562, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45172,11 +45183,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 563, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45196,11 +45207,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 564, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45220,11 +45231,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 565, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45244,11 +45255,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 566, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45268,11 +45279,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 567, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45292,11 +45303,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 568, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45316,11 +45327,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 569, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45340,11 +45351,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 570, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45364,11 +45375,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 571, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45388,11 +45399,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 572, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45412,11 +45423,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 573, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45436,11 +45447,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 574, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45460,11 +45471,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 575, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45484,11 +45495,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 576, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45508,11 +45519,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 577, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45532,11 +45543,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 578, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45556,11 +45567,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 579, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45580,11 +45591,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 580, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45604,11 +45615,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 581, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45628,11 +45639,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 582, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45652,11 +45663,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 583, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45676,11 +45687,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 584, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45700,11 +45711,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 585, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45724,11 +45735,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 586, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45748,11 +45759,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 587, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45772,11 +45783,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 588, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45796,11 +45807,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 589, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45820,11 +45831,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 590, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45844,11 +45855,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 591, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45868,11 +45879,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 592, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45892,11 +45903,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 593, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45916,11 +45927,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 594, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45940,11 +45951,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 595, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45964,11 +45975,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 596, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -45988,11 +45999,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 597, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46012,11 +46023,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 598, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46036,11 +46047,11 @@ void run_test_batch_500_to_600() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 599, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46053,7 +46064,7 @@ void run_test_batch_500_to_600() {
     }
 }
 
-void run_test_batch_600_to_700() {
+void run_test_batch_600_to_700(test_stats_t* stats) {
     { // Test Case 600
         cluster_status_t cs = { 0, 49, 102, 1, 1, 23, 9, 924 };
         int computed_passes = 0;
@@ -46063,11 +46074,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 600, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46087,11 +46098,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 601, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46111,11 +46122,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 602, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46135,11 +46146,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 603, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46159,11 +46170,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 604, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46183,11 +46194,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 605, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46207,11 +46218,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 606, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46231,11 +46242,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 607, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46255,11 +46266,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 608, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46279,11 +46290,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 609, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46303,11 +46314,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 610, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46327,11 +46338,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 611, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46351,11 +46362,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 612, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46375,11 +46386,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 613, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46399,11 +46410,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 614, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46423,11 +46434,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 615, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46447,11 +46458,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 616, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46471,11 +46482,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 617, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46495,11 +46506,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 618, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46519,11 +46530,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 619, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46543,11 +46554,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 620, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46567,11 +46578,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 621, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46591,11 +46602,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 622, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46615,11 +46626,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 623, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46639,11 +46650,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 624, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46663,11 +46674,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 625, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46687,11 +46698,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 626, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46711,11 +46722,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 627, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46735,11 +46746,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 628, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46759,11 +46770,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 629, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46783,11 +46794,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 630, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46807,11 +46818,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 631, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46831,11 +46842,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 632, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46855,11 +46866,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 633, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46879,11 +46890,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 634, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46903,11 +46914,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 635, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46927,11 +46938,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 636, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46951,11 +46962,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 637, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46975,11 +46986,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 638, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -46999,11 +47010,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 639, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47023,11 +47034,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 640, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47047,11 +47058,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 641, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47071,11 +47082,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 642, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47095,11 +47106,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 643, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47119,11 +47130,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 644, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47143,11 +47154,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 645, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47167,11 +47178,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 646, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47191,11 +47202,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 647, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47215,11 +47226,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 648, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47239,11 +47250,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 649, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47263,11 +47274,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 650, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47287,11 +47298,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 651, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47311,11 +47322,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 652, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47335,11 +47346,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 653, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47359,11 +47370,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 654, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47383,11 +47394,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 655, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47407,11 +47418,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 656, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47431,11 +47442,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 657, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47455,11 +47466,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 658, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47479,11 +47490,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 659, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47503,11 +47514,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 660, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47527,11 +47538,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 661, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47551,11 +47562,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 662, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47575,11 +47586,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 663, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47599,11 +47610,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 664, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47623,11 +47634,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 665, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47647,11 +47658,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 666, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47671,11 +47682,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 667, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47695,11 +47706,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 668, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47719,11 +47730,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 669, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47743,11 +47754,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 670, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47767,11 +47778,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 671, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47791,11 +47802,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 672, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47815,11 +47826,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 673, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47839,11 +47850,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 674, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47863,11 +47874,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 675, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47887,11 +47898,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 676, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47911,11 +47922,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 677, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47935,11 +47946,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 678, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47959,11 +47970,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 679, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -47983,11 +47994,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 680, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48007,11 +48018,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 681, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48031,11 +48042,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 682, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48055,11 +48066,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 683, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48079,11 +48090,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 684, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48103,11 +48114,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 685, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48127,11 +48138,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 686, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48151,11 +48162,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 687, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48175,11 +48186,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 688, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48199,11 +48210,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 689, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48223,11 +48234,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 690, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48247,11 +48258,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 691, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48271,11 +48282,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 692, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48295,11 +48306,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 693, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48319,11 +48330,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 694, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48343,11 +48354,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 695, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48367,11 +48378,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 696, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48391,11 +48402,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 697, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48415,11 +48426,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 698, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48439,11 +48450,11 @@ void run_test_batch_600_to_700() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 699, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48456,7 +48467,7 @@ void run_test_batch_600_to_700() {
     }
 }
 
-void run_test_batch_700_to_800() {
+void run_test_batch_700_to_800(test_stats_t* stats) {
     { // Test Case 700
         cluster_status_t cs = { 0, 14, 235, 6, 0, 25, 8, 668 };
         int computed_passes = 0;
@@ -48466,11 +48477,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 700, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48490,11 +48501,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 701, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48514,11 +48525,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 702, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48538,11 +48549,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 703, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48562,11 +48573,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 704, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48586,11 +48597,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 705, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48610,11 +48621,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 706, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48634,11 +48645,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 707, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48658,11 +48669,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 708, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48682,11 +48693,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 709, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48706,11 +48717,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 710, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48730,11 +48741,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 711, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48754,11 +48765,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 712, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48778,11 +48789,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 713, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48802,11 +48813,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 714, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48826,11 +48837,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 715, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48850,11 +48861,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 716, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48874,11 +48885,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 717, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48898,11 +48909,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 718, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48922,11 +48933,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 719, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48946,11 +48957,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 720, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48970,11 +48981,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 721, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -48994,11 +49005,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 722, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49018,11 +49029,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 723, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49042,11 +49053,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 724, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49066,11 +49077,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 725, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49090,11 +49101,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 726, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49114,11 +49125,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 727, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49138,11 +49149,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 728, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49162,11 +49173,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 729, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49186,11 +49197,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 730, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49210,11 +49221,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 731, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49234,11 +49245,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 732, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49258,11 +49269,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 733, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49282,11 +49293,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 734, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49306,11 +49317,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 735, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49330,11 +49341,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 736, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49354,11 +49365,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 737, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49378,11 +49389,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 738, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49402,11 +49413,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 739, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49426,11 +49437,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 740, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49450,11 +49461,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 741, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49474,11 +49485,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 742, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49498,11 +49509,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 743, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49522,11 +49533,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 744, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49546,11 +49557,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 745, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49570,11 +49581,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 746, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49594,11 +49605,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 747, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49618,11 +49629,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 748, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49642,11 +49653,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 749, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49666,11 +49677,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 750, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49690,11 +49701,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 751, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49714,11 +49725,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 752, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49738,11 +49749,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 753, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49762,11 +49773,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 754, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49786,11 +49797,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 755, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49810,11 +49821,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 756, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49834,11 +49845,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 757, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49858,11 +49869,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 758, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49882,11 +49893,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 759, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49906,11 +49917,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 760, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49930,11 +49941,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 761, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49954,11 +49965,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 762, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -49978,11 +49989,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 763, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50002,11 +50013,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 764, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50026,11 +50037,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 765, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50050,11 +50061,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 766, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50074,11 +50085,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 767, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50098,11 +50109,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 768, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50122,11 +50133,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 769, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50146,11 +50157,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 770, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50170,11 +50181,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 771, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50194,11 +50205,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 772, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50218,11 +50229,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 773, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50242,11 +50253,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 774, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50266,11 +50277,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 775, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50290,11 +50301,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 776, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50314,11 +50325,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 777, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50338,11 +50349,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 778, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50362,11 +50373,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 779, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50386,11 +50397,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 780, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50410,11 +50421,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 781, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50434,11 +50445,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 782, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50458,11 +50469,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 783, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50482,11 +50493,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 784, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50506,11 +50517,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 785, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50530,11 +50541,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 786, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50554,11 +50565,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 787, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50578,11 +50589,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 788, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50602,11 +50613,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 789, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50626,11 +50637,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 790, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50650,11 +50661,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 791, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50674,11 +50685,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 792, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50698,11 +50709,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 793, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50722,11 +50733,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 794, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50746,11 +50757,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 795, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50770,11 +50781,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 796, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50794,11 +50805,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 797, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50818,11 +50829,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 798, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50842,11 +50853,11 @@ void run_test_batch_700_to_800() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 799, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50859,7 +50870,7 @@ void run_test_batch_700_to_800() {
     }
 }
 
-void run_test_batch_800_to_900() {
+void run_test_batch_800_to_900(test_stats_t* stats) {
     { // Test Case 800
         cluster_status_t cs = { 0, 186, 145, 3, 1, 7, 8, 603 };
         int computed_passes = 0;
@@ -50869,11 +50880,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 800, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50893,11 +50904,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 801, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50917,11 +50928,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 802, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50941,11 +50952,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 803, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50965,11 +50976,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 804, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -50989,11 +51000,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 805, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51013,11 +51024,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 806, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51037,11 +51048,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 807, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51061,11 +51072,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 808, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51085,11 +51096,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 809, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51109,11 +51120,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 810, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51133,11 +51144,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 811, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51157,11 +51168,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 812, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51181,11 +51192,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 813, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51205,11 +51216,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 814, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51229,11 +51240,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 815, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51253,11 +51264,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 816, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51277,11 +51288,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 817, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51301,11 +51312,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 818, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51325,11 +51336,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 819, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51349,11 +51360,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 820, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51373,11 +51384,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 821, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51397,11 +51408,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 822, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51421,11 +51432,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 823, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51445,11 +51456,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 824, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51469,11 +51480,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 825, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51493,11 +51504,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 826, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51517,11 +51528,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 827, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51541,11 +51552,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 828, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51565,11 +51576,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 829, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51589,11 +51600,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 830, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51613,11 +51624,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 831, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51637,11 +51648,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 832, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51661,11 +51672,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 833, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51685,11 +51696,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 834, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51709,11 +51720,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 835, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51733,11 +51744,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 836, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51757,11 +51768,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 837, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51781,11 +51792,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 838, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51805,11 +51816,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 839, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51829,11 +51840,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 840, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51853,11 +51864,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 841, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51877,11 +51888,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 842, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51901,11 +51912,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 843, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51925,11 +51936,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 844, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51949,11 +51960,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 845, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51973,11 +51984,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 846, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -51997,11 +52008,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 847, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52021,11 +52032,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 848, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52045,11 +52056,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 849, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52069,11 +52080,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 850, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52093,11 +52104,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 4) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 851, 4, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52117,11 +52128,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 852, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52141,11 +52152,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 853, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52165,11 +52176,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 854, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52189,11 +52200,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 855, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52213,11 +52224,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 856, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52237,11 +52248,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 857, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52261,11 +52272,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 858, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52285,11 +52296,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 859, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52309,11 +52320,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 860, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52333,11 +52344,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 861, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52357,11 +52368,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 862, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52381,11 +52392,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 863, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52405,11 +52416,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 864, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52429,11 +52440,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 865, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52453,11 +52464,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 866, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52477,11 +52488,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 867, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52501,11 +52512,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 868, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52525,11 +52536,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 869, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52549,11 +52560,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 870, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52573,11 +52584,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 871, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52597,11 +52608,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 872, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52621,11 +52632,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 873, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52645,11 +52656,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 874, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52669,11 +52680,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 875, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52693,11 +52704,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 876, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52717,11 +52728,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 877, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52741,11 +52752,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 878, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52765,11 +52776,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 879, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52789,11 +52800,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 880, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52813,11 +52824,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 881, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52837,11 +52848,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 882, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52861,11 +52872,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 883, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52885,11 +52896,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 884, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52909,11 +52920,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 885, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52933,11 +52944,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 886, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52957,11 +52968,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 887, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -52981,11 +52992,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 888, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53005,11 +53016,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 889, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53029,11 +53040,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 890, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53053,11 +53064,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 891, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53077,11 +53088,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 892, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53101,11 +53112,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 893, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53125,11 +53136,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 894, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53149,11 +53160,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 895, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53173,11 +53184,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 896, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53197,11 +53208,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 897, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53221,11 +53232,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 898, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53245,11 +53256,11 @@ void run_test_batch_800_to_900() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 899, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53262,7 +53273,7 @@ void run_test_batch_800_to_900() {
     }
 }
 
-void run_test_batch_900_to_1000() {
+void run_test_batch_900_to_1000(test_stats_t* stats) {
     { // Test Case 900
         cluster_status_t cs = { 0, 32, 212, 1, 0, 6, 10, 887 };
         int computed_passes = 0;
@@ -53272,11 +53283,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 900, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53296,11 +53307,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 901, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53320,11 +53331,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 902, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53344,11 +53355,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 903, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53368,11 +53379,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 904, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53392,11 +53403,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 905, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53416,11 +53427,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 906, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53440,11 +53451,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 907, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53464,11 +53475,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 908, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53488,11 +53499,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 909, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53512,11 +53523,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 910, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53536,11 +53547,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 911, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53560,11 +53571,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 912, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53584,11 +53595,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 913, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53608,11 +53619,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 914, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53632,11 +53643,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 915, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53656,11 +53667,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 916, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53680,11 +53691,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 917, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53704,11 +53715,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 918, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53728,11 +53739,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 919, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53752,11 +53763,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 920, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53776,11 +53787,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 921, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53800,11 +53811,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 922, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53824,11 +53835,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 923, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53848,11 +53859,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 924, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53872,11 +53883,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 925, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53896,11 +53907,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 926, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53920,11 +53931,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 927, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53944,11 +53955,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 928, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53968,11 +53979,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 929, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -53992,11 +54003,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 930, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54016,11 +54027,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 931, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54040,11 +54051,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 932, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54064,11 +54075,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 933, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54088,11 +54099,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 934, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54112,11 +54123,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 935, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54136,11 +54147,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 936, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54160,11 +54171,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 937, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54184,11 +54195,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 938, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54208,11 +54219,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 939, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54232,11 +54243,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 940, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54256,11 +54267,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 941, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54280,11 +54291,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 942, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54304,11 +54315,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 943, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54328,11 +54339,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 944, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54352,11 +54363,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 945, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54376,11 +54387,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 946, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54400,11 +54411,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 947, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54424,11 +54435,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 948, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54448,11 +54459,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 949, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54472,11 +54483,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 950, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54496,11 +54507,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 951, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54520,11 +54531,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 952, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54544,11 +54555,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 953, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54568,11 +54579,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 954, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54592,11 +54603,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 955, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54616,11 +54627,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 956, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54640,11 +54651,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 957, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54664,11 +54675,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 958, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54688,11 +54699,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 959, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54712,11 +54723,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 960, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54736,11 +54747,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 961, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54760,11 +54771,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 962, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54784,11 +54795,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 963, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54808,11 +54819,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 964, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54832,11 +54843,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 965, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54856,11 +54867,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 966, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54880,11 +54891,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 967, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54904,11 +54915,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 968, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54928,11 +54939,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 969, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54952,11 +54963,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 970, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -54976,11 +54987,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 971, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55000,11 +55011,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 972, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55024,11 +55035,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 973, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55048,11 +55059,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 974, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55072,11 +55083,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 975, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55096,11 +55107,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 976, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55120,11 +55131,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 977, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55144,11 +55155,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 978, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55168,11 +55179,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 11) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 979, 11, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55192,11 +55203,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 980, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55216,11 +55227,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 6) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 981, 6, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55240,11 +55251,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 12) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 982, 12, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55264,11 +55275,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 5) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 983, 5, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55288,11 +55299,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 984, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55312,11 +55323,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 985, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55336,11 +55347,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 986, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55360,11 +55371,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 987, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55384,11 +55395,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 988, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55408,11 +55419,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 989, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55432,11 +55443,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 990, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55456,11 +55467,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 8) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 991, 8, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55480,11 +55491,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 992, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55504,11 +55515,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 993, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55528,11 +55539,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 994, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55552,11 +55563,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 995, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55576,11 +55587,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 996, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55600,11 +55611,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 7) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 997, 7, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55624,11 +55635,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 10) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 998, 10, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55648,11 +55659,11 @@ void run_test_batch_900_to_1000() {
                 computed_passes++;
             }
         }
-        g_stats.total++;
+        stats->total++;
         if (computed_passes == 9) {
-            g_stats.passed++;
+            stats->passed++;
         } else {
-            g_stats.failed++;
+            stats->failed++;
             printf("[FAIL] Consensus Mismatch in Test %d (Expected Passes: %d, Got: %d)\n", 999, 9, computed_passes);
         }
         float expected_d_r = (float)cs.primary_synced * (1.0f - (float)cs.replication_lag / (float)cs.sync_threshold);
@@ -55665,18 +55676,77 @@ void run_test_batch_900_to_1000() {
     }
 }
 
-void run_all_consensus_tests() {
-    run_test_batch_0_to_100();
-    run_test_batch_100_to_200();
-    run_test_batch_200_to_300();
-    run_test_batch_300_to_400();
-    run_test_batch_400_to_500();
-    run_test_batch_500_to_600();
-    run_test_batch_600_to_700();
-    run_test_batch_700_to_800();
-    run_test_batch_800_to_900();
-    run_test_batch_900_to_1000();
+
+typedef void (*test_batch_fn_t)(test_stats_t*);
+static const test_batch_fn_t g_test_batches[] = {
+
+    run_test_batch_0_to_100,
+    run_test_batch_100_to_200,
+    run_test_batch_200_to_300,
+    run_test_batch_300_to_400,
+    run_test_batch_400_to_500,
+    run_test_batch_500_to_600,
+    run_test_batch_600_to_700,
+    run_test_batch_700_to_800,
+    run_test_batch_800_to_900,
+    run_test_batch_900_to_1000,
+};
+
+typedef struct {
+    int thread_id;
+    test_stats_t stats;
+} thread_arg_t;
+
+#if defined(_WIN32)
+DWORD WINAPI worker_thread_func(LPVOID lpParam) {
+    thread_arg_t* arg = (thread_arg_t*)lpParam;
+    pin_current_thread(arg->thread_id);
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 10) num_threads = 10;
+    for (int b = arg->thread_id * 100; b < NUM_TEST_CASES; b += num_threads * 100) {
+        g_test_batches[b / 100](&arg->stats);
+        paced_sleep(1);
+    }
+    return 0;
 }
+#else
+void* worker_thread_func(void* lpParam) {
+    thread_arg_t* arg = (thread_arg_t*)lpParam;
+    pin_current_thread(arg->thread_id);
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 10) num_threads = 10;
+    for (int b = arg->thread_id * 100; b < NUM_TEST_CASES; b += num_threads * 100) {
+        g_test_batches[b / 100](&arg->stats);
+        paced_sleep(1);
+    }
+    return NULL;
+}
+#endif
+
+void run_all_consensus_tests() {
+    int num_threads = get_core_count();
+    if (num_threads < 1) num_threads = 1;
+    if (num_threads > 10) num_threads = 10;
+
+    thread_arg_t args[10];
+    thread_t threads[10];
+
+    for (int t = 0; t < num_threads; t++) {
+        args[t].thread_id = t;
+        memset(&args[t].stats, 0, sizeof(test_stats_t));
+        thread_create(&threads[t], worker_thread_func, &args[t]);
+    }
+
+    for (int t = 0; t < num_threads; t++) {
+        thread_join(threads[t]);
+        g_stats.total += args[t].stats.total;
+        g_stats.passed += args[t].stats.passed;
+        g_stats.failed += args[t].stats.failed;
+    }
+}
+
 
 int main() {
     printf("==================================================\n");
