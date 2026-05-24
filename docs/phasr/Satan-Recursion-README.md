@@ -75,4 +75,4 @@ node generate_satan.js --chunks <num_chunks> --routines <routines_per_chunk>
 ## 5. Mathematical Models & Equations
 
 For details on the covariant D'Alembertian wave propagation and module design, refer to [Satan-Recursion.md](Satan-Recursion.md).
-For detailed analytical derivations, proofs, and step-by-step numerical examples of Kerr metrics and Carter's invariants, refer to the unified [Equation.md](../equations/Equation.md) specification.
+For detailed analytical derivations, proofs, and step-by-step numerical examples of Kerr metrics and Carter's invariants, refer to the unified [Equations.md](../equations/Equations.md) specification.
