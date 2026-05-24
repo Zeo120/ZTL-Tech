@@ -142,11 +142,13 @@ PHASR is our security audit platform.
   * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
   * **`build.bat`**: Windows MSVC C compilation and test runner script.
 * **`phasr/Satan-Recursion/`**: The source directory for Satan's Recursion curved spacetime wave solver.
-  * **`satan_recursion.cpp`**: C++ driver and verification suite, implementing the covariant wave propagation solver and containing 1,000 unit tests.
-  * **`satan_linux_x64.s`**: Statically generated x86-64 assembly containing 10,000 recursive check helper routines.
-  * **`satan_arm64.s`**: Statically generated ARM64 assembly containing 10,000 recursive check helper routines.
-  * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
-  * **`build.bat`**: Windows MSVC C++ compilation and test runner script.
+  * **`satan_recursion.cpp`**: C++ master driver, containing wave propagation solvers, pointer tables, and the unit test entry points.
+  * **`satan_chunk_xx.cpp`**: Statically generated C++ fallback invariant routines (partitioned into chunks).
+  * **`satan_chunk_xx_x64.s`**: Statically generated x86-64 assembly containing unrolled Kerr metric routines.
+  * **`satan_chunk_xx_arm64.s`**: Statically generated ARM64 assembly containing unrolled Kerr metric routines.
+  * **`Makefile`**: Cross-platform Makefile to automatically detect platform and link all assembly engine chunks.
+  * **`build.bat`**: Windows MSVC C++ compilation script to compile all chunks and driver.
+  * **`render_video.py`**: Python script to parse binary outputs and render high-fidelity simulation videos.
 
 
 
@@ -385,7 +387,7 @@ Satan's Recursion compiles with either of the two assembly back-ends (x86-64 / A
    cd phasr\Satan-Recursion
    build.bat
    ```
-3. The script compiles `satan_recursion.cpp` with `/EHsc /W4 /WX /GS /Od` flags and executes the test suite.
+3. The script compiles all C++ chunks (`*.cpp`) with `/EHsc /W4 /WX /GS /Od` flags and executes the test suite.
 
 #### Option B — Linux x86-64 or ARM64 (GAS / GCC)
 
@@ -394,11 +396,23 @@ Satan's Recursion compiles with either of the two assembly back-ends (x86-64 / A
    cd phasr/Satan-Recursion
    make
    ```
-2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `satan_linux_x64.s` (on x86-64) or `satan_arm64.s` (on ARM64), falling back to portable C++ on other architectures.
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles and links all `satan_chunk_*_x64.s` (on x86-64) or `satan_chunk_*_arm64.s` (on ARM64) files dynamically, falling back to C++ chunks on other platforms.
 3. Run the output binary:
    ```bash
    ./satan_recursion
    ```
 
-> **Note:** The Satan's Recursion assembly and C++ helper files are auto-generated. To regenerate them, run:
-> * `node generate_satan.js`
+#### Option C — Generating Video Frames & Visualizations
+To scale the simulation up to 1,000,000 steps and export the states to render video animation:
+```cmd
+cd phasr\Satan-Recursion
+:: Run 1,000,000 simulation steps and export binary states
+.\satan_recursion.exe --steps 1000000 --export spacetime_simulation.bin --silent
+
+:: Generate animation GIF or MP4 via Python script
+python render_video.py spacetime_simulation.bin gif
+```
+
+> **Note:** The Satan's Recursion assembly and C++ helper files are auto-generated. To regenerate them at 100X Scale (100,000 routines), run:
+> * `node generate_satan.js --chunks 10 --routines 10000`
+
