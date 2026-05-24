@@ -30,9 +30,11 @@ All verification phases (Phase 1 through 5, and Satan's Recursion) utilize the u
 #include <pthread.h>
 #include <unistd.h>
 #include <sched.h>
+#include <sys/mman.h>
 #endif
+#include <stdlib.h>
 
-// Determine number of physical/logical cores
+// Determine number of physical cores
 static inline int get_core_count(void) {
 #if defined(_WIN32)
     SYSTEM_INFO sysinfo;
@@ -43,16 +45,28 @@ static inline int get_core_count(void) {
 #endif
 }
 
-// Pin current thread to core index
+// Pin current thread to core index with priority elevation and physical core mapping (SMT/hyperthreading avoidance)
 static inline void pin_current_thread(int core_index) {
+    // 1. Thread priority elevation
+#if defined(_WIN32)
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+#else
+    struct sched_param param;
+    param.sched_priority = 50; // high priority
+    pthread_setschedparam(pthread_self(), SCHED_RR, &param);
+#endif
+
+    // 2. Physical core mapping (prioritize even-numbered physical cores over hyperthreaded siblings)
     int cores = get_core_count();
     if (cores <= 0) cores = 1;
+    int target_core = (core_index * 2) % cores;
+
 #if defined(_WIN32)
-    SetThreadAffinityMask(GetCurrentThread(), 1ULL << (core_index % cores));
+    SetThreadAffinityMask(GetCurrentThread(), 1ULL << target_core);
 #else
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
-    CPU_SET(core_index % cores, &cpuset);
+    CPU_SET(target_core, &cpuset);
     pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 #endif
 }
@@ -66,6 +80,39 @@ static inline void paced_sleep(int ms) {
 #endif
 }
 
+// Allocate high-performance memory using HugePages / Large Pages (with fallback)
+static inline void* allocate_huge_pages(size_t size) {
+#if defined(_WIN32)
+    // Attempt large pages commit (requires SeLockMemoryPrivilege enabled in OS), fallback to standard VirtualAlloc
+    void* ptr = VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE | MEM_LARGE_PAGES, PAGE_READWRITE);
+    if (!ptr) {
+        ptr = VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    }
+    return ptr;
+#else
+    // Attempt Linux HugeTLB anonymous mapping, fallback to malloc
+    void* ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    if (ptr == MAP_FAILED) {
+        ptr = malloc(size);
+    }
+    return ptr;
+#endif
+}
+
+// Free HugePages allocated memory
+static inline void free_huge_pages(void* ptr, size_t size) {
+    if (!ptr) return;
+#if defined(_WIN32)
+    (void)size;
+    VirtualFree(ptr, 0, MEM_RELEASE);
+#else
+    // Attempt to unmap first (checking standard size unmapping), fallback to free
+    if (munmap(ptr, size) != 0) {
+        free(ptr);
+    }
+#endif
+}
+
 #endif // COMPUTE_BALANCER_H
 ```
 
@@ -75,6 +122,9 @@ static inline void paced_sleep(int ms) {
 
 ### A. NUMA Core Pinning (Thread Affinity)
 By locking each worker thread onto a single physical core, we prevent the operating system from migrating threads. This preserves **L1/L2 cache locality** and ensures that the core's cache lines remain warm with local validation parameters.
+- **SMT/Hyperthreading Bypass:** The balancer maps logical threads to alternate core indices (`(core_index * 2) % cores`). This assigns work strictly to primary physical CPU cores (Performance Cores) instead of sharing hardware pipelines with virtual sibling threads, maximizing processing speed.
+- **Real-Time Priority Elevation:** Automatically elevates worker thread priority to `THREAD_PRIORITY_HIGHEST` (Windows) or schedules under Real-Time Round-Robin scheduling (`SCHED_RR`, Linux) to prevent scheduling preemption by background operating system tasks.
+- **HugePages Allocation:** Support for direct HugePages allocation (`allocate_huge_pages`) using OS-specific large page allocation flags (`MEM_LARGE_PAGES` on Windows / `MAP_HUGETLB` on Linux) to minimize Translation Lookaside Buffer (TLB) address resolution overhead.
 
 ### B. Static Task Partitioning (No Work-Stealing)
 Traditional task schedulers use dynamic work-stealing (e.g., Intel TBB, OpenMP) which allocates work based on runtime scheduler state. The PHASR balancer uses a deterministic **static round-robin** allocation mapping chunk $C$ to thread $T$:
