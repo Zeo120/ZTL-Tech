@@ -13,6 +13,8 @@
 #include <cmath>
 #include <stdint.h>
 #include <stdlib.h>
+#include <fstream>
+#include <string>
 
 #define NUM_CONTROLS 10000
 #define NUM_TEST_CASES 1000
@@ -92222,7 +92224,23 @@ void run_all_satan_tests() {
     run_test_batch_900_to_1000();
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    int sim_steps = 30;
+    std::string export_path = "";
+    bool silent = false;
+
+    for (int i = 1; i < argc; i++) {
+        if ((std::strcmp(argv[i], "--steps") == 0 || std::strcmp(argv[i], "-s") == 0) && i + 1 < argc) {
+            sim_steps = std::atoi(argv[++i]);
+            if (sim_steps < 1) sim_steps = 1;
+            if (sim_steps > 1000000) sim_steps = 1000000;
+        } else if ((std::strcmp(argv[i], "--export") == 0 || std::strcmp(argv[i], "-e") == 0) && i + 1 < argc) {
+            export_path = argv[++i];
+        } else if (std::strcmp(argv[i], "--silent") == 0 || std::strcmp(argv[i], "-q") == 0) {
+            silent = true;
+        }
+    }
+
     std::cout << "==================================================\n";
     std::cout << "PHASR Satan's Recursion: Curved Spacetime Engine   \n";
     std::cout << "Target Engine: C++ Covariant D'Alembertian Solver \n";
@@ -92240,6 +92258,7 @@ int main() {
     }
 
     std::cout << "[2/2] Running Geodesic Wave Propagation Simulation...\n";
+    std::cout << "      Instances to run: " << sim_steps << "\n";
     std::cout << "      Equation: Box_g (Psi) = 0 (Covariant Spacetime Wave Solver)\n\n";
 
     SpacetimeSim sim;
@@ -92253,13 +92272,36 @@ int main() {
     // Modulate the metric using results from the other 4 equations
     modulate_metric(&sim, 0.9f, 0.85f, 0.95f, 0.92f);
 
-    float dt = 0.1f;
-    for (int step = 0; step < 30; step++) {
-        step_spacetime_sim(&sim, dt);
-        if (step % 3 == 0) {
-            print_wave_profile(&sim);
-            std::cout << "\n";
+    std::ofstream out_file;
+    if (!export_path.empty()) {
+        out_file.open(export_path, std::ios::binary);
+        if (!out_file) {
+            std::cerr << "[ERROR] Failed to open export file: " << export_path << "\n";
+            return 1;
         }
+        uint32_t grid_size = WAVE_GRID_SIZE;
+        uint32_t total_steps = sim_steps;
+        out_file.write(reinterpret_cast<const char*>(&grid_size), sizeof(grid_size));
+        out_file.write(reinterpret_cast<const char*>(&total_steps), sizeof(total_steps));
+    }
+
+    float dt = 0.1f;
+    for (int step = 0; step < sim_steps; step++) {
+        step_spacetime_sim(&sim, dt);
+        if (out_file.is_open()) {
+            out_file.write(reinterpret_cast<const char*>(sim.phi), sizeof(sim.phi));
+        }
+        if (!silent && sim_steps <= 100) {
+            if (step % 3 == 0) {
+                print_wave_profile(&sim);
+                std::cout << "\n";
+            }
+        }
+    }
+
+    if (out_file.is_open()) {
+        out_file.close();
+        std::cout << "      SUCCESS: Exported " << sim_steps << " steps of spacetime grid simulation to " << export_path << "\n";
     }
 
     std::cout << "Spacetime simulation telemetry sequence complete.\n";
