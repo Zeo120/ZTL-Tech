@@ -10,33 +10,37 @@ TARGET   := satan_recursion
 # Auto-detect platform
 UNAME_M := $(shell uname -m 2>/dev/null || echo unknown)
 
+# Wildcards for source chunks
+CPP_CHUNKS := $(wildcard satan_chunk_*.cpp)
+OBJ_CHUNKS := $(CPP_CHUNKS:.cpp=.o)
+
 ifeq ($(PLATFORM),arm64)
-    ASM_SRC := satan_arm64.s
-    ASM_OBJ := satan_arm64.o
+    ASM_SRC := $(wildcard satan_chunk_*_arm64.s)
+    ASM_OBJ := $(ASM_SRC:.s=.o)
     AS      := as
     ASFLAGS :=
     CXXFLAGS += -D__aarch64__
 else ifeq ($(PLATFORM),x64)
-    ASM_SRC := satan_linux_x64.s
-    ASM_OBJ := satan_linux_x64.o
+    ASM_SRC := $(wildcard satan_chunk_*_x64.s)
+    ASM_OBJ := $(ASM_SRC:.s=.o)
     AS      := as
     ASFLAGS := --64
     CXXFLAGS += -D__x86_64__ -D__linux__
 else ifeq ($(UNAME_M),aarch64)
-    ASM_SRC := satan_arm64.s
-    ASM_OBJ := satan_arm64.o
+    ASM_SRC := $(wildcard satan_chunk_*_arm64.s)
+    ASM_OBJ := $(ASM_SRC:.s=.o)
     AS      := as
     ASFLAGS :=
     CXXFLAGS += -D__aarch64__
 else ifeq ($(UNAME_M),arm64)
-    ASM_SRC := satan_arm64.s
-    ASM_OBJ := satan_arm64.o
+    ASM_SRC := $(wildcard satan_chunk_*_arm64.s)
+    ASM_OBJ := $(ASM_SRC:.s=.o)
     AS      := as
     ASFLAGS :=
     CXXFLAGS += -D__aarch64__
 else ifeq ($(UNAME_M),x86_64)
-    ASM_SRC := satan_linux_x64.s
-    ASM_OBJ := satan_linux_x64.o
+    ASM_SRC := $(wildcard satan_chunk_*_x64.s)
+    ASM_OBJ := $(ASM_SRC:.s=.o)
     AS      := as
     ASFLAGS := --64
     CXXFLAGS += -D__x86_64__ -D__linux__
@@ -45,26 +49,29 @@ else
     FALLBACK := 1
 endif
 
+# Clean up C++ objects that might be created during fallback or driver builds
+ALL_OBJS := satan_recursion.o $(OBJ_CHUNKS)
+
 ifndef FALLBACK
 
 all: $(TARGET)
 
-$(ASM_OBJ): $(ASM_SRC)
+%.o: %.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
-satan_recursion.o: satan_recursion.cpp
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(TARGET): satan_recursion.o $(ASM_OBJ)
+$(TARGET): $(ALL_OBJS) $(ASM_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-	echo "[OK] Built $(TARGET) using $(ASM_SRC) assembly engine"
+	echo "[OK] Built $(TARGET) using assembly engine chunks"
 
 else
 
 all: fallback
 
-fallback:
-	$(CXX) $(CXXFLAGS) -o $(TARGET)_fallback satan_recursion.cpp $(LDFLAGS)
+fallback: $(ALL_OBJS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET)_fallback $^ $(LDFLAGS)
 	echo "[OK] Built $(TARGET)_fallback using C++ fallback engine"
 
 endif

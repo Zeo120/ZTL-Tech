@@ -25,7 +25,7 @@ echo [1/2] Initializing MSVC build environment...
 call "!VCVARS_PATH!" > nul
 
 echo [2/2] Compiling C++ Satan's Recursion Engine and linking...
-cl /EHsc /W4 /WX /GS /Od /Fe:satan_recursion.exe satan_recursion.cpp
+cl /EHsc /W4 /WX /GS /Od /Fe:satan_recursion.exe *.cpp
 if %errorlevel% neq 0 (
     echo [ERROR] Compilation failed!
     exit /b 1
