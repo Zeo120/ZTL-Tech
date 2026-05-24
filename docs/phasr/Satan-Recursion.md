@@ -99,7 +99,7 @@ To run the audits, 10,000 helper functions are statically compiled. The driver e
 
 ```mermaid
 flowchart LR
-    subgraph Host OS detection
+    subgraph HostOSDetection ["Host OS detection"]
         Linux["Linux (x86-64 / ARM64)"] -->|"Assembly Back-end"| Assembly["satan_linux_x64.s / satan_arm64.s"]
         Windows["Windows (MSVC)"] -->|"C++ Fallback"| Fallback["satan_recursion.cpp (inline implementations)"]
     end

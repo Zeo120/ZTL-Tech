@@ -10,20 +10,20 @@ The diagram below maps every telemetry pipeline, validation engine loop, ledger 
 
 ```mermaid
 graph TB
-    subgraph Data Plane [1. Telemetry Capture & Normalization]
+    subgraph DataPlane [1. Telemetry Capture & Normalization]
         eBPF_Sys[eBPF Sensors: Syscalls] -->|C-struct payload| Normalizer[Normalization Plane]
         eBPF_Net[eBPF Sensors: Network] -->|C-struct payload| Normalizer
         Configs[configs: IaC / RBAC] -->|JSON Parser| Normalizer
         DB_Logs[Database Logs] -->|Polled stream| Normalizer
     end
 
-    subgraph Pipeline Plane [2. Ingestion & Priority Queues]
+    subgraph PipelinePlane [2. Ingestion & Priority Queues]
         Normalizer -->|Protobuf Events| NATS{NATS JetStream Ingest Bus}
         NATS -->|Priority 0: Real-Time| P0_Queue[Active Invariant Evaluation Queue]
         NATS -->|Priority 1: Delayed| P1_Queue[Historical Analytics Queue]
     end
 
-    subgraph Core Engine Plane [3. Invariant Evaluation & Graph Mapping]
+    subgraph CoreEnginePlane [3. Invariant Evaluation & Graph Mapping]
         P0_Queue --> CoreEngine[Core Invariant Evaluator]
         ActiveSpec[(Active Spec Graph)] <-->|DFS / BFS Reachability| SubgraphCache[(In-Memory Subgraph Cache)]
         SubgraphCache <--> CoreEngine
@@ -39,16 +39,16 @@ graph TB
         CoreEngine <--> SubEngines
     end
 
-    subgraph Storage & Exporter Plane [4. Attestation & Alert Outgress]
+    subgraph StoragePlane [4. Attestation & Alert Outgress]
         CoreEngine -->|State Attestation| MerkleProcessor[Merkle Tree Hash Processor]
         MerkleProcessor -->|Ledger Block| AuditDb[(Append-Only Ledger Database)]
         CoreEngine -->|Violation Proof Traces| AlertEngine[Proof Trace Generator]
         AlertEngine -->|gRPC / TLS| SecOpsAlerts[SecOps Alert Gateway]
     end
 
-    style Core Engine Plane fill:#05050a,stroke:#ff003c,stroke-width:2px
-    style Pipeline Plane fill:#0a0a0f,stroke:#00f3ff,stroke-width:1px
-    style Storage & Exporter Plane fill:#0d0d12,stroke:#00ffaa,stroke-width:1px
+    style CoreEnginePlane fill:#05050a,stroke:#ff003c,stroke-width:2px
+    style PipelinePlane fill:#0a0a0f,stroke:#00f3ff,stroke-width:1px
+    style StoragePlane fill:#0d0d12,stroke:#00ffaa,stroke-width:1px
 ```
 
 ---
