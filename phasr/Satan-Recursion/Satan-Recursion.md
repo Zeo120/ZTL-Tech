@@ -61,10 +61,30 @@ flowchart LR
     
     Assembly --> Driver["satan_recursion (C++ driver)"]
     Fallback --> Driver
-    
     Driver -->|"Runs 1,000 cases"| AuditLoop["Evaluate 15 random audits per case"]
     AuditLoop -->|"Compare passes"| InvariantCheck{"Passed == Expected?"}
     
     InvariantCheck -->|"Pass"| IncPass["Increment passed counter"]
     InvariantCheck -->|"Fail"| IncFail["Increment failed counter"]
 ```
+
+---
+
+## 4. Video Frame & Animation Generation Flow
+
+The simulation output can be scaled up to 1,000,000 steps and exported as a binary float sequence stream for animation rendering.
+
+```mermaid
+flowchart TD
+    RunSim["Run Driver: satan_recursion --steps 1000000 --export spacetime_simulation.bin --silent"]
+    RunSim -->|"Exports Raw Binary"| BinaryFile["spacetime_simulation.bin (header + 160MB data)"]
+    
+    BinaryFile -->|"Process in Python"| PythonScript["render_video.py"]
+    PythonScript -->|"numpy.frombuffer"| Reshape["Reshape Array to (Steps, GridSize)"]
+    
+    Reshape -->|"Render Loop"| Matplotlib["matplotlib.animation.FuncAnimation"]
+    Matplotlib -->|"Option A"| GIF["Export spacetime_simulation.gif (Pillow Writer)"]
+    Matplotlib -->|"Option B"| MP4["Export spacetime_simulation.mp4 (FFMpeg Writer)"]
+    Matplotlib -->|"Option C"| PNGs["Export Individual Frame Images"]
+```
+
