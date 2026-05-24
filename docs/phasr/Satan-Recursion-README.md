@@ -72,8 +72,7 @@ node generate_satan.js --chunks <num_chunks> --routines <routines_per_chunk>
 * **Default 1000X Scale (1,000,000 routines):**
   `node generate_satan.js --chunks 100 --routines 10000`
 
----
-
 ## 5. Mathematical Models & Equations
 
-For details on the covariant D'Alembertian wave propagation, Kerr metric coordinate transformations, and Carter's constant invariants, refer to [Satan-Recursion.md](Satan-Recursion.md).
+For details on the covariant D'Alembertian wave propagation and module design, refer to [Satan-Recursion.md](Satan-Recursion.md).
+For detailed analytical derivations, proofs, and step-by-step numerical examples of Kerr metrics and Carter's invariants, refer to the unified [Equation.md](../equations/Equation.md) specification.

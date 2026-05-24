@@ -29,6 +29,10 @@ Here is a list of all folders and files, with a simple explanation of what each 
 *   **`README.md`** *(This file)*: The main guide to help you understand the codebase.
 *   **`.gitignore`**: A text file that tells Git which files to ignore (like large `node_modules` folders or secret `.env` files) so we don't upload them to GitHub by accident.
 *   **`setup_git.bat`**: A Windows batch script. Double-clicking it automatically initializes Git, stages all files, and makes the first commit.
+*   **`docs/`**: The organized parent directory containing all design, architecture, phase-specific requirements, and physics equations documentation.
+    *   **`docs/architecture/`**: Houses global system designs and compute balancer specifications.
+    *   **`docs/phasr/`**: Houses context guides and requirements for the 5 validation phases and Satan's Recursion.
+    *   **`docs/equations/`**: Houses the proofs, derivations, and numerical examples for the mathematical models.
 
 ---
 
