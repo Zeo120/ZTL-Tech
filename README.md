@@ -141,6 +141,13 @@ PHASR is our security audit platform.
   * **`consensus_arm64.s`**: Statically generated ARM64 assembly containing 4,500 consensus verification helper routines.
   * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
   * **`build.bat`**: Windows MSVC C compilation and test runner script.
+* **`phasr/Satan-Recursion/`**: The source directory for Satan's Recursion curved spacetime wave solver.
+  * **`satan_recursion.cpp`**: C++ driver and verification suite, implementing the covariant wave propagation solver and containing 1,000 unit tests.
+  * **`satan_linux_x64.s`**: Statically generated x86-64 assembly containing 10,000 recursive check helper routines.
+  * **`satan_arm64.s`**: Statically generated ARM64 assembly containing 10,000 recursive check helper routines.
+  * **`Makefile`**: Cross-platform Makefile to link assembly back-ends on Linux.
+  * **`build.bat`**: Windows MSVC C++ compilation and test runner script.
+
 
 
 
@@ -364,6 +371,34 @@ The consensus auditor compiles with either of the two assembly back-ends (x86-64
 > **Note:** The Phase-5 assembly files are auto-generated. To regenerate them, run:
 > * `node generate_phase_5.js`
 
+---
 
+### 8. Compiling and Running Satan's Recursion Wave Solver
 
+Satan's Recursion compiles with either of the two assembly back-ends (x86-64 / ARM64) or a portable C++ fallback.
 
+#### Option A — Windows x86-64 (MSVC C++ Fallback)
+
+1. Ensure **Visual Studio Build Tools** (MSVC C++ compiler) is installed.
+2. Run the build batch file:
+   ```cmd
+   cd phasr\Satan-Recursion
+   build.bat
+   ```
+3. The script compiles `satan_recursion.cpp` with `/EHsc /W4 /WX /GS /Od` flags and executes the test suite.
+
+#### Option B — Linux x86-64 or ARM64 (GAS / GCC)
+
+1. Build using the cross-platform Makefile:
+   ```bash
+   cd phasr/Satan-Recursion
+   make
+   ```
+2. The Makefile automatically detects the host architecture (`uname -m`) and compiles `satan_linux_x64.s` (on x86-64) or `satan_arm64.s` (on ARM64), falling back to portable C++ on other architectures.
+3. Run the output binary:
+   ```bash
+   ./satan_recursion
+   ```
+
+> **Note:** The Satan's Recursion assembly and C++ helper files are auto-generated. To regenerate them, run:
+> * `node generate_satan.js`
