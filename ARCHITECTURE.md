@@ -307,4 +307,26 @@ The core transitive closure sweep is implemented in raw ARM64 assembly ([reachab
 - **Linux ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the ARM64 NEON Assembly engine.
 - **Linux non-ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the C++ fallback engine.
 
+---
+
+## 6. Custom Compute Balancer & Hardware Thermal Protection
+
+To ensure deterministic, repeatable, and safe execution across thousands of unrolled invariant validator loops, PHASR implements a custom-designed **Deterministic Compute Balancer** across all workflows.
+
+### 6.1 Balancer Design Principles
+
+```mermaid
+graph TD
+    CB["Compute Balancer"] --> Pin["NUMA Core Pinning (Thread Affinity)"]
+    CB --> Part["Static Task Partitioning (No Work-Stealing)"]
+    CB --> Tile["L1 I-Cache Instruction Tiling"]
+    CB --> Pacing["Paced Duty Cycling (Thermal Protection)"]
+```
+
+- **Deterministic Thread Affinity:** Forces worker threads to lock onto specific physical CPU cores (e.g., `SetThreadAffinityMask` on Windows, `pthread_setaffinity_np` on Linux).
+- **Static Round-Robin Partitioning:** Tasks (test batches) are mapped to threads via $T = C \pmod N$. This bypasses runtime dynamic work-stealing, eliminating scheduler non-determinism.
+- **Paced Duty Cycling:** Worker threads yield using millisecond sleep cycles at fixed batch boundaries to cool the CPU junction temperature and avoid thermal throttling.
+- **Thread-Safety & Race Prevention:** Shared statistics and data structures (such as Phase 3 eBPF ring buffers) are configured as thread-local parameters to prevent write-collisions and guarantee 100% deterministic assertion audits.
+
+
 
