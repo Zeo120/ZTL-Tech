@@ -878,6 +878,49 @@ $$
 
 where $\tau_{\text{min}}$ represents physical limits on execution speed (preventing script-based transition bypasses) and $\tau_{\text{max}}$ prevents thread stalling anomalies.
 
+### Mapping to PHASR Core Validation Equations
+
+These telemetry data collection parameters map directly into the core PHASR deterministic and wave equations:
+
+#### 1. Coupling with Phase Lifecycle Integrity ($D_P$ — Workflow 1)
+The deterministic FSM validator score $D_P$ evaluates execution sequencing. By coupling it with the telemetry data collection guard, the composite validation gate $D_P'$ is defined as:
+
+$$
+D_P' = D_P \cdot \mathbf{1}\!\left[D_M(\mathbf{T}_{a \to b}) \leq \chi^2_{d, \, 1-\alpha}\right] \cdot \mathbf{1}\!\left[\Delta t_{a \to b} \in [\tau_{\text{min}}, \ \tau_{\text{max}}]\right]
+$$
+
+where:
+*   $D_P = \delta(s_a, s_b) \cdot \prod_{j=1}^{m} \text{Pre}_j(s_b)$ represents the structural FSM sequence check.
+*   The transaction is blocked ($D_P' = 0$) if either the system drift exceeds normal variance or the execution speed violates the physical bounds.
+
+#### 2. Orthogonality with Invariant Attestation ($D_A$ — Workflow 3)
+The Telemetry Invariant Product Score $D_A$ evaluates independent threshold assertions:
+
+$$
+D_A = \prod_{k=0}^{4499} \mathbf{1}\!\left[L_k \leq X_{j(k)} \leq U_k\right]
+$$
+
+While $D_A$ enforces a hyper-rectangular hard safety boundary on individual parameters, the Mahalanobis distance $D_M(\mathbf{T}_{a \to b})$ detects anomalous *multivariate correlations* inside the covariance ellipsoid. They combine to form the total system integrity attestation score:
+
+$$
+D_{\text{Total}} = D_P' \cdot D_H \cdot D_A \cdot D_S \cdot D_R
+$$
+
+#### 3. Wave Simulation Perturbation Mapping (Satan's Recursion Metric Modulation)
+In the continuous wave-equation simulations, the telemetry data collection results are injected as an impulse source term $S(x, t)$ at the grid midpoint $x_s$:
+
+$$
+S(x, t) = A \cdot \delta(x - x_s) \cdot \left(1 - D_P'\right)
+$$
+
+If a state-transition anomaly occurs ($D_P' = 0$), the source term injects a high-amplitude wave pulse. This propagates through the FDTD solver:
+
+$$
+\Phi_i^{n+1} = \frac{2\Phi_i^n - \Phi_i^{n-1}\left(1 - \frac{\gamma\Delta t}{2}\right) + r^2\left(\Phi_{i+1}^n - 2\Phi_i^n + \Phi_{i-1}^n\right) + \Delta t^2 \cdot S(x_i, n\Delta t)}{1 + \frac{\gamma\Delta t}{2}}
+$$
+
+This localized energy injection warps the curved spacetime metric ($g^{00}, g^{11}$) in Satan's Recursion via telemetry coupling $\kappa(t) = 0.15 \times \sum \Phi_p(t)$, destabilizing the numerical solver and triggering a **singularity event**.
+
 ---
 
 ## Summary — Score Definitions
