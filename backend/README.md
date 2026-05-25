@@ -72,7 +72,7 @@ backend/
 
 ## Expected Tables
 
-The first auth path expects:
+The application expects the following tables in MS SQL Server:
 
 ```sql
 Users(
@@ -80,7 +80,9 @@ Users(
   email NVARCHAR(254) UNIQUE NOT NULL,
   password_hash NVARCHAR(MAX) NOT NULL,
   role NVARCHAR(32) NOT NULL,
-  is_active BIT NOT NULL
+  is_active BIT NOT NULL,
+  created_at DATETIME2 NOT NULL,
+  updated_at DATETIME2 NULL
 )
 
 Pages(
@@ -107,6 +109,51 @@ AuditLog(
   user_agent NVARCHAR(512) NULL,
   success BIT NOT NULL,
   metadata_json NVARCHAR(MAX) NULL,
+  created_at DATETIME2 NOT NULL
+)
+
+PhasrAudits(
+  id INT IDENTITY PRIMARY KEY,
+  user_id INT NOT NULL,
+  domain_name NVARCHAR(255) NOT NULL,
+  proof_details NVARCHAR(MAX) NOT NULL,
+  agreement_filename NVARCHAR(255) NULL,
+  status NVARCHAR(50) NOT NULL,
+  created_at DATETIME2 NOT NULL
+)
+
+CodebaseScans(
+  id INT IDENTITY PRIMARY KEY,
+  user_id INT NOT NULL,
+  target_path NVARCHAR(MAX) NOT NULL,
+  source_type NVARCHAR(50) NOT NULL,
+  scan_focus NVARCHAR(50) NOT NULL,
+  total_files INT NOT NULL,
+  critical_count INT NOT NULL,
+  warning_count INT NOT NULL,
+  info_count INT NOT NULL,
+  created_at DATETIME2 NOT NULL
+)
+
+CodebaseDependencies(
+  id INT IDENTITY PRIMARY KEY,
+  scan_id INT NOT NULL,
+  name NVARCHAR(255) NOT NULL,
+  version NVARCHAR(50) NOT NULL,
+  manager NVARCHAR(100) NOT NULL,
+  type NVARCHAR(100) NOT NULL,
+  created_at DATETIME2 NOT NULL
+)
+
+CodebaseScanFindings(
+  id INT IDENTITY PRIMARY KEY,
+  scan_id INT NOT NULL,
+  file_path NVARCHAR(MAX) NOT NULL,
+  line_number INT NOT NULL,
+  code_snippet NVARCHAR(MAX) NOT NULL,
+  category NVARCHAR(100) NOT NULL,
+  severity NVARCHAR(50) NOT NULL,
+  remediation NVARCHAR(MAX) NOT NULL,
   created_at DATETIME2 NOT NULL
 )
 ```

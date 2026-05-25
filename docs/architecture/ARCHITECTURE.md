@@ -347,6 +347,7 @@ To maintain strict execution sequencing and prevent Time-of-Check to Time-of-Use
 The historical record of codebase scans, dependencies, and state-transition audit trails is persisted inside MS SQL Server under the `dbo` schema:
 *   **`dbo.CodebaseScans`**: Stores metadata for each execution lifecycle scan, including total files processed, vulnerability counts, and scan targets.
 *   **`dbo.CodebaseDependencies`**: Maintains the mapping of dependencies associated with each scan ID, ensuring full tracking of dependency trees.
+*   **`dbo.CodebaseScanFindings`**: Persists each individual vulnerability or policy violation discovered during codebase scans (including file path, line number, category, severity, code snippet, and remediation).
 *   **`dbo.AuditLog`**: Logs every state progression and validation event (e.g., transition `s_a -> s_b`, actor details, execution duration).
 
 ### 7.3 Tier 3: Cryptographic Ledger Chain (Audit Ledger)

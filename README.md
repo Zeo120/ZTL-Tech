@@ -49,7 +49,7 @@ The backend is built using **Node.js** and **Express**. It runs a server on your
 #### Inside `backend/src/config/` (Settings & Database Connections)
 *   **`db.js`**: Connects the server to a Microsoft SQL Server database. It has safety checks to reuse database connections so we don't crash the database.
 *   **`env.js`**: Reads settings from the `.env` file and makes sure all required passwords and keys are present before starting.
-*   **`initDb.js`**: Automatically creates the database tables we need if they do not exist yet (like `Users`, `Pages`, `Widgets`, `AuditLog`, and `PhasrAudits`).
+*   **`initDb.js`**: Automatically creates the database tables we need if they do not exist yet (like `Users`, `Pages`, `Widgets`, `AuditLog`, `PhasrAudits`, `CodebaseScans`, `CodebaseDependencies`, and `CodebaseScanFindings`).
 *   **`redis.js`**: Connects the server to Redis (a super fast in-memory database used for tracking active user log-ins).
 
 #### Inside `backend/src/middleware/` (Security Guards)
