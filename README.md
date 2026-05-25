@@ -32,7 +32,7 @@ Here is a list of all folders and files, with a simple explanation of what each 
 *   **`docs/`**: The organized parent directory containing all design, architecture, phase-specific requirements, and physics equations documentation.
     *   **`docs/architecture/`**: Houses global system designs and compute balancer specifications.
     *   **`docs/phasr/`**: Houses context guides and requirements for the 5 validation phases and Satan's Recursion.
-    *   **`docs/equations/`**: Houses the proofs, derivations, and numerical examples for the mathematical models.
+    *   **`docs/equations/`**: Houses the proofs, derivations, and numerical examples for the mathematical models (including FSM transition logic, FDTD wave propagation, Kerr metric invariants, and the state-transition telemetry collection and Mahalanobis drift validation models).
 
 ---
 
@@ -118,7 +118,7 @@ PHASR is our security audit platform.
   * **`fsm_validator_linux_x64.s`**: Port of the FSM validator in **x86-64 GAS assembly** (Linux System V AMD64 ABI, Intel syntax). Auto-generated, 130,562 lines.
   * **`fsm_validator_linux_arm64.s`**: Port of the FSM validator in **ARM64 AArch64 GAS assembly** (Linux AAPCS64 ABI). Auto-generated, 130,559 lines.
   * **`fsm_validator_fallback.c`**: Pure-C fallback implementation of `validate_transition`, used when assembling on unsupported platforms.
-  * **`phase_fsm.c`**: The self-contained C test runner and FDTD numerical wave simulation (with state mappings and configuration constants inlined).
+  * **`phase_fsm.c`**: The self-contained C test runner and FDTD numerical wave simulation, updated to support the coupled state-transition telemetry data collection, multivariate Mahalanobis drift validation, and temporal velocity guards.
   * **`build.bat`**: The Windows build script using MSVC `ml64` and `cl`.
   * **`Makefile`**: Cross-platform build file. Automatically selects the x86-64 or ARM64 assembly back-end based on the host architecture.
 * **`phasr/Phase-2/`**: The source directory for Phase-2 hierarchy access boundary verification.
