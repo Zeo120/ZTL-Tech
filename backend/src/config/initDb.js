@@ -223,8 +223,43 @@ const tables = [
         sql: 'CREATE INDEX IX_CodebaseDependencies_scan_id ON dbo.CodebaseDependencies(scan_id);'
       }
     ]
+  },
+  {
+    name: 'CodebaseScanFindings',
+    createSql: `
+      CREATE TABLE dbo.CodebaseScanFindings (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CodebaseScanFindings PRIMARY KEY,
+        scan_id INT NOT NULL,
+        file_path NVARCHAR(MAX) NOT NULL,
+        line_number INT NOT NULL,
+        code_snippet NVARCHAR(MAX) NOT NULL,
+        category NVARCHAR(100) NOT NULL,
+        severity NVARCHAR(50) NOT NULL,
+        remediation NVARCHAR(MAX) NOT NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_CodebaseScanFindings_created_at DEFAULT SYSUTCDATETIME()
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'scan_id', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScanFindings_scan_id DEFAULT 0' },
+      { name: 'file_path', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_CodebaseScanFindings_file_path DEFAULT N\'\'' },
+      { name: 'line_number', sql: 'INT NOT NULL CONSTRAINT DF_CodebaseScanFindings_line_number DEFAULT 0' },
+      { name: 'code_snippet', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_CodebaseScanFindings_code_snippet DEFAULT N\'\'' },
+      { name: 'category', sql: 'NVARCHAR(100) NOT NULL CONSTRAINT DF_CodebaseScanFindings_category DEFAULT N\'\'' },
+      { name: 'severity', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_CodebaseScanFindings_severity DEFAULT N\'\'' },
+      { name: 'remediation', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_CodebaseScanFindings_remediation DEFAULT N\'\'' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CodebaseScanFindings_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_CodebaseScanFindings',
+    indexes: [
+      {
+        name: 'IX_CodebaseScanFindings_scan_id',
+        sql: 'CREATE INDEX IX_CodebaseScanFindings_scan_id ON dbo.CodebaseScanFindings(scan_id);'
+      }
+    ]
   }
 ];
+
 
 
 async function objectExists(pool, name, type) {
@@ -424,6 +459,7 @@ async function initDb() {
   await ensureForeignKey(pool, 'PhasrAudits', 'FK_PhasrAudits_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'CodebaseScans', 'FK_CodebaseScans_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'CodebaseDependencies', 'FK_CodebaseDependencies_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CodebaseScanFindings', 'FK_CodebaseScanFindings_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 

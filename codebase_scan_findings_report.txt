@@ -1,0 +1,1046 @@
+================================================================================
+PHASR VULNERABILITY AUDIT & CODEBASE SCAN FINDINGS REPORT
+================================================================================
+Generated on: 2026-05-25T10:49:53.676Z
+Target System: ZTL Tech Codebase Scans
+================================================================================
+
+--------------------------------------------------------------------------------
+SCAN ID: 2 | Target: d:/Project XT
+--------------------------------------------------------------------------------
+Scan Date: 2026-05-25T10:49:53.676Z
+Focus Area: full
+Source Type: offline
+Total Files Scanned: 103
+Severity Summary:
+  - Critical Vulnerabilities: 1
+  - Warning Vulnerabilities:  140
+  - Informational Notes:      5
+  - Total Findings:           146
+
+Dependencies Audited (0 found):
+  No package dependencies registered.
+
+Detailed Vulnerability Findings (146 found):
+  Finding #1: [Warning]
+    - File Path:    backend/src/app.js
+    - Line Number:  51
+    - Category:     Transition Discrepancy
+    - Code Snippet: res.redirect('/ztl_tech/index.html');
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #2: [Critical]
+    - File Path:    backend/src/config/initDb.js
+    - Line Number:  6
+    - Category:     Weak Login Logic
+    - Code Snippet: const ADMIN_PASSWORD = 'admin123';
+    - Remediation:  Remove hardcoded passwords, secrets, or API keys. Use environment configurations or secure secrets vaults.
+
+  Finding #3: [Warning]
+    - File Path:    backend/src/middleware/rateLimit.js
+    - Line Number:  11
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setInterval(...)
+    - Remediation:  Ensure interval loops are terminated via clearInterval() when context terminates or component unmounts.
+
+  Finding #4: [Warning]
+    - File Path:    backend/src/middleware/rateLimit.js
+    - Line Number:  56
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #5: [Info]
+    - File Path:    backend/src/routes/admin.routes.js
+    - Line Number:  292
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setTimeout(...)
+    - Remediation:  Clear active timeout timers via clearTimeout() to ensure routines do not trigger on stale components.
+
+  Finding #6: [Warning]
+    - File Path:    grid/index.html
+    - Line Number:  264
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary">Initiate GRID Assessment</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #7: [Warning]
+    - File Path:    grid/index.html
+    - Line Number:  306
+    - Category:     Transition Discrepancy
+    - Code Snippet: window.location.href = `mailto:Bhargavnarumanchi779@gmail.com?subject=${subject}&body=${body}`;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #8: [Warning]
+    - File Path:    grid/index.html
+    - Line Number:  294
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #9: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  374
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" oncli
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #10: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  383
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card active" id="card-suite-api" onclick="selectSuite('api')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #11: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  398
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card" id="card-suite-broker" onclick="selectSuite('broker')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #12: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  412
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card" id="card-suite-db" onclick="selectSuite('db')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #13: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  438
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-lb" onclick="toggleNode('lb')">Load Balancer</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #14: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  442
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-gw" onclick="toggleNode('gw')">Gateway Proxy</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #15: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  446
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-app" onclick="toggleNode('app')">App Clusters</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #16: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  447
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-cache" onclick="toggleNode('cache')">Redis Cache</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #17: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  451
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-mq" onclick="toggleNode('mq')">Kafka Queue</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #18: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  455
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-db" onclick="toggleNode('db')">DB Shard Nodes</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #19: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  456
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="blueprint-node active" id="node-rep" onclick="toggleNode('rep')">Read Replicas</div>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #20: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  497
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('app_node')">Kill App Node</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #21: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  498
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('cache_outage')">Cache Failure</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #22: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  499
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('region_loss')">Region Loss</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #23: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  500
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('redis_outage')">Redis Outage</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #24: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  501
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('packet_loss')">Packet Loss</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #25: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  502
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="fail-btn" onclick="injectFailure('repl_delay')">Replication Lag</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #26: [Warning]
+    - File Path:    grid/admin.html
+    - Line Number:  852
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #27: [Warning]
+    - File Path:    grid/login.html
+    - Line Number:  203
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Console</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #28: [Warning]
+    - File Path:    grid/login.html
+    - Line Number:  204
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #29: [Warning]
+    - File Path:    grid/login.html
+    - Line Number:  229
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Togg
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #30: [Warning]
+    - File Path:    grid/login.html
+    - Line Number:  239
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authenticate Session</but
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #31: [Warning]
+    - File Path:    grid/login.html
+    - Line Number:  339
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #32: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  353
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" oncli
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #33: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  362
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card active" id="card-suite-crm" onclick="selectSuite('crm')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #34: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  377
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card" id="card-suite-hr" onclick="selectSuite('hr')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #35: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  391
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="operator-panel suite-card" id="card-suite-ops" onclick="selectSuite('ops')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #36: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  737
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: node.onclick = () => selectFileNode(idx);
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #37: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  762
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #38: [Info]
+    - File Path:    paradigm/admin.html
+    - Line Number:  682
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setTimeout(...)
+    - Remediation:  Clear active timeout timers via clearTimeout() to ensure routines do not trigger on stale components.
+
+  Finding #39: [Warning]
+    - File Path:    paradigm/admin.html
+    - Line Number:  576
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #40: [Warning]
+    - File Path:    paradigm/login.html
+    - Line Number:  203
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Console</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #41: [Warning]
+    - File Path:    paradigm/login.html
+    - Line Number:  204
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #42: [Warning]
+    - File Path:    paradigm/login.html
+    - Line Number:  229
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Togg
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #43: [Warning]
+    - File Path:    paradigm/login.html
+    - Line Number:  239
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authenticate Session</but
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #44: [Warning]
+    - File Path:    paradigm/login.html
+    - Line Number:  339
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #45: [Warning]
+    - File Path:    paradigm/index.html
+    - Line Number:  266
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary">Request Custom Architecture</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #46: [Warning]
+    - File Path:    paradigm/index.html
+    - Line Number:  308
+    - Category:     Transition Discrepancy
+    - Code Snippet: window.location.href = `mailto:Bhargavnarumanchi779@gmail.com?subject=${subject}&body=${body}`;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #47: [Warning]
+    - File Path:    paradigm/index.html
+    - Line Number:  296
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #48: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  502
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" oncli
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #49: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  507
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card active" id="card-t-1" onclick="selectPhase(-1)">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #50: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  517
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card" id="card-t1" onclick="selectPhase(1); runPhaseAudit(1); window.open('nerd-stats.html?phase=1', '
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #51: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  527
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card" id="card-t2" onclick="selectPhase(2); runPhaseAudit(2); window.open('nerd-stats.html?phase=2', '
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #52: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  537
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card" id="card-t3" onclick="selectPhase(3); runPhaseAudit(3); window.open('nerd-stats.html?phase=3', '
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #53: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  547
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card" id="card-t4" onclick="selectPhase(4); runPhaseAudit(4); window.open('nerd-stats.html?phase=4', '
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #54: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  557
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="phase-card" id="card-t5" onclick="selectPhase(5); runPhaseAudit(5); window.open('nerd-stats.html?phase=5', '
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #55: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  732
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" id="stats-nerds-btn" style="width:100%; margin-top:1.2rem; padding:0.5rem; font-size:0.75rem
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #56: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  734
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;" onclick="resetFree
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #57: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  757
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="width:100%; margin-top:0.5rem; padding:0.5rem; font-size:0.75rem;">${da
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #58: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  786
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" id="codebase-stats-btn" style="width:100%; margin-top:0.6rem; padding:0.5rem; font-size:0.75
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #59: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  787
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:0.4rem; padding:0.5rem; font-size:0.75rem;" onclick="resetCode
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #60: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  816
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="width:100%; margin-top:0.3rem; padding:0.5rem; font-size:0.75rem;">Laun
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #61: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  835
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="role-node active" id="role-sa" onclick="selectRole('sa')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #62: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  839
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="role-node" id="role-a" onclick="selectRole('a')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #63: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  843
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="role-node" id="role-s" onclick="selectRole('s')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #64: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  847
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div class="role-node danger-node" id="role-g" onclick="selectRole('g')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #65: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  873
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <rect class="svg-node" id="svg-node-browser" x="10" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" 
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #66: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  877
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <rect class="svg-node" id="svg-node-gateway" x="110" y="20" width="100" height="50" rx="6" fill="rgba(255,0,60,0.05)" st
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #67: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  881
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <rect class="svg-node" id="svg-node-auth" x="220" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" st
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #68: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  885
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <rect class="svg-node" id="svg-node-redis" x="330" y="20" width="100" height="50" rx="6" fill="rgba(255,255,255,0.03)" s
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #69: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  889
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <rect class="svg-node" id="svg-node-db" x="440" y="20" width="110" height="50" rx="6" fill="rgba(255,255,255,0.03)" stro
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #70: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  899
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:1.5rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseA
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #71: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  922
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAud
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #72: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  934
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="transition-btn active" id="btn-tr-gu" onclick="runTransitionAudit('gu')">guest → user</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #73: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  935
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="transition-btn" id="btn-tr-ua" onclick="runTransitionAudit('ua')">user → admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #74: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  936
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="transition-btn" id="btn-tr-as" onclick="runTransitionAudit('as')">admin → super-admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #75: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  943
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAud
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #76: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  954
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="padding: 0.6rem; font-size: 0.8rem; width: 100%;" id="failover-btn" onclick="startFai
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #77: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  960
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAud
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #78: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  975
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="width:100%; margin-top:1rem; padding:0.4rem; font-size:0.75rem;" onclick="runPhaseAud
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #79: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  984
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #80: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1022
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #81: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1052
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #82: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1079
+    - Category:     Weak Login Logic
+    - Code Snippet: localStorage.setItem('latestCodebaseReport', JSON.stringify(latestCodebaseReport));
+    - Remediation:  Avoid saving authentication credentials or state keys inside localStorage. Use secure HTTP-only cookies.
+
+  Finding #83: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1181
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #84: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1227
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #85: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1306
+    - Category:     Weak Login Logic
+    - Code Snippet: localStorage.setItem('latestAuditReport', JSON.stringify(latestAuditReport));
+    - Remediation:  Avoid saving authentication credentials or state keys inside localStorage. Use secure HTTP-only cookies.
+
+  Finding #86: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1318
+    - Category:     Weak Login Logic
+    - Code Snippet: localStorage.setItem('latestCodebaseReport', JSON.stringify(latestCodebaseReport));
+    - Remediation:  Avoid saving authentication credentials or state keys inside localStorage. Use secure HTTP-only cookies.
+
+  Finding #87: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1329
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #88: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1345
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <div onclick="openCodebaseStatsPage(${s.id})" style="cursor:pointer; background:rgba(255,255,255,0.02); border:1px solid
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #89: [Info]
+    - File Path:    phasr/admin.html
+    - Line Number:  826
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setTimeout(...)
+    - Remediation:  Clear active timeout timers via clearTimeout() to ensure routines do not trigger on stale components.
+
+  Finding #90: [Warning]
+    - File Path:    phasr/admin.html
+    - Line Number:  1437
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #91: [Warning]
+    - File Path:    phasr/index.html
+    - Line Number:  268
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary">Initiate PHASR Audit</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #92: [Warning]
+    - File Path:    phasr/index.html
+    - Line Number:  310
+    - Category:     Transition Discrepancy
+    - Code Snippet: window.location.href = `mailto:Bhargavnarumanchi779@gmail.com?subject=${subject}&body=${body}`;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #93: [Warning]
+    - File Path:    phasr/index.html
+    - Line Number:  298
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #94: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  342
+    - Category:     Transition Discrepancy
+    - Code Snippet: const params = new URLSearchParams(window.location.search);
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #95: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  350
+    - Category:     Weak Login Logic
+    - Code Snippet: const auditDataStr = localStorage.getItem('latestAuditReport');
+    - Remediation:  Avoid saving authentication credentials or state keys inside localStorage. Use secure HTTP-only cookies.
+
+  Finding #96: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  351
+    - Category:     Weak Login Logic
+    - Code Snippet: const codebaseDataStr = localStorage.getItem('latestCodebaseReport');
+    - Remediation:  Avoid saving authentication credentials or state keys inside localStorage. Use secure HTTP-only cookies.
+
+  Finding #97: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  367
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #98: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  867
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #99: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  925
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setInterval(...)
+    - Remediation:  Ensure interval loops are terminated via clearInterval() when context terminates or component unmounts.
+
+  Finding #100: [Warning]
+    - File Path:    phasr/nerd-stats.html
+    - Line Number:  472
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #101: [Warning]
+    - File Path:    phasr/login.html
+    - Line Number:  203
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Console</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #102: [Warning]
+    - File Path:    phasr/login.html
+    - Line Number:  204
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #103: [Warning]
+    - File Path:    phasr/login.html
+    - Line Number:  229
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Togg
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #104: [Warning]
+    - File Path:    phasr/login.html
+    - Line Number:  239
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authenticate Session</but
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #105: [Warning]
+    - File Path:    phasr/login.html
+    - Line Number:  339
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #106: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  353
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" oncli
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #107: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  372
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(1)">Run Flow</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #108: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  382
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(2)">Run Flow</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #109: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  392
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="padding:0.25rem 0.5rem; font-size:0.68rem;" onclick="runCronJob(3)">Run Flow</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #110: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  409
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem;" id="dispatch-swarm-btn" onclick="dispatchA
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #111: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  464
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="breaker-btn" onclick="tripAutoHealer('db_crash')">Simulate DB Crash</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #112: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  465
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="breaker-btn" onclick="tripAutoHealer('cache_stall')">Simulate Cache Outage</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #113: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  466
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="breaker-btn" onclick="tripAutoHealer('queue_stall')">Queue Stall</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #114: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  467
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="breaker-btn" onclick="tripAutoHealer('timeout')">Service Timeout</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #115: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  609
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="appr-btn approve" onclick="handleOperatorApproval(true)">Approve Action</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #116: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  610
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="appr-btn reject" onclick="handleOperatorApproval(false)">Reject Action</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #117: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  701
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #118: [Warning]
+    - File Path:    scalpel/admin.html
+    - Line Number:  654
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #119: [Warning]
+    - File Path:    scalpel/index.html
+    - Line Number:  263
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary">Initiate SCALPEL Blueprint</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #120: [Warning]
+    - File Path:    scalpel/index.html
+    - Line Number:  305
+    - Category:     Transition Discrepancy
+    - Code Snippet: window.location.href = `mailto:Bhargavnarumanchi779@gmail.com?subject=${subject}&body=${body}`;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #121: [Warning]
+    - File Path:    scalpel/index.html
+    - Line Number:  293
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #122: [Warning]
+    - File Path:    scalpel/login.html
+    - Line Number:  203
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Console</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #123: [Warning]
+    - File Path:    scalpel/login.html
+    - Line Number:  204
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #124: [Warning]
+    - File Path:    scalpel/login.html
+    - Line Number:  229
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Togg
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #125: [Warning]
+    - File Path:    scalpel/login.html
+    - Line Number:  239
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authenticate Session</but
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #126: [Warning]
+    - File Path:    scalpel/login.html
+    - Line Number:  339
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #127: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  391
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('health')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #128: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  397
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('cache')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #129: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  403
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('refresh')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #130: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  409
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('reset')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #131: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  490
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #132: [Info]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  443
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setTimeout(...)
+    - Remediation:  Clear active timeout timers via clearTimeout() to ensure routines do not trigger on stale components.
+
+  Finding #133: [Warning]
+    - File Path:    ztl_tech/admin.html
+    - Line Number:  479
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #134: [Warning]
+    - File Path:    ztl_tech/login.html
+    - Line Number:  49
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary" id="login-button">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #135: [Warning]
+    - File Path:    ztl_tech/login.html
+    - Line Number:  67
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #136: [Warning]
+    - File Path:    ztl_tech/index.html
+    - Line Number:  1133
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button type="submit" class="btn-primary">Send Brief</button>
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #137: [Warning]
+    - File Path:    ztl_tech/index.html
+    - Line Number:  1166
+    - Category:     Transition Discrepancy
+    - Code Snippet: window.location.href = `mailto:Bhargavnarumanchi779@gmail.com?subject=${subject}&body=${body}`;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #138: [Warning]
+    - File Path:    ztl_tech/index.html
+    - Line Number:  1161
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+
+  Finding #139: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  261
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 0.6rem 1.4rem; font-size: 0.85rem;" oncl
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #140: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  395
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('phasr')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #141: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  401
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('grid')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #142: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  407
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('scalpel')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #143: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  413
+    - Category:     Action CSRF Vulnerability
+    - Code Snippet: <button class="btn-panel" onclick="triggerAction('reset')">
+    - Remediation:  Enforce anti-CSRF headers or CSRF validation tokens on state-changing API request channels and event listeners.
+
+  Finding #144: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  536
+    - Category:     Transition Discrepancy
+    - Code Snippet: const origin = window.location.origin;
+    - Remediation:  Verify user authorization status or role permissions prior to executing navigation redirections.
+
+  Finding #145: [Info]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  447
+    - Category:     Resource/Timer Leak
+    - Code Snippet: setTimeout(...)
+    - Remediation:  Clear active timeout timers via clearTimeout() to ensure routines do not trigger on stale components.
+
+  Finding #146: [Warning]
+    - File Path:    ztl_tech/super_admin.html
+    - Line Number:  525
+    - Category:     Resource/Timer Leak
+    - Code Snippet: Socket / Connection initialization
+    - Remediation:  Close active sockets, network interfaces, or channels using close() or disconnect() routines.
+

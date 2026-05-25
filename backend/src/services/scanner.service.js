@@ -583,6 +583,86 @@ async function runCodebaseScan({ userId, sourceType, targetPath, scanFocus, ip, 
             `);
         }
       }
+
+      if (findings && findings.length > 0) {
+        for (const finding of findings) {
+          await pool.request()
+            .input('scanId', sql.Int, scanId)
+            .input('filePath', sql.NVarChar(sql.MAX), finding.file || '')
+            .input('lineNumber', sql.Int, finding.line || 0)
+            .input('codeSnippet', sql.NVarChar(sql.MAX), finding.code || '')
+            .input('category', sql.NVarChar(100), finding.category || '')
+            .input('severity', sql.NVarChar(50), finding.severity || '')
+            .input('remediation', sql.NVarChar(sql.MAX), finding.remediation || '')
+            .query(`
+              INSERT INTO CodebaseScanFindings (scan_id, file_path, line_number, code_snippet, category, severity, remediation, created_at)
+              VALUES (@scanId, @filePath, @lineNumber, @codeSnippet, @category, @severity, @remediation, SYSUTCDATETIME());
+            `);
+        }
+      }
+
+      // Generate the text report
+      let reportText = `================================================================================
+PHASR VULNERABILITY AUDIT & CODEBASE SCAN FINDINGS REPORT
+================================================================================
+Generated on: ${new Date().toISOString()}
+Target System: ZTL Tech Codebase Scans
+================================================================================
+
+--------------------------------------------------------------------------------
+SCAN ID: ${scanId} | Target: ${targetPath}
+--------------------------------------------------------------------------------
+Scan Date: ${new Date().toISOString()}
+Focus Area: ${scanFocus}
+Source Type: ${sourceType}
+Total Files Scanned: ${filePaths.length}
+Severity Summary:
+  - Critical Vulnerabilities: ${criticalCount}
+  - Warning Vulnerabilities:  ${warningCount}
+  - Informational Notes:      ${infoCount}
+  - Total Findings:           ${findings.length}
+
+`;
+
+      reportText += `Dependencies Audited (${dependencies.length} found):\n`;
+      if (dependencies.length === 0) {
+        reportText += `  No package dependencies registered.\n`;
+      } else {
+        for (const dep of dependencies) {
+          reportText += `  - [${dep.manager}] ${dep.name} (${dep.version}) - Type: ${dep.type}\n`;
+        }
+      }
+      reportText += `\n`;
+
+      reportText += `Detailed Vulnerability Findings (${findings.length} found):\n`;
+      if (findings.length === 0) {
+        reportText += `  No vulnerabilities or informational notes detected in this scan.\n`;
+      } else {
+        findings.forEach((finding, idx) => {
+          reportText += `  Finding #${idx + 1}: [${finding.severity || 'UNKNOWN'}]\n`;
+          reportText += `    - File Path:    ${finding.file || 'N/A'}\n`;
+          reportText += `    - Line Number:  ${finding.line || 'N/A'}\n`;
+          reportText += `    - Category:     ${finding.category || 'N/A'}\n`;
+          reportText += `    - Code Snippet: ${finding.code || 'N/A'}\n`;
+          reportText += `    - Remediation:  ${finding.remediation || 'N/A'}\n\n`;
+        });
+      }
+
+      // Write report to the target directory if it is offline and exists
+      if (sourceType === 'offline' && fs.existsSync(targetPath)) {
+        try {
+          fs.writeFileSync(path.join(targetPath, 'codebase_scan_findings_report.txt'), reportText, 'utf8');
+        } catch (err) {
+          console.error(`Failed to write findings report to target path ${targetPath}:`, err);
+        }
+      }
+
+      // Always write to workspace root for quick user access
+      try {
+        fs.writeFileSync('d:/Project XT/codebase_scan_findings_report.txt', reportText, 'utf8');
+      } catch (err) {
+        console.error('Failed to write findings report to workspace root:', err);
+      }
     } catch (dbErr) {
       console.error('Failed to save codebase scan telemetry to database:', dbErr);
     }

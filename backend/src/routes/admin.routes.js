@@ -779,29 +779,23 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
       ORDER BY manager, name;
     `);
 
-  // Fetch the final vulnerability report from audit log (stored as metadata JSON)
-  const auditResult = await pool.request()
-    .input('userId', sql.Int, userId)
-    .input('targetPath', sql.NVarChar(sql.MAX), scan.target_path)
+  // Fetch the vulnerability findings from CodebaseScanFindings
+  const findingsResult = await pool.request()
+    .input('scanId', sql.Int, scanId)
     .query(`
-      SELECT TOP 1 metadata_json, created_at
-      FROM dbo.AuditLog
-      WHERE actor_user_id = @userId
-        AND action = 'phasr.vulnerability_report_generated'
-        AND target_id = @targetPath
-      ORDER BY created_at DESC;
+      SELECT 
+        file_path AS [file], 
+        line_number AS line, 
+        code_snippet AS code, 
+        category, 
+        severity, 
+        remediation
+      FROM dbo.CodebaseScanFindings
+      WHERE scan_id = @scanId
+      ORDER BY id ASC;
     `);
 
-  let findings = [];
-  let reportMeta = null;
-  if (auditResult.recordset[0] && auditResult.recordset[0].metadata_json) {
-    try {
-      reportMeta = JSON.parse(auditResult.recordset[0].metadata_json);
-      findings = reportMeta.findings || [];
-    } catch (_) {
-      findings = [];
-    }
-  }
+  const findings = findingsResult.recordset;
 
   return ok(res, {
     scan: {
