@@ -1,0 +1,149 @@
+================================================================================
+PHASR STATE-TRANSITION TELEMETRY & DRIFT ATTESTATION SUMMARY
+================================================================================
+Date: 2026-05-25
+System Version: PHASR Core v1.5 (Production Spec)
+================================================================================
+
+1. ARCHITECTURAL OVERVIEW
+--------------------------------------------------------------------------------
+This document summarizes the mathematical specifications, data flows, and code
+verification results for the coupled FSM state-transition telemetry capture,
+multivariate drift validation, and temporal velocity guards implemented in PHASR.
+
+To prevent Time-of-Check to Time-of-Use (TOCTOU) exploits and script-based
+transition bypasses, the Phase-1 FSM sequence check is hard-coupled with real-time
+system metrics during lifecycle progression.
+
+
+2. CORE MATHEMATICAL MODEL
+--------------------------------------------------------------------------------
+When transitioning from state s_a to state s_b at time t, the composite
+attestation score (D_P') is evaluated as:
+
+    D_P' = D_P * 1[D_M(T) <= chi^2] * 1[delta_t in [tau_min, tau_max]]
+
+where:
+
+*   D_P = delta(s_a, s_b) * Product_{j=1..m} Pre_j(s_b)
+    (The structural FSM sequence check, evaluated in hand-written assembly).
+
+*   T_{a -> b} = [X_1(t), X_2(t), ..., X_d(t)]^T
+    (The collected telemetry vector containing syscall frequencies, network
+    throughput, CPU load, and file descriptors).
+
+*   D_M(T) = sqrt( (T - mu_a)^T * Sigma_inv_a * (T - mu_a) )
+    (The Mahalanobis distance checking system profile drift inside the
+    covariance ellipsoid of the source state s_a).
+
+*   delta_t = t_b - t_a
+    (The transition duration, checked against minimum speed limit tau_min
+    and maximum stall threshold tau_max).
+
+*   H_i = SHA-256( H_{i-1} || s_i || T_{i-1 -> i} || D_P' )
+    (The cryptographic chaining of attestation records in the append-only ledger).
+
+
+3. MULTI-TIERED STATE STORAGE MAPPING
+--------------------------------------------------------------------------------
+State and validation telemetry are persisted across four distinct tiers:
+
+*   Tier 1: Transient In-Memory State (Hot-Path)
+    FSM state and prerequisites are held directly in CPU registers (RCX/RDX/R8).
+    Telemetry metrics are cached inside thread-local stacks (ring_buffer_t) to
+    ensure 100% thread isolation and thread-safe execution.
+
+*   Tier 2: Relational Schema (SQL Server Persistence)
+    Scan metadata, identified file dependencies, and transition logs are stored
+    under the dbo schema inside the following tables:
+    - dbo.CodebaseScans
+    - dbo.CodebaseDependencies
+    - dbo.AuditLog (success, action, metadata_json)
+
+*   Tier 3: Cryptographic Ledger (Merkle Hash Chain)
+    Chained attestation block hashes (H_i) are persisted in the append-only
+    ledger database (AuditDb) to prevent history alteration.
+
+*   Tier 4: Time-Series Analytics (Historical Drift Store)
+    High-frequency metrics and wave amplitudes are routed via NATS JetStream (P1)
+    to a TSDB (Time Series Database) for long-term drift tracking.
+
+
+4. COMPILATION & UNIT TEST RESULTS
+--------------------------------------------------------------------------------
+The suite was compiled using MSVC with security flags (/O2 /W4 /WX /GS /guard:cf)
+and linked with the MASM assembly backend.
+
+Console Test Output:
+--------------------------------------------------------------------------------
+PHASR Phase-1: Temporal Execution Validator Suite
+Core Engine: x86-64 Assembly FSM & C Wave Sim
+==================================================
+
+[1/2] Running 2200 Generated Assembly FSM Assertions...
+      Assertions Run: 2200
+      Passed: 2200 | Failed: 0
+      SUCCESS: All FSM boundary edge cases passed validation.
+
+[1.5/2] Running Coupled State-Transition Telemetry & Drift Validator Tests...
+      Test 1 (Normal Transition): ALLOWED (Expected: ALLOWED)
+      Test 2 (Leapfrog Sequence): BLOCKED (Expected: BLOCKED)
+      Test 3 (Timing Bypass Guard): BLOCKED (Expected: BLOCKED)
+      Test 4 (Telemetry Drift Guard): BLOCKED (Expected: BLOCKED)
+
+[2/2] Running Wave Equation Invariant Telemetry Simulation...
+      Equation: d^2(phi)/dt^2 - v^2 * del^2(phi) = sin(omega * t)
+
+  --- Telemetry Wave Edge Cases Assertions ---
+  [WARNING] Telemetry query step bypassed: dt must be positive (Received: 0.000000)
+  [WARNING] Telemetry query step bypassed: dt must be positive (Received: -0.500000)
+  --------------------------------------------
+
+  [Step 013 | Heartbeat Amp: +0.2377]
+  +----------------------------------------+
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  |                    *                   |
+  |oooooooooooooooooooo-ooooooooooooooooooo|
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  +----------------------------------------+
+
+  [VIOLATION] State-transition check failed (D_P' = 0)! Injecting high-amplitude shock wave...
+  [Step 016 | Heartbeat Amp: +0.2955]
+  +----------------------------------------+
+  |                                        |
+  |                    *                   |
+  |                                        |
+  |                                        |
+  |                   * *                  |
+  |ooooooooooooooooooo---oooooooooooooooooo|
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  +----------------------------------------+
+
+  [Step 019 | Heartbeat Amp: +0.3523]
+  +----------------------------------------+
+  |                   * *                  |
+  |                    *                   |
+  |                                        |
+  |                  *   *                 |
+  |                 *     *                |
+  |ooooooooooooooooo-------oooooooooooooooo|
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  |                                        |
+  +----------------------------------------+
+
+Wave simulation telemetry sequence complete.
+================================================================================
