@@ -26673,7 +26673,7 @@ void init_wave_sim(wave_sim_t *sim) {
     sim->step = 0;
 }
 
-void step_wave_sim(wave_sim_t *sim, float dt) {
+void step_wave_sim_coupled(wave_sim_t *sim, float dt, int d_p_prime) {
     int i;
     float r2 = WAVE_COURANT * WAVE_COURANT;
     int source_idx = WAVE_GRID_SIZE / 2;
@@ -26702,8 +26702,12 @@ void step_wave_sim(wave_sim_t *sim, float dt) {
         }
     }
 
-    // Source driving term
+    // Source driving term: sinusoidal heartbeat plus violation shock pulse if validation fails
     sim->phi_next[source_idx] += dt * dt * sim->source_amplitude * 10.0f;
+    if (d_p_prime == 0) {
+        printf("  [VIOLATION] State-transition check failed (D_P' = 0)! Injecting high-amplitude shock wave...\n");
+        sim->phi_next[source_idx] += dt * dt * 100.0f; // huge anomaly pulse
+    }
 
     // Dirichlet boundary conditions (zero clamp at edges)
     sim->phi_next[0] = 0.0f;
@@ -26714,6 +26718,10 @@ void step_wave_sim(wave_sim_t *sim, float dt) {
     memcpy(sim->phi, sim->phi_next, sizeof(sim->phi));
     
     sim->step++;
+}
+
+void step_wave_sim(wave_sim_t *sim, float dt) {
+    step_wave_sim_coupled(sim, dt, 1);
 }
 
 void print_wave_profile(const wave_sim_t *sim) {
@@ -26757,6 +26765,115 @@ void print_wave_profile(const wave_sim_t *sim) {
     printf("  +----------------------------------------+\n");
 }
 
+// ============================================================================
+// Workflow 1 Extension: Coupled State-Transition Telemetry & Drift Validator
+// ============================================================================
+
+#define TELEMETRY_DIM 4
+
+// Calculates the Mahalanobis distance: D_M = sqrt( (T - mu)^T * Sigma_inv * (T - mu) )
+static float compute_mahalanobis_distance(const float *T, const float *mu, const float *Sigma_inv, int d) {
+    float diff[8];
+    int i, j;
+    for (i = 0; i < d; i++) {
+        diff[i] = T[i] - mu[i];
+    }
+    
+    float sum = 0.0f;
+    for (i = 0; i < d; i++) {
+        float temp = 0.0f;
+        for (j = 0; j < d; j++) {
+            temp += diff[j] * Sigma_inv[j * d + i];
+        }
+        sum += temp * diff[i];
+    }
+    return sqrtf(sum);
+}
+
+// Composite validation score: D_P' = D_P * 1[D_M(T) <= crit] * 1[delta_t in [tau_min, tau_max]]
+int validate_transition_composite(
+    int current_state,
+    int next_state,
+    uint64_t prerequisites,
+    const float *telemetry_vector,
+    const float *baseline_mean,
+    const float *cov_matrix_inv,
+    int d,
+    float critical_value,
+    double delta_t,
+    double tau_min,
+    double tau_max
+) {
+    // 1. Structural FSM check
+    int D_P = validate_transition(current_state, next_state, prerequisites);
+    if (D_P == 0) return 0;
+    
+    // State 0 transition (reset) is unconditionally legal
+    if (next_state == 0) return 1;
+
+    // 2. Temporal velocity validation
+    if (delta_t < tau_min || delta_t > tau_max) return 0;
+
+    // 3. Multivariate telemetry drift check (Mahalanobis distance)
+    float D_M = compute_mahalanobis_distance(telemetry_vector, baseline_mean, cov_matrix_inv, d);
+    if (D_M > critical_value) return 0;
+
+    return 1;
+}
+
+static void run_composite_validator_tests(void) {
+    printf("[1.5/2] Running Coupled State-Transition Telemetry & Drift Validator Tests...\n");
+    
+    // Baseline mean profile: syscalls=100/sec, network=50KB/s, CPU=12%, files=25
+    float baseline_mean[TELEMETRY_DIM] = {100.0f, 50.0f, 12.0f, 25.0f};
+
+    // Inverse covariance matrix (Sigma_inv_ii = 1.0 / variance_i)
+    float cov_matrix_inv[TELEMETRY_DIM * TELEMETRY_DIM] = {
+        0.01f, 0.0f,  0.0f,  0.0f,   // variance of syscalls = 100
+        0.0f,  0.04f, 0.0f,  0.0f,   // variance of network = 25
+        0.0f,  0.0f,  0.25f, 0.0f,   // variance of CPU = 4
+        0.0f,  0.0f,  0.0f,  0.16f   // variance of files = 6.25
+    };
+
+    float critical_val = 3.0f;
+
+    // Test Case 1: Ideal transition (within bounds)
+    float telemetry_ideal[TELEMETRY_DIM] = {102.0f, 48.0f, 11.5f, 24.0f};
+    int res1 = validate_transition_composite(
+        0, 1, PREREQ_CONTRACT_SIGNED,
+        telemetry_ideal, baseline_mean, cov_matrix_inv, TELEMETRY_DIM,
+        critical_val, 0.5, 0.1, 5.0
+    );
+    printf("      Test 1 (Normal Transition): %s (Expected: ALLOWED)\n", res1 ? "ALLOWED" : "BLOCKED");
+
+    // Test Case 2: Out-of-bounds FSM sequence (leapfrog attempt 0 -> 2)
+    int res2 = validate_transition_composite(
+        0, 2, PREREQ_CONTRACT_SIGNED | PREREQ_DISCOVERY_COMPLETE,
+        telemetry_ideal, baseline_mean, cov_matrix_inv, TELEMETRY_DIM,
+        critical_val, 0.5, 0.1, 5.0
+    );
+    printf("      Test 2 (Leapfrog Sequence): %s (Expected: BLOCKED)\n", res2 ? "ALLOWED" : "BLOCKED");
+
+    // Test Case 3: Timing bypass (transition happens too fast)
+    int res3 = validate_transition_composite(
+        0, 1, PREREQ_CONTRACT_SIGNED,
+        telemetry_ideal, baseline_mean, cov_matrix_inv, TELEMETRY_DIM,
+        critical_val, 0.005, 0.1, 5.0
+    );
+    printf("      Test 3 (Timing Bypass Guard): %s (Expected: BLOCKED)\n", res3 ? "ALLOWED" : "BLOCKED");
+
+    // Test Case 4: Telemetry drift anomaly (syscall rate spikes to 250/sec)
+    float telemetry_drift[TELEMETRY_DIM] = {250.0f, 48.0f, 45.0f, 24.0f};
+    int res4 = validate_transition_composite(
+        0, 1, PREREQ_CONTRACT_SIGNED,
+        telemetry_drift, baseline_mean, cov_matrix_inv, TELEMETRY_DIM,
+        critical_val, 0.5, 0.1, 5.0
+    );
+    printf("      Test 4 (Telemetry Drift Guard): %s (Expected: BLOCKED)\n", res4 ? "ALLOWED" : "BLOCKED");
+    
+    printf("\n");
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
@@ -26782,6 +26899,9 @@ int main(int argc, char **argv) {
         printf("      WARNING: Core FSM validation failure detected!\n\n");
     }
 
+    // Run the newly coupled composite transition validator tests
+    run_composite_validator_tests();
+
     printf("[2/2] Running Wave Equation Invariant Telemetry Simulation...\n");
     printf("      Equation: d^2(phi)/dt^2 - v^2 * del^2(phi) = sin(omega * t)\n\n");
 
@@ -26796,7 +26916,9 @@ int main(int argc, char **argv) {
 
     float dt = 0.1f;
     for (int step = 0; step < 30; step++) {
-        step_wave_sim(&sim, dt);
+        // Trigger a simulated telemetry/sequence anomaly violation (D_P' = 0) at step 15
+        int d_p_prime = (step == 15) ? 0 : 1;
+        step_wave_sim_coupled(&sim, dt, d_p_prime);
         if (step % 3 == 0) {
             print_wave_profile(&sim);
             printf("\n");
