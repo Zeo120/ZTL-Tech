@@ -61,21 +61,27 @@ the assembly gates reject any such query with a hard `0` return.
 For a query $(C, N, P)$ where $C$ is the current state, $N$ is the requested next state,
 and $P \in \mathbb{Z}_{64}$ is the 64-bit prerequisite bitmask:
 
-$$\text{prereq\_bit}(N) = \begin{cases} N - 1 & \text{if } N > 0 \\ 0 & \text{if } N = 0 \end{cases}$$
+$$
+p_{\text{req}}(N) = \begin{cases} N - 1 & \text{if } N > 0 \\ 0 & \text{if } N = 0 \end{cases}
+$$
 
 **Transition validity:**
 
-$$\text{Valid}(C, N, P) = \begin{cases} 1 & \text{if } N = 0 \quad \text{(reset — always legal)} \\ 0 & \text{if } N \neq C + 1 \quad \text{(out-of-sequence — always blocked)} \\ \left\lfloor \dfrac{P \;\&\; \left(1 \ll \text{prereq\_bit}(N)\right)}{1 \ll \text{prereq\_bit}(N)} \right\rfloor & \text{if } N = C + 1 \end{cases}$$
+$$
+\text{Valid}(C, N, P) = \begin{cases} 1 & \text{if } N = 0 \quad \text{(reset — always legal)} \\ 0 & \text{if } N \neq C + 1 \quad \text{(out-of-sequence — always blocked)} \\ \left\lfloor \dfrac{P \ \text{AND} \ \left(1 \ll p_{\text{req}}(N)\right)}{1 \ll p_{\text{req}}(N)} \right\rfloor & \text{if } N = C + 1 \end{cases}
+$$
 
-The last case extracts a single bit: if bit `prereq_bit` is set in $P$ the result is `1`
-(allowed); if clear the result is `0` (blocked).
+The last case extracts a single bit: if bit $p_{\text{req}}$ is set in $P$ the result is $1$
+(allowed); if clear the result is $0$ (blocked).
 
 ### Derivation
 The bitmask formula is equivalent to the Boolean expression:
 
-$$\text{Valid} = \mathbb{1}\!\left[P \;\&\; \left(1 \ll (N-1)\right) \neq 0\right]$$
+$$
+\text{Valid} = \mathbf{1}\!\left[\left(P \ \text{AND} \ \left(1 \ll (N-1)\right)\right) \neq 0\right]
+$$
 
-where $\mathbb{1}[\cdot]$ is the Iverson bracket. This is implemented directly in MASM as a
+where $\mathbf{1}[\cdot]$ is the Iverson bracket. This is implemented directly in MASM as a
 `BT` (bit-test) instruction operating on register `r8` (prerequisite), with the bit index
 derived from `rdx` (next state):
 
@@ -262,11 +268,15 @@ zero tolerance for partial compliance.
 Let $X_j$ be the current measured value of telemetry parameter $j$, and let $[L_k, U_k]$
 be the safety interval for invariant $k$ targeting parameter $j(k)$:
 
-$$\text{Inv}_k = \mathbb{1}\!\left[L_k \leq X_{j(k)} \leq U_k\right] = \begin{cases} 1 & \text{in bounds} \\ 0 & \text{out of bounds} \end{cases}$$
+$$
+\text{Inv}_k = \mathbf{1}\!\left[L_k \leq X_{j(k)} \leq U_k\right] = \begin{cases} 1 & \text{in bounds} \\ 0 & \text{out of bounds} \end{cases}
+$$
 
 **Invariant Attestation Score:**
 
-$$\boxed{D_A = \prod_{k=0}^{4499} \text{Inv}_k}$$
+$$
+D_A = \prod_{k=0}^{4499} \text{Inv}_k
+$$
 
 | $D_A$ | Interpretation |
 |-------|----------------|
