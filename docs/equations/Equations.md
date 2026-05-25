@@ -28,6 +28,7 @@
 | 12 | [Metric Modulation via Telemetry Coupling](#12-metric-modulation-via-telemetry-coupling) | Satan's Recursion | — |
 | 13 | [Carter's Constant — Kerr Geodesic Invariant](#13-carters-constant--kerr-geodesic-invariant) | Satan's Recursion | — |
 | 14 | [Kerr Metric Coefficients in Boyer-Lindquist Coordinates](#14-kerr-metric-coefficients-in-boyer-lindquist-coordinates) | Satan's Recursion | — |
+| 15 | [State-Transition Telemetry Data Collection](#15-state-transition-telemetry-data-collection) | Phase 1 / FSM | — |
 
 ---
 
@@ -816,6 +817,66 @@ $$\rho^2(r,\theta) = r^2 + a^2\cos^2\theta \qquad \text{(conformal factor)}$$
 $$0 \leq |a| \leq M \qquad \text{(extremal Kerr: } |a| = M\text{)}$$
 
 For $|a| > M$, $\Delta$ has no real roots → no event horizon → **naked singularity** (unphysical).
+
+---
+
+## 15. State-Transition Telemetry Data Collection
+
+### Origin
+Multivariate statistical normalization, Mahalanobis distance analysis (Mahalanobis 1936), and cryptographic hash chaining (Merkle 1979).
+
+### Security Intent
+During transitions between FSM lifecycle states ($s_a \to s_b$), the system must capture and verify active system telemetry. This prevents Time-of-Check to Time-of-Use (TOCTOU) exploits where an attacker alters code or system state immediately after a transition guard validation but before execution commences in the next state.
+
+### Mathematical Formulation
+At the instant of a transition request $s_a \to s_b$ at time $t$, a vector $\mathbf{T}_{a \to b}$ of $d$ normalized system parameters is captured:
+
+$$
+\mathbf{T}_{a \to b} = \begin{bmatrix} X_1(t) \\ X_2(t) \\ \vdots \\ X_d(t) \end{bmatrix} \in \mathbb{R}^d
+$$
+
+where $X_i(t)$ represents telemetry variables (e.g., active syscall rates, open file descriptors, network entropy, binary file integrity hashes).
+
+**Multivariate Drift Guard (Mahalanobis Distance):**
+To verify that the host state profile does not diverge anomalously during the transition, the distance $D_M$ is evaluated:
+
+$$
+D_M(\mathbf{T}_{a \to b}) = \sqrt{(\mathbf{T}_{a \to b} - \boldsymbol{\mu}_a)^T \mathbf{\Sigma}_a^{-1} (\mathbf{T}_{a \to b} - \boldsymbol{\mu}_a)}
+$$
+
+where:
+*   $\boldsymbol{\mu}_a \in \mathbb{R}^d$ is the historical baseline mean vector for state $s_a$.
+*   $\mathbf{\Sigma}_a \in \mathbb{R}^{d \times d}$ is the covariance matrix representing normal runtime variance in state $s_a$.
+
+The transition is authorized only if the distance lies within the acceptable chi-squared confidence envelope:
+
+$$
+D_M(\mathbf{T}_{a \to b}) \leq \chi^2_{d, \, 1-\alpha}
+$$
+
+where $\chi^2_{d, \, 1-\alpha}$ is the critical value for $d$ degrees of freedom at significance level $\alpha$.
+
+**Cryptographic State Attestation Chain:**
+To ensure the historical sequence of collected data cannot be retroactively modified, each transition forms a block in an append-only ledger, chained via cryptographic hashing:
+
+$$
+H_i = \text{SHA-256}\left(H_{i-1} \ \parallel \ s_i \ \parallel \ \mathbf{T}_{i-1 \to i} \ \parallel \ D_P\right)
+$$
+
+where:
+*   $H_i$ is the attestation hash of state $s_i$.
+*   $H_{i-1}$ is the hash of the preceding ledger entry.
+*   $\mathbf{T}_{i-1 \to i}$ is the transition telemetry vector.
+*   $D_P \in \{0, 1\}$ is the temporal FSM validation score.
+
+**Temporal Integrity Constraint:**
+The transition interval $\Delta t_{a \to b}$ must satisfy:
+
+$$
+\Delta t_{a \to b} = t_b - t_a \in [\tau_{\text{min}}, \ \tau_{\text{max}}]
+$$
+
+where $\tau_{\text{min}}$ represents physical limits on execution speed (preventing script-based transition bypasses) and $\tau_{\text{max}}$ prevents thread stalling anomalies.
 
 ---
 
