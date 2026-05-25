@@ -16,12 +16,15 @@ The **Phase FSM Validator** is the core hot-path temporal execution sequencing c
 ## 2. Global Execution Workflow
 
 The FSM validation process operates as follows:
-1. **Telemetry Capture:** Ingress static scanners or eBPF execution sensors capture transition events (e.g., transition from `STATE_PHASE_1_CODEBASE_DISCOVERY` to `STATE_PHASE_2_TECH_STACK_DOCUMENT`).
-2. **Transition Query:** The system intercepts the transition request and passes the parameters: `current_state`, `next_state`, and `prerequisites` bitmask.
-3. **Low-Level Check:** The system dispatches the query to `validate_transition` in the active platform-specific assembly backend (or C fallback).
+1. **Telemetry Capture:** Ingress static scanners or eBPF execution sensors capture transition events (e.g., transition from `STATE_PHASE_1_CODEBASE_DISCOVERY` to `STATE_PHASE_2_TECH_STACK_DOCUMENT`) and construct the telemetry data vector $\mathbf{T}_{a \to b}$.
+2. **Transition Query:** The system intercepts the transition request and passes the parameters: `current_state`, `next_state`, `prerequisites` bitmask, and the telemetry vector.
+3. **Low-Level Check & Multivariate Drift Verification:**
+   - The FSM sequence is evaluated via `validate_transition` in the active platform-specific assembly backend (or C fallback) to produce the score $D_P$.
+   - Simultaneously, the telemetry drift monitor calculates the Mahalanobis distance $D_M$ of the collected vector against the source state baseline profile and verifies the transition time delta.
+   - The composite score $D_P'$ is computed.
 4. **Attestation & Ledger Ingestion:**
-   - If allowed: The transition is authorized, and the validation results (metadata + dependencies + findings) are written to the database under `dbo.CodebaseScans` and `dbo.CodebaseDependencies`.
-   - If blocked: The transition is denied, and the system raises a security violation in `dbo.AuditLog`.
+   - If allowed ($D_P' = 1$): The transition is authorized, and the validation results (metadata + dependencies + findings + telemetry vector) are written to the database under `dbo.CodebaseScans` and `dbo.CodebaseDependencies`, and appended as a cryptographically chained block to the state-transition ledger.
+   - If blocked ($D_P' = 0$): The transition is denied, and the system raises a security violation in `dbo.AuditLog` and triggers a shock pulse in the wave simulation.
 5. **Dashboard Retrieval:** The Phase-1 Operator console dynamically queries the database via `GET /api/admin/phasr/scans` (or specific `?scanId=X` details in `nerd-stats.html`) to display the audit trail.
 
 ---

@@ -59,7 +59,7 @@ The following matrix maps every data path from telemetry source to its target wo
 
 | Telemetry Source | Data Path Interface | Target Workflow | Verification Type |
 | :--- | :--- | :--- | :--- |
-| **eBPF: Syscalls & Execs** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 1: Phase** | Temporal execution sequencing check. FSM evaluated by `validate_transition` (x86-64/ARM64). |
+| **eBPF: Syscalls & Execs** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 1: Phase** | Temporal execution sequencing check coupled with telemetry data collection (FSM + Mahalanobis drift analysis + temporal validation). |
 | **eBPF: Network Connects** | Kernel Ring Buffer -> Protobuf -> NATS P0 | **Workflow 2: Hierarchy** | Access boundary & reachability audit. |
 | **IAM & RBAC Configs** | Static Config Parsers -> Active Spec Graph | **Workflow 2: Hierarchy** | Privilege boundary & role audit. |
 | **App Logs & Metrics** | Systemd / File Monitors -> Normalizer -> NATS P1 | **Workflow 3: Assumptions** | Invariant drift & performance decay check. |
@@ -72,7 +72,7 @@ The following matrix maps every data path from telemetry source to its target wo
 ## 3. Detailed Data Flows of the 5 Workflows
 
 ### 3.1 Workflow 1: Phase Lifecycle Verification
-Validates execution sequencing. Prevents unauthorized state-jumps.
+Validates execution sequencing and prevents unauthorized state-jumps using coupled telemetry validation.
 
 ```mermaid
 sequenceDiagram
@@ -81,17 +81,21 @@ sequenceDiagram
     participant Queue as NATS Ingest Queue
     participant Core as Core Invariant Engine
     participant FSM as Phase FSM Engine
+    participant Telemetry as Telemetry & Drift Monitor
     participant Ledger as Merkle Audit Ledger
 
     System->>Queue: Emit transition event (State: s_a -> s_b)
     Queue->>Core: Forward transition event
     Core->>FSM: Check transition matrix delta(s_a, s_b)
-    FSM-->>Core: Return validation output
-    Core->>Core: Evaluate entry conditions (Pre_j)
-    alt Validation Passes
-        Core->>Ledger: Write signed state attestation block
+    FSM-->>Core: Return sequence output (D_P)
+    Core->>Telemetry: Request transition telemetry check (T_{a -> b})
+    Telemetry->>Telemetry: Calculate Mahalanobis distance (D_M) & Time delta
+    Telemetry-->>Core: Return drift & temporal validation status
+    Core->>Core: Compute composite score D_P'
+    alt D_P' = 1 (Sequence, Drift, and Timing valid)
+        Core->>Ledger: Write signed state attestation block (including T_{a -> b})
         Core-->>System: Authorize transition (Fail-Safe execution allowed)
-    else Validation Fails (Drift / Unauthorized Jump)
+    else D_P' = 0 (Validation Fails - Sequence jump, Drift anomaly, or Timing bypass)
         Core->>Ledger: Write signed violation block
         Core-->>System: Block execution / Force state = DISCONNECTED
     end
