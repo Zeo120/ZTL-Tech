@@ -332,5 +332,30 @@ graph TD
 - **Paced Duty Cycling:** Worker threads yield using millisecond sleep cycles at fixed batch boundaries to cool the CPU junction temperature and avoid thermal throttling.
 - **Thread-Safety & Race Prevention:** Shared statistics and data structures (such as Phase 3 eBPF ring buffers) are configured as thread-local parameters to prevent write-collisions and guarantee 100% deterministic assertion audits.
 
+---
+
+## 7. State Storage & Data Preservation Between Phases
+
+To maintain strict execution sequencing and prevent Time-of-Check to Time-of-Use (TOCTOU) exploits, PHASR preserves state and telemetry data across phase transitions using a multi-tiered storage architecture:
+
+### 7.1 Tier 1: Transient In-Memory State (Hot-Path Validation)
+*   **FSM Register Allocation:** The active execution state ($s$) and prerequisite bitmask ($P$) are stored directly in CPU registers during hot-path validation (e.g., `RCX`/`RDX` on Windows; `RDI`/`RSI` on Linux) to prevent memory-tampering vectors.
+*   **Thread-Local Stack Buffers:** Telemetry metrics and active invariants are buffered inside thread-local stacks (`ring_buffer_t` in Phase 3) to enforce thread isolation and eliminate race conditions during concurrent execution.
+*   **In-Memory Subgraph Cache:** Graph reachability models and boundary matrices are maintained in a high-speed, thread-safe in-memory cache to guarantee sub-millisecond lookups.
+
+### 7.2 Tier 2: Relational Schema & Attestation Ledger (SQL Server)
+The historical record of codebase scans, dependencies, and state-transition audit trails is persisted inside MS SQL Server under the `dbo` schema:
+*   **`dbo.CodebaseScans`**: Stores metadata for each execution lifecycle scan, including total files processed, vulnerability counts, and scan targets.
+*   **`dbo.CodebaseDependencies`**: Maintains the mapping of dependencies associated with each scan ID, ensuring full tracking of dependency trees.
+*   **`dbo.AuditLog`**: Logs every state progression and validation event (e.g., transition `s_a -> s_b`, actor details, execution duration).
+
+### 7.3 Tier 3: Cryptographic Ledger Chain (Audit Ledger)
+*   **Append-Only Hash Chain:** The hash of each state block ($H_i$) is cryptographically chained to the preceding block ($H_{i-1}$) using the cryptographic relation:
+    $$H_i = \text{SHA-256}\left(H_{i-1} \ \parallel \ s_i \ \parallel \ \mathbf{T}_{i-1 \to i} \ \parallel \ D_P\right)$$
+    This hash chain is stored in an append-only ledger database (`AuditDb`), ensuring that historical telemetry and validation records cannot be retroactively altered by an attacker who gains root access.
+
+### 7.4 Tier 4: Time-Series Analytics (Historical Drift Store)
+*   **Telemetry Wave TSDB:** High-frequency telemetry metrics and wave simulation amplitudes from the NATS Priority 1 queue are streamed to a Time-Series Database (TSDB) for long-term trend analysis and drift visualization.
+
 
 
