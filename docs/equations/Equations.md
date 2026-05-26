@@ -29,6 +29,7 @@
 | 13 | [Carter's Constant — Kerr Geodesic Invariant](#13-carters-constant--kerr-geodesic-invariant) | Satan's Recursion | — |
 | 14 | [Kerr Metric Coefficients in Boyer-Lindquist Coordinates](#14-kerr-metric-coefficients-in-boyer-lindquist-coordinates) | Satan's Recursion | — |
 | 15 | [State-Transition Telemetry Data Collection](#15-state-transition-telemetry-data-collection) | Phase 1 / FSM | — |
+| 16 | [Incentives & Game-Theoretic Modeling of Admin Privileges](#16-incentives--game-theoretic-modeling-of-admin-privileges) | All / Phase 5 | — |
 
 ---
 
@@ -923,15 +924,172 @@ This localized energy injection warps the curved spacetime metric ($g^{00}, g^{1
 
 ---
 
-## Summary — Score Definitions
+## 16. Incentives & Game-Theoretic Modeling of Admin Privileges
 
-| Score | Symbol | Phase | Pass condition | Fail action |
-|-------|--------|-------|----------------|-------------|
-| Boundary Attestation | $D_H$ | 2 | $D_H = 1$ (no path) | Block + alert |
-| Invariant Attestation | $D_A$ | 3 | $D_A = 1$ (all in bounds) | Escalate |
-| Mitigation Attestation | $D_S$ | 4 | $D_S = 1$ (all controls active) | Alarm |
-| Resilience Attestation | $D_R$ | 5 | $D_R > 0$ (lag within threshold) | Promote replica |
+### Origin
+Classical game theory, utility optimization, Nash equilibrium analysis, and consensus protocol incentives (slashing/promotion games).
 
-> **Composite gate.** In Satan's Recursion the four scores are ANDed as a final
-> spacetime integrity check. Any single failure collapses the composite gate and the
-> curved-spacetime audit registers a **singularity event**.
+### Security Intent
+To formalize the economic and operational incentives governing system administrators and consensus replica nodes. By modeling operators as rational utility-maximizing agents, we derive the mathematical thresholds at which administrative compliance is guaranteed, preventing rational privilege abuse or replica node stagnation.
+
+---
+
+### A. The Admin-Protocol Privilege Game
+We model the interaction between an **Administrator (Admin)** and the **Verification Protocol (PHASR)** as a static game of complete information. 
+
+#### 1. Player Strategies
+*   **Admin Node ($A$):** Chooses a strategy $s_A \in \{H, M\}$:
+    *   $H$ (Honesty): Executes normal administrative workflows, obeys FSM lifecycle sequences, and maintains active security controls.
+    *   $M$ (Malice/Abuse): Exploits administrative privileges to bypass validations, modify restricted states, or disable security controls.
+*   **Verification Protocol ($P$):** Verifies the system state continuously, attesting FSM transitions, invariants, and mitigations.
+
+#### 2. Payoffs and Parameters
+*   $R_A$: Compliance reward (service payment, protocol utility, or reputation gains) received by the Admin for acting honestly.
+*   $C_C$: Compliance cost (computational overhead, rate-limiting constraints, and FSM audit validation delays) incurred by the Admin.
+*   $G_E$: Exploitation gain (value derived from bypassing a security check or unauthorized action) received by the Admin when choosing strategy $M$.
+*   $P_M$: Slashing penalty (role revocation, stake slashing, session termination) inflicted on the Admin if caught acting maliciously.
+*   $p_{\text{detect}}$: Probability of the protocol detecting malicious behavior.
+
+#### 3. Game Matrix
+The expected payoffs for the Admin and Protocol are represented in the matrix below:
+
+| Admin \ Protocol | Attest & Audit |
+|:---|:---:|
+| **Honest ($H$)** | $(R_A - C_C, \ V_S - C_{\text{Audit}})$ |
+| **Malicious ($M$)** | $((1 - p_{\text{detect}})G_E - p_{\text{detect}}P_M, \ -V_{\text{Loss}})$ |
+
+where:
+*   $V_S$: Value of standard secure system operations to the Protocol.
+*   $C_{\text{Audit}}$: Auditing cost (CPU/memory overhead of cryptographic tracing).
+*   $V_{\text{Loss}}$: Systemic damage/value loss to the Protocol if an exploit occurs.
+
+---
+
+### B. Attestation Score Coupling & Critical Threshold
+The detection probability $p_{\text{detect}}$ is not static; it is directly coupled to the composite attestation score of the system, $D_{\text{Total}}$:
+
+$$
+p_{\text{detect}} = D_{\text{Total}} \quad \text{where} \quad D_{\text{Total}} = D_P' \cdot D_H \cdot D_A \cdot D_S \cdot D_R
+$$
+
+When all security controls, invariants, and FSM transition constraints are fully attested ($D_{\text{Total}} = 1$), detection is guaranteed. If controls are disabled or bypassed, $D_{\text{Total}} \to 0$, rendering the protocol blind to privilege abuse.
+
+#### 1. Expected Utility of Malice
+Substituting $p_{\text{detect}} = D_{\text{Total}}$ into the malicious payoff function yields:
+
+$$
+E[U_A(M)] = (1 - D_{\text{Total}})G_E - D_{\text{Total}}P_M
+$$
+
+#### 2. Security Incentive Constraint (Nash Equilibrium)
+To guarantee that the unique Nash Equilibrium of the system is honest play ($H$), the protocol must ensure that the utility of honesty strictly exceeds the expected utility of malice:
+
+$$
+U_A(H) > E[U_A(M)]
+$$
+
+$$
+R_A - C_C > (1 - D_{\text{Total}})G_E - D_{\text{Total}}P_M
+$$
+
+#### 3. Derivation of the Critical Attestation Threshold ($D_{\text{critical}}$)
+Solving for $D_{\text{Total}}$:
+
+$$
+R_A - C_C > G_E - D_{\text{Total}}G_E - D_{\text{Total}}P_M
+$$
+
+$$
+D_{\text{Total}}(G_E + P_M) > G_E - R_A + C_C
+$$
+
+$$
+\boxed{D_{\text{Total}} \geq \frac{G_E - R_A + C_C}{G_E + P_M} \equiv D_{\text{critical}}}
+$$
+
+If the system integrity score drops below this critical limit ($D_{\text{Total}} < D_{\text{critical}}$), the compliance incentive collapses. The Admin shifts to a state of **Rational Malice**, where the expected value of exploiting their admin privileges exceeds compliance gains.
+
+---
+
+### C. Phase-5 Consensus Slashing & Promotion Game
+In a high-availability consensus cluster (Phase 5), the **Primary Node ($P$)** and the **Consensus Replica ($R$)** play an asymmetric game governing replication lag and node promotion.
+
+#### 1. Payoffs and Strategies
+*   **Primary Node ($P$):** Can choose to maintain low replication lag (**Cooperate**, $C_P$) or defer updates to conserve network/compute bandwidth (**Defer**, $D_P$).
+*   **Replica Node ($R$):** Can choose to monitor and challenge node health (**Challenge**, $C_R$) or silently follow (**Follow**, $F_R$).
+
+Let:
+*   $R_P$: Block writing reward received by the active Primary.
+*   $L$: Current replica lag in ms.
+*   $T$: Max tolerable lag threshold in ms.
+*   $D_R$: Resilience Attestation Score, $D_R = \text{PSync} \cdot (1 - \frac{L}{T})$.
+*   $R_{\text{promo}}$: Promotion reward (transitioning from replica to primary).
+*   $C_{\text{challenge}}$: Election and state synchronization cost.
+*   $P_{\text{slash}}$: Slashing penalty applied to the Primary if promoted over.
+
+The probability of a successful challenge by the Replica is given by the failure of resilience:
+
+$$
+p_{\text{success}} = 1 - D_R = 1 - \text{PSync}\left(1 - \frac{L}{T}\right)
+$$
+
+The expected utility for a Replica initiating a challenge ($C_R$) is:
+
+$$
+E[U_R(C_R)] = p_{\text{success}} \cdot R_{\text{promo}} - C_{\text{challenge}} = (1 - D_R)R_{\text{promo}} - C_{\text{challenge}}
+$$
+
+A rational Replica will initiate a node promotion challenge iff $E[U_R(C_R)] > 0$:
+
+$$
+(1 - D_R)R_{\text{promo}} > C_{\text{challenge}}
+$$
+
+$$
+1 - D_R > \frac{C_{\text{challenge}}}{R_{\text{promo}}}
+$$
+
+$$
+\boxed{D_R < 1 - \frac{C_{\text{challenge}}}{R_{\text{promo}}} \equiv D_{R, \, \text{critical}}}
+$$
+
+This derived inequality mathematically triggers the replica promotion protocol.
+
+---
+
+### D. Consensus Damping Modulation (FDTD Wave Linkage)
+To link the game-theoretic state transition to the physical wave simulation, the FDTD damping coefficient $\gamma_R$ of the consensus audit grid is dynamically modulated by the resilience score $D_R$:
+
+$$
+\gamma_R(D_R) = \gamma_0 \cdot D_R + \gamma_{\text{transient}} \cdot (1 - D_R)
+$$
+
+where:
+*   $\gamma_0$: Healthy steady-state damping coefficient ($0.4$).
+*   $\gamma_{\text{transient}}$: Near-zero election damping coefficient ($0.02$).
+
+#### Derivation of the Modulated Wave Update
+Substituting $\gamma_R(D_R)$ into the explicit FDTD discretised wave equation:
+
+$$
+\Phi_i^{n+1} = \frac{2\Phi_i^n - \Phi_i^{n-1}\left(1 - \frac{\gamma_R(D_R)\Delta t}{2}\right) + r^2\left(\Phi_{i+1}^n - 2\Phi_i^n + \Phi_{i-1}^n\right)}{1 + \frac{\gamma_R(D_R)\Delta t}{2}}
+$$
+
+As $D_R \to 0$ (lag approaching the critical threshold or primary offline):
+1. Damping collapses: $\gamma_R(D_R) \to \gamma_{\text{transient}} \approx 0.02$.
+2. Attenuation drops, allowing the wave amplitude $\Phi_i$ to amplify (representing high-volume election traffic).
+3. The resulting high-energy wave output perturbs the curved spacetime metric in Satan's Recursion via coupling $\kappa(t) = 0.15 \times \sum \Phi_p(t)$, triggering a metrics attestation **singularity event**.
+
+---
+
+## Summary — Score & Incentive Definitions
+
+| Score / Parameter | Symbol | Phase | Pass condition / Bounds | Fail action / Transition |
+|---|:---:|:---:|---|---|
+| Boundary Attestation | $D_H$ | 2 | $D_H = 1$ (no path) | Block + raise path-leak alert |
+| Invariant Attestation | $D_A$ | 3 | $D_A = 1$ (all in bounds) | Escalate threat level |
+| Mitigation Attestation | $D_S$ | 4 | $D_S = 1$ (all controls active) | Alarm unmitigated vector |
+| Resilience Attestation | $D_R$ | 5 | $D_R \geq D_{R, \, \text{critical}}$ | Promote standby replica to primary |
+| Composite Integrity | $D_{\text{Total}}$ | All | $D_{\text{Total}} \geq D_{\text{critical}}$ | Shift system status to **Rational Malice** |
+
+> **Incentives-Coupled Security Gate.** Any attestation failure or latency drift reduces $D_{\text{Total}}$ below the critical threshold $D_{\text{critical}}$, altering the economic utility of administrative operations. The FDTD wave solver is perturbed by the resulting compliance decay, warping the curved metric coefficients in Satan's Recursion and triggering a metric **singularity event**.
