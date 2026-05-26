@@ -395,18 +395,19 @@ The module is structured under `phasr/Lucifers-Blessing/` and compiles via nativ
 The **Primordial Sin** engine (`primordial_engine`) validates the boot-time hardware configuration, TPM registers, and firmware images before the FSM transition validation loop starts. It ensures that the system begins from a trusted state.
 
 ### 9.1 Engine Functions
-1. `calculate_shannon_entropy(const uint8_t* boot_data, uint64_t size)`: Computes the byte-level Shannon entropy of the initialization space.
-2. `evaluate_bayesian_trust(const double* likelihoods_trust, const double* likelihoods_compromised, int n, double prior_trust)`: Performs sequential Bayesian updating to estimate the posterior probability of platform trust.
-3. `initialize_wave_field(float* phi, int grid_size, double d_initial, double amplitude, double sigma, double center)`: Seeds the FDTD grid with a Gaussian wave displacement based on initial state failures ($1.0 - D_{\text{Initial}}$).
+1. `validate_boot_memory(const uint8_t* boot_data, const uint8_t* baseline_data, uint64_t* hash_accum, uint32_t* histogram)`: Performs a single-pass validation of the 4,096-byte boot space using fully unrolled byte-level scanners. Each position possesses a unique, position-specific hash rotation to mitigate timing side-channel attacks. It populates a 256-bin histogram and calculates a Knuth-based rolling hash accumulation.
+2. `calculate_shannon_entropy(const uint32_t* histogram, uint64_t total_count)`: Computes the byte-level Shannon entropy over the 256 pre-filled histogram bins in a constant-time unrolled fashion.
+3. `evaluate_bayesian_trust(const double* likelihoods_trust, const double* likelihoods_compromised, int n, double prior_trust)`: Performs sequential Bayesian updating to estimate the posterior probability of platform trust based on verification check outcomes.
+4. `initialize_wave_field(float* phi, int grid_size, double d_initial, double amplitude, double sigma, double center)`: Seeds the FDTD wave grid with a spatial Gaussian pulse if the composite attestation score indicates compromise ($D_{\text{Initial}} = 0$).
 
 ### 9.2 Build and Platform Matrix
-The module resides in `phasr/Primordial-Sin/`:
+The module resides in `phasr/Primordial-Sin/`. It is implemented in **pure unrolled assembly** (~380K lines combined) for maximum performance and timing-attack protection, linking against the C++ verification driver:
 
 | Platform | Build Command | Compiler/Toolchain | Files Used |
 | :--- | :--- | :--- | :--- |
 | **Windows x86-64** | `cd phasr\Primordial-Sin && build.bat` | MSVC `cl.exe` + `ml64.exe` | `primordial_engine.asm`, `primordial_driver.cpp` |
 | **Linux x86-64** | `cd phasr/Primordial-Sin && make` | GNU `as` + `g++` | `primordial_engine_linux_x64.s`, `primordial_driver.cpp` |
-| **Fallback Platforms**| `cd phasr/Primordial-Sin && make fallback` | Any C++11 Compiler | `primordial_engine_fallback.cpp`, `primordial_driver.cpp` |
+| **Fallback Platforms**| `cd phasr/Primordial-Sin && make fallback` | Any C++11 Compiler (NO_ASM mode) | `primordial_driver.cpp` (uses internal fallback namespace) |
 
 
 

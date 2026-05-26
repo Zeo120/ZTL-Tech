@@ -8,7 +8,6 @@ LDFLAGS =
 
 TARGET = primordial_engine
 SRC_DRV = primordial_driver.cpp
-SRC_FB = primordial_engine_fallback.cpp
 SRC_ASM = primordial_engine_linux_x64.s
 
 UNAME_S := $(shell uname -s)
@@ -30,12 +29,12 @@ ifeq ($(USE_ASM),1)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC_DRV) primordial_engine.o $(LDFLAGS)
 else
 	@echo "Detected non-x86-64 or non-Linux host. Building with C++ fallback engine..."
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC_DRV) $(SRC_FB) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -DNO_ASM -o $(TARGET) $(SRC_DRV) $(LDFLAGS)
 endif
 
-fallback: $(SRC_DRV) $(SRC_FB)
+fallback: $(SRC_DRV)
 	@echo "Forcing build with C++ fallback engine..."
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC_DRV) $(SRC_FB) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -DNO_ASM -o $(TARGET) $(SRC_DRV) $(LDFLAGS)
 
 clean:
 	rm -f $(TARGET) *.o

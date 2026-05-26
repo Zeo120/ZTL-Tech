@@ -1108,16 +1108,33 @@ To guarantee that the platform starts execution from a known, untampered state b
 
 ---
 
-### A. Shannon Entropy of Boot Memory ($H_{\text{boot}}$)
-The byte distribution profile of the critical boot memory region is evaluated to ensure it matches expected profiles (detecting encrypted payloads, code injection, or configuration padding).
+### A. Boot Memory Attestation & Knuth Rolling Hash
+The critical boot memory space of size $N = 4096$ bytes is verified in a single pass using fully unrolled, position-specific byte scanners. During validation, a 256-bin histogram of observed byte frequencies is generated and a Knuth-based rolling hash is accumulated.
+
+#### 1. Unrolled Memory Scanning & Histogram Generation
+For each byte position $i \in [0, 4095]$, let $b_i$ be the byte value from `boot_data` and $r_i$ be the byte value from `baseline_data`. The match indicator is:
+$$\text{Match}_i = \mathbf{1}\!\left[b_i = r_i\right]$$
+The total matching bytes is:
+$$\text{TotalMatches} = \sum_{i=0}^{4095} \text{Match}_i$$
+Simultaneously, the 256-bin histogram counts $c_j$ for $j \in [0, 255]$ are accumulated:
+$$c_j = \sum_{i=0}^{4095} \mathbf{1}\!\left[b_i = j\right]$$
+
+#### 2. Position-Specific Knuth Rolling Hash
+To eliminate branch-based timing side-channels, every byte position $i$ rotates the accumulated hash by a position-dependent count $rot_i$, combines it with the current byte, and updates it with the Knuth golden ratio constant:
+$$rot_i = (i \bmod 13) + 1$$
+$$H_0 = 0$$
+$$H_i = \left((H_{i-1} \oplus b_i) \lll rot_i\right) + \text{0x9E3779B9ULL}$$
+where $\lll$ denotes the left rotation of a 64-bit integer.
+
+---
+
+### B. Shannon Entropy of Boot Memory ($H_{\text{boot}}$)
+Once the unrolled scan completes, the Shannon entropy of the boot configuration is computed directly from the pre-filled histogram bins.
 
 #### 1. Mathematical Formulation
-Let $X$ be the sequence of byte values in the boot memory window of size $N$. Let $c_j$ be the count of occurrences of byte value $j \in [0, 255]$. The probability of byte value $j$ is:
-
-$$P(j) = \frac{c_j}{N}$$
-
-The Shannon entropy $H(X)$ is:
-
+Let $P(j)$ be the probability of occurrence of byte value $j$:
+$$P(j) = \frac{c_j}{N} \quad \text{where} \quad N = 4096$$
+The Shannon entropy $H(X)$ is computed via a 256-way unrolled summation:
 $$H(X) = -\sum_{j=0}^{255} P(j) \log_2 P(j) \quad \text{with} \quad 0 \log_2 0 \equiv 0$$
 
 #### 2. Pass Criteria
@@ -1125,31 +1142,28 @@ $$D_{\text{Entropy}} = \mathbf{1}\!\left[H_{\text{min}} \leq H(X) \leq H_{\text{
 
 ---
 
-### B. Bayesian Boot-Trust Belief Propagation
-During the boot sequence, a vector of $n$ attestation checks (e.g. PCR register measurements, key verification checks) emits binary outcomes $e_k \in \{0, 1\}$. We define the conditional likelihoods:
-* $t_k = P(e_k = 1 \mid \text{Trust})$ (probability of pass when system is healthy)
-* $c_k = P(e_k = 1 \mid \text{Compromised})$ (probability of pass when system is compromised)
+### C. Bayesian Boot-Trust Belief Propagation
+During platform initialization, a vector of $n$ independent attestation checkpoint likelihoods is evaluated to estimate the posterior trust probability.
 
 #### 1. Mathematical Formulation
-Using Bayes' rule sequentially, the posterior probability of trust after observing the evidence vector $\mathbf{E} = \{e_1, e_2, \dots, e_n\}$ is:
+Given the prior probability of platform trust $\pi_0$, and two vectors of size $n$:
+* $t_k = P(e_k \mid \text{Trust})$ (likelihood of observing evidence $e_k$ under trust)
+* $c_k = P(e_k \mid \text{Compromised})$ (likelihood of observing evidence $e_k$ under compromise)
 
-$$P(\text{Trust} \mid \mathbf{E}) = \frac{\pi_0 \prod_{k=1}^{n} \left[ e_k t_k + (1 - e_k)(1 - t_k) \right]}{\pi_0 \prod_{k=1}^{n} \left[ e_k t_k + (1 - e_k)(1 - t_k) \right] + (1 - \pi_0) \prod_{k=1}^{n} \left[ e_k c_k + (1 - e_k)(1 - c_k) \right]}$$
-
-where $\pi_0$ is the prior probability of platform trust.
+The updated posterior probability of trust is:
+$$P(\text{Trust} \mid \mathbf{E}) = \frac{\pi_0 \prod_{k=1}^{n} t_k}{\pi_0 \prod_{k=1}^{n} t_k + (1 - \pi_0) \prod_{k=1}^{n} c_k}$$
 
 #### 2. Pass Criteria
 $$D_{\text{Bayes}} = \mathbf{1}\!\left[P(\text{Trust} \mid \mathbf{E}) \geq P_{\text{threshold}}\right]$$
 
 ---
 
-### C. Initial Wave Displacement (FDTD Seed)
-The composite boot attestation score is the product:
-
-$$D_{\text{Initial}} = D_{\text{Entropy}} \cdot D_{\text{Bayes}}$$
+### D. Initial Wave Displacement (FDTD Seed)
+The composite boot attestation score is:
+$$D_{\text{Initial}} = \mathbf{1}\!\left[\text{TotalMatches} = 4096\right] \cdot D_{\text{Entropy}} \cdot D_{\text{Bayes}}$$
 
 At simulation time $t = 0$, the wave grid $\Phi_i^0$ and its previous state $\Phi_i^{-1}$ are initialized with a spatial Gaussian packet centered at grid index $x_c$:
-
 $$\Phi_i^0 = \Phi_i^{-1} = A_0 \cdot \exp\left( - \frac{(i - x_c)^2}{2\sigma^2} \right) \cdot (1 - D_{\text{Initial}})$$
-
 * If $D_{\text{Initial}} = 1$ (system is fully attested), the grid is completely flat.
-* If $D_{\text{Initial}} = 0$ (compromised boot), a large Gaussian pulse is seeded into the grid, propagating through the domain and perturbing the metrics in subsequent phases.
+* If $D_{\text{Initial}} = 0$ (compromised boot), a large Gaussian pulse is seeded into the grid, propagating through the domain and perturbing metrics in subsequent phases.
+
