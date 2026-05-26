@@ -40,25 +40,31 @@
  */
 int validate_transition(int current_state, int next_state, uint64_t prerequisites)
 {
-    /* Bounds check current_state */
-    if (current_state < FSM_STATE_MIN || current_state > FSM_STATE_MAX)
-        return 0;
+    uint32_t c_curr = (uint32_t)current_state;
+    uint32_t c_next = (uint32_t)next_state;
 
-    /* Bounds check next_state */
-    if (next_state < FSM_STATE_MIN || next_state > FSM_STATE_MAX)
-        return 0;
+    /* Bounds check: 0 <= state <= 7
+     * For any x, ~((x | (7 - x)) >> 31) & 1 yields 1 if 0 <= x <= 7, and 0 otherwise.
+     */
+    uint32_t curr_ok = ~((c_curr | (7 - c_curr)) >> 31) & 1;
+    uint32_t next_ok = ~((c_next | (7 - c_next)) >> 31) & 1;
+    uint32_t bounds_ok = curr_ok & next_ok;
 
-    /* Reset transition: any state -> state 0 is always valid */
-    if (next_state == 0)
-        return 1;
+    /* Reset transition: any state -> state 0 is always allowed.
+     * x | -x has the sign bit set for any non-zero x, and 0 for x == 0.
+     */
+    uint32_t is_reset = ~((c_next | -c_next) >> 31) & 1;
 
-    /* Sequential progression check: must advance exactly one step */
-    if (next_state != current_state + 1)
-        return 0;
+    /* Sequential progression check: next_state must be current_state + 1 */
+    uint32_t diff = c_next - (c_curr + 1);
+    uint32_t is_sequential = ~((diff | -diff) >> 31) & 1;
 
     /* Prerequisite check: bit (next_state - 1) must be set */
-    if (!(prerequisites & PREREQ_BIT((unsigned)(next_state - 1))))
-        return 0;
+    uint32_t bit_index = (c_next - 1) & 63;
+    uint32_t prereq_ok = (uint32_t)((prerequisites >> bit_index) & 1);
 
-    return 1;
+    /* Allowed: bounds are ok AND (is reset OR (is sequential AND prerequisites are met)) */
+    uint32_t allowed = bounds_ok & (is_reset | (is_sequential & prereq_ok));
+
+    return (int)allowed;
 }
