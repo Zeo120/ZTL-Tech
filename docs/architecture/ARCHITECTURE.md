@@ -29,7 +29,7 @@ graph TB
         SubgraphCache <--> CoreEngine
         
         subgraph SubEngines [P-H-A-S-R Validators]
-            P_Eng["Phase FSM Validator\n(x86-64 MASM / ARM64 GAS / C-fallback)"]
+            Init_Eng["Primordial Sin\n(Boot Attestation & Hardware RoT)"] --> P_Eng["Phase FSM Validator\n(x86-64 MASM / ARM64 GAS / C-fallback)"]
             H_Eng[Hierarchy Reachability Validator]
             A_Eng[Assumption Graph Propagator]
             S_Eng[Solutions Mitigation Verifier]
@@ -67,6 +67,7 @@ The following matrix maps every data path from telemetry source to its target wo
 | **Chaos Injector** | Sandbox CLI Interface -> Mock Attacks API | **Workflow 4: Solutions** | Bypass-resistance & control challenge check. |
 | **Database Replication Logs** | Database Engine Poller -> TSDB Stream | **Workflow 5: Redundancy** | Sync lag & consensus heartbeat validation. |
 | **System Attestation Logs** | TSDB + Audit Logs -> Lucifer Engine | **Lucifers-Blessing (Game Theory)** | Game-theoretic auditing, critical attestation thresholds, and replica promotion challenges. |
+| **TPM PCRs & Boot Memory** | Boot Loader Attestator -> Audit Log | **Primordial-Sin (Hardware RoT)** | Boot-time configuration, Shannon Entropy, and Bayesian platform trust updates. |
 
 ---
 
@@ -386,6 +387,26 @@ The module is structured under `phasr/Lucifers-Blessing/` and compiles via nativ
 | **Windows x86-64** | `cd phasr\Lucifers-Blessing && build.bat` | MSVC `cl.exe` + `ml64.exe` | `lucifer_engine.asm`, `lucifer_driver.cpp` |
 | **Linux x86-64** | `cd phasr/Lucifers-Blessing && make` | GNU `as` + `g++` | `lucifer_engine_linux_x64.s`, `lucifer_driver.cpp` |
 | **Fallback Platforms**| `cd phasr/Lucifers-Blessing && make fallback` | Any C++11 Compiler | `lucifer_engine_fallback.cpp`, `lucifer_driver.cpp` |
+
+---
+
+## 9. Primordial Sin — Boot-Time Attestation & Hardware Root of Trust
+
+The **Primordial Sin** engine (`primordial_engine`) validates the boot-time hardware configuration, TPM registers, and firmware images before the FSM transition validation loop starts. It ensures that the system begins from a trusted state.
+
+### 9.1 Engine Functions
+1. `calculate_shannon_entropy(const uint8_t* boot_data, uint64_t size)`: Computes the byte-level Shannon entropy of the initialization space.
+2. `evaluate_bayesian_trust(const double* likelihoods_trust, const double* likelihoods_compromised, int n, double prior_trust)`: Performs sequential Bayesian updating to estimate the posterior probability of platform trust.
+3. `initialize_wave_field(float* phi, int grid_size, double d_initial, double amplitude, double sigma, double center)`: Seeds the FDTD grid with a Gaussian wave displacement based on initial state failures ($1.0 - D_{\text{Initial}}$).
+
+### 9.2 Build and Platform Matrix
+The module resides in `phasr/Primordial-Sin/`:
+
+| Platform | Build Command | Compiler/Toolchain | Files Used |
+| :--- | :--- | :--- | :--- |
+| **Windows x86-64** | `cd phasr\Primordial-Sin && build.bat` | MSVC `cl.exe` + `ml64.exe` | `primordial_engine.asm`, `primordial_driver.cpp` |
+| **Linux x86-64** | `cd phasr/Primordial-Sin && make` | GNU `as` + `g++` | `primordial_engine_linux_x64.s`, `primordial_driver.cpp` |
+| **Fallback Platforms**| `cd phasr/Primordial-Sin && make fallback` | Any C++11 Compiler | `primordial_engine_fallback.cpp`, `primordial_driver.cpp` |
 
 
 

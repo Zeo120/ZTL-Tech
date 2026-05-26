@@ -30,6 +30,7 @@
 | 14 | [Kerr Metric Coefficients in Boyer-Lindquist Coordinates](#14-kerr-metric-coefficients-in-boyer-lindquist-coordinates) | Satan's Recursion | — |
 | 15 | [State-Transition Telemetry Data Collection](#15-state-transition-telemetry-data-collection) | Phase 1 / FSM | — |
 | 16 | [Incentives & Game-Theoretic Modeling of Admin Privileges](#16-incentives--game-theoretic-modeling-of-admin-privileges) | All / Phase 5 | — |
+| 17 | [Primordial Sin — Boot-Time Attestation & Root of Trust](#17-primordial-sin--boot-time-attestation--root-of-trust) | Pre-Boot / Hardware | $D_{\text{Initial}}$ |
 
 ---
 
@@ -904,7 +905,7 @@ $$
 While $D_A$ enforces a hyper-rectangular hard safety boundary on individual parameters, the Mahalanobis distance $D_M(\mathbf{T}_{a \to b})$ detects anomalous *multivariate correlations* inside the covariance ellipsoid. They combine to form the total system integrity attestation score:
 
 $$
-D_{\text{Total}} = D_P' \cdot D_H \cdot D_A \cdot D_S \cdot D_R
+D_{\text{Total}} = D_{\text{Initial}} \cdot D_P' \cdot D_H \cdot D_A \cdot D_S \cdot D_R
 $$
 
 #### 3. Wave Simulation Perturbation Mapping (Satan's Recursion Metric Modulation)
@@ -1086,6 +1087,7 @@ As $D_R \to 0$ (lag approaching the critical threshold or primary offline):
 
 | Score / Parameter | Symbol | Phase | Pass condition / Bounds | Fail action / Transition |
 |---|:---:|:---:|---|---|
+| Initial Attestation | $D_{\text{Initial}}$ | Boot | $D_{\text{Initial}} = 1$ (entropy in bounds) | Seed initial FDTD wave displacement |
 | Boundary Attestation | $D_H$ | 2 | $D_H = 1$ (no path) | Block + raise path-leak alert |
 | Invariant Attestation | $D_A$ | 3 | $D_A = 1$ (all in bounds) | Escalate threat level |
 | Mitigation Attestation | $D_S$ | 4 | $D_S = 1$ (all controls active) | Alarm unmitigated vector |
@@ -1093,3 +1095,61 @@ As $D_R \to 0$ (lag approaching the critical threshold or primary offline):
 | Composite Integrity | $D_{\text{Total}}$ | All | $D_{\text{Total}} \geq D_{\text{critical}}$ | Shift system status to **Rational Malice** |
 
 > **Incentives-Coupled Security Gate.** Any attestation failure or latency drift reduces $D_{\text{Total}}$ below the critical threshold $D_{\text{critical}}$, altering the economic utility of administrative operations. The FDTD wave solver is perturbed by the resulting compliance decay, warping the curved metric coefficients in Satan's Recursion and triggering a metric **singularity event**.
+
+---
+
+## 17. Primordial Sin — Boot-Time Attestation & Root of Trust
+
+### Origin
+Information theory (Shannon entropy), probability theory (Bayesian inference), and partial differential equations (initial value problems for wave propagation).
+
+### Security Intent
+To guarantee that the platform starts execution from a known, untampered state before any state transitions occur. By measuring the entropy of boot memory and calculating the Bayesian probability of platform integrity across initialization checkpoints, we construct a boot attestation score $D_{\text{Initial}}$. If boot validation fails, we seed a localized wave displacement as a "primordial taint" in the FDTD simulation grid.
+
+---
+
+### A. Shannon Entropy of Boot Memory ($H_{\text{boot}}$)
+The byte distribution profile of the critical boot memory region is evaluated to ensure it matches expected profiles (detecting encrypted payloads, code injection, or configuration padding).
+
+#### 1. Mathematical Formulation
+Let $X$ be the sequence of byte values in the boot memory window of size $N$. Let $c_j$ be the count of occurrences of byte value $j \in [0, 255]$. The probability of byte value $j$ is:
+
+$$P(j) = \frac{c_j}{N}$$
+
+The Shannon entropy $H(X)$ is:
+
+$$H(X) = -\sum_{j=0}^{255} P(j) \log_2 P(j) \quad \text{with} \quad 0 \log_2 0 \equiv 0$$
+
+#### 2. Pass Criteria
+$$D_{\text{Entropy}} = \mathbf{1}\!\left[H_{\text{min}} \leq H(X) \leq H_{\text{max}}\right]$$
+
+---
+
+### B. Bayesian Boot-Trust Belief Propagation
+During the boot sequence, a vector of $n$ attestation checks (e.g. PCR register measurements, key verification checks) emits binary outcomes $e_k \in \{0, 1\}$. We define the conditional likelihoods:
+* $t_k = P(e_k = 1 \mid \text{Trust})$ (probability of pass when system is healthy)
+* $c_k = P(e_k = 1 \mid \text{Compromised})$ (probability of pass when system is compromised)
+
+#### 1. Mathematical Formulation
+Using Bayes' rule sequentially, the posterior probability of trust after observing the evidence vector $\mathbf{E} = \{e_1, e_2, \dots, e_n\}$ is:
+
+$$P(\text{Trust} \mid \mathbf{E}) = \frac{\pi_0 \prod_{k=1}^{n} \left[ e_k t_k + (1 - e_k)(1 - t_k) \right]}{\pi_0 \prod_{k=1}^{n} \left[ e_k t_k + (1 - e_k)(1 - t_k) \right] + (1 - \pi_0) \prod_{k=1}^{n} \left[ e_k c_k + (1 - e_k)(1 - c_k) \right]}$$
+
+where $\pi_0$ is the prior probability of platform trust.
+
+#### 2. Pass Criteria
+$$D_{\text{Bayes}} = \mathbf{1}\!\left[P(\text{Trust} \mid \mathbf{E}) \geq P_{\text{threshold}}\right]$$
+
+---
+
+### C. Initial Wave Displacement (FDTD Seed)
+The composite boot attestation score is the product:
+
+$$D_{\text{Initial}} = D_{\text{Entropy}} \cdot D_{\text{Bayes}}$$
+
+At simulation time $t = 0$, the wave grid $\Phi_i^0$ and its previous state $\Phi_i^{-1}$ are initialized with a spatial Gaussian packet centered at grid index $x_c$:
+
+$$\Phi_i^0 = \Phi_i^{-1} = A_0 \cdot \exp\left( - \frac{(i - x_c)^2}{2\sigma^2} \right) \cdot (1 - D_{\text{Initial}})$$
+
+* If $D_{\text{Initial}} = 1$ (system is fully attested), the grid is completely flat.
+* If $D_{\text{Initial}} = 0$ (compromised boot), a large Gaussian pulse is seeded into the grid, propagating through the domain and perturbing the metrics in subsequent phases.
