@@ -29,6 +29,7 @@ Here is a list of all folders and files, with a simple explanation of what each 
 *   **`README.md`** *(This file)*: The main guide to help you understand the codebase.
 *   **`.gitignore`**: A text file that tells Git which files to ignore (like large `node_modules` folders or secret `.env` files) so we don't upload them to GitHub by accident.
 *   **`setup_git.bat`**: A Windows batch script. Double-clicking it automatically initializes Git, stages all files, and makes the first commit.
+*   **`codebase_scan_findings_report.txt`**: A clean, structured plain text report of the latest static analysis findings, detailing critical, warning, and informational bugs, files, line numbers, and remediation guidelines.
 *   **`docs/`**: The organized parent directory containing all design, architecture, phase-specific requirements, and physics equations documentation.
     *   **`docs/architecture/`**: Houses global system designs and compute balancer specifications.
     *   **`docs/phasr/`**: Houses context guides and requirements for the 5 validation phases and Satan's Recursion.
@@ -73,7 +74,7 @@ Services contain the actual core logic of the application. If a route is a waite
 *   **`audit.service.js`**: Writes security log entries to the `AuditLog` database table (e.g., recording who logged in and when).
 *   **`auth.service.js`**: Handles hashing passwords safely (using Argon2) and checking if user credentials are correct when logging in.
 *   **`ownership.service.js`**: Makes sure a regular admin can only edit or view their own pages, not other admins' pages.
-*   **`scanner.service.js`**: The scanner engine. It clones Git repositories, walks through files, and scans files to find security bugs.
+*   **`scanner.service.js`**: The scanner engine. It clones Git repositories, walks through files, and scans files to find security bugs. It is configured to automatically persist vulnerability findings directly to the `dbo.CodebaseScanFindings` relational database table and generate a clean, structured plain text report `codebase_scan_findings_report.txt` in the workspace root.
 *   **`session.service.js`**: Handles generating, tracking, and deleting user session tokens inside the Redis database.
 *   **`user.service.js`**: Handles finding and managing user accounts in the SQL Server database.
 

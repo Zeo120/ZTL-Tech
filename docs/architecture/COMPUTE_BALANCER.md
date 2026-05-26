@@ -33,6 +33,19 @@ All verification phases (Phase 1 through 5, and Satan's Recursion) utilize the u
 #include <sys/mman.h>
 #endif
 #include <stdlib.h>
+#include <stdint.h>
+
+#if defined(_MSC_VER)
+#define ALIGN_CACHE __declspec(align(64))
+#else
+#define ALIGN_CACHE __attribute__((aligned(64)))
+#endif
+
+// Cache-line padded struct to prevent false sharing in thread arrays
+typedef struct ALIGN_CACHE {
+    uint32_t value;
+    uint8_t padding[60]; // Pad to 64 bytes
+} PaddedUInt32;
 
 // Determine number of physical cores
 static inline int get_core_count(void) {
@@ -135,6 +148,11 @@ where $N$ is the number of active threads. This ensures identical execution step
 To limit junction temperatures ($T_J$) to a safe range ($65^\circ\text{C}$ to $70^\circ\text{C}$), worker threads execute paced sleep cycles:
 - Workers sleep for **1 millisecond** after completing a validation block (typically 100 assertions).
 - This introduces a deterministic cool-down duty cycle, preventing physical hardware degradation and throttling spikes.
+
+### D. Cache Line Alignment & False Sharing Mitigation
+When multiple worker threads concurrently write to adjacent indices in a shared array (such as tracking per-thread statistics or completion states), they can cause **False Sharing**. Even if each thread writes to a separate array element, the entire cache line (typically 64 bytes) is invalidated across cores, causing severe memory bus thrashing and pipeline stalls.
+- **`ALIGN_CACHE` Directive:** Standardizes compiler-specific alignment macros (`__declspec(align(64))` for MSVC and `__attribute__((aligned(64)))` for GCC/Clang) to align structures to 64-byte boundaries.
+- **`PaddedUInt32` Struct:** Pads a 32-bit counter with 60 bytes of padding to align the size of the structure exactly with a standard CPU L1/L2 cache line (64 bytes). This ensures that each thread's state counter occupies a distinct, exclusive cache line, completely eliminating false sharing during concurrent multi-threaded execution.
 
 ---
 

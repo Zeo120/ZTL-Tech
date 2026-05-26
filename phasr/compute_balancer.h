@@ -11,6 +11,19 @@
 #include <sys/mman.h>
 #endif
 #include <stdlib.h>
+#include <stdint.h>
+
+#if defined(_MSC_VER)
+#define ALIGN_CACHE __declspec(align(64))
+#else
+#define ALIGN_CACHE __attribute__((aligned(64)))
+#endif
+
+// Cache-line padded struct to prevent false sharing in thread arrays
+typedef struct ALIGN_CACHE {
+    uint32_t value;
+    uint8_t padding[60]; // Pad to 64 bytes
+} PaddedUInt32;
 
 // Determine number of physical cores
 static inline int get_core_count(void) {
