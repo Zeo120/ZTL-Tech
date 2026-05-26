@@ -66,6 +66,7 @@ The following matrix maps every data path from telemetry source to its target wo
 | **Audit Trail Logs** | File Poller -> Protobuf Normalizer -> NATS P0 | **Workflow 4: Solutions** | Control active status validation. |
 | **Chaos Injector** | Sandbox CLI Interface -> Mock Attacks API | **Workflow 4: Solutions** | Bypass-resistance & control challenge check. |
 | **Database Replication Logs** | Database Engine Poller -> TSDB Stream | **Workflow 5: Redundancy** | Sync lag & consensus heartbeat validation. |
+| **System Attestation Logs** | TSDB + Audit Logs -> Lucifer Engine | **Lucifers-Blessing (Game Theory)** | Game-theoretic auditing, critical attestation thresholds, and replica promotion challenges. |
 
 ---
 
@@ -207,7 +208,7 @@ The Phase FSM Engine (`validate_transition`) is the innermost hot-path of Workfl
 | **x86-64 MASM** | `fsm_validator.asm` | Windows x86-64 | MSVC `ml64.exe` | ~117 K |
 | **x86-64 GAS (Intel)** | `fsm_validator_linux_x64.s` | Linux x86-64 | GNU `as` / `gcc` | 130,562 |
 | **AArch64 GAS** | `fsm_validator_linux_arm64.s` | Linux ARM64 | GNU `as` / `gcc` | 130,559 |
-| **Pure-C Fallback** | `fsm_validator_fallback.c` | Any platform | Any C99 compiler | ~65 |
+| **Pure-C Fallback** | `fsm_validator_fallback.c` | Any platform | Any C99 compiler (Hardened Branchless) | ~65 |
 
 ### 4.1 Shared Logic — 4,500 Helper Procedures
 
@@ -357,6 +358,35 @@ The historical record of codebase scans, dependencies, and state-transition audi
 
 ### 7.4 Tier 4: Time-Series Analytics (Historical Drift Store)
 *   **Telemetry Wave TSDB:** High-frequency telemetry metrics and wave simulation amplitudes from the NATS Priority 1 queue are streamed to a Time-Series Database (TSDB) for long-term trend analysis and drift visualization.
+
+---
+
+## 8. Lucifer's Blessing — Game-Theoretic Privilege & Consensus Audit Engine
+
+The **Lucifer's Blessing** engine (`lucifer_engine`) evaluates the game-theoretic incentives of system administrators and consensus replicas under the presence of attestation faults and replication lag. It governs when system compliance collapses into **Rational Malice** and triggers node promotion challenges.
+
+### 8.1 Engine Architecture & Functions
+To eliminate compile-time optimization non-determinism, the core mathematical models are implemented in handwritten x86-64 assembly with System V AMD64 and Windows x64 ABI variants, alongside a portable C++ fallback engine.
+
+The engine exposes four low-level APIs:
+1. `evaluate_critical_threshold(const game_params_t* params)`: Compares the composite attestation score ($D_{\text{Total}}$) against the critical threshold ($D_{\text{critical}}$) and returns `1` (compliant) or `0` (Rational Malice state).
+2. `evaluate_replica_challenge(const replica_params_t* params)`: Evaluates if a replica node should initiate an election challenge ($D_R < D_{R, \, \text{critical}}$).
+3. `modulate_damping(const damping_params_t* params)`: Calculates the dynamic FDTD damping coefficient ($\gamma_R(D_R)$).
+4. `fdtd_wave_step(const fdtd_params_t* params)`: Executes a high-performance FDTD update step over the consensus audit grid.
+
+### 8.2 Assembly Interface Details
+*   **Struct Alignment:** All data structures are passed by reference via pointers, mapping fields directly to memory offsets to avoid stack-spill overhead.
+*   **Floating-Point Vectorization:** Relational double-precision calculations are executed using SSE2 vector instructions (`movsd`, `subsd`, `addsd`, `divsd`, `mulsd`, `ucomisd`, `setae`/`seta`) to guarantee constant-latency pipelines.
+
+### 8.3 Build and Platform Matrix
+The module is structured under `phasr/Lucifers-Blessing/` and compiles via native platform builders:
+
+| Platform | Build Command | Compiler/Toolchain | Files Used |
+| :--- | :--- | :--- | :--- |
+| **Windows x86-64** | `cd phasr\Lucifers-Blessing && build.bat` | MSVC `cl.exe` + `ml64.exe` | `lucifer_engine.asm`, `lucifer_driver.cpp` |
+| **Linux x86-64** | `cd phasr/Lucifers-Blessing && make` | GNU `as` + `g++` | `lucifer_engine_linux_x64.s`, `lucifer_driver.cpp` |
+| **Fallback Platforms**| `cd phasr/Lucifers-Blessing && make fallback` | Any C++11 Compiler | `lucifer_engine_fallback.cpp`, `lucifer_driver.cpp` |
+
 
 
 
