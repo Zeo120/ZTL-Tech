@@ -7,7 +7,7 @@ The **Phase FSM Validator** is the core hot-path temporal execution sequencing c
 - **Windows x86-64:** MASM Assembly ([fsm_validator.asm](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator.asm)) using Windows x64 ABI (RCX, RDX, R8 registers) compiled with MSVC `ml64.exe` and `cl.exe`.
 - **Linux x86-64:** GNU Assembler Intel-syntax Assembly ([fsm_validator_linux_x64.s](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_linux_x64.s)) using System V AMD64 ABI (EDI, ESI, RDX registers).
 - **Linux ARM64:** GNU Assembler AArch64 Assembly ([fsm_validator_linux_arm64.s](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_linux_arm64.s)) using AAPCS64 ABI (W0, W1, X2 registers).
-- **Portable Fallback:** Standard ISO C99 ([fsm_validator_fallback.c](file:///d:/Project%20XT/phasr/Phase-1/fsm_validator_fallback.c)).
+- **Portable Fallback:** Standard ISO C99 (inline in [phase_fsm.c](file:///d:/Project%20XT/phasr/Phase-1/phase_fsm.c) under `FSM_C_FALLBACK`).
 - **Build System:** Cross-platform [Makefile](file:///d:/Project%20XT/phasr/Phase-1/Makefile) (automatically selects the proper target via `uname -m`) and Windows [build.bat](file:///d:/Project%20XT/phasr/Phase-1/build.bat) script.
 
 
@@ -39,7 +39,7 @@ graph TD
     B -->|Windows x64| C[MASM fsm_validator.asm]
     B -->|Linux x86-64| D[GAS Intel fsm_validator_linux_x64.s]
     B -->|Linux ARM64| E[GAS AArch64 fsm_validator_linux_arm64.s]
-    B -->|Other / Fallback| F[C99 fsm_validator_fallback.c]
+    B -->|Other / Fallback| F[C99 phase_fsm.c inline]
     
     C -->|RCX, RDX, R8 ABI| G[validate_transition]
     D -->|EDI, ESI, RDX ABI| G

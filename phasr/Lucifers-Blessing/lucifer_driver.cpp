@@ -77,6 +77,23 @@ namespace fallback {
     }
 }
 
+#ifdef NO_ASM
+extern "C" {
+    int evaluate_critical_threshold(const game_params_t* params) {
+        return fallback::evaluate_critical_threshold(params);
+    }
+    int evaluate_replica_challenge(const replica_params_t* params) {
+        return fallback::evaluate_replica_challenge(params);
+    }
+    double modulate_damping(const damping_params_t* params) {
+        return fallback::modulate_damping(params);
+    }
+    void fdtd_wave_step(const fdtd_params_t* params) {
+        fallback::fdtd_wave_step(params);
+    }
+}
+#endif
+
 void print_wave(const float* phi, int size) {
     const int height = 9;
     const int mid_y = height / 2;

@@ -64,7 +64,7 @@ endif
 
 fallback:
 	$(CC) $(CFLAGS) -DFSM_C_FALLBACK -o $(TARGET)_fallback \
-	    phase_fsm.c fsm_validator_fallback.c $(LDFLAGS)
+	    phase_fsm.c $(LDFLAGS)
 	echo "[OK] Built $(TARGET)_fallback using pure C fallback"
 
 clean:

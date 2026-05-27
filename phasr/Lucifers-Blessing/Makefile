@@ -46,7 +46,7 @@ else
 all: fallback
 
 fallback:
-	$(CXX) $(CXXFLAGS) -o $(TARGET)_fallback lucifer_driver.cpp lucifer_engine_fallback.cpp $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -DNO_ASM -o $(TARGET)_fallback lucifer_driver.cpp $(LDFLAGS)
 	@echo "[OK] Built $(TARGET)_fallback using C++ fallback engine"
 
 endif

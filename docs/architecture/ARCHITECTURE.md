@@ -209,7 +209,7 @@ The Phase FSM Engine (`validate_transition`) is the innermost hot-path of Workfl
 | **x86-64 MASM** | `fsm_validator.asm` | Windows x86-64 | MSVC `ml64.exe` | ~117 K |
 | **x86-64 GAS (Intel)** | `fsm_validator_linux_x64.s` | Linux x86-64 | GNU `as` / `gcc` | 130,562 |
 | **AArch64 GAS** | `fsm_validator_linux_arm64.s` | Linux ARM64 | GNU `as` / `gcc` | 130,559 |
-| **Pure-C Fallback** | `fsm_validator_fallback.c` | Any platform | Any C99 compiler (Hardened Branchless) | ~65 |
+| **Pure-C Fallback** | `phase_fsm.c` (inline under FSM_C_FALLBACK) | Any platform | Any C99 compiler (Hardened Branchless) | ~65 |
 
 ### 4.1 Shared Logic — 4,500 Helper Procedures
 
@@ -290,7 +290,7 @@ flowchart TD
 | **Windows x86-64** | `cd phasr\Phase-1 && build.bat` | `fsm_validator.asm` (MASM ml64) |
 | **Linux x86-64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
 | **Linux AArch64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_arm64.s` (GAS) |
-| **Any other** | `cd phasr/Phase-1 && make fallback` | `fsm_validator_fallback.c` (C99) |
+| **Any other** | `cd phasr/Phase-1 && make fallback` | `phase_fsm.c` (C99, FSM_C_FALLBACK) |
 | **Regenerate x64 .s** | `node generate_fsm_asm_linux_x64.js` | *(re-generates 130,562 lines)* |
 | **Regenerate ARM64 .s** | `node generate_fsm_asm_arm64.js` | *(re-generates 130,559 lines)* |
 
@@ -386,7 +386,7 @@ The module is structured under `phasr/Lucifers-Blessing/` and compiles via nativ
 | :--- | :--- | :--- | :--- |
 | **Windows x86-64** | `cd phasr\Lucifers-Blessing && build.bat` | MSVC `cl.exe` + `ml64.exe` | `lucifer_engine.asm`, `lucifer_driver.cpp` |
 | **Linux x86-64** | `cd phasr/Lucifers-Blessing && make` | GNU `as` + `g++` | `lucifer_engine_linux_x64.s`, `lucifer_driver.cpp` |
-| **Fallback Platforms**| `cd phasr/Lucifers-Blessing && make fallback` | Any C++11 Compiler | `lucifer_engine_fallback.cpp`, `lucifer_driver.cpp` |
+| **Fallback Platforms**| `cd phasr/Lucifers-Blessing && make fallback` | Any C++11 Compiler (NO_ASM mode) | `lucifer_driver.cpp` (uses inline fallback namespace) |
 
 ---
 
