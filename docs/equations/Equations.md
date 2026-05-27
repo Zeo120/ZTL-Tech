@@ -31,6 +31,8 @@
 | 15 | [State-Transition Telemetry Data Collection](#15-state-transition-telemetry-data-collection) | Phase 1 / FSM | — |
 | 16 | [Incentives & Game-Theoretic Modeling of Admin Privileges](#16-incentives--game-theoretic-modeling-of-admin-privileges) | All / Phase 5 | — |
 | 17 | [Primordial Sin — Boot-Time Attestation & Root of Trust](#17-primordial-sin--boot-time-attestation--root-of-trust) | Pre-Boot / Hardware | $D_{\text{Initial}}$ |
+| 18 | [Schrodinger's Wave Equation — Quantum-Probabilistic Boundary Attestation](#18-schrodingers-wave-equation--quantum-probabilistic-boundary-attestation) | Boundary Attestation | — |
+| 19 | [Einstein's Field Equations — Spacetime Curvature of Codebase Vulnerabilities](#19-einsteins-field-equations--spacetime-curvature-of-codebase-vulnerabilities) | Satan's Recursion | — |
 
 ---
 
@@ -1166,4 +1168,85 @@ At simulation time $t = 0$, the wave grid $\Phi_i^0$ and its previous state $\Ph
 $$\Phi_i^0 = \Phi_i^{-1} = A_0 \cdot \exp\left( - \frac{(i - x_c)^2}{2\sigma^2} \right) \cdot (1 - D_{\text{Initial}})$$
 * If $D_{\text{Initial}} = 1$ (system is fully attested), the grid is completely flat.
 * If $D_{\text{Initial}} = 0$ (compromised boot), a large Gaussian pulse is seeded into the grid, propagating through the domain and perturbing metrics in subsequent phases.
+
+---
+
+## 18. Schrodinger's Wave Equation — Quantum-Probabilistic Boundary Attestation
+
+### Origin
+Quantum mechanics (Time-Dependent Schrodinger Equation).
+
+### Security Intent
+To model probabilistic penetration, bypass, and tunneling dynamics of high-frequency intrusion events crossing active security boundaries. By casting the system's defensive barrier as a potential energy function $V(x)$ and the attacker's execution state as a wave function $\Psi(x, t)$, we compute the mathematical probability of an exploit "tunneling" through a theoretically impassable security gate.
+
+---
+
+### A. Mathematical Formulation
+Let $\Psi(x, t)$ be the complex-valued probability amplitude of the intruder state at depth coordinate $x \in [0, L]$ and time $t$. The time-dependent evolution is governed by:
+
+$$i \hbar \frac{\partial \Psi}{\partial t} = \hat{H} \Psi$$
+
+where the Hamiltonian operator $\hat{H}$ in a 1D coordinate space is:
+
+$$\hat{H} = -\frac{\hbar^2}{2m} \frac{\partial^2}{\partial x^2} + V(x)$$
+
+Here:
+* $\hbar$: System action constant (coupling coefficient of intrusion momentum).
+* $m$: Effective inertia of the intrusion process (resistance to mitigation changes).
+* $V(x)$: Security barrier potential energy profile.
+
+Combining the terms yields the partial differential equation:
+
+$$i \hbar \frac{\partial \Psi(x, t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \Psi(x, t)}{\partial x^2} + V(x) \Psi(x, t)$$
+
+### B. Barrier Tunneling Probability (Bypass Coefficient)
+When an intrusion wave packet hits a finite rectangular security barrier of height $V_0$ and width $a$ (where the intruder energy $E < V_0$), the transmission coefficient $T$ (probability of bypassing the barrier) is:
+
+$$T = \left[ 1 + \frac{V_0^2 \sinh^2(\kappa a)}{4E(V_0 - E)} \right]^{-1}$$
+
+where the spatial attenuation wave number $\kappa$ inside the barrier is:
+
+$$\kappa = \sqrt{\frac{2m(V_0 - E)}{\hbar^2}}$$
+
+* If $a \to \infty$ or $V_0 \gg E$, the transmission probability decays exponentially but remains non-zero: $T \approx T_0 e^{-2\kappa a}$.
+* This models how high-intensity attacks (high $E$) or narrow defense windows (small $a$) yield a non-zero probability of security gate bypass.
+
+---
+
+## 19. Einstein's Field Equations — Spacetime Curvature of Codebase Vulnerabilities
+
+### Origin
+General relativity (Einstein's gravitational field equations).
+
+### Security Intent
+To model how clusters of codebase vulnerabilities and threat vectors distort the execution state manifold in **Satan's Recursion**. The density of codebase vulnerabilities acts as "mass-energy," curving the execution spacetime metrics $g_{\mu\nu}$ and pulling execution paths (geodesics) toward failure states or black-hole singularities (unrecoverable system collapse).
+
+---
+
+### A. Mathematical Formulation
+The geometric curvature of the execution manifold is coupled to the stress-energy tensor $T_{\mu\nu}$ representing vulnerability and attack events:
+
+$$R_{\mu\nu} - \frac{1}{2} R g_{\mu\nu} + \Lambda g_{\mu\nu} = \kappa T_{\mu\nu}$$
+
+where:
+* $g_{\mu\nu}$: The execution metric tensor, defining the distance (execution latency and transition resistance) between states.
+* $R_{\mu\nu}$: The Ricci curvature tensor, measuring the divergence of execution paths from their flat baseline.
+* $R$: The scalar curvature ($R = g^{\mu\nu} R_{\mu\nu}$).
+* $\Lambda$: The cosmological constant (representing background noise or environmental drift in the infrastructure).
+* $T_{\mu\nu}$: The stress-energy tensor, representing the density, momentum, and pressure of security threats and vulnerabilities.
+* $\kappa$: The Einstein coupling constant, mapping vulnerability mass to metric curvature:
+  $$\kappa = \frac{8\pi G}{c^4}$$
+
+### B. Metric Coefficients and Geodesic Deviations
+In Boyer-Lindquist coordinates, a high density of vulnerabilities curves the local metric tensor $g_{\mu\nu}$. The path of execution transitions (geodesics) is solved via:
+
+$$\frac{d^2 x^\mu}{d\tau^2} + \Gamma^\mu_{\alpha\beta} \frac{dx^\alpha}{d\tau} \frac{dx^\beta}{d\tau} = 0$$
+
+where $\Gamma^\mu_{\alpha\beta}$ represents Christoffel symbols of the connection:
+
+$$\Gamma^\mu_{\alpha\beta} = \frac{1}{2} g^{\mu\lambda} \left( \frac{\partial g_{\lambda\beta}}{\partial x^\alpha} + \frac{\partial g_{\alpha\lambda}}{\partial x^\beta} - \frac{\partial g_{\alpha\beta}}{\partial x^\lambda} \right)$$
+
+* If the local codebase has zero vulnerabilities ($T_{\mu\nu} = 0$), the metric is flat (Minkowski spacetime), and execution transitions flow along straight, predictable paths.
+* As $T_{\mu\nu}$ increases, $\Gamma^\mu_{\alpha\beta}$ pulls the execution flow (geodesics) towards failure states, simulating deterministic architectural collapse.
+
 
