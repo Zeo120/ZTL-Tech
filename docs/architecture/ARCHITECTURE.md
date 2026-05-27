@@ -409,6 +409,81 @@ The module resides in `phasr/Primordial-Sin/`. It is implemented in **pure unrol
 | **Linux x86-64** | `cd phasr/Primordial-Sin && make` | GNU `as` + `g++` | `primordial_engine_linux_x64.s`, `primordial_driver.cpp` |
 | **Fallback Platforms**| `cd phasr/Primordial-Sin && make fallback` | Any C++11 Compiler (NO_ASM mode) | `primordial_driver.cpp` (uses internal fallback namespace) |
 
+---
+
+### 9.3 Advanced Hardening Designs & Mitigation Workflows
+
+#### A. Cache-Timing Side-Channel Protection (Vulnerable vs. Hardened Histogram Update)
+To prevent timing side-channels, index-based scatter/gather logic is replaced with a constant-time comparison loop over all bins.
+
+```mermaid
+graph TD
+    subgraph VulnerableDesign [Vulnerable Index-based Update]
+        V_Start([Read Boot Byte: B]) --> V_Index[Lookup: histogram[B]]
+        V_Index --> V_Inc[Increment bin count]
+        V_Inc --> V_End([Cache Leakage Point])
+    end
+
+    subgraph HardenedDesign [Hardened Branchless Update]
+        H_Start([Read Boot Byte: B]) --> H_Init[Initialize Bin Index: j = 0]
+        H_Init --> H_Loop{j < 256?}
+        H_Loop -- Yes --> H_Comp["Compute Mask: M = (B == j)"]
+        H_Comp --> H_Add["Add Mask (M) to histogram[j] without branches"]
+        H_Add --> H_Next["Increment: j = j + 1"]
+        H_Next --> H_Loop
+        H_Loop -- No --> H_End([Timing & Cache Oblivious Output])
+    end
+
+    style VulnerableDesign fill:#2d1a1d,stroke:#ff3333,stroke-width:2px
+    style HardenedDesign fill:#1a2d21,stroke:#33ff33,stroke-width:2px
+```
+
+#### B. Multi-Block Paged Attestation (Block-Chaining Pipeline)
+For memory regions exceeding the 4,096-byte boundary, pages are processed in a rolling hash-chain where the previous page's output seed becomes the next page's hash key.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Host as Verification Driver
+    participant ASM as Unrolled Assembly Engine
+    participant Accum as Hash Accumulator
+    participant Hist as Global Histogram
+
+    Host->>Accum: Initialize seed (H_0 = 0)
+    
+    loop For each 4KB Page p in Memory [0 ... P-1]
+        Host->>ASM: Pass Page(p), Baseline(p), and Accumulator(H_p)
+        Note over ASM: Execute 4,096 unrolled byte scanners
+        ASM->>Hist: Accumulate byte frequencies into Hist
+        ASM->>Accum: Update rolling hash (H_{p+1} via Knuth step)
+        ASM-->>Host: Return match count (PageMatches_p)
+    end
+
+    Host->>Host: Verify cumulative matches == P * 4096
+    alt All Pages Untampered
+        Host-->>Host: Set D_Initial = 1 (State Attested)
+    else Any Page Corrupted
+        Host-->>Host: Set D_Initial = 0 (State Compromised)
+    end
+```
+
+#### C. 2D Gaussian Wave Field Seeding
+Illustrates how the attestation score dynamically seeds the multidimensional grid.
+
+```mermaid
+flowchart LR
+    A[Initial Attestation Score: D_Initial] --> B{D_Initial == 1?}
+    B -- Yes --> C[Flat Wave Field: phi = 0]
+    B -- No --> D[Calculate 2D Gaussian Amplitude: A_0 * 1 - D_Initial]
+    D --> E[Compute Spatial Gaussian Profile for all coordinates i, j]
+    E --> F["Seed Wave Field Grid: phi[i][j] = Elliptical Gaussian Pulse"]
+    F --> G[Propagate Perturbations in FDTD Engine]
+
+    style C fill:#0f220f,stroke:#00ff00,stroke-width:1px
+    style F fill:#220f0f,stroke:#ff0000,stroke-width:1px
+```
+
+
 
 
 
