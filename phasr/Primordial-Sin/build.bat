@@ -29,7 +29,7 @@ if %errorlevel% neq 0 (
 )
 
 echo [3/3] Compiling C++ Simulation Driver and Linking...
-cl /EHsc /O2 /W4 /WX /GS /Fe:primordial_engine.exe primordial_driver.cpp primordial_engine.obj
+cl /EHsc /O2 /W4 /WX /GS /guard:cf /Fe:primordial_engine.exe primordial_driver.cpp primordial_engine.obj /link /guard:cf
 if %errorlevel% neq 0 (
     echo [ERROR] Compilation failed!
     exit /b 1
