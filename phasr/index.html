@@ -252,14 +252,249 @@
                         <line x1="550" y1="50" x2="550" y2="100" stroke="rgba(255, 0, 60, 0.3)" stroke-width="1" />
                     </g>
                     
-                    <!-- Status logs bottom left -->
-                    <g class="hud-text" transform="translate(30, 310)">
-                        <text x="0" y="0" class="hud-cyan">■ STATUS: RUNNING REAL-TIME HARMONIC SOLVER</text>
-                        <text x="0" y="12">■ SYSTEM: NO DRIFT DETECTED IN PCR[17-22]</text>
-                        <text x="0" y="24">■ BOUNDARY RESISTANCE: EXTREMELY HIGH</text>
-                        <rect x="-5" y="-12" width="235" height="45" fill="none" stroke="rgba(0, 255, 170, 0.15)" stroke-width="0.8" />
-                    </g>
-                </svg>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE PLAYGROUND SECTION -->
+        <section class="playground-section" id="playground" style="padding: 6rem 2rem 4rem; display: flex; flex-direction: column; gap: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; align-items: center;">
+            <div class="playground-header animate">
+                <span class="badge" style="background: rgba(255, 0, 60, 0.08); color: #ff5376; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 0, 60, 0.25); display: inline-block; margin-bottom: 1rem; letter-spacing: 1px;">INTERACTIVE SANDBOX</span>
+                <h2>PHASR Sandbox Playground</h2>
+                <p style="color: var(--text-secondary); max-width: 650px; margin: 0 auto; font-size: 0.95rem;">
+                    Adjust inputs to solve Schrodinger intrusion bypasses, simulate vulnerability gravitational stress curvature, or toggle TPM boot-attestation PCR codes in real time.
+                </p>
+            </div>
+
+            <!-- Tab Nav Bar -->
+            <div class="tab-controls animate" style="width: 100%; max-width: 800px;">
+                <button class="tab-btn active" onclick="switchTab('quantum')">Quantum Tunneling</button>
+                <button class="tab-btn" onclick="switchTab('relativity')">Spacetime Curvature</button>
+                <button class="tab-btn" onclick="switchTab('trust')">PCR Attestation</button>
+            </div>
+
+            <!-- TAB 1: QUANTUM TUNNELING (Schrodinger Engine) -->
+            <div id="panel-quantum" class="sim-tab-content active animate">
+                <div class="sim-grid">
+                    <!-- Left: SVG Plot -->
+                    <div class="sim-display-panel">
+                        <svg id="quantum-svg" width="100%" height="340" viewBox="0 0 600 340" style="background: #030303; border-radius: 8px;">
+                            <!-- Tech Grid -->
+                            <defs>
+                                <pattern id="qGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 255, 255, 0.02)" stroke-width="0.5" />
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#qGrid)" />
+                            
+                            <!-- Reference Line -->
+                            <line x1="0" y1="170" x2="600" y2="170" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5" />
+                            
+                            <!-- Potential Barrier Wall -->
+                            <rect id="barrier-wall" x="270" y="50" width="60" height="240" fill="rgba(255, 0, 60, 0.15)" stroke="#ff003c" stroke-width="1.5" />
+                            
+                            <!-- Waves -->
+                            <path id="incoming-wave-path" class="quantum-wave" stroke="#00ffaa" stroke-width="2.5" />
+                            <path id="attenuated-wave-path" class="quantum-wave" stroke="#ffaa00" stroke-width="2.5" stroke-dasharray="3, 3" />
+                            <path id="tunnelled-wave-path" class="quantum-wave" stroke="#ff003c" stroke-width="2.5" />
+
+                            <!-- SVG Text Annotations -->
+                            <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Ψ(x) Incoming Wave Packet</text>
+                            <text id="barrier-label" x="280" y="35" fill="#ff3366" font-family="monospace" font-size="10" text-anchor="middle">V_0 Barrier</text>
+                            <text x="440" y="40" fill="#ff003c" font-family="monospace" font-size="10">Tunnelled Wave</text>
+                        </svg>
+                    </div>
+                    <!-- Right: Inputs & Math -->
+                    <div class="sim-controls-panel">
+                        <h2 class="sim-title">
+                            <span>Schrodinger Solver</span>
+                            <span id="coeff-badge" style="font-family:monospace; font-size:0.8rem; color:#00ffaa; background:rgba(0,255,170,0.08); border:1px solid rgba(0,255,170,0.2); padding:0.2rem 0.5rem; border-radius:3px;">T = 1.2e-4</span>
+                        </h2>
+                        
+                        <div class="math-block" style="margin: 0 0 1rem; padding: 0.6rem; font-size: 0.75rem;">
+                            <span class="math-label">Transmission Probability Coefficient</span>
+                            <div class="math-equation" style="font-size: 0.8rem;">
+                                T = [ 1 + 
+                                <div class="math-fraction" style="font-size: 0.75rem;">
+                                    <span class="math-numerator">V<span class="math-sub">0</span><span class="math-sup">2</span> sinh<span class="math-sup">2</span>(κa)</span>
+                                    <span class="math-denominator">4E(V<span class="math-sub">0</span> - E)</span>
+                                </div>
+                                ]<span class="math-sup">-1</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Security Barrier Height (V<sub>0</sub>)</span>
+                                <span class="control-val" id="val-v0">5.0 eV</span>
+                            </div>
+                            <input type="range" id="input-v0" min="2.0" max="10.0" step="0.2" value="5.0">
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Attack Energy Vector (E)</span>
+                                <span class="control-val" id="val-energy">3.0 eV</span>
+                            </div>
+                            <input type="range" id="input-energy" min="0.5" max="8.0" step="0.1" value="3.0">
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Gate Barrier Width (a)</span>
+                                <span class="control-val" id="val-width">30 nm</span>
+                            </div>
+                            <input type="range" id="input-width" min="10" max="80" step="1" value="30">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SPACETIME CURVATURE (Einstein Engine) -->
+            <div id="panel-relativity" class="sim-tab-content animate">
+                <div class="sim-grid">
+                    <!-- Left: SVG Plot -->
+                    <div class="sim-display-panel">
+                        <svg id="relativity-svg" width="100%" height="340" viewBox="0 0 600 340" style="background: #030303; border-radius: 8px;">
+                            <rect width="100%" height="100%" fill="#000" />
+                            <!-- Distorted Grid Path group -->
+                            <g id="vortex-grid-group" stroke="rgba(255, 0, 60, 0.12)" stroke-width="0.8" fill="none"></g>
+                            <!-- Target Vulnerability Vortex Core -->
+                            <circle cx="300" cy="170" r="45" fill="url(#singularityGlow)" />
+                            <circle id="vortex-core" cx="300" cy="170" r="10" fill="#ff003c" />
+                            <circle id="vortex-center" cx="300" cy="170" r="3" fill="#ffffff" />
+                            
+                            <!-- Geodesic Transition Line -->
+                            <path id="geodesic-path" fill="none" stroke="#00ffaa" stroke-width="2.5" />
+                            
+                            <!-- Labels -->
+                            <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Geodesic Transition Path (State Flow)</text>
+                            <text x="315" y="160" fill="#ff5376" font-family="monospace" font-size="10">Vulnerability Singularity</text>
+                        </svg>
+                    </div>
+                    <!-- Right: Inputs & Math -->
+                    <div class="sim-controls-panel">
+                        <h2 class="sim-title">
+                            <span>Einstein Curvature</span>
+                            <span id="metric-badge" style="font-family:monospace; font-size:0.8rem; color:#ff3366; background:rgba(255,0,60,0.08); border:1px solid rgba(255,0,60,0.2); padding:0.2rem 0.5rem; border-radius:3px;">COLLAPSE: LOW</span>
+                        </h2>
+                        
+                        <div class="math-block" style="margin: 0 0 1rem; padding: 0.6rem; font-size: 0.75rem;">
+                            <span class="math-label">Geodesic State Equations</span>
+                            <div class="math-equation" style="font-size: 0.8rem;">
+                                R<span class="math-sub">μν</span> - 
+                                <div class="math-fraction" style="font-size: 0.75rem;">
+                                    <span class="math-numerator">1</span>
+                                    <span class="math-denominator">2</span>
+                                </div>
+                                R g<span class="math-sub">μν</span> + Λ g<span class="math-sub">μν</span> = κ T<span class="math-sub">μν</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Vulnerability Density (T<sub>μν</sub> / Threat Mass)</span>
+                                <span class="control-val" id="val-mass">3.0</span>
+                            </div>
+                            <input type="range" id="input-mass" min="0.0" max="10.0" step="0.2" value="3.0">
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Drift Noise Offset (Λ / Cosmological Constant)</span>
+                                <span class="control-val" id="val-lambda">0.00</span>
+                            </div>
+                            <input type="range" id="input-lambda" min="-2.0" max="2.0" step="0.1" value="0.0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: BOOT ATTESTATION (Primordial Sin) -->
+            <div id="panel-trust" class="sim-tab-content animate">
+                <div class="sim-grid">
+                    <!-- Left: Verification Dashboard -->
+                    <div class="sim-display-panel" style="justify-content: flex-start; text-align: left; padding: 2rem;">
+                        <div style="width: 100%;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 1.5rem; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.5rem;">
+                                CRITICAL ATTENDED SYSTEM STATE
+                            </h3>
+                            
+                            <div id="boot-status-banner" style="background: rgba(0, 255, 170, 0.06); border: 1px solid #00ffaa; border-radius: 8px; padding: 1.2rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 1.1rem; font-weight: 800; color: #00ffaa; letter-spacing: 0.5px;" id="boot-status-title">BOOT SIGNATURE SECURE</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;" id="boot-status-desc">All platform configuration registers (PCRs) align with whitelisted references.</div>
+                                </div>
+                                <span id="boot-status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 10px #00ffaa; display: inline-block;"></span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; width: 100%;">
+                                <div>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Calculated Trust Probability</span>
+                                    <div style="font-size: 2.2rem; font-weight: 800; font-family: monospace; color: #00ffaa; margin-top: 0.25rem;" id="trust-prob-val">99.8%</div>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Seeded Wave Grid State</span>
+                                    <div style="font-size: 1.4rem; font-weight: 800; font-family: monospace; color: #ffffff; margin-top: 0.4rem;" id="wave-seeded-val">FLAT (0.00 V/m)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right: Checklist Toggles -->
+                    <div class="sim-controls-panel">
+                        <h2 class="sim-title">TPM PCR Registers</h2>
+                        
+                        <div class="checklist-row">
+                            <div>
+                                <div style="font-weight: 700; color: #ffffff;">PCR 0 (SRTM Firmware)</div>
+                                <div style="font-size: 0.72rem; color: var(--text-secondary);">Verifies hardware bootloader ROM</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="pcr0" checked onchange="runTrustSimulation()">
+                                <span class="slider-round"></span>
+                            </label>
+                        </div>
+
+                        <div class="checklist-row">
+                            <div>
+                                <div style="font-weight: 700; color: #ffffff;">PCR 4 (OS Kernel Load)</div>
+                                <div style="font-size: 0.72rem; color: var(--text-secondary);">Cryptographic kernel image signature</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="pcr4" checked onchange="runTrustSimulation()">
+                                <span class="slider-round"></span>
+                            </label>
+                        </div>
+
+                        <div class="checklist-row">
+                            <div>
+                                <div style="font-weight: 700; color: #ffffff;">PCR 8 (Environment Config)</div>
+                                <div style="font-size: 0.72rem; color: var(--text-secondary);">Isolates system parameters configurations</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="pcr8" checked onchange="runTrustSimulation()">
+                                <span class="slider-round"></span>
+                            </label>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span>Shannon Entropy H(X) limit</span>
+                                <span class="control-val" id="val-entropy">7.8 bits</span>
+                            </div>
+                            <input type="range" id="input-entropy" min="4.0" max="8.0" step="0.1" value="7.8" oninput="runTrustSimulation()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Console Logging Feed -->
+            <div class="animate" style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem; margin-top: 1.5rem; width: 100%;">
+                <h3 style="font-size: 0.9rem; font-weight: 800; color: #ffffff; letter-spacing: 1px; text-transform: uppercase;">
+                    Lab Telemetry Output Signal Feed
+                </h3>
+                <div class="terminal-panel" id="terminal-feed">
+                    <div class="terminal-log-line"><span class="log-timestamp">[13:18:43]</span><span class="log-info">[SYSTEM] Loaded sandbox playground. Interactive solvers initialized.</span></div>
+                </div>
             </div>
         </section>
 
@@ -416,6 +651,330 @@
     </footer>
 
     <script>
+        // --- PLAYGROUND WORKSPACE INTERACTIVE LOGIC ---
+        const term = document.getElementById('terminal-feed');
+        function logMsg(text, level='info') {
+            if (!term) return;
+            const line = document.createElement('div');
+            line.className = 'terminal-log-line';
+            const timestamp = new Date().toTimeString().split(' ')[0];
+            line.innerHTML = `<span class="log-timestamp">[${timestamp}]</span><span class="log-${level}">${text}</span>`;
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        // Tab switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('#playground .sim-tab-content').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.querySelectorAll('#playground .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const selectedPanel = document.getElementById(`panel-${tabId}`);
+            if (selectedPanel) selectedPanel.classList.add('active');
+            
+            const eventTrigger = window.event;
+            if (eventTrigger && eventTrigger.currentTarget) {
+                eventTrigger.currentTarget.classList.add('active');
+            }
+            
+            logMsg(`[SANDBOX] Switched workspace view to panel: ${tabId.toUpperCase()}`);
+            if (tabId === 'quantum') runQuantumSimulation();
+            if (tabId === 'relativity') runRelativitySimulation();
+            if (tabId === 'trust') runTrustSimulation();
+        }
+
+        // --- QUANTUM SIMULATION LOGIC ---
+        const inV0 = document.getElementById('input-v0');
+        const inE = document.getElementById('input-energy');
+        const inW = document.getElementById('input-width');
+
+        const valV0 = document.getElementById('val-v0');
+        const valE = document.getElementById('val-energy');
+        const valW = document.getElementById('val-width');
+
+        const badgeCoeff = document.getElementById('coeff-badge');
+        const wallRect = document.getElementById('barrier-wall');
+
+        function runQuantumSimulation() {
+            if (!inV0 || !inE || !inW) return;
+            let v0 = parseFloat(inV0.value);
+            let e = parseFloat(inE.value);
+            let width = parseInt(inW.value, 10);
+
+            if (e >= v0) {
+                e = v0 - 0.1;
+                inE.value = e.toFixed(1);
+            }
+
+            if (valV0) valV0.innerText = v0.toFixed(1) + ' eV';
+            if (valE) valE.innerText = e.toFixed(1) + ' eV';
+            if (valW) valW.innerText = width + ' nm';
+
+            const hbar = 1.0;
+            const m = 0.5;
+            const kappa = Math.sqrt(2 * m * (v0 - e) / (hbar * hbar));
+            const scalingA = width * 0.08; 
+            const sinhValue = Math.sinh(kappa * scalingA);
+            const denom = 4 * e * (v0 - e);
+            const numer = (v0 * v0) * (sinhValue * sinhValue);
+            const tCoeff = Math.min(1.0, 1 / (1 + (numer / denom)));
+
+            if (badgeCoeff) badgeCoeff.innerText = 'T = ' + tCoeff.toExponential(3);
+
+            if (wallRect) {
+                const wallX = 300 - (width / 2);
+                wallRect.setAttribute('x', wallX);
+                wallRect.setAttribute('width', width);
+
+                let incoming = '';
+                let attenuated = '';
+                let tunnelled = '';
+                const centerY = 170;
+                const incomingAmp = 40;
+
+                for(let x=0; x <= wallX; x++) {
+                    const kVal = 0.15;
+                    const waveY = centerY + Math.sin(x * kVal) * incomingAmp;
+                    incoming += `${x===0 ? 'M' : 'L'} ${x} ${waveY} `;
+                }
+
+                for(let x=wallX; x <= (wallX + width); x++) {
+                    const relativeX = x - wallX;
+                    const waveY = centerY + (Math.sin(wallX * 0.15) * incomingAmp) * Math.exp(-kappa * relativeX * 0.1);
+                    attenuated += `${x===wallX ? 'M' : 'L'} ${x} ${waveY} `;
+                }
+
+                const rightStart = wallX + width;
+                const tunnelledAmp = incomingAmp * Math.sqrt(tCoeff);
+                for(let x=rightStart; x <= 600; x++) {
+                    const relativeX = x - rightStart;
+                    const kVal = 0.15;
+                    const waveY = centerY + Math.sin(x * kVal) * tunnelledAmp;
+                    tunnelled += `${x===rightStart ? 'M' : 'L'} ${x} ${waveY} `;
+                }
+
+                const inPath = document.getElementById('incoming-wave-path');
+                const attPath = document.getElementById('attenuated-wave-path');
+                const tunPath = document.getElementById('tunnelled-wave-path');
+                if (inPath) inPath.setAttribute('d', incoming);
+                if (attPath) attPath.setAttribute('d', attenuated);
+                if (tunPath) tunPath.setAttribute('d', tunnelled);
+
+                const barLbl = document.getElementById('barrier-label');
+                if (barLbl) barLbl.setAttribute('x', 300);
+            }
+            
+            logMsg(`[SCHRODINGER] Recalculated. Attenuation kappa: ${kappa.toFixed(3)}, Tunnel bypass ratio T: ${tCoeff.toExponential(2)}`);
+        }
+
+        // --- RELATIVITY SIMULATION LOGIC ---
+        function runRelativitySimulation() {
+            const inM = document.getElementById('input-mass');
+            const inL = document.getElementById('input-lambda');
+            const valM = document.getElementById('val-mass');
+            const valL = document.getElementById('val-lambda');
+            const badgeMetric = document.getElementById('metric-badge');
+            const gridGroup = document.getElementById('vortex-grid-group');
+            const pathLine = document.getElementById('geodesic-path');
+
+            if (!inM || !inL) return;
+            const mass = parseFloat(inM.value);
+            const lambda = parseFloat(inL.value);
+
+            if (valM) valM.innerText = mass.toFixed(1);
+            if (valL) valL.innerText = lambda.toFixed(2);
+
+            const centerX = 300;
+            const centerY = 170;
+
+            if (gridGroup) {
+                gridGroup.innerHTML = '';
+                for(let gx=30; gx < 600; gx += 30) {
+                    let d = '';
+                    for(let gy=0; gy <= 340; gy += 10) {
+                        let rx = gx;
+                        let ry = gy;
+                        const dx = rx - centerX;
+                        const dy = ry - centerY;
+                        const distSq = dx*dx + dy*dy + 100;
+                        const pull = mass * 3000 / (distSq * Math.sqrt(distSq));
+                        rx -= dx * pull;
+                        ry -= dy * pull;
+                        rx += lambda * 4;
+                        d += `${gy===0 ? 'M' : 'L'} ${rx} ${ry} `;
+                    }
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute('d', d);
+                    gridGroup.appendChild(path);
+                }
+
+                for(let gy=20; gy < 340; gy += 20) {
+                    let d = '';
+                    for(let gx=0; gx <= 600; gx += 15) {
+                        let rx = gx;
+                        let ry = gy;
+                        const dx = rx - centerX;
+                        const dy = ry - centerY;
+                        const distSq = dx*dx + dy*dy + 100;
+                        const pull = mass * 3000 / (distSq * Math.sqrt(distSq));
+                        rx -= dx * pull;
+                        ry -= dy * pull;
+                        rx += lambda * 4;
+                        d += `${gx===0 ? 'M' : 'L'} ${rx} ${ry} `;
+                    }
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute('d', d);
+                    gridGroup.appendChild(path);
+                }
+            }
+
+            if (pathLine) {
+                let geodD = 'M 10 120 ';
+                let px = 10;
+                let py = 120;
+                let vx = 3.5;
+                let vy = 0.05;
+
+                for(let step=0; step < 180; step++) {
+                    const dx = px - centerX;
+                    const dy = py - centerY;
+                    const distSq = dx*dx + dy*dy + 500;
+                    const force = mass * 45 / distSq;
+                    const fx = -dx * force / Math.sqrt(distSq);
+                    const fy = -dy * force / Math.sqrt(distSq);
+                    vx += fx;
+                    vy += fy;
+                    vx += lambda * 0.005;
+                    px += vx;
+                    py += vy;
+
+                    const distToCenter = Math.sqrt((px-centerX)*(px-centerX) + (py-centerY)*(py-centerY));
+                    if (distToCenter < 12) {
+                        geodD += `L ${centerX} ${centerY} `;
+                        break;
+                    }
+                    if (px > 600 || px < 0 || py > 340 || py < 0) break;
+                    geodD += `L ${px} ${py} `;
+                }
+                pathLine.setAttribute('d', geodD);
+            }
+
+            if (badgeMetric) {
+                if (mass > 7.5) {
+                    badgeMetric.innerText = 'CRITICAL SINGULARITY COLLAPSE';
+                    badgeMetric.style.color = '#ff3366';
+                    badgeMetric.style.background = 'rgba(255,51,102,0.1)';
+                } else if (mass > 3.0) {
+                    badgeMetric.innerText = 'WARNING: ORBITAL DEVIATION';
+                    badgeMetric.style.color = '#ffaa00';
+                    badgeMetric.style.background = 'rgba(255,170,0,0.1)';
+                } else {
+                    badgeMetric.innerText = 'METRIC STABLE (FLAT BASES)';
+                    badgeMetric.style.color = '#00ffaa';
+                    badgeMetric.style.background = 'rgba(0,255,170,0.1)';
+                }
+            }
+
+            logMsg(`[GEODESIC] Distortion calculated. Threat mass: ${mass.toFixed(1)}, Metric curvature lambda: ${lambda.toFixed(2)}`);
+        }
+
+        // --- TRUST ATTESTATION LOGIC ---
+        function runTrustSimulation() {
+            const pcr0El = document.getElementById('pcr0');
+            const pcr4El = document.getElementById('pcr4');
+            const pcr8El = document.getElementById('pcr8');
+            const entropyEl = document.getElementById('input-entropy');
+
+            if (!pcr0El || !pcr4El || !pcr8El || !entropyEl) return;
+
+            const pcr0 = pcr0El.checked;
+            const pcr4 = pcr4El.checked;
+            const pcr8 = pcr8El.checked;
+            const entropyVal = parseFloat(entropyEl.value);
+
+            const valEntropy = document.getElementById('val-entropy');
+            if (valEntropy) valEntropy.innerText = entropyVal.toFixed(1) + ' bits';
+
+            const banner = document.getElementById('boot-status-banner');
+            const title = document.getElementById('boot-status-title');
+            const desc = document.getElementById('boot-status-desc');
+            const dot = document.getElementById('boot-status-indicator');
+            const trustVal = document.getElementById('trust-prob-val');
+            const waveVal = document.getElementById('wave-seeded-val');
+
+            let trustRating = 99.9;
+            let missingRegisters = [];
+            if (!pcr0) { trustRating -= 35; missingRegisters.push('PCR0'); }
+            if (!pcr4) { trustRating -= 45; missingRegisters.push('PCR4'); }
+            if (!pcr8) { trustRating -= 15; missingRegisters.push('PCR8'); }
+
+            if (entropyVal < 6.5) {
+                trustRating -= (6.5 - entropyVal) * 20;
+            }
+            trustRating = Math.max(0.1, trustRating);
+
+            if (trustVal) trustVal.innerText = trustRating.toFixed(1) + '%';
+
+            if (banner && title && desc && dot && waveVal) {
+                if (pcr0 && pcr4 && pcr8 && entropyVal >= 6.5) {
+                    banner.style.borderColor = '#00ffaa';
+                    banner.style.background = 'rgba(0, 255, 170, 0.06)';
+                    title.innerText = 'BOOT SIGNATURE SECURE';
+                    title.style.color = '#00ffaa';
+                    desc.innerText = 'All platform configuration registers (PCRs) match referenced whitelist signatures.';
+                    dot.style.background = '#00ffaa';
+                    dot.style.boxShadow = '0 0 10px #00ffaa';
+                    waveVal.innerText = 'FLAT (0.00 V/m)';
+                    waveVal.style.color = '#ffffff';
+                    logMsg(`[TPM] Attestation verified. Matches: 4096. Boot Trust state: 1.00`, 'success');
+                } else {
+                    banner.style.borderColor = '#ff3366';
+                    banner.style.background = 'rgba(255, 51, 102, 0.06)';
+                    title.innerText = 'ATTENUATION DRIFT: COMPROMISED';
+                    title.style.color = '#ff3366';
+                    
+                    let defectMsg = '';
+                    if (missingRegisters.length > 0) {
+                        defectMsg = `Invalid registers: ${missingRegisters.join(', ')}. `;
+                    }
+                    if (entropyVal < 6.5) {
+                        defectMsg += `Low Shannon Entropy detected: ${entropyVal.toFixed(1)} bits (Potential payload injection).`;
+                    }
+                    desc.innerText = defectMsg;
+                    dot.style.background = '#ff3366';
+                    dot.style.boxShadow = '0 0 10px #ff3366';
+
+                    const seedVolts = (100 - trustRating) * 2.8;
+                    waveVal.innerText = `SEEDED (${seedVolts.toFixed(2)} V/m)`;
+                    waveVal.style.color = '#ff3366';
+                    logMsg(`[WARNING] Boot attestation failed. Seeded Gaussian packet into wave grid. Amplitude: ${seedVolts.toFixed(1)} V/m`, 'error');
+                }
+            }
+        }
+
+        // Bind playground events when DOM content is loaded
+        function initPlayground() {
+            const inV0 = document.getElementById('input-v0');
+            const inE = document.getElementById('input-energy');
+            const inW = document.getElementById('input-width');
+            const inM = document.getElementById('input-mass');
+            const inL = document.getElementById('input-lambda');
+
+            if (inV0) inV0.addEventListener('input', runQuantumSimulation);
+            if (inE) inE.addEventListener('input', runQuantumSimulation);
+            if (inW) inW.addEventListener('input', runQuantumSimulation);
+            if (inM) inM.addEventListener('input', runRelativitySimulation);
+            if (inL) inL.addEventListener('input', runRelativitySimulation);
+
+            // Trigger initial calculations
+            runQuantumSimulation();
+            runRelativitySimulation();
+            runTrustSimulation();
+        }
+
         // Interactive mailto submission handler
         function handleContactForm(event, portalName) {
             event.preventDefault();
@@ -481,6 +1040,8 @@
             document.querySelectorAll('.hero .animate').forEach(el => {
                 el.classList.add('visible');
             });
+            // Initialize playground calculations and event bindings
+            initPlayground();
         };
         if (document.readyState === 'loading') {
             window.addEventListener('DOMContentLoaded', forceHeroVisible);

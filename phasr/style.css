@@ -834,3 +834,272 @@ footer {
     }
 }
 
+/* PHASR Playground Interactive Sandbox Styles */
+.playground-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.playground-header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(135deg, #ffffff, var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 0, 60, 0.15);
+    letter-spacing: 2px;
+}
+
+/* Tab Controls */
+.tab-controls {
+    display: flex;
+    background: rgba(3, 3, 3, 0.8);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 0.35rem;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    max-width: 300px;
+}
+
+.tab-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 0, 60, 0.04);
+}
+
+.tab-btn.active {
+    background: var(--accent-primary);
+    color: #ffffff;
+    border-color: var(--accent-secondary);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Simulator Panels */
+.sim-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .sim-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sim-display-panel {
+    background: #000000;
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    min-height: 380px;
+}
+
+.sim-display-panel svg {
+    display: block;
+}
+
+.sim-controls-panel {
+    background: rgba(5, 5, 6, 0.95);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+}
+
+.sim-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    border-bottom: 1px solid var(--surface-border);
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Form Controls */
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.control-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: bold;
+}
+
+.control-val {
+    color: #00ffaa;
+    font-family: monospace;
+}
+
+.sim-tab-content {
+    display: none;
+    width: 100%;
+}
+
+.sim-tab-content.active {
+    display: block;
+}
+
+/* Slide Inputs */
+.sim-controls-panel input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 0, 60, 0.15);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.sim-controls-panel input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    box-shadow: 0 0 8px var(--accent-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sim-controls-panel input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    background: #ffffff;
+    box-shadow: 0 0 12px #ffffff;
+}
+
+/* Terminal styling */
+.terminal-panel {
+    background: #000000;
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    color: #00ffaa;
+    height: 150px;
+    overflow-y: auto;
+    text-align: left;
+    box-shadow: inset 0 0 10px rgba(0, 255, 170, 0.02);
+    margin-top: 1rem;
+}
+
+.terminal-log-line {
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.log-timestamp {
+    color: rgba(255, 0, 60, 0.5);
+    margin-right: 0.5rem;
+}
+
+.log-info { color: #88c0d0; }
+.log-warn { color: #ffaa00; }
+.log-error { color: #ff3366; }
+
+/* Checklist styles */
+.checklist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.checklist-row:hover {
+    background: rgba(255, 0, 60, 0.02);
+    border-color: rgba(255, 0, 60, 0.15);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-round {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.slider-round:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider-round {
+    background-color: #00ffaa;
+    border-color: #00ffaa;
+}
+
+input:checked + .slider-round:before {
+    transform: translateX(22px);
+    background-color: #000000;
+}
+
+/* SVG wave styles */
+.quantum-wave {
+    fill: none;
+    stroke-linecap: round;
+}
+
+
