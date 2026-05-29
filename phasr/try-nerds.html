@@ -407,13 +407,20 @@
                         <!-- Potential Barrier Wall -->
                         <rect id="barrier-wall" x="270" y="50" width="60" height="240" fill="rgba(255, 0, 60, 0.15)" stroke="#ff003c" stroke-width="1.5" />
                         
-                        <!-- Waves -->
+                        <!-- Waves (Real Part - Solid) -->
                         <path id="incoming-wave-path" class="quantum-wave" stroke="#00ffaa" stroke-width="2.5" />
                         <path id="attenuated-wave-path" class="quantum-wave" stroke="#ffaa00" stroke-width="2.5" stroke-dasharray="3, 3" />
                         <path id="tunnelled-wave-path" class="quantum-wave" stroke="#ff003c" stroke-width="2.5" />
 
-                        <!-- Quantum Attestation Packet Particle -->
-                        <circle id="quantum-particle" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
+                        <!-- Waves (Imaginary Part - Faded Phase-Shifted) -->
+                        <path id="incoming-wave-path-img" class="quantum-wave" stroke="#b026ff" stroke-width="1.5" opacity="0.4" />
+                        <path id="attenuated-wave-path-img" class="quantum-wave" stroke="#ff0080" stroke-width="1.5" stroke-dasharray="3, 3" opacity="0.3" />
+                        <path id="tunnelled-wave-path-img" class="quantum-wave" stroke="#00b3ff" stroke-width="1.5" opacity="0.4" />
+
+                        <!-- Quantum Attestation Packet Particle Stream -->
+                        <circle id="quantum-particle-1" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
+                        <circle id="quantum-particle-2" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
+                        <circle id="quantum-particle-3" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
 
                         <!-- SVG Text Annotations -->
                         <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Ψ(x) Incoming Wave Packet</text>
@@ -498,8 +505,10 @@
                         <!-- Geodesic Transition Line -->
                         <path id="geodesic-path" fill="none" stroke="#00ffaa" stroke-width="2.5" />
 
-                        <!-- Relativity Packet Particle -->
-                        <circle id="relativity-particle" r="6" fill="#00ffaa" filter="url(#rNeon)" style="opacity: 0;" />
+                        <!-- Relativity Packet Particle Stream -->
+                        <circle id="relativity-particle-1" r="6" fill="#00ffaa" filter="url(#rNeon)" style="opacity: 0;" />
+                        <circle id="relativity-particle-2" r="6" fill="#00ffaa" filter="url(#rNeon)" style="opacity: 0;" />
+                        <circle id="relativity-particle-3" r="6" fill="#00ffaa" filter="url(#rNeon)" style="opacity: 0;" />
                         
                         <!-- Labels -->
                         <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Geodesic Transition Path (State Flow)</text>
@@ -757,14 +766,23 @@
             let incoming = '';
             let attenuated = '';
             let tunnelled = '';
+            
+            let incomingImg = '';
+            let attenuatedImg = '';
+            let tunnelledImg = '';
+            
             const centerY = 170;
             const incomingAmp = 40;
             const kVal = 0.15;
+            const phaseShift = Math.PI / 2; // 90 deg shift for imaginary part
 
             // 1. Incident Wave propagating to the right
             for(let x=0; x <= wallX; x++) {
                 const waveY = centerY + Math.sin(x * kVal - phase) * incomingAmp;
                 incoming += `${x===0 ? 'M' : 'L'} ${x} ${waveY} `;
+                
+                const waveYImg = centerY + Math.sin(x * kVal - phase - phaseShift) * (incomingAmp * 0.7);
+                incomingImg += `${x===0 ? 'M' : 'L'} ${x} ${waveYImg} `;
             }
 
             // 2. Inside barrier: Exponential decay
@@ -772,14 +790,21 @@
                 const relativeX = x - wallX;
                 const waveY = centerY + (Math.sin(wallX * kVal - phase) * incomingAmp) * Math.exp(-kappa * relativeX * 0.1);
                 attenuated += `${x===wallX ? 'M' : 'L'} ${x} ${waveY} `;
+                
+                const waveYImg = centerY + (Math.sin(wallX * kVal - phase - phaseShift) * (incomingAmp * 0.7)) * Math.exp(-kappa * relativeX * 0.1);
+                attenuatedImg += `${x===wallX ? 'M' : 'L'} ${x} ${waveYImg} `;
             }
 
             // 3. Right side wave: Attenuated transmission
             const rightStart = wallX + width;
             const tunnelledAmp = incomingAmp * Math.sqrt(tCoeff);
+            const tunnelledAmpImg = tunnelledAmp * 0.7;
             for(let x=rightStart; x <= 600; x++) {
                 const waveY = centerY + Math.sin(x * kVal - phase) * tunnelledAmp;
                 tunnelled += `${x===rightStart ? 'M' : 'L'} ${x} ${waveY} `;
+                
+                const waveYImg = centerY + Math.sin(x * kVal - phase - phaseShift) * tunnelledAmpImg;
+                tunnelledImg += `${x===rightStart ? 'M' : 'L'} ${x} ${waveYImg} `;
             }
 
             const inPath = document.getElementById('incoming-wave-path');
@@ -789,14 +814,24 @@
             if (attPath) attPath.setAttribute('d', attenuated);
             if (tunPath) tunPath.setAttribute('d', tunnelled);
 
+            const inPathImg = document.getElementById('incoming-wave-path-img');
+            const attPathImg = document.getElementById('attenuated-wave-path-img');
+            const tunPathImg = document.getElementById('tunnelled-wave-path-img');
+            if (inPathImg) inPathImg.setAttribute('d', incomingImg);
+            if (attPathImg) attPathImg.setAttribute('d', attenuatedImg);
+            if (tunPathImg) tunPathImg.setAttribute('d', tunnelledImg);
+
             const barLbl = document.getElementById('barrier-label');
             if (barLbl) barLbl.setAttribute('x', 300);
 
-            // Animate Packet/Particle along the wave profile
-            const qPart = document.getElementById('quantum-particle');
-            if (qPart) {
-                // Map current phase to particle position
-                const px = (phase * 16) % 640; 
+            // Animate multiple threat packets along the wave profile
+            const qParticlesCount = 3;
+            for(let i=0; i < qParticlesCount; i++) {
+                const qPart = document.getElementById(`quantum-particle-${i+1}`);
+                if (!qPart) continue;
+                
+                const offset = i * (640 / qParticlesCount);
+                const px = ((phase * 16) + offset) % 640; 
                 let py = centerY;
                 let pOpacity = 1;
                 let pColor = '#00ffaa'; // neon green
@@ -963,21 +998,28 @@
 
         // Animate packet along the spacetime geodesic curve
         function updateRelativityDraw() {
-            const rPart = document.getElementById('relativity-particle');
-            if (!rPart || geodesicPoints.length === 0) return;
+            if (geodesicPoints.length === 0) return;
 
-            relativityStep = (relativityStep + 1) % (geodesicPoints.length + 15);
+            relativityStep = (relativityStep + 0.8) % (geodesicPoints.length + 60);
 
-            if (relativityStep < geodesicPoints.length) {
-                const pt = geodesicPoints[relativityStep];
-                rPart.setAttribute('cx', pt.x);
-                rPart.setAttribute('cy', pt.y);
-                rPart.style.opacity = 1;
-                rPart.setAttribute('fill', '#00ffaa');
-                rPart.setAttribute('stroke', '#ffffff');
-                rPart.setAttribute('stroke-width', '1.5');
-            } else {
-                rPart.style.opacity = 0;
+            for (let i = 0; i < 3; i++) {
+                const rPart = document.getElementById(`relativity-particle-${i+1}`);
+                if (!rPart) continue;
+
+                const offset = i * 35;
+                const currentStep = Math.floor((relativityStep + offset) % (geodesicPoints.length + 60));
+
+                if (currentStep < geodesicPoints.length) {
+                    const pt = geodesicPoints[currentStep];
+                    rPart.setAttribute('cx', pt.x);
+                    rPart.setAttribute('cy', pt.y);
+                    rPart.style.opacity = 1;
+                    rPart.setAttribute('fill', '#00ffaa');
+                    rPart.setAttribute('stroke', '#ffffff');
+                    rPart.setAttribute('stroke-width', '1.5');
+                } else {
+                    rPart.style.opacity = 0;
+                }
             }
         }
 
