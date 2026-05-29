@@ -706,3 +706,131 @@ footer {
         display: none;
     }
 }
+
+/* Custom Mathematical Notation Styling */
+.math-block {
+    background: rgba(13, 5, 8, 0.95);
+    border: 1px solid rgba(255, 0, 60, 0.25);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.2rem 0;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.95rem;
+    color: #ffffff;
+    box-shadow: inset 0 0 10px rgba(255, 0, 60, 0.1), 0 0 15px rgba(255, 0, 60, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    overflow-x: auto;
+}
+
+.math-equation {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    white-space: nowrap;
+    color: var(--accent-secondary);
+    text-shadow: 0 0 4px var(--accent-glow);
+    font-weight: 600;
+}
+
+.math-fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    padding: 0 0.2rem;
+}
+
+.math-numerator {
+    text-align: center;
+    padding-bottom: 2px;
+}
+
+.math-denominator {
+    border-top: 1px solid var(--accent-secondary);
+    text-align: center;
+    padding-top: 2px;
+    width: 100%;
+}
+
+.math-sub {
+    font-size: 0.7rem;
+    vertical-align: sub;
+}
+
+.math-sup {
+    font-size: 0.7rem;
+    vertical-align: super;
+}
+
+.math-bold {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.math-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Enhancements for capabilities cards in index.html */
+.capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.capabilities-card {
+    background: rgba(3, 3, 3, 0.8);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: var(--transition);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9);
+    position: relative;
+    overflow: hidden;
+}
+
+.capabilities-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    opacity: 0.5;
+    transition: var(--transition);
+}
+
+.capabilities-card:hover {
+    background: rgba(255, 0, 60, 0.02);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 30px rgba(255, 0, 60, 0.2), 0 10px 40px rgba(0, 0, 0, 0.95);
+    transform: translateY(-4px);
+}
+
+.capabilities-card:hover::before {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--accent-primary);
+}
+
+@media (max-width: 900px) {
+    .capabilities-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
