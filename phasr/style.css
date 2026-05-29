@@ -1102,4 +1102,142 @@ input:checked + .slider-round:before {
     stroke-linecap: round;
 }
 
+/* PHASR Futuristic Mainframe Portal Grid and Card styles */
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+}
+
+@media (max-width: 850px) {
+    .portal-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+.portal-card {
+    background: rgba(3, 3, 3, 0.9);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95);
+    min-height: 420px;
+}
+
+.portal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    opacity: 0.6;
+    transition: var(--transition);
+}
+
+.portal-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 35px rgba(255, 0, 60, 0.25), 0 10px 40px rgba(0, 0, 0, 0.95);
+    transform: translateY(-5px);
+}
+
+.portal-card:hover::before {
+    opacity: 1;
+    box-shadow: 0 0 15px var(--accent-primary);
+}
+
+.portal-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 0, 60, 0.05);
+    border: 1px solid rgba(255, 0, 60, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    position: relative;
+    transition: var(--transition);
+}
+
+.portal-card:hover .portal-icon {
+    background: rgba(255, 0, 60, 0.1);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(255, 0, 60, 0.2);
+}
+
+/* Sci-fi scanner overlay effect */
+.scanner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 50%, rgba(255, 0, 60, 0.04) 50%);
+    background-size: 100% 4px;
+    opacity: 0.45;
+}
+
+/* Glowing text and telemetry values */
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed rgba(255, 0, 60, 0.1);
+    font-size: 0.85rem;
+}
+
+.telemetry-label {
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+.telemetry-value {
+    color: #00ffaa;
+    font-family: monospace;
+    font-weight: 700;
+}
+
+/* Pulse / scanline animation */
+@keyframes scanning-line {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(340px); }
+}
+
+.sim-display-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+.sim-display-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    box-shadow: 0 0 8px var(--accent-primary);
+    animation: scanning-line 5s linear infinite;
+    pointer-events: none;
+}
+
+
 
