@@ -378,6 +378,7 @@
             <button class="tab-btn active" onclick="switchTab('quantum')">Quantum Tunneling</button>
             <button class="tab-btn" onclick="switchTab('relativity')">Spacetime Curvature</button>
             <button class="tab-btn" onclick="switchTab('trust')">PCR Attestation</button>
+            <button class="tab-btn" onclick="switchTab('turing')">Turing Decider</button>
         </div>
 
         <!-- TAB 1: QUANTUM TUNNELING (Schrodinger Engine) -->
@@ -631,6 +632,118 @@
             </div>
         </div>
 
+        <!-- TAB 4: TURING DECIDER (Attestation Turing Machine) -->
+        <div id="panel-turing" class="sim-tab-content">
+            <div class="sim-grid">
+                <!-- Left: SVG Tape Visualization -->
+                <div class="sim-display-panel">
+                    <svg id="turing-svg" width="100%" height="340" viewBox="0 0 600 340" style="background: #030303; border-radius: 8px;">
+                        <defs>
+                            <pattern id="tGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 255, 255, 0.02)" stroke-width="0.5" />
+                            </pattern>
+                            <filter id="tNeon" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <filter id="tNeonSoft" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="2" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#tGrid)" />
+
+                        <!-- State label -->
+                        <text id="turing-state-label" x="300" y="38" fill="#00ffaa" font-family="monospace" font-size="11" text-anchor="middle" filter="url(#tNeonSoft)">STATE: q_init</text>
+
+                        <!-- Tape track rail -->
+                        <line x1="25" y1="170" x2="575" y2="170" stroke="rgba(0,255,170,0.10)" stroke-width="60" stroke-linecap="round" />
+                        <line x1="25" y1="170" x2="575" y2="170" stroke="rgba(0,255,170,0.04)" stroke-width="62" stroke-linecap="round" />
+
+                        <!-- Tape cells (11 cells) -->
+                        <g id="turing-tape-group"></g>
+
+                        <!-- Head pointer triangle -->
+                        <polygon id="turing-head" points="300,110 290,95 310,95" fill="#00ffaa" filter="url(#tNeon)" />
+                        <line id="turing-head-line" x1="300" y1="111" x2="300" y2="140" stroke="#00ffaa" stroke-width="2" opacity="0.7" />
+
+                        <!-- Step progress bar background -->
+                        <rect x="25" y="255" width="550" height="6" rx="3" fill="rgba(255,255,255,0.05)" />
+                        <rect id="turing-progress-bar" x="25" y="255" width="0" height="6" rx="3" fill="#00ffaa" filter="url(#tNeonSoft)" />
+
+                        <!-- Bottom annotations -->
+                        <text x="25" y="285" fill="rgba(255,255,255,0.3)" font-family="monospace" font-size="9">STEP 0</text>
+                        <text id="turing-step-label" x="25" y="285" fill="#00ffaa" font-family="monospace" font-size="9">STEP 0</text>
+                        <text id="turing-max-label" x="575" y="285" fill="rgba(255,255,255,0.3)" font-family="monospace" font-size="9" text-anchor="end">MAX 50</text>
+
+                        <!-- Entropy wave (decorative) -->
+                        <path id="turing-entropy-wave" fill="none" stroke="#b026ff" stroke-width="1.5" opacity="0.35" />
+
+                        <!-- SVG Labels -->
+                        <text x="25" y="22" fill="rgba(255,255,255,0.3)" font-family="monospace" font-size="9">TURING ATTESTATION MACHINE &mdash; M_attest</text>
+                        <text x="575" y="22" fill="#ff5376" font-family="monospace" font-size="9" text-anchor="end" id="turing-verdict-label">RUNNING</text>
+                    </svg>
+                </div>
+                <!-- Right: Telemetry & Controls -->
+                <div class="sim-controls-panel">
+                    <h2 class="sim-title">
+                        <span>Turing Decider</span>
+                        <span id="turing-status-badge" style="font-family:monospace; font-size:0.8rem; color:#00ffaa; background:rgba(0,255,170,0.08); border:1px solid rgba(0,255,170,0.2); padding:0.2rem 0.5rem; border-radius:3px;">RUNNING</span>
+                    </h2>
+
+                    <div style="background: rgba(13, 5, 8, 0.95); border: 1px solid rgba(0, 255, 170, 0.25); border-radius: 8px; padding: 1rem; margin: 0 0 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-family: monospace; letter-spacing: 1px;">Attestation Telemetry</span>
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">&gt; TAPE_HEAD_INDEX:</span>
+                            <span class="telemetry-value" id="telemetry-head-index">0</span>
+                        </div>
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">&gt; TAPE_ENTROPY:</span>
+                            <span class="telemetry-value" id="telemetry-tape-entropy">0.000 bits</span>
+                        </div>
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">&gt; HALTING_CONFIDENCE:</span>
+                            <span class="telemetry-value" id="telemetry-halt-conf">100.00%</span>
+                        </div>
+                        <div class="telemetry-row">
+                            <span class="telemetry-label">&gt; COMPUTATIONAL_STEPS:</span>
+                            <span class="telemetry-value" id="telemetry-comp-steps">0</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-header">
+                            <span>State Space Complexity (|Q|)</span>
+                            <span class="control-val" id="val-turing-q">5 states</span>
+                        </div>
+                        <input type="range" id="input-turing-q" min="3" max="10" step="1" value="5">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-header">
+                            <span>Tape Input Noise (Payload Entropy)</span>
+                            <span class="control-val" id="val-turing-noise">20%</span>
+                        </div>
+                        <input type="range" id="input-turing-noise" min="0" max="100" step="1" value="20">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-header">
+                            <span>Simulation Cycle Delay</span>
+                            <span class="control-val" id="val-turing-speed">300 ms</span>
+                        </div>
+                        <input type="range" id="input-turing-speed" min="100" max="1000" step="50" value="300">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Terminal Console Logging Feed -->
         <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem; margin-top: 1.5rem;">
             <h3 style="font-size: 0.9rem; font-weight: 800; color: #ffffff; letter-spacing: 1px; text-transform: uppercase;">
@@ -692,6 +805,7 @@
             if (tabId === 'quantum') runQuantumSimulation();
             if (tabId === 'relativity') runRelativitySimulation();
             if (tabId === 'trust') runTrustSimulation();
+            if (tabId === 'turing') runTuringSimulation();
         }
 
         // --- QUANTUM SIMULATION LOGIC ---
@@ -1097,12 +1211,242 @@
             }
         }
 
+        // --- TURING DECIDER SIMULATION LOGIC ---
+        let turingParams = { q: 5, noise: 20, delay: 300 };
+        let turingState = { tape: [], head: 0, step: 0, maxSteps: 50, halted: false, verdict: 'RUNNING', currentState: 'q_init', nextTick: 0, haltConf: 1.0, entropy: 0 };
+
+        function buildTuringTape(noise, tapeLen) {
+            const tape = [];
+            const cleanSymbols = ['0', '1', 'A', 'B'];
+            const noiseSymbols = ['X', 'S', '#', '?', 'E', 'F'];
+            for (let i = 0; i < tapeLen; i++) {
+                tape.push(Math.random() * 100 < noise ? noiseSymbols[Math.floor(Math.random() * noiseSymbols.length)] : cleanSymbols[Math.floor(Math.random() * cleanSymbols.length)]);
+            }
+            return tape;
+        }
+
+        function shannonEntropy(tape) {
+            const freq = {};
+            tape.forEach(s => { freq[s] = (freq[s] || 0) + 1; });
+            const n = tape.length;
+            return Object.values(freq).reduce((h, c) => {
+                const p = c / n;
+                return h - p * Math.log2(p);
+            }, 0);
+        }
+
+        function runTuringSimulation() {
+            const inQ = document.getElementById('input-turing-q');
+            const inNoise = document.getElementById('input-turing-noise');
+            const inSpeed = document.getElementById('input-turing-speed');
+            if (!inQ || !inNoise || !inSpeed) return;
+
+            turingParams.q = parseInt(inQ.value, 10);
+            turingParams.noise = parseInt(inNoise.value, 10);
+            turingParams.delay = parseInt(inSpeed.value, 10);
+
+            const valQ = document.getElementById('val-turing-q');
+            const valNoise = document.getElementById('val-turing-noise');
+            const valSpeed = document.getElementById('val-turing-speed');
+            if (valQ) valQ.innerText = turingParams.q + ' states';
+            if (valNoise) valNoise.innerText = turingParams.noise + '%';
+            if (valSpeed) valSpeed.innerText = turingParams.delay + ' ms';
+
+            const tapeLen = 11;
+            const tape = buildTuringTape(turingParams.noise, tapeLen);
+            const maxSteps = turingParams.q * 10;
+
+            turingState.tape = tape;
+            turingState.head = 0;
+            turingState.step = 0;
+            turingState.maxSteps = maxSteps;
+            turingState.halted = false;
+            turingState.verdict = 'RUNNING';
+            turingState.currentState = 'q_init';
+            turingState.nextTick = performance.now();
+            turingState.entropy = shannonEntropy(tape);
+            turingState.haltConf = Math.exp(-turingState.entropy * (turingParams.q / 10));
+
+            renderTuringTapeDOM(turingState.tape, 0);
+            logMsg(`[TURING] Machine reset. |Q|=${turingParams.q}, tape_noise=${turingParams.noise}%, max_steps=${maxSteps}`);
+            logMsg(`[TURING] Tape entropy H=${turingState.entropy.toFixed(3)} bits, C_halt=${(turingState.haltConf * 100).toFixed(1)}%`);
+        }
+
+        function renderTuringTapeDOM(tape, headIdx) {
+            const g = document.getElementById('turing-tape-group');
+            if (!g) return;
+            g.innerHTML = '';
+            const cellW = 46;
+            const cellH = 46;
+            const startX = (600 - tape.length * cellW) / 2;
+            const cellY = 147;
+            const noiseSymbols = new Set(['X', 'S', '#', '?', 'E', 'F']);
+
+            tape.forEach((sym, i) => {
+                const cx = startX + i * cellW;
+                const isHead = i === headIdx;
+                const isNoisy = noiseSymbols.has(sym);
+                const cellColor = isHead ? 'rgba(0,255,170,0.2)' : (isNoisy ? 'rgba(255,51,102,0.12)' : 'rgba(255,255,255,0.03)');
+                const strokeColor = isHead ? '#00ffaa' : (isNoisy ? '#ff3366' : 'rgba(255,255,255,0.12)');
+                const strokeW = isHead ? 2 : 1;
+                const txtColor = isHead ? '#00ffaa' : (isNoisy ? '#ff5376' : 'rgba(255,255,255,0.6)');
+
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', cx + 2); rect.setAttribute('y', cellY); rect.setAttribute('width', cellW - 4); rect.setAttribute('height', cellH);
+                rect.setAttribute('rx', '4'); rect.setAttribute('fill', cellColor); rect.setAttribute('stroke', strokeColor); rect.setAttribute('stroke-width', strokeW);
+                if (isHead) rect.setAttribute('filter', 'url(#tNeonSoft)');
+                g.appendChild(rect);
+
+                const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                txt.setAttribute('x', cx + cellW / 2); txt.setAttribute('y', cellY + 29);
+                txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-family', 'monospace'); txt.setAttribute('font-size', '14');
+                txt.setAttribute('fill', txtColor); txt.setAttribute('font-weight', isHead ? '800' : '400');
+                txt.textContent = sym;
+                g.appendChild(txt);
+            });
+        }
+
+        function turingTransition(state, sym) {
+            if (state === 'q_init') return { next: 'q_read', write: sym, dir: 1 };
+            if (state === 'q_read') return { next: 'q_validate', write: sym, dir: 1 };
+            if (state === 'q_validate') {
+                const noisy = ['X', 'S', '#', '?', 'E', 'F'];
+                return noisy.includes(sym) ? { next: 'q_check_H', write: 'X', dir: 0 } : { next: 'q_read', write: sym, dir: 1 };
+            }
+            if (state === 'q_check_H') return { next: 'q_reject', write: sym, dir: 0 };
+            return { next: state, write: sym, dir: 1 };
+        }
+
+        function tickTuringMachine(now) {
+            if (turingState.halted) return;
+            if (now < turingState.nextTick) return;
+            turingState.nextTick = now + turingParams.delay;
+
+            const tape = turingState.tape;
+            const tapeLen = tape.length;
+            const head = turingState.head;
+            const state = turingState.currentState;
+            const sym = tape[head] || '_';
+
+            turingState.entropy = shannonEntropy(tape);
+            turingState.haltConf = Math.exp(-turingState.entropy * (turingParams.q / 10));
+
+            if (turingState.haltConf < 0.65) {
+                turingState.halted = true;
+                turingState.verdict = 'HALTED (REJECTED)';
+                turingState.currentState = 'q_reject';
+                logMsg(`[TURING] ATTACKER INVALIDATED — High payload entropy H=${turingState.entropy.toFixed(3)} bits. C_halt=${(turingState.haltConf*100).toFixed(1)}% < 65% threshold.`, 'error');
+                updateTuringTelemetry();
+                return;
+            }
+
+            if (turingState.step >= turingState.maxSteps) {
+                turingState.halted = true;
+                turingState.verdict = 'HALTED (REJECTED)';
+                turingState.currentState = 'q_reject';
+                logMsg(`[TURING] Infinite-loop exploit detected. Step count ${turingState.step} exceeded psi(M)=${turingState.maxSteps}. Trace rejected.`, 'error');
+                updateTuringTelemetry();
+                return;
+            }
+
+            const trans = turingTransition(state, sym);
+            tape[head] = trans.write;
+            const prevState = state;
+            turingState.currentState = trans.next;
+            turingState.head = Math.max(0, Math.min(tapeLen - 1, head + trans.dir));
+            turingState.step++;
+
+            logMsg(`[TURING] Step ${turingState.step}: ${prevState} → ${trans.next}. Scanned [${sym}]→wrote[${trans.write}] @ cell ${head}`);
+
+            if (trans.next === 'q_reject') {
+                turingState.halted = true;
+                turingState.verdict = 'HALTED (REJECTED)';
+                logMsg(`[TURING] Trace halted in q_reject. Attacker execution path invalidated.`, 'error');
+            } else if (turingState.head >= tapeLen - 1 || trans.next === 'q_accept') {
+                turingState.halted = true;
+                turingState.verdict = 'HALTED (ACCEPTED)';
+                turingState.currentState = 'q_accept';
+                logMsg(`[TURING] Trace validated. System attestation PASSED — halted in q_accept.`, 'success');
+            }
+
+            updateTuringTelemetry();
+            renderTuringTapeDOM(tape, turingState.head);
+        }
+
+        function updateTuringTelemetry() {
+            const headEl = document.getElementById('telemetry-head-index');
+            const entEl = document.getElementById('telemetry-tape-entropy');
+            const confEl = document.getElementById('telemetry-halt-conf');
+            const stepEl = document.getElementById('telemetry-comp-steps');
+            const badge = document.getElementById('turing-status-badge');
+            const stateLabel = document.getElementById('turing-state-label');
+            const verdictLabel = document.getElementById('turing-verdict-label');
+            const progBar = document.getElementById('turing-progress-bar');
+            const stepLabel = document.getElementById('turing-step-label');
+            const maxLabel = document.getElementById('turing-max-label');
+            const headPoly = document.getElementById('turing-head');
+            const headLine = document.getElementById('turing-head-line');
+
+            if (headEl) headEl.innerText = turingState.head;
+            if (entEl) entEl.innerText = turingState.entropy.toFixed(3) + ' bits';
+            if (confEl) {
+                confEl.innerText = (turingState.haltConf * 100).toFixed(1) + '%';
+                confEl.style.color = turingState.haltConf < 0.65 ? '#ff3366' : '#00ffaa';
+            }
+            if (stepEl) stepEl.innerText = turingState.step;
+            if (stateLabel) stateLabel.textContent = 'STATE: ' + turingState.currentState;
+            if (stepLabel) stepLabel.textContent = 'STEP ' + turingState.step;
+            if (maxLabel) maxLabel.textContent = 'MAX ' + turingState.maxSteps;
+
+            const progW = turingState.maxSteps > 0 ? Math.min(550, (turingState.step / turingState.maxSteps) * 550) : 0;
+            if (progBar) progBar.setAttribute('width', progW);
+
+            const cellW = 46;
+            const startX = (600 - turingState.tape.length * cellW) / 2;
+            const headX = startX + turingState.head * cellW + cellW / 2;
+            if (headPoly) headPoly.setAttribute('points', `${headX},110 ${headX-10},95 ${headX+10},95`);
+            if (headLine) { headLine.setAttribute('x1', headX); headLine.setAttribute('x2', headX); }
+
+            if (badge && verdictLabel) {
+                const v = turingState.verdict;
+                const isRej = v.includes('REJECTED');
+                const isAcc = v.includes('ACCEPTED');
+                const col = isRej ? '#ff3366' : (isAcc ? '#00d4ff' : '#00ffaa');
+                const bg = isRej ? 'rgba(255,51,102,0.1)' : (isAcc ? 'rgba(0,212,255,0.08)' : 'rgba(0,255,170,0.08)');
+                const brd = isRej ? 'rgba(255,51,102,0.3)' : (isAcc ? 'rgba(0,212,255,0.25)' : 'rgba(0,255,170,0.2)');
+                badge.innerText = v;
+                badge.style.color = col; badge.style.background = bg; badge.style.borderColor = brd;
+                verdictLabel.textContent = v;
+                verdictLabel.style.fill = col;
+            }
+        }
+
+        function updateTuringDraw(now) {
+            const panel = document.getElementById('panel-turing');
+            if (!panel || !panel.classList.contains('active')) return;
+            tickTuringMachine(now);
+
+            const entropyWave = document.getElementById('turing-entropy-wave');
+            if (entropyWave) {
+                let wPath = '';
+                const amp = Math.min(18, turingState.entropy * 5);
+                const freq = 0.06;
+                const t = performance.now() * 0.001;
+                for (let x = 25; x <= 575; x += 3) {
+                    const y = 310 + Math.sin(x * freq + t * 2) * amp;
+                    wPath += `${x === 25 ? 'M' : 'L'} ${x} ${y} `;
+                }
+                entropyWave.setAttribute('d', wPath);
+            }
+        }
+
         // --- GLOBAL FRAME ANIMATION LOOP ---
         let quantumPhase = 0;
         let animationActive = true;
 
         function animatePlayground() {
             if (!animationActive) return;
+            const now = performance.now();
 
             // Increment phase
             quantumPhase += 0.08;
@@ -1112,6 +1456,9 @@
 
             // Update Spacetime curvature particle along geodesic
             updateRelativityDraw();
+
+            // Update Turing tape step machine
+            updateTuringDraw(now);
 
             requestAnimationFrame(animatePlayground);
         }
@@ -1124,10 +1471,18 @@
             if (inM) inM.addEventListener('input', runRelativitySimulation);
             if (inL) inL.addEventListener('input', runRelativitySimulation);
 
+            const inTQ = document.getElementById('input-turing-q');
+            const inTN = document.getElementById('input-turing-noise');
+            const inTS = document.getElementById('input-turing-speed');
+            if (inTQ) inTQ.addEventListener('input', runTuringSimulation);
+            if (inTN) inTN.addEventListener('input', runTuringSimulation);
+            if (inTS) inTS.addEventListener('input', runTuringSimulation);
+
             // Trigger initial calculations
             runQuantumSimulation();
             runRelativitySimulation();
             runTrustSimulation();
+            runTuringSimulation();
 
             // Run continuous frame animations
             animationActive = true;
