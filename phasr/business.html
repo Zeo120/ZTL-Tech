@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASR Business | Zeo Thinking Labs</title>
+    <meta name="description" content="Explore the business value, compliance benefits, and interactive ROI metrics of PHASR security attestation.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .business-hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .business-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff, var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 0, 60, 0.15);
+        }
+
+        .calculator-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(5, 5, 6, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 0, 60, 0.05);
+            text-align: left;
+        }
+
+        .calculator-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.8rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .slider-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .slider-val {
+            color: #00ffaa;
+            font-family: monospace;
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 0, 60, 0.15);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            transition: var(--transition);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        .results-panel {
+            background: rgba(0, 255, 170, 0.01);
+            border: 1px dashed rgba(0, 255, 170, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .result-card {
+            text-align: center;
+        }
+
+        .result-card .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: monospace;
+            color: #00ffaa;
+            text-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+            margin-bottom: 0.3rem;
+        }
+
+        .result-card .value.negative {
+            color: #ff3366;
+            text-shadow: 0 0 8px rgba(255, 51, 102, 0.2);
+        }
+
+        .result-card .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            max-width: 1000px;
+            width: 100%;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .comparison-table-wrapper {
+            background: rgba(3, 3, 3, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .comparison-table th, 
+        .comparison-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 0, 60, 0.08);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 0, 60, 0.03);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .comparison-table td.highlight {
+            color: #ffffff;
+            font-weight: 700;
+            border-left: 2px solid var(--accent-primary);
+            background: rgba(255, 0, 60, 0.01);
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 3rem auto 5rem;
+            padding: 0 2rem;
+        }
+
+        .compliance-card {
+            background: rgba(5, 5, 6, 0.9);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: var(--transition);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .compliance-card:hover {
+            border-color: #00ffaa;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 170, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .business-hero h1 {
+                font-size: 2.5rem;
+            }
+            .calculator-container {
+                padding: 1.5rem;
+            }
+            .results-panel {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+            .compliance-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .comparison-table th, 
+            .comparison-table td {
+                padding: 0.8rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav>
+        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+            <div class="logo-diamond"></div>
+            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+        </a>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links">
+            <a href="../ztl_tech/index.html#home">Home</a>
+            <div class="nav-item-dropdown">
+                <a href="#products" class="dropdown-trigger">Products <span class="dropdown-arrow">▼</span></a>
+                <div class="dropdown-menu">
+                    <a href="../paradigm/index.html">
+                        <span class="dropdown-title">Paradigm</span>
+                        <span class="dropdown-desc">Custom Software Design</span>
+                    </a>
+                    <a href="index.html">
+                        <span class="dropdown-title">Systems Design</span>
+                        <span class="dropdown-desc">PHASR Platform</span>
+                    </a>
+                    <a href="business.html">
+                        <span class="dropdown-title">PHASR Business</span>
+                        <span class="dropdown-desc">ROI &amp; Compliance</span>
+                    </a>
+                    <a href="try-nerds.html">
+                        <span class="dropdown-title">PHASR for Nerds</span>
+                        <span class="dropdown-desc">Interactive Simulation</span>
+                    </a>
+                    <a href="../grid/index.html">
+                        <span class="dropdown-title">Architecture &amp; Grid</span>
+                        <span class="dropdown-desc">GRID</span>
+                    </a>
+                    <a href="../scalpel/index.html">
+                        <span class="dropdown-title">Workflow Automation</span>
+                        <span class="dropdown-desc">SCALPEL</span>
+                    </a>
+                </div>
+            </div>
+            <a href="../ztl_tech/index.html#contact">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Mobile Nav Menu -->
+    <div class="nav-menu">
+        <a href="../ztl_tech/index.html#home" class="mobile-main-link">Home</a>
+        <div class="mobile-dropdown">
+            <div class="mobile-dropdown-trigger">Products <span class="mobile-arrow">▼</span></div>
+            <div class="mobile-dropdown-menu">
+                <a href="../paradigm/index.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Paradigm</span>
+                    <span class="mobile-sublink-desc">Custom Software Design</span>
+                </a>
+                <a href="index.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Systems Design</span>
+                    <span class="mobile-sublink-desc">PHASR Platform</span>
+                </a>
+                <a href="business.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">PHASR Business</span>
+                    <span class="mobile-sublink-desc">ROI &amp; Compliance</span>
+                </a>
+                <a href="try-nerds.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">PHASR for Nerds</span>
+                    <span class="mobile-sublink-desc">Interactive Simulation</span>
+                </a>
+                <a href="../grid/index.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Architecture &amp; Grid</span>
+                    <span class="mobile-sublink-desc">GRID</span>
+                </a>
+                <a href="../scalpel/index.html" class="mobile-sublink">
+                    <span class="mobile-sublink-title">Workflow Automation</span>
+                    <span class="mobile-sublink-desc">SCALPEL</span>
+                </a>
+            </div>
+        </div>
+        <a href="../ztl_tech/index.html#contact" class="mobile-main-link">Contact</a>
+    </div>
+
+    <main>
+        <section class="business-hero">
+            <span class="badge animate" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(0, 255, 170, 0.25); display: inline-block; margin-bottom: 1.5rem; letter-spacing: 1px;">EXECUTIVE VALUE BRIEF</span>
+            <h1 class="animate">PHASR Business Case</h1>
+            <p class="animate delay-1" style="max-width: 750px; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.7;">
+                Vulnerability scanning discovers flaws <i>after</i> they have already compromised your security boundary. PHASR secures systems before deployment, validating states mathematically to dramatically compress vulnerability fix hours.
+            </p>
+        </section>
+
+        <!-- ROI Calculator -->
+        <section class="animate delay-2" style="padding: 0 2rem;">
+            <div class="calculator-container">
+                <h2 class="calculator-title">Interactive Security ROI Solver</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">
+                    Configure your team size and operational profile below to compute estimated annual security budget savings with PHASR.
+                </p>
+                
+                <div class="slider-group">
+                    <div class="slider-label-row">
+                        <span>Codebase Size (Lines of Code)</span>
+                        <span class="slider-val" id="loc-display">150,000 LOC</span>
+                    </div>
+                    <input type="range" id="loc-slider" min="10000" max="500000" step="5000" value="150000">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label-row">
+                        <span>Number of Software Engineers</span>
+                        <span class="slider-val" id="eng-display">25 Engineers</span>
+                    </div>
+                    <input type="range" id="eng-slider" min="5" max="100" step="1" value="25">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label-row">
+                        <span>Annual Security Incident History Cost</span>
+                        <span class="slider-val" id="incident-display">$150,000</span>
+                    </div>
+                    <input type="range" id="incident-slider" min="10000" max="1000000" step="10000" value="150000">
+                </div>
+
+                <div class="results-panel">
+                    <div class="result-card">
+                        <div class="value negative" id="cost-traditional">$215,000</div>
+                        <div class="label">Traditional Audit Cost</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="cost-phasr">$53,750</div>
+                        <div class="label">PHASR Attested Cost</div>
+                    </div>
+                    <div class="result-card" style="border-left: 1px solid rgba(0, 255, 170, 0.15);">
+                        <div class="value" id="cost-savings" style="color: #ffffff; text-shadow: 0 0 12px #00ffaa;">$161,250</div>
+                        <div class="label">Estimated Net Savings</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Comparisons -->
+        <section class="comparison-section animate">
+            <div class="section-header" style="margin-bottom: 2.5rem;">
+                <h2>Platform Comparison</h2>
+                <p style="color: var(--text-secondary)">Why mathematical proofs outperform retro-active heuristic tooling.</p>
+            </div>
+            
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Capability Area</th>
+                            <th>Traditional SAST / DAST</th>
+                            <th>PHASR Attestation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="highlight">Core Security Proof</td>
+                            <td>Heuristic patterns (High false positives)</td>
+                            <td>Formal mathematical FSM &amp; PCR validation</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight">Bypass Vector Analysis</td>
+                            <td>Static signatures checking</td>
+                            <td>Quantum-probabilistic tunneling simulation</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight">Vulnerability Scaling</td>
+                            <td>Flat list of individual alerts</td>
+                            <td>Einstein field metric state-space curvature</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight">Redundancy Testing</td>
+                            <td>Simulated request mocks</td>
+                            <td>Active drift telemetry &amp; eBPF lag insertion</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight">Mitigation Style</td>
+                            <td>Post-incident code patch recommendations</td>
+                            <td>Fail-closed compile-time verification</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Compliance Matrix -->
+        <section class="animate">
+            <div class="section-header" style="margin-bottom: 2.5rem;">
+                <h2>Regulatory Audit Readiness</h2>
+                <p style="color: var(--text-secondary)">Satisfy standard regulatory compliance frameworks out of the box.</p>
+            </div>
+            
+            <div class="compliance-grid">
+                <div class="compliance-card">
+                    <span class="badge" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; border-color: rgba(0,255,170,0.25);">SOC 2 Trust Services</span>
+                    <h3 style="margin-top: 1rem; margin-bottom: 0.8rem; font-weight: 700;">Criteria CC6.1 &amp; CC6.3</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                        PHASR's Phase 1-4 engines audit hierarchy boundaries and validate logical transition state trees, satisfying continuous system configuration auditing requirements.
+                    </p>
+                </div>
+                <div class="compliance-card">
+                    <span class="badge" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; border-color: rgba(0,255,170,0.25);">ISO/IEC 27001:2022</span>
+                    <h3 style="margin-top: 1rem; margin-bottom: 0.8rem; font-weight: 700;">Control A.8.20 &amp; A.8.24</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                        Primordial Sin boot attestation ensures hardware integrity and cryptographic configuration validation through verifiable TPM PCR registrations.
+                    </p>
+                </div>
+                <div class="compliance-card">
+                    <span class="badge" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; border-color: rgba(0,255,170,0.25);">NIST SP 800-207</span>
+                    <h3 style="margin-top: 1rem; margin-bottom: 0.8rem; font-weight: 700;">Zero Trust Architecture</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                        Quantum boundary attestation models potential barrier resistance, ensuring that no internal communication path retains implicit trust boundaries.
+                    </p>
+                </div>
+                <div class="compliance-card">
+                    <span class="badge" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; border-color: rgba(0,255,170,0.25);">HIPAA Security Rule</span>
+                    <h3 style="margin-top: 1rem; margin-bottom: 0.8rem; font-weight: 700;">Section 164.312 Technicals</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                        Active database redundancy testing and failover emulation verify that system nodes maintain hot standby consistency, preventing data unavailability.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 5rem 10%; border-top: 1px solid var(--surface-border); text-align: center;">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: center;">
+            <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
+                <div class="logo-diamond"></div>
+                <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+            </a>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">© 2026 Zeo Thinking Labs. All rights reserved.</p>
+        <div class="footer-links" style="justify-content: center; display: flex; gap: 2rem; flex-wrap: wrap;">
+            <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">PHASR Platform</a>
+            <a href="business.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">Business Case</a>
+            <a href="try-nerds.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">Try for Nerds</a>
+            <a href="../ztl_tech/index.html#contact" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">Contact Us</a>
+        </div>
+    </footer>
+
+    <script>
+        // Hamburger Menu Interactive Logic
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-main-link, .mobile-sublink');
+        const mobileDropdown = document.querySelector('.mobile-dropdown');
+        const mobileTrigger = document.querySelector('.mobile-dropdown-trigger');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+                if (mobileDropdown) mobileDropdown.classList.remove('active');
+            });
+        });
+
+        if (mobileTrigger && mobileDropdown) {
+            mobileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileDropdown.classList.toggle('active');
+            });
+        }
+
+        // Force all hero elements visible
+        const forceHeroVisible = () => {
+            document.querySelectorAll('.business-hero .animate, main > .animate').forEach(el => {
+                el.classList.add('visible');
+            });
+        };
+        window.addEventListener('DOMContentLoaded', forceHeroVisible);
+
+        // ROI Calculator Computation Engine
+        const locSlider = document.getElementById('loc-slider');
+        const engSlider = document.getElementById('eng-slider');
+        const incidentSlider = document.getElementById('incident-slider');
+
+        const locDisplay = document.getElementById('loc-display');
+        const engDisplay = document.getElementById('eng-display');
+        const incidentDisplay = document.getElementById('incident-display');
+
+        const costTraditional = document.getElementById('cost-traditional');
+        const costPhasr = document.getElementById('cost-phasr');
+        const costSavings = document.getElementById('cost-savings');
+
+        function formatCurrency(val) {
+            return '$' + val.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        }
+
+        function calculateROI() {
+            const loc = parseInt(locSlider.value, 10);
+            const eng = parseInt(engSlider.value, 10);
+            const incidentCost = parseInt(incidentSlider.value, 10);
+
+            // Displays
+            locDisplay.innerText = loc.toLocaleString() + ' LOC';
+            engDisplay.innerText = eng + ' Engineers';
+            incidentDisplay.innerText = formatCurrency(incidentCost);
+
+            // Computations
+            // Traditional Auditing: Developer time fixing leaks/incidents after shipping
+            // Assume 1 vulnerability per 3,000 LOC, taking 12 hours of dev time to fix at $75/hour
+            const vulnsCount = loc / 3000;
+            const fixHours = vulnsCount * 12;
+            const devRate = 75;
+            const fixingDevCost = fixHours * devRate;
+
+            const totalTraditional = fixingDevCost + (incidentCost * 0.8) + (eng * 800); // base auditing overheads
+            const totalPhasr = (fixingDevCost * 0.15) + (incidentCost * 0.1) + 20000; // 85% dev fix reduction, 90% incident reduction
+
+            const netSavings = Math.max(0, totalTraditional - totalPhasr);
+
+            costTraditional.innerText = formatCurrency(totalTraditional);
+            costPhasr.innerText = formatCurrency(totalPhasr);
+            costSavings.innerText = formatCurrency(netSavings);
+        }
+
+        locSlider.addEventListener('input', calculateROI);
+        engSlider.addEventListener('input', calculateROI);
+        incidentSlider.addEventListener('input', calculateROI);
+
+        // Run initially
+        calculateROI();
+
+        // Intersection Observer
+        try {
+            const observerOptions = { threshold: 0.05 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate').forEach(element => {
+                observer.observe(element);
+            });
+        } catch(e) {
+            document.querySelectorAll('.animate').forEach(el => el.classList.add('visible'));
+        }
+    </script>
+</body>
+</html>
