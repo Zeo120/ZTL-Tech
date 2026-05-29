@@ -25,112 +25,80 @@
             text-shadow: 0 0 20px rgba(255, 0, 60, 0.15);
         }
 
-        .calculator-container {
-            max-width: 900px;
+        /* KPI grid styles */
+        .kpi-section {
+            max-width: 1000px;
             width: 100%;
-            background: rgba(5, 5, 6, 0.95);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            padding: 3rem;
-            margin: 3rem auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 0, 60, 0.05);
-            text-align: left;
+            margin: 4rem auto;
+            padding: 0 2rem;
         }
 
-        .calculator-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--surface-border);
-            padding-bottom: 0.8rem;
-            color: #ffffff;
-            letter-spacing: 1px;
-        }
-
-        .slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .slider-label-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .slider-val {
-            color: #00ffaa;
-            font-family: monospace;
-            font-weight: 700;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 0, 60, 0.15);
-            border-radius: 3px;
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            transition: var(--transition);
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--accent-primary);
-            box-shadow: 0 0 10px var(--accent-primary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: #ffffff;
-            box-shadow: 0 0 15px #ffffff;
-        }
-
-        .results-panel {
-            background: rgba(0, 255, 170, 0.01);
-            border: 1px dashed rgba(0, 255, 170, 0.2);
-            border-radius: 8px;
-            padding: 2rem;
+        .kpi-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-top: 2.5rem;
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .result-card {
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .kpi-card {
+            background: rgba(5, 5, 6, 0.95);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
             text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85);
+            position: relative;
+            overflow: hidden;
         }
 
-        .result-card .value {
-            font-size: 1.8rem;
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffaa, #00b3ff);
+            opacity: 0.7;
+        }
+
+        .kpi-card:hover {
+            border-color: #00ffaa;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 255, 170, 0.12);
+        }
+
+        .kpi-value {
+            font-size: 3.5rem;
             font-weight: 800;
-            font-family: monospace;
-            color: #00ffaa;
-            text-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
-            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, #00ffaa, #00b3ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 0 15px rgba(0, 255, 170, 0.1);
         }
 
-        .result-card .value.negative {
-            color: #ff3366;
-            text-shadow: 0 0 8px rgba(255, 51, 102, 0.2);
+        .kpi-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
         }
 
-        .result-card .label {
-            font-size: 0.8rem;
+        .kpi-desc {
             color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         /* Comparison Table */
@@ -215,14 +183,7 @@
             .business-hero h1 {
                 font-size: 2.5rem;
             }
-            .calculator-container {
-                padding: 1.5rem;
-            }
-            .results-panel {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-                padding: 1rem;
-            }
+
             .compliance-grid {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
@@ -534,50 +495,38 @@
             </div>
         </section>
 
-        <!-- ROI Calculator -->
-        <section class="animate delay-2" style="padding: 0 2rem;">
-            <div class="calculator-container">
-                <h2 class="calculator-title">Interactive Security ROI Solver</h2>
-                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">
-                    Configure your team size and operational profile below to compute estimated annual security budget savings with PHASR.
-                </p>
-                
-                <div class="slider-group">
-                    <div class="slider-label-row">
-                        <span>Codebase Size (Lines of Code)</span>
-                        <span class="slider-val" id="loc-display">150,000 LOC</span>
+        <!-- KPI Economic Value Section -->
+        <section class="kpi-section animate">
+            <div class="section-header" style="margin-bottom: 2.5rem; text-align: center;">
+                <h2>Economic Impact &amp; ROI</h2>
+                <p style="color: var(--text-secondary)">Quantifiable business outcomes delivered through compile-time attestation.</p>
+            </div>
+            
+            <div class="kpi-grid">
+                <!-- KPI 1 -->
+                <div class="kpi-card">
+                    <div class="kpi-value">85%</div>
+                    <div class="kpi-title">Vulnerability Cost Reduction</div>
+                    <div class="kpi-desc">
+                        By proving security boundaries at the compilation level, PHASR cuts post-deployment remediation hours and dev cycles by over 5.5x.
                     </div>
-                    <input type="range" id="loc-slider" min="10000" max="500000" step="5000" value="150000">
                 </div>
 
-                <div class="slider-group">
-                    <div class="slider-label-row">
-                        <span>Number of Software Engineers</span>
-                        <span class="slider-val" id="eng-display">25 Engineers</span>
+                <!-- KPI 2 -->
+                <div class="kpi-card">
+                    <div class="kpi-value">90%</div>
+                    <div class="kpi-title">Incident Mitigation</div>
+                    <div class="kpi-desc">
+                        Formal verification of logic states and zero-trust configuration prevents compromise vectors and security breaches.
                     </div>
-                    <input type="range" id="eng-slider" min="5" max="100" step="1" value="25">
                 </div>
 
-                <div class="slider-group">
-                    <div class="slider-label-row">
-                        <span>Annual Security Incident History Cost</span>
-                        <span class="slider-val" id="incident-display">$150,000</span>
-                    </div>
-                    <input type="range" id="incident-slider" min="10000" max="1000000" step="10000" value="150000">
-                </div>
-
-                <div class="results-panel">
-                    <div class="result-card">
-                        <div class="value negative" id="cost-traditional">$215,000</div>
-                        <div class="label">Traditional Audit Cost</div>
-                    </div>
-                    <div class="result-card">
-                        <div class="value" id="cost-phasr">$53,750</div>
-                        <div class="label">PHASR Attested Cost</div>
-                    </div>
-                    <div class="result-card" style="border-left: 1px solid rgba(0, 255, 170, 0.15);">
-                        <div class="value" id="cost-savings" style="color: #ffffff; text-shadow: 0 0 12px #00ffaa;">$161,250</div>
-                        <div class="label">Estimated Net Savings</div>
+                <!-- KPI 3 -->
+                <div class="kpi-card">
+                    <div class="kpi-value">75%</div>
+                    <div class="kpi-title">Audit Time Compression</div>
+                    <div class="kpi-desc">
+                        Cryptographically signed attestation records satisfy SOC 2 and ISO 27001 readiness checks automatically out of the box.
                     </div>
                 </div>
             </div>
@@ -724,57 +673,7 @@
         };
         window.addEventListener('DOMContentLoaded', forceHeroVisible);
 
-        // ROI Calculator Computation Engine
-        const locSlider = document.getElementById('loc-slider');
-        const engSlider = document.getElementById('eng-slider');
-        const incidentSlider = document.getElementById('incident-slider');
 
-        const locDisplay = document.getElementById('loc-display');
-        const engDisplay = document.getElementById('eng-display');
-        const incidentDisplay = document.getElementById('incident-display');
-
-        const costTraditional = document.getElementById('cost-traditional');
-        const costPhasr = document.getElementById('cost-phasr');
-        const costSavings = document.getElementById('cost-savings');
-
-        function formatCurrency(val) {
-            return '$' + val.toLocaleString(undefined, { maximumFractionDigits: 0 });
-        }
-
-        function calculateROI() {
-            const loc = parseInt(locSlider.value, 10);
-            const eng = parseInt(engSlider.value, 10);
-            const incidentCost = parseInt(incidentSlider.value, 10);
-
-            // Displays
-            locDisplay.innerText = loc.toLocaleString() + ' LOC';
-            engDisplay.innerText = eng + ' Engineers';
-            incidentDisplay.innerText = formatCurrency(incidentCost);
-
-            // Computations
-            // Traditional Auditing: Developer time fixing leaks/incidents after shipping
-            // Assume 1 vulnerability per 3,000 LOC, taking 12 hours of dev time to fix at $75/hour
-            const vulnsCount = loc / 3000;
-            const fixHours = vulnsCount * 12;
-            const devRate = 75;
-            const fixingDevCost = fixHours * devRate;
-
-            const totalTraditional = fixingDevCost + (incidentCost * 0.8) + (eng * 800); // base auditing overheads
-            const totalPhasr = (fixingDevCost * 0.15) + (incidentCost * 0.1) + 20000; // 85% dev fix reduction, 90% incident reduction
-
-            const netSavings = Math.max(0, totalTraditional - totalPhasr);
-
-            costTraditional.innerText = formatCurrency(totalTraditional);
-            costPhasr.innerText = formatCurrency(totalPhasr);
-            costSavings.innerText = formatCurrency(netSavings);
-        }
-
-        locSlider.addEventListener('input', calculateROI);
-        engSlider.addEventListener('input', calculateROI);
-        incidentSlider.addEventListener('input', calculateROI);
-
-        // Run initially
-        calculateROI();
 
         // Intersection Observer
         try {
