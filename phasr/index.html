@@ -283,6 +283,13 @@
                                 <pattern id="qGrid" width="30" height="30" patternUnits="userSpaceOnUse">
                                     <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 255, 255, 0.02)" stroke-width="0.5" />
                                 </pattern>
+                                <filter id="qNeon" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
                             </defs>
                             <rect width="100%" height="100%" fill="url(#qGrid)" />
                             
@@ -296,6 +303,9 @@
                             <path id="incoming-wave-path" class="quantum-wave" stroke="#00ffaa" stroke-width="2.5" />
                             <path id="attenuated-wave-path" class="quantum-wave" stroke="#ffaa00" stroke-width="2.5" stroke-dasharray="3, 3" />
                             <path id="tunnelled-wave-path" class="quantum-wave" stroke="#ff003c" stroke-width="2.5" />
+
+                            <!-- Quantum Attestation Packet Particle -->
+                            <circle id="quantum-particle" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
 
                             <!-- SVG Text Annotations -->
                             <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Ψ(x) Incoming Wave Packet</text>
@@ -355,16 +365,33 @@
                     <!-- Left: SVG Plot -->
                     <div class="sim-display-panel">
                         <svg id="relativity-svg" width="100%" height="340" viewBox="0 0 600 340" style="background: #030303; border-radius: 8px;">
+                            <defs>
+                                <radialGradient id="rSingularityGlow" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#ff003c" stop-opacity="0.8" />
+                                    <stop offset="40%" stop-color="#ff003c" stop-opacity="0.3" />
+                                    <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                                </radialGradient>
+                                <filter id="rNeon" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
                             <rect width="100%" height="100%" fill="#000" />
                             <!-- Distorted Grid Path group -->
                             <g id="vortex-grid-group" stroke="rgba(255, 0, 60, 0.12)" stroke-width="0.8" fill="none"></g>
                             <!-- Target Vulnerability Vortex Core -->
-                            <circle cx="300" cy="170" r="45" fill="url(#singularityGlow)" />
+                            <circle cx="300" cy="170" r="45" fill="url(#rSingularityGlow)" />
                             <circle id="vortex-core" cx="300" cy="170" r="10" fill="#ff003c" />
                             <circle id="vortex-center" cx="300" cy="170" r="3" fill="#ffffff" />
                             
                             <!-- Geodesic Transition Line -->
                             <path id="geodesic-path" fill="none" stroke="#00ffaa" stroke-width="2.5" />
+
+                            <!-- Relativity Packet Particle -->
+                            <circle id="relativity-particle" r="6" fill="#00ffaa" filter="url(#rNeon)" style="opacity: 0;" />
                             
                             <!-- Labels -->
                             <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Geodesic Transition Path (State Flow)</text>
@@ -698,6 +725,15 @@
         const badgeCoeff = document.getElementById('coeff-badge');
         const wallRect = document.getElementById('barrier-wall');
 
+        // Parameter cache for real-time animation drawer
+        let qParams = {
+            v0: 5.0,
+            e: 3.0,
+            width: 30,
+            kappa: 1.414,
+            tCoeff: 1.2e-4
+        };
+
         function runQuantumSimulation() {
             if (!inV0 || !inE || !inW) return;
             let v0 = parseFloat(inV0.value);
@@ -724,53 +760,100 @@
 
             if (badgeCoeff) badgeCoeff.innerText = 'T = ' + tCoeff.toExponential(3);
 
-            if (wallRect) {
-                const wallX = 300 - (width / 2);
-                wallRect.setAttribute('x', wallX);
-                wallRect.setAttribute('width', width);
+            qParams.v0 = v0;
+            qParams.e = e;
+            qParams.width = width;
+            qParams.kappa = kappa;
+            qParams.tCoeff = tCoeff;
 
-                let incoming = '';
-                let attenuated = '';
-                let tunnelled = '';
-                const centerY = 170;
-                const incomingAmp = 40;
-
-                for(let x=0; x <= wallX; x++) {
-                    const kVal = 0.15;
-                    const waveY = centerY + Math.sin(x * kVal) * incomingAmp;
-                    incoming += `${x===0 ? 'M' : 'L'} ${x} ${waveY} `;
-                }
-
-                for(let x=wallX; x <= (wallX + width); x++) {
-                    const relativeX = x - wallX;
-                    const waveY = centerY + (Math.sin(wallX * 0.15) * incomingAmp) * Math.exp(-kappa * relativeX * 0.1);
-                    attenuated += `${x===wallX ? 'M' : 'L'} ${x} ${waveY} `;
-                }
-
-                const rightStart = wallX + width;
-                const tunnelledAmp = incomingAmp * Math.sqrt(tCoeff);
-                for(let x=rightStart; x <= 600; x++) {
-                    const relativeX = x - rightStart;
-                    const kVal = 0.15;
-                    const waveY = centerY + Math.sin(x * kVal) * tunnelledAmp;
-                    tunnelled += `${x===rightStart ? 'M' : 'L'} ${x} ${waveY} `;
-                }
-
-                const inPath = document.getElementById('incoming-wave-path');
-                const attPath = document.getElementById('attenuated-wave-path');
-                const tunPath = document.getElementById('tunnelled-wave-path');
-                if (inPath) inPath.setAttribute('d', incoming);
-                if (attPath) attPath.setAttribute('d', attenuated);
-                if (tunPath) tunPath.setAttribute('d', tunnelled);
-
-                const barLbl = document.getElementById('barrier-label');
-                if (barLbl) barLbl.setAttribute('x', 300);
-            }
-            
             logMsg(`[SCHRODINGER] Recalculated. Attenuation kappa: ${kappa.toFixed(3)}, Tunnel bypass ratio T: ${tCoeff.toExponential(2)}`);
         }
 
+        // Draw quantum wave and particle frame
+        function updateQuantumDraw(phase) {
+            if (!wallRect) return;
+            const { v0, e, width, kappa, tCoeff } = qParams;
+            const wallX = 300 - (width / 2);
+            wallRect.setAttribute('x', wallX);
+            wallRect.setAttribute('width', width);
+
+            let incoming = '';
+            let attenuated = '';
+            let tunnelled = '';
+            const centerY = 170;
+            const incomingAmp = 40;
+            const kVal = 0.15;
+
+            // 1. Incident Wave propagating to the right
+            for(let x=0; x <= wallX; x++) {
+                const waveY = centerY + Math.sin(x * kVal - phase) * incomingAmp;
+                incoming += `${x===0 ? 'M' : 'L'} ${x} ${waveY} `;
+            }
+
+            // 2. Attenuating Wave decaying exponentially inside barrier (phase matched)
+            for(let x=wallX; x <= (wallX + width); x++) {
+                const relativeX = x - wallX;
+                const waveY = centerY + (Math.sin(wallX * kVal - phase) * incomingAmp) * Math.exp(-kappa * relativeX * 0.1);
+                attenuated += `${x===wallX ? 'M' : 'L'} ${x} ${waveY} `;
+            }
+
+            // 3. Tunnelled Wave propagating on the other side
+            const rightStart = wallX + width;
+            const tunnelledAmp = incomingAmp * Math.sqrt(tCoeff);
+            for(let x=rightStart; x <= 600; x++) {
+                const waveY = centerY + Math.sin(x * kVal - phase) * tunnelledAmp;
+                tunnelled += `${x===rightStart ? 'M' : 'L'} ${x} ${waveY} `;
+            }
+
+            const inPath = document.getElementById('incoming-wave-path');
+            const attPath = document.getElementById('attenuated-wave-path');
+            const tunPath = document.getElementById('tunnelled-wave-path');
+            if (inPath) inPath.setAttribute('d', incoming);
+            if (attPath) attPath.setAttribute('d', attenuated);
+            if (tunPath) tunPath.setAttribute('d', tunnelled);
+
+            const barLbl = document.getElementById('barrier-label');
+            if (barLbl) barLbl.setAttribute('x', 300);
+
+            // Animate Packet/Particle along the wave profile
+            const qPart = document.getElementById('quantum-particle');
+            if (qPart) {
+                // Map current phase to particle position
+                const px = (phase * 16) % 640; 
+                let py = centerY;
+                let pOpacity = 1;
+                let pColor = '#00ffaa'; // neon green
+
+                if (px <= wallX) {
+                    py = centerY + Math.sin(px * kVal - phase) * incomingAmp;
+                    pColor = '#00ffaa';
+                    pOpacity = 1;
+                } else if (px <= wallX + width) {
+                    const relativeX = px - wallX;
+                    py = centerY + (Math.sin(wallX * kVal - phase) * incomingAmp) * Math.exp(-kappa * relativeX * 0.1);
+                    pColor = '#ffaa00'; // warning orange
+                    pOpacity = 1.0 - (relativeX / width) * (1.0 - Math.sqrt(tCoeff));
+                } else if (px <= 600) {
+                    py = centerY + Math.sin(px * kVal - phase) * tunnelledAmp;
+                    pColor = '#ff003c'; // tunnelled red
+                    pOpacity = Math.max(0.15, Math.sqrt(tCoeff));
+                } else {
+                    pOpacity = 0; // off-screen hide
+                }
+
+                qPart.setAttribute('cx', px);
+                qPart.setAttribute('cy', py);
+                qPart.setAttribute('fill', pColor);
+                qPart.setAttribute('stroke', '#ffffff');
+                qPart.setAttribute('stroke-width', '1.5');
+                qPart.style.opacity = pOpacity;
+            }
+        }
+
         // --- RELATIVITY SIMULATION LOGIC ---
+        let geodesicPoints = []; // caches coordinate path
+        let relativityStep = 0;
+
         function runRelativitySimulation() {
             const inM = document.getElementById('input-mass');
             const inL = document.getElementById('input-lambda');
@@ -831,34 +914,42 @@
                 }
             }
 
-            if (pathLine) {
-                let geodD = 'M 10 120 ';
-                let px = 10;
-                let py = 120;
-                let vx = 3.5;
-                let vy = 0.05;
+            // Build geodesic path and cache points
+            geodesicPoints = [];
+            let geodD = 'M 10 120 ';
+            let px = 10;
+            let py = 120;
+            let vx = 3.5;
+            let vy = 0.05;
 
-                for(let step=0; step < 180; step++) {
-                    const dx = px - centerX;
-                    const dy = py - centerY;
-                    const distSq = dx*dx + dy*dy + 500;
-                    const force = mass * 45 / distSq;
-                    const fx = -dx * force / Math.sqrt(distSq);
-                    const fy = -dy * force / Math.sqrt(distSq);
-                    vx += fx;
-                    vy += fy;
-                    vx += lambda * 0.005;
-                    px += vx;
-                    py += vy;
+            geodesicPoints.push({x: px, y: py});
 
-                    const distToCenter = Math.sqrt((px-centerX)*(px-centerX) + (py-centerY)*(py-centerY));
-                    if (distToCenter < 12) {
-                        geodD += `L ${centerX} ${centerY} `;
-                        break;
-                    }
-                    if (px > 600 || px < 0 || py > 340 || py < 0) break;
-                    geodD += `L ${px} ${py} `;
+            for(let step=0; step < 180; step++) {
+                const dx = px - centerX;
+                const dy = py - centerY;
+                const distSq = dx*dx + dy*dy + 500;
+                const force = mass * 45 / distSq;
+                const fx = -dx * force / Math.sqrt(distSq);
+                const fy = -dy * force / Math.sqrt(distSq);
+                vx += fx;
+                vy += fy;
+                vx += lambda * 0.005;
+                px += vx;
+                py += vy;
+
+                geodesicPoints.push({x: px, y: py});
+
+                const distToCenter = Math.sqrt((px-centerX)*(px-centerX) + (py-centerY)*(py-centerY));
+                if (distToCenter < 12) {
+                    geodD += `L ${centerX} ${centerY} `;
+                    geodesicPoints.push({x: centerX, y: centerY});
+                    break;
                 }
+                if (px > 600 || px < 0 || py > 340 || py < 0) break;
+                geodD += `L ${px} ${py} `;
+            }
+
+            if (pathLine) {
                 pathLine.setAttribute('d', geodD);
             }
 
@@ -878,7 +969,29 @@
                 }
             }
 
+            relativityStep = 0; // reset step animation sync
+
             logMsg(`[GEODESIC] Distortion calculated. Threat mass: ${mass.toFixed(1)}, Metric curvature lambda: ${lambda.toFixed(2)}`);
+        }
+
+        // Animate packet along the spacetime geodesic curve
+        function updateRelativityDraw() {
+            const rPart = document.getElementById('relativity-particle');
+            if (!rPart || geodesicPoints.length === 0) return;
+
+            relativityStep = (relativityStep + 1) % (geodesicPoints.length + 15);
+
+            if (relativityStep < geodesicPoints.length) {
+                const pt = geodesicPoints[relativityStep];
+                rPart.setAttribute('cx', pt.x);
+                rPart.setAttribute('cy', pt.y);
+                rPart.style.opacity = 1;
+                rPart.setAttribute('fill', '#00ffaa');
+                rPart.setAttribute('stroke', '#ffffff');
+                rPart.setAttribute('stroke-width', '1.5');
+            } else {
+                rPart.style.opacity = 0;
+            }
         }
 
         // --- TRUST ATTESTATION LOGIC ---
@@ -955,6 +1068,25 @@
             }
         }
 
+        // --- GLOBAL FRAME ANIMATION LOOP ---
+        let quantumPhase = 0;
+        let animationActive = true;
+
+        function animatePlayground() {
+            if (!animationActive) return;
+
+            // Increment phase
+            quantumPhase += 0.08;
+
+            // Update Schrödinger wave propagation and particle
+            updateQuantumDraw(quantumPhase);
+
+            // Update Spacetime curvature particle along geodesic
+            updateRelativityDraw();
+
+            requestAnimationFrame(animatePlayground);
+        }
+
         // Bind playground events when DOM content is loaded
         function initPlayground() {
             const inV0 = document.getElementById('input-v0');
@@ -973,6 +1105,10 @@
             runQuantumSimulation();
             runRelativitySimulation();
             runTrustSimulation();
+
+            // Run continuous frame animations
+            animationActive = true;
+            requestAnimationFrame(animatePlayground);
         }
 
         // Interactive mailto submission handler
