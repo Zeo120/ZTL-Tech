@@ -419,6 +419,197 @@
         .terminal-error { color: #bf616a; }
         .terminal-success { color: #a3be8c; }
 
+        /* ─── TBAIS Security Alerts Panel ─── */
+        .tbais-card-badge {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            font-size: 0.58rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 3px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: rgba(255, 60, 80, 0.12);
+            color: #ff3c50;
+            border: 1px solid rgba(255, 60, 80, 0.35);
+            animation: tbaisBadgePulse 2s ease-in-out infinite alternate;
+        }
+        @keyframes tbaisBadgePulse {
+            0% { box-shadow: 0 0 4px rgba(255, 60, 80, 0.1); }
+            100% { box-shadow: 0 0 12px rgba(255, 60, 80, 0.35); }
+        }
+
+        .tbais-fsm-container {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 60, 80, 0.12);
+            border-radius: 10px;
+            padding: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .tbais-fsm-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 60, 80, 0.5), rgba(0, 255, 170, 0.3), transparent);
+            animation: tbaisScanline 4s linear infinite;
+        }
+        @keyframes tbaisScanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .tbais-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .tbais-stat-cell {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 0.6rem 0.5rem;
+            text-align: center;
+        }
+        .tbais-stat-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+        }
+        .tbais-stat-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.15rem;
+        }
+
+        .tbais-alert-feed {
+            max-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .tbais-alert-row {
+            background: rgba(255, 60, 80, 0.03);
+            border: 1px solid rgba(255, 60, 80, 0.1);
+            border-radius: 6px;
+            padding: 0.7rem 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .tbais-alert-row:hover {
+            background: rgba(255, 60, 80, 0.07);
+            border-color: rgba(255, 60, 80, 0.25);
+        }
+        .tbais-alert-row.expanded {
+            background: rgba(255, 60, 80, 0.06);
+            border-color: rgba(255, 60, 80, 0.3);
+        }
+        .tbais-alert-icon {
+            flex-shrink: 0;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            background: rgba(255, 60, 80, 0.1);
+            border: 1px solid rgba(255, 60, 80, 0.25);
+        }
+        .tbais-alert-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .tbais-alert-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #ff3c50;
+            letter-spacing: 0.3px;
+        }
+        .tbais-alert-meta {
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+            margin-top: 0.15rem;
+            font-family: monospace;
+        }
+        .tbais-alert-detail {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: none;
+        }
+        .tbais-alert-row.expanded .tbais-alert-detail {
+            display: block;
+        }
+        .tbais-signal-tag {
+            display: inline-block;
+            background: rgba(255, 170, 0, 0.08);
+            border: 1px solid rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.58rem;
+            font-weight: 700;
+            margin: 0.1rem;
+            font-family: monospace;
+        }
+        .tbais-trust-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            margin-top: 0.4rem;
+            overflow: hidden;
+        }
+        .tbais-trust-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.6s ease;
+        }
+
+        .tbais-empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-secondary);
+        }
+        .tbais-empty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        /* DFA Graph SVG Styles */
+        .tbais-dfa-svg .dfa-node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tbais-dfa-svg .dfa-node:hover {
+            filter: brightness(1.3);
+        }
+        .tbais-dfa-svg .dfa-edge {
+            fill: none;
+            stroke-width: 1.5;
+        }
+        .tbais-dfa-svg .dfa-label {
+            font-family: 'Courier New', monospace;
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .tbais-stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .tbais-stats-grid { grid-template-columns: 1fr; }
+        }
+
         /* Mobile Responsiveness Refinements */
         @media (max-width: 768px) {
             .dashboard-container {
@@ -502,7 +693,7 @@
             <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('Auditor session securely closed.');">Logout Operator</a>
         </div>
 
-        <!-- Cards Grid: PHASE - 1 Free to Phase-5 -->
+        <!-- Cards Grid: PHASE - 1 Free to Legions-Consensus -->
         <div class="cards-grid">
             <div class="phase-card active" id="card-t-1" onclick="selectPhase(-1)">
                 <div class="phase-card-badge free">FREE</div>
@@ -517,7 +708,7 @@
             <div class="phase-card" id="card-t1" onclick="selectPhase(1); runPhaseAudit(1); window.open('nerd-stats.html?phase=1', '_blank');">
                 <div class="phase-card-badge premium">PREMIUM</div>
                 <div class="phase-card-num">PHASE - 1</div>
-                <div class="phase-card-title">Phase-1</div>
+                <div class="phase-card-title">Acherons-Gate</div>
                 <div class="phase-card-desc">Audit entry vector path boundary definitions.</div>
                 <div class="phase-card-status" id="status-t1">
                     <span class="status-indicator ready"></span> READY
@@ -527,7 +718,7 @@
             <div class="phase-card" id="card-t2" onclick="selectPhase(2); runPhaseAudit(2); window.open('nerd-stats.html?phase=2', '_blank');">
                 <div class="phase-card-badge premium">PREMIUM</div>
                 <div class="phase-card-num">PHASE - 2</div>
-                <div class="phase-card-title">Phase-2</div>
+                <div class="phase-card-title">Nine-Circles</div>
                 <div class="phase-card-desc">Analyze role privileges and trust boundary maps.</div>
                 <div class="phase-card-status" id="status-t2">
                     <span class="status-indicator ready"></span> READY
@@ -537,7 +728,7 @@
             <div class="phase-card" id="card-t3" onclick="selectPhase(3); runPhaseAudit(3); window.open('nerd-stats.html?phase=3', '_blank');">
                 <div class="phase-card-badge premium">PREMIUM</div>
                 <div class="phase-card-num">PHASE - 3</div>
-                <div class="phase-card-title">Phase-3</div>
+                <div class="phase-card-title">Brimstone-Drift</div>
                 <div class="phase-card-desc">Verify threat assumptions in runtime environments.</div>
                 <div class="phase-card-status" id="status-t3">
                     <span class="status-indicator ready"></span> READY
@@ -547,7 +738,7 @@
             <div class="phase-card" id="card-t4" onclick="selectPhase(4); runPhaseAudit(4); window.open('nerd-stats.html?phase=4', '_blank');">
                 <div class="phase-card-badge premium">PREMIUM</div>
                 <div class="phase-card-num">PHASE - 4</div>
-                <div class="phase-card-title">Phase-4</div>
+                <div class="phase-card-title">Abaddons-Chasm</div>
                 <div class="phase-card-desc">Monitor session state transition consistency.</div>
                 <div class="phase-card-status" id="status-t4">
                     <span class="status-indicator ready"></span> READY
@@ -557,10 +748,19 @@
             <div class="phase-card" id="card-t5" onclick="selectPhase(5); runPhaseAudit(5); window.open('nerd-stats.html?phase=5', '_blank');">
                 <div class="phase-card-badge premium">PREMIUM</div>
                 <div class="phase-card-num">PHASE - 5</div>
-                <div class="phase-card-title">Phase-5</div>
+                <div class="phase-card-title">Legions-Consensus</div>
                 <div class="phase-card-desc">Inject database failures and verify standby failover.</div>
                 <div class="phase-card-status" id="status-t5">
                     <span class="status-indicator ready"></span> READY
+                </div>
+            </div>
+            <div class="phase-card" id="card-tbais" onclick="selectPhase('tbais')" style="border-color: rgba(255, 60, 80, 0.2);">
+                <div class="tbais-card-badge">TURING FSM</div>
+                <div class="phase-card-num">SECURITY LAYER</div>
+                <div class="phase-card-title">TBAIS Sentinel</div>
+                <div class="phase-card-desc">Turing-Based Attacker Invalidation System. Deterministic FSM audit of every login session.</div>
+                <div class="phase-card-status" id="status-tbais">
+                    <span class="status-indicator active" style="background: #ff3c50; box-shadow: 0 0 6px #ff3c50;"></span> MONITORING
                 </div>
             </div>
         </div>
@@ -584,6 +784,111 @@
                 <div class="terminal-line terminal-success">[SUCCESS] Cryptographic reasoning console secured. Ready to audit.</div>
             </div>
         </div>
+
+        <!-- TBAIS Security Alerts Panel -->
+        <div class="operator-panel" id="tbais-panel" style="display: none;">
+            <h2 class="panel-header-title">
+                <span>⚡ TBAIS — TURING ATTACKER INVALIDATION</span>
+                <span style="font-size: 0.7rem; color: #ff3c50; font-weight: 700;" id="tbais-alert-count">0 Alerts</span>
+            </h2>
+
+            <!-- DFA State Machine Visualization -->
+            <div class="tbais-fsm-container">
+                <div style="font-size: 0.75rem; font-weight: 800; color: #ffffff; margin-bottom: 0.7rem; letter-spacing: 0.5px;">DETERMINISTIC FINITE AUTOMATON — SESSION ATTESTATION</div>
+                <svg class="tbais-dfa-svg" width="100%" height="110" viewBox="0 0 680 110" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Edges -->
+                    <line class="dfa-edge" x1="55" y1="40" x2="120" y2="40" stroke="rgba(0,255,170,0.3)" marker-end="url(#arrowGreen)" />
+                    <line class="dfa-edge" x1="175" y1="40" x2="240" y2="40" stroke="rgba(0,255,170,0.3)" marker-end="url(#arrowGreen)" />
+                    <line class="dfa-edge" x1="295" y1="40" x2="360" y2="40" stroke="rgba(0,255,170,0.3)" marker-end="url(#arrowGreen)" />
+                    <line class="dfa-edge" x1="415" y1="40" x2="480" y2="40" stroke="rgba(0,255,170,0.3)" marker-end="url(#arrowGreen)" />
+                    <line class="dfa-edge" x1="535" y1="40" x2="600" y2="40" stroke="rgba(0,255,170,0.3)" marker-end="url(#arrowGreen)" />
+                    <!-- Reject paths -->
+                    <path class="dfa-edge" d="M 147 55 Q 147 95, 400 95 Q 640 95, 640 65" stroke="rgba(255,60,80,0.2)" stroke-dasharray="3,3" marker-end="url(#arrowRed)" />
+                    <path class="dfa-edge" d="M 267 55 Q 267 85, 400 85 Q 620 85, 635 65" stroke="rgba(255,60,80,0.15)" stroke-dasharray="3,3" />
+                    <path class="dfa-edge" d="M 387 55 Q 387 80, 500 80 Q 615 80, 635 65" stroke="rgba(255,60,80,0.15)" stroke-dasharray="3,3" />
+
+                    <!-- Arrow markers -->
+                    <defs>
+                        <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="rgba(0,255,170,0.5)" />
+                        </marker>
+                        <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="rgba(255,60,80,0.5)" />
+                        </marker>
+                    </defs>
+
+                    <!-- State Nodes -->
+                    <circle class="dfa-node" id="dfa-q0" cx="35" cy="40" r="20" fill="rgba(0,255,170,0.06)" stroke="rgba(0,255,170,0.4)" stroke-width="1.5" />
+                    <text class="dfa-label" x="35" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₀</text>
+                    <text class="dfa-label" x="35" y="10" fill="rgba(255,255,255,0.4)" font-size="5.5" text-anchor="middle">INIT</text>
+
+                    <circle class="dfa-node" id="dfa-q1" cx="147" cy="40" r="20" fill="rgba(0,255,170,0.06)" stroke="rgba(0,255,170,0.35)" stroke-width="1.5" />
+                    <text class="dfa-label" x="147" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₁</text>
+                    <text class="dfa-label" x="147" y="10" fill="rgba(255,255,255,0.4)" font-size="5.5" text-anchor="middle">CRED</text>
+
+                    <circle class="dfa-node" id="dfa-q2" cx="267" cy="40" r="20" fill="rgba(0,255,170,0.06)" stroke="rgba(0,255,170,0.3)" stroke-width="1.5" />
+                    <text class="dfa-label" x="267" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₂</text>
+                    <text class="dfa-label" x="267" y="10" fill="rgba(255,255,255,0.4)" font-size="5.5" text-anchor="middle">IP</text>
+
+                    <circle class="dfa-node" id="dfa-q3" cx="387" cy="40" r="20" fill="rgba(0,255,170,0.06)" stroke="rgba(0,255,170,0.25)" stroke-width="1.5" />
+                    <text class="dfa-label" x="387" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₃</text>
+                    <text class="dfa-label" x="387" y="10" fill="rgba(255,255,255,0.4)" font-size="5.5" text-anchor="middle">FP</text>
+
+                    <circle class="dfa-node" id="dfa-q4" cx="507" cy="40" r="20" fill="rgba(0,255,170,0.06)" stroke="rgba(0,255,170,0.25)" stroke-width="1.5" />
+                    <text class="dfa-label" x="507" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₄</text>
+                    <text class="dfa-label" x="507" y="10" fill="rgba(255,255,255,0.4)" font-size="5.5" text-anchor="middle">BEH</text>
+
+                    <!-- Accept state (double circle) -->
+                    <circle class="dfa-node" id="dfa-q5" cx="627" cy="40" r="20" fill="rgba(0,255,170,0.08)" stroke="#00ffaa" stroke-width="2" />
+                    <circle cx="627" cy="40" r="16" fill="none" stroke="#00ffaa" stroke-width="1" pointer-events="none" />
+                    <text class="dfa-label" x="627" y="43" fill="#00ffaa" font-size="8" text-anchor="middle" font-weight="bold">q₅</text>
+                    <text class="dfa-label" x="627" y="10" fill="rgba(0,255,170,0.7)" font-size="5.5" text-anchor="middle" font-weight="bold">ACCEPT</text>
+
+                    <!-- Reject state -->
+                    <circle class="dfa-node" id="dfa-q9" cx="645" cy="90" r="14" fill="rgba(255,60,80,0.1)" stroke="#ff3c50" stroke-width="2" />
+                    <text class="dfa-label" x="645" y="93" fill="#ff3c50" font-size="7" text-anchor="middle" font-weight="bold">q₉</text>
+                    <text class="dfa-label" x="610" y="93" fill="rgba(255,60,80,0.7)" font-size="5.5" text-anchor="middle" font-weight="bold">REJECT</text>
+                </svg>
+                <div style="display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.6rem; color: var(--text-secondary);">
+                    <span><span style="color: #00ffaa;">●</span> Accept Path (δ → q₅)</span>
+                    <span><span style="color: #ff3c50;">●</span> Reject / Turing Halt (δ → q₉)</span>
+                    <span style="font-family: monospace;">T<sub>c</sub> = 40·IP + 30·FP + 20·BEH + 10·TIME</span>
+                </div>
+            </div>
+
+            <!-- Alert Statistics -->
+            <div class="tbais-stats-grid" id="tbais-stats">
+                <div class="tbais-stat-cell">
+                    <div class="tbais-stat-value" style="color: #ff3c50;" id="tbais-total-halts">—</div>
+                    <div class="tbais-stat-label">Turing Halts</div>
+                </div>
+                <div class="tbais-stat-cell">
+                    <div class="tbais-stat-value" style="color: #ffaa00;" id="tbais-ip-absent">—</div>
+                    <div class="tbais-stat-label">IP Absent</div>
+                </div>
+                <div class="tbais-stat-cell">
+                    <div class="tbais-stat-value" style="color: #ffaa00;" id="tbais-fp-mismatch">—</div>
+                    <div class="tbais-stat-label">FP Mismatch</div>
+                </div>
+                <div class="tbais-stat-cell">
+                    <div class="tbais-stat-value" style="color: #00ffaa;" id="tbais-avg-trust">—</div>
+                    <div class="tbais-stat-label">Avg T<sub>c</sub></div>
+                </div>
+            </div>
+
+            <!-- Live Alert Feed -->
+            <div style="font-size: 0.75rem; font-weight: 800; color: #ffffff; margin-bottom: 0.4rem; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;">
+                <span>IRREGULAR LOGIN FEED</span>
+                <button onclick="fetchSecurityAlerts()" style="background: rgba(255,60,80,0.08); border: 1px solid rgba(255,60,80,0.2); color: #ff3c50; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.62rem; cursor: pointer; font-weight: 700;">↻ Refresh</button>
+            </div>
+            <div class="tbais-alert-feed" id="tbais-alert-feed">
+                <div class="tbais-empty-state">
+                    <div class="tbais-empty-icon">🛡️</div>
+                    <div style="font-size: 0.75rem; font-weight: 700;">No Irregular Logins Detected</div>
+                    <div style="font-size: 0.65rem; margin-top: 0.3rem;">The Turing FSM has not halted on any anomalous sessions yet.</div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
@@ -592,8 +897,10 @@
 
     <script>
         const terminal = document.getElementById('terminal');
-        let verifiedPhases = { [-1]: false, 1: false, 2: false, 3: false, 4: false, 5: false };
+        let verifiedPhases = { [-1]: false, 1: false, 2: false, 3: false, 4: false, 5: false, tbais: false };
         let latestAuditReport = null;
+        let tbaisAlerts = [];
+        let tbaisPollingActive = false;
 
         const MAX_LOGS = 100;
         function logEvent(text, type = '') {
@@ -664,16 +971,29 @@
         };
 
         let currentPhase = -1;
+        const tbaisPanel = document.getElementById('tbais-panel');
+        const phaseWorkspace = document.getElementById('active-phase-workspace');
         function selectPhase(num) {
             currentPhase = num;
             document.querySelectorAll('.phase-card').forEach((card) => {
-                const targetId = num === -1 ? 'card-t-1' : `card-t${num}`;
+                const targetId = num === 'tbais' ? 'card-tbais' : (num === -1 ? 'card-t-1' : `card-t${num}`);
                 if (card.id === targetId) {
                     card.classList.add('active');
                 } else {
                     card.classList.remove('active');
                 }
             });
+
+            // Toggle TBAIS vs Phase workspace visibility
+            if (num === 'tbais') {
+                tbaisPanel.style.display = '';
+                phaseWorkspace.style.display = 'none';
+                fetchSecurityAlerts();
+                return;
+            } else {
+                tbaisPanel.style.display = 'none';
+                phaseWorkspace.style.display = '';
+            }
 
             // Update workspace header title
             const titles = {
@@ -1600,6 +1920,100 @@
             }, 3200);
         }
 
+        // ─── TBAIS Security Alerts Logic ───
+        async function fetchSecurityAlerts() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/admin/security-alerts`, { credentials: 'include' });
+                if (!res.ok) throw new Error('Request failed');
+                const payload = await res.json();
+                if (payload.success && payload.data && payload.data.alerts) {
+                    tbaisAlerts = payload.data.alerts;
+                    renderTbaisAlerts(tbaisAlerts);
+                    renderTbaisStats(tbaisAlerts);
+                    logEvent(`[TBAIS] Fetched ${tbaisAlerts.length} irregular login event(s) from FSM audit log.`, tbaisAlerts.length > 0 ? 'terminal-error' : 'terminal-success');
+                }
+            } catch (err) {
+                console.error('TBAIS fetch error:', err);
+                logEvent('[TBAIS] Failed to fetch security alerts from backend.', 'terminal-error');
+            }
+        }
+
+        function renderTbaisStats(alerts) {
+            const totalHalts = alerts.length;
+            let ipAbsent = 0, fpMismatch = 0, totalTrust = 0;
+            alerts.forEach(a => {
+                const m = a.metadata || {};
+                if (m.ipAbsent) ipAbsent++;
+                if (m.fpMismatch) fpMismatch++;
+                totalTrust += (m.trustScore || 0);
+            });
+            const avgTrust = totalHalts > 0 ? Math.round(totalTrust / totalHalts) : 100;
+
+            document.getElementById('tbais-total-halts').textContent = totalHalts;
+            document.getElementById('tbais-ip-absent').textContent = ipAbsent;
+            document.getElementById('tbais-fp-mismatch').textContent = fpMismatch;
+            document.getElementById('tbais-avg-trust').textContent = avgTrust;
+            document.getElementById('tbais-alert-count').textContent = `${totalHalts} Alert${totalHalts !== 1 ? 's' : ''}`;
+
+            // Update card status based on alerts
+            const statusEl = document.getElementById('status-tbais');
+            if (totalHalts > 0) {
+                statusEl.innerHTML = `<span class="status-indicator active" style="background: #ff3c50; box-shadow: 0 0 8px #ff3c50;"></span> ${totalHalts} HALT${totalHalts !== 1 ? 'S' : ''} DETECTED`;
+            } else {
+                statusEl.innerHTML = '<span class="status-indicator verified"></span> ALL CLEAR';
+            }
+        }
+
+        function renderTbaisAlerts(alerts) {
+            const feed = document.getElementById('tbais-alert-feed');
+            if (alerts.length === 0) {
+                feed.innerHTML = `
+                    <div class="tbais-empty-state">
+                        <div class="tbais-empty-icon">🛡️</div>
+                        <div style="font-size: 0.75rem; font-weight: 700;">No Irregular Logins Detected</div>
+                        <div style="font-size: 0.65rem; margin-top: 0.3rem;">The Turing FSM has not halted on any anomalous sessions yet.</div>
+                    </div>`;
+                return;
+            }
+
+            feed.innerHTML = alerts.map((alert, idx) => {
+                const m = alert.metadata || {};
+                const ts = new Date(alert.createdAt).toLocaleString();
+                const trustScore = m.trustScore || 0;
+                const trustColor = trustScore < 30 ? '#ff3c50' : (trustScore < 70 ? '#ffaa00' : '#00ffaa');
+                const signals = (m.signalsFed || []).map(s => `<span class="tbais-signal-tag">${s}</span>`).join('');
+                const stateNames = ['Q_INITIATED','Q_CREDENTIAL_RECV','Q_IP_BOUND','Q_FP_MATCH','Q_BEHAVIORAL_PASS','Q_TRUSTED','Q_IP_ABSENT','Q_FP_MISMATCH','Q_ENTROPY_SPIKE','Q_ANOMALOUS'];
+                const finalStateName = stateNames[m.finalState] || `q${m.finalState}`;
+                
+                const reasons = [];
+                if (m.ipAbsent) reasons.push('IP Address Absent — Origin Undecidable');
+                if (m.fpMismatch) reasons.push('Device Fingerprint Anomaly — Automated Agent Detected');
+                if (reasons.length === 0) reasons.push('FSM Halted on Anomalous Signal Path');
+
+                return `
+                    <div class="tbais-alert-row" onclick="this.classList.toggle('expanded')">
+                        <div class="tbais-alert-icon">⚠️</div>
+                        <div class="tbais-alert-body">
+                            <div class="tbais-alert-title">TURING HALT — ${reasons[0]}</div>
+                            <div class="tbais-alert-meta">${ts} · IP: ${alert.ipAddress || '0.0.0.0'} · T<sub>c</sub>: ${trustScore}</div>
+                            <div class="tbais-trust-bar"><div class="tbais-trust-fill" style="width: ${trustScore}%; background: ${trustColor};"></div></div>
+                            <div class="tbais-alert-detail">
+                                <div style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 0.3rem;">SIGNAL TAPE:</div>
+                                <div>${signals}</div>
+                                <div style="margin-top: 0.4rem; font-size: 0.65rem;">
+                                    <span style="color: var(--text-secondary);">Terminal State:</span> <span style="color: #ff3c50; font-weight: bold;">${finalStateName}</span>
+                                </div>
+                                <div style="font-size: 0.65rem;">
+                                    <span style="color: var(--text-secondary);">User-Agent:</span> <span style="color: #ffffff; font-family: monospace; word-break: break-all;">${alert.userAgent || 'unknown'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
         // Initial setup loads
         selectPhase(-1);
         selectRole('sa');
@@ -1615,6 +2029,13 @@
             setTimeout(startPollingLoop, 2500);
         }
         startPollingLoop();
+
+        // TBAIS background polling (every 15s when panel is visible)
+        setInterval(() => {
+            if (currentPhase === 'tbais') {
+                fetchSecurityAlerts();
+            }
+        }, 15000);
     </script>
 </body>
 </html>

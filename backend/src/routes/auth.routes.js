@@ -19,7 +19,7 @@ const loginLimiter = loginRateLimit({
 
 authRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const result = await login(req.body, {
-    ip: req.ip,
+    ip: req.body.simulateNoIp ? '' : req.ip,
     userAgent: req.get('user-agent') || ''
   });
 

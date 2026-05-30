@@ -143,11 +143,11 @@ Top-level PHASR files include:
 
 PHASR validation and simulation modules:
 
-- `phasr/Phase-1/` - temporal FSM transition validation.
-- `phasr/Phase-2/` - hierarchy reachability and access-boundary verification.
-- `phasr/Phase-3/` - invariant drift and telemetry monitoring.
-- `phasr/Phase-4/` - mitigation and chaos verification.
-- `phasr/Phase-5/` - redundancy failover and consensus attestation.
+- `phasr/Acherons-Gate/` - temporal FSM transition validation.
+- `phasr/Nine-Circles/` - hierarchy reachability and access-boundary verification.
+- `phasr/Brimstone-Drift/` - invariant drift and telemetry monitoring.
+- `phasr/Abaddons-Chasm/` - mitigation and chaos verification.
+- `phasr/Legions-Consensus/` - redundancy failover and consensus attestation.
 - `phasr/Satan-Recursion/` - curved spacetime wave solver with chunked generated routines.
 - `phasr/Primordial-Sin/` - primordial engine driver and assembly backends.
 - `phasr/Lucifers-Blessing/` - Lucifer engine driver and assembly backends.
@@ -159,19 +159,19 @@ Most PHASR engine folders provide both a Windows `build.bat` and a Linux/Unix `M
 Windows example:
 
 ```cmd
-cd phasr\Phase-1
+cd phasr\Acherons-Gate
 build.bat
 ```
 
 Linux example:
 
 ```bash
-cd phasr/Phase-1
+cd phasr/Acherons-Gate
 make
 ./phase_fsm
 ```
 
-The same pattern applies to `Phase-2` through `Phase-5`, `Satan-Recursion`, `Primordial-Sin`, and `Lucifers-Blessing`, with each module producing its own executable.
+The same pattern applies to `Nine-Circles` through `Legions-Consensus`, `Satan-Recursion`, `Primordial-Sin`, and `Lucifers-Blessing`, with each module producing its own executable.
 
 Architecture support varies by module:
 
@@ -207,11 +207,11 @@ Useful documentation entry points:
 - `docs/architecture/ARCHITECTURE.md`
 - `docs/architecture/COMPUTE_BALANCER.md`
 - `docs/phasr/PHASR_CORE_CONTEXT.md`
-- `docs/phasr/Phase-1.md`
-- `docs/phasr/Phase-2.md`
-- `docs/phasr/Phase-3.md`
-- `docs/phasr/Phase-4.md`
-- `docs/phasr/Phase-5.md`
+- `docs/phasr/Acherons-Gate.md`
+- `docs/phasr/Nine-Circles.md`
+- `docs/phasr/Brimstone-Drift.md`
+- `docs/phasr/Abaddons-Chasm.md`
+- `docs/phasr/Legions-Consensus.md`
 - `docs/phasr/Satan-Recursion.md`
 - `docs/equations/Equations.md`
 
@@ -250,14 +250,14 @@ npm start
 Build a PHASR module on Windows:
 
 ```cmd
-cd phasr\Phase-4
+cd phasr\Abaddons-Chasm
 build.bat
 ```
 
 Build a PHASR module on Linux:
 
 ```bash
-cd phasr/Phase-4
+cd phasr/Abaddons-Chasm
 make
 ./chaos_verifier
 ```

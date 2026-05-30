@@ -7,6 +7,7 @@ const { httpError } = require('../utils/httpError');
 const { validateLoginBody } = require('../utils/validators');
 const { writeAuditEvent } = require('./audit.service');
 const { createSession } = require('./session.service');
+const { auditLoginSession } = require('./tbais.service');
 
 const VALID_ROLES = new Set(['super-admin', 'super_admin', 'admin', 'user']);
 
@@ -85,13 +86,16 @@ async function login(body, requestContext) {
     await verifyPassword(DUMMY_HASH, password);
   }
 
-  if (!user || !passwordMatches || !user.is_active || !VALID_ROLES.has(user.role)) {
+  const credentialsValid = !!(user && passwordMatches && user.is_active && VALID_ROLES.has(user.role));
+  const tbaisResult = await auditLoginSession(requestContext, credentialsValid);
+
+  if (!credentialsValid) {
     await writeAuditEvent({
       action: 'auth.login_failed',
       ip: requestContext.ip,
       userAgent: requestContext.userAgent,
       success: false,
-      metadata: { email }
+      metadata: { email, tbais: tbaisResult }
     });
     throw httpError(401, 'Invalid email or password');
   }
@@ -108,7 +112,8 @@ async function login(body, requestContext) {
     action: 'auth.login_succeeded',
     ip: requestContext.ip,
     userAgent: requestContext.userAgent,
-    success: true
+    success: true,
+    metadata: { tbais: tbaisResult }
   });
 
   return {

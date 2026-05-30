@@ -287,16 +287,16 @@ flowchart TD
 
 | Platform | Command | Back-end selected |
 | :--- | :--- | :--- |
-| **Windows x86-64** | `cd phasr\Phase-1 && build.bat` | `fsm_validator.asm` (MASM ml64) |
-| **Linux x86-64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
-| **Linux AArch64** | `cd phasr/Phase-1 && make` | `fsm_validator_linux_arm64.s` (GAS) |
-| **Any other** | `cd phasr/Phase-1 && make fallback` | `phase_fsm.c` (C99, FSM_C_FALLBACK) |
+| **Windows x86-64** | `cd phasr\Acherons-Gate && build.bat` | `fsm_validator.asm` (MASM ml64) |
+| **Linux x86-64** | `cd phasr/Acherons-Gate && make` | `fsm_validator_linux_x64.s` (GAS Intel) |
+| **Linux AArch64** | `cd phasr/Acherons-Gate && make` | `fsm_validator_linux_arm64.s` (GAS) |
+| **Any other** | `cd phasr/Acherons-Gate && make fallback` | `phase_fsm.c` (C99, FSM_C_FALLBACK) |
 | **Regenerate x64 .s** | `node generate_fsm_asm_linux_x64.js` | *(re-generates 130,562 lines)* |
 | **Regenerate ARM64 .s** | `node generate_fsm_asm_arm64.js` | *(re-generates 130,559 lines)* |
 
 ---
 
-## 5. Phase-2 Hierarchy Reachability Engine
+## 5. Nine-Circles Hierarchy Reachability Engine
 
 The **Hierarchy Reachability Engine** audits access paths and privilege boundaries on the active reachability graph.
 
@@ -306,12 +306,12 @@ The access graph is flattened in memory as a contiguous bit-packed matrix of siz
 - Reachability matrix: `uint16_t reachability[16]` representing the transitive closure (with self-reachability) of the adjacency matrix.
 
 ### 5.2 ARM64 NEON assembly implementation
-The core transitive closure sweep is implemented in raw ARM64 assembly ([reachability_arm64.s](file:///d:/Project%20XT/phasr/Phase-2/reachability_arm64.s)) utilizing ARM64 registers for bit-packed rows, executing Warshall's algorithm with zero runtime heap allocation.
+The core transitive closure sweep is implemented in raw ARM64 assembly ([reachability_arm64.s](file:///d:/Project%20XT/phasr/Nine-Circles/reachability_arm64.s)) utilizing ARM64 registers for bit-packed rows, executing Warshall's algorithm with zero runtime heap allocation.
 
 ### 5.3 Build Matrix
-- **Windows:** Run `cd phasr\Phase-2 && build.bat` to build and run using the MSVC C++ fallback engine.
-- **Linux ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the ARM64 NEON Assembly engine.
-- **Linux non-ARM64:** Run `cd phasr/Phase-2 && make` to build and run using the C++ fallback engine.
+- **Windows:** Run `cd phasr\Nine-Circles && build.bat` to build and run using the MSVC C++ fallback engine.
+- **Linux ARM64:** Run `cd phasr/Nine-Circles && make` to build and run using the ARM64 NEON Assembly engine.
+- **Linux non-ARM64:** Run `cd phasr/Nine-Circles && make` to build and run using the C++ fallback engine.
 
 ---
 

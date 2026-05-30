@@ -541,11 +541,11 @@ adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), 
       const isWin = process.platform === 'win32';
       let binName = '';
       let folderName = '';
-      if (phaseNum === 1) { binName = isWin ? 'phase_fsm.exe' : 'phase_fsm'; folderName = 'Phase-1'; }
-      else if (phaseNum === 2) { binName = isWin ? 'reachability_engine.exe' : 'reachability_engine'; folderName = 'Phase-2'; }
-      else if (phaseNum === 3) { binName = isWin ? 'telemetry_collector.exe' : 'telemetry_collector'; folderName = 'Phase-3'; }
-      else if (phaseNum === 4) { binName = isWin ? 'chaos_verifier.exe' : 'chaos_verifier'; folderName = 'Phase-4'; }
-      else if (phaseNum === 5) { binName = isWin ? 'consensus_auditor.exe' : 'consensus_auditor'; folderName = 'Phase-5'; }
+      if (phaseNum === 1) { binName = isWin ? 'phase_fsm.exe' : 'phase_fsm'; folderName = 'Acherons-Gate'; }
+      else if (phaseNum === 2) { binName = isWin ? 'reachability_engine.exe' : 'reachability_engine'; folderName = 'Nine-Circles'; }
+      else if (phaseNum === 3) { binName = isWin ? 'telemetry_collector.exe' : 'telemetry_collector'; folderName = 'Brimstone-Drift'; }
+      else if (phaseNum === 4) { binName = isWin ? 'chaos_verifier.exe' : 'chaos_verifier'; folderName = 'Abaddons-Chasm'; }
+      else if (phaseNum === 5) { binName = isWin ? 'consensus_auditor.exe' : 'consensus_auditor'; folderName = 'Legions-Consensus'; }
       else {
         // Phase -1 (Free audit)
         await writeAuditEvent({
@@ -662,6 +662,30 @@ adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), 
 
   return ok(res, {
     message: `Verification drill for Phase ${phaseNum} triggered.`
+  });
+}));
+
+// GET /api/admin/security-alerts
+adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .query(`
+      SELECT id, action, ip_address, user_agent, success, metadata_json, created_at
+      FROM dbo.AuditLog
+      WHERE action = 'auth.irregular_login_detected'
+      ORDER BY created_at DESC;
+    `);
+  
+  return ok(res, {
+    alerts: result.recordset.map(row => ({
+      id: row.id,
+      action: row.action,
+      ipAddress: row.ip_address,
+      userAgent: row.user_agent,
+      success: row.success,
+      metadata: row.metadata_json ? JSON.parse(row.metadata_json) : null,
+      createdAt: row.created_at
+    }))
   });
 }));
 
