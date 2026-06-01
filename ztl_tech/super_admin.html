@@ -417,6 +417,78 @@
                 </div>
             </div>
         </div>
+
+        <!-- Client Administration & License Provisioning Hub -->
+        <div class="control-panel" style="margin-top: 2rem; grid-template-columns: 1fr;">
+            <div>
+                <h3 class="panel-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Client Administration & Licensing
+                </h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; margin-top: -1rem;">
+                    Provision secure login credentials and manage custom business suite licenses for client accounts.
+                </p>
+
+                <!-- 2-Column Split: Create Client on Left, Existing Clients on Right -->
+                <div style="display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 2rem;">
+                    <!-- Left: Create Client Form -->
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem;">
+                        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff;">Generate Client Credentials</h4>
+                        <form id="create-client-form" onsubmit="event.preventDefault(); generateClientCredentials();" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.4rem; text-align: left;">
+                                <label for="client-email" style="font-size: 0.8rem; color: var(--text-secondary);">Client Corporate Email</label>
+                                <input type="email" id="client-email" required placeholder="ceo@acme.com" style="background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #ffffff; padding: 0.6rem; font-size: 0.85rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.4rem; text-align: left;">
+                                <label for="client-password" style="font-size: 0.8rem; color: var(--text-secondary);">Initial Account Password</label>
+                                <input type="password" id="client-password" required placeholder="••••••••••••" style="background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #ffffff; padding: 0.6rem; font-size: 0.85rem;">
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem; text-align: left; margin-top: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Licensed Suites</span>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                                        <input type="checkbox" name="module" value="crm" checked style="accent-color: #a259ff;"> CRM Suite
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                                        <input type="checkbox" name="module" value="hr" style="accent-color: #a259ff;"> HR Suite
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                                        <input type="checkbox" name="module" value="ops" style="accent-color: #a259ff;"> OPS Suite
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                                        <input type="checkbox" name="module" value="payroll" checked style="accent-color: #a259ff;"> Payroll Suite
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="margin-top: 1rem; border: none; padding: 0.7rem; font-size: 0.85rem; font-weight: 700; width: 100%;">
+                                Provision Client Account
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Clients List -->
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; overflow-x: auto;">
+                        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff;">Active Provisioned Clients</h4>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary);">
+                                    <th style="padding: 0.6rem 0.5rem;">Email Address</th>
+                                    <th style="padding: 0.6rem 0.5rem;">Licensed Modules</th>
+                                    <th style="padding: 0.6rem 0.5rem; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-list-body">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading clients...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer style="margin-top: 4rem; padding: 4rem 10% 2rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary);">
@@ -531,6 +603,158 @@
             appendTerminalLine('[SYSTEM] BroadcastChannel disabled in this sandbox environment.', 'terminal-warn');
         }
 
+        // Helper cookie grabber
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function getCSRFToken() {
+            return getCookie('XSRF-TOKEN') || getCookie('xsrf-token');
+        }
+
+        let activeClients = [];
+
+        async function loadClients() {
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/admin/clients`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.clients) {
+                        activeClients = payload.data.clients;
+                        renderClients(activeClients);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load clients list", err);
+            }
+        }
+
+        function renderClients(clients) {
+            const body = document.getElementById('clients-list-body');
+            body.innerHTML = '';
+            
+            if (clients.length === 0) {
+                body.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 2.5rem; color: var(--text-secondary); font-size: 0.85rem;">No active provisioned clients.</td></tr>`;
+                return;
+            }
+            
+            clients.forEach(client => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+                
+                const suites = ['crm', 'hr', 'ops', 'payroll'];
+                const checkGroup = suites.map(suite => {
+                    const checked = client.purchased_modules.includes(suite) ? 'checked' : '';
+                    return `
+                        <label style="margin-right: 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.72rem; color: #ffffff;">
+                            <input type="checkbox" ${checked} onchange="updateClientLicense(${client.id}, '${suite}', this.checked)" style="accent-color: #a259ff;">
+                            <span style="text-transform: uppercase;">${suite}</span>
+                        </label>
+                    `;
+                }).join('');
+                
+                tr.innerHTML = `
+                    <td style="padding: 0.8rem 0.5rem; font-weight: 600; color: #ffffff; font-family: monospace; font-size: 0.85rem;">${client.email}</td>
+                    <td style="padding: 0.8rem 0.5rem;">${checkGroup}</td>
+                    <td style="padding: 0.8rem 0.5rem; text-align: center;">
+                        <span class="widget-badge" style="background: rgba(0, 255, 170, 0.08); color: #00ffaa; border-color: rgba(0, 255, 170, 0.2); font-size: 0.7rem; font-weight: 800; padding: 0.25rem 0.6rem;">ACTIVE</span>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        async function generateClientCredentials() {
+            const email = document.getElementById('client-email').value.trim();
+            const password = document.getElementById('client-password').value;
+            const checkBoxes = document.querySelectorAll('#create-client-form input[name="module"]:checked');
+            const purchased_modules = Array.from(checkBoxes).map(cb => cb.value);
+
+            if (!email || !password) {
+                alert('Email and Password are required.');
+                return;
+            }
+
+            appendTerminalLine(`[CLIENT] Requesting credential generation for "${email}"...`, 'terminal-info');
+
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/admin/clients`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': getCSRFToken()
+                    },
+                    body: JSON.stringify({ email, password, purchased_modules })
+                });
+
+                const payload = await res.json();
+                if (res.ok && payload.success) {
+                    appendTerminalLine(`[SUCCESS] Client credentials generated for "${email}". Active licenses: ${purchased_modules.join(', ').toUpperCase()}.`, 'terminal-success');
+                    document.getElementById('client-email').value = '';
+                    document.getElementById('client-password').value = '';
+                    loadClients();
+                } else {
+                    const err = payload.error || 'Failed to generate client credentials.';
+                    appendTerminalLine(`[ERROR] Account creation rejected: ${err}`, 'terminal-error');
+                    alert(err);
+                }
+            } catch (err) {
+                appendTerminalLine(`[ERROR] Server connection lost during account provisioning.`, 'terminal-error');
+                console.error(err);
+            }
+        }
+
+        async function updateClientLicense(clientId, moduleName, hasLicense) {
+            const client = activeClients.find(c => c.id === clientId);
+            if (!client) return;
+
+            let updatedModules = [...client.purchased_modules];
+            if (hasLicense) {
+                if (!updatedModules.includes(moduleName)) {
+                    updatedModules.push(moduleName);
+                }
+            } else {
+                updatedModules = updatedModules.filter(m => m !== moduleName);
+            }
+
+            appendTerminalLine(`[LICENSING] Updating client ID ${clientId} modules to: [${updatedModules.join(', ').toUpperCase()}]...`, 'terminal-info');
+
+            try {
+                const origin = window.location.origin;
+                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+                const res = await fetch(`${apiBase}/api/admin/clients/${clientId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': getCSRFToken()
+                    },
+                    body: JSON.stringify({ purchased_modules: updatedModules })
+                });
+
+                const payload = await res.json();
+                if (res.ok && payload.success) {
+                    appendTerminalLine(`[SUCCESS] Client ID ${clientId} licenses updated successfully.`, 'terminal-success');
+                    client.purchased_modules = updatedModules; // sync memory
+                } else {
+                    appendTerminalLine(`[ERROR] License update rejected.`, 'terminal-error');
+                    loadClients(); // revert checkboxes on failure
+                }
+            } catch (err) {
+                appendTerminalLine(`[ERROR] Connection failed during licensing sync.`, 'terminal-error');
+                console.error(err);
+                loadClients();
+            }
+        }
+
         async function loadUserData() {
             try {
                 const origin = window.location.origin;
@@ -554,6 +778,7 @@
         }
 
         loadUserData();
+        loadClients();
     </script>
 </body>
 </html>

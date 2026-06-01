@@ -14,6 +14,7 @@ const { writeAuditEvent } = require('../services/audit.service');
 const { rotateSession } = require('../services/session.service');
 const { signSessionToken } = require('../services/auth.service');
 const { sql, getDbPool } = require('../config/db');
+const { tbaisEvents } = require('../services/event.service');
 
 const adminRoutes = express.Router();
 
@@ -473,39 +474,28 @@ adminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin
   const ip = req.ip;
   const userAgent = req.get('user-agent') || '';
 
-  // Import scanner service
-  const { runCodebaseScan } = require('../services/scanner.service');
+  const { queueService } = require('../services/queue.service');
 
-  // Trigger scan as a background task, similar to the free audit, to return a quick acknowledgment
-  setTimeout(async () => {
-    try {
-      await runCodebaseScan({
-        userId,
-        sourceType,
-        targetPath,
-        scanFocus,
-        ip,
-        userAgent
-      });
-    } catch (scanErr) {
-      console.error('Codebase scan failure:', scanErr);
-      await writeAuditEvent({
-        actorUserId: userId,
-        action: 'phasr.scan_failed',
-        targetType: 'codebase',
-        targetId: targetPath,
-        ip,
-        userAgent,
-        success: false,
-        metadata: { error: scanErr.message, details: `Codebase static analysis scan failed: ${scanErr.message}` }
-      });
-    }
-  }, 100);
+  // Dispatch job to the native Worker Thread pool
+  const jobId = queueService.dispatchCodebaseScan(targetPath, scanFocus);
 
   return ok(res, {
-    message: 'Premium Codebase Static Analysis scan initiated. Real-time updates will stream to the operational feed.'
+    message: 'Premium Codebase Static Analysis scan queued.',
+    jobId: jobId
   });
 }));
+
+// GET /api/admin/phasr/scan-status/:jobId
+adminRoutes.get('/phasr/scan-status/:jobId', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
+  const { queueService } = require('../services/queue.service');
+  const status = queueService.getJobStatus(req.params.jobId);
+  
+  if (!status) {
+    return res.status(404).json({ success: false, error: 'Job not found' });
+  }
+  
+  return ok(res, { job: status });
+});
 
 // POST /api/admin/phasr/run-drill
 adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
@@ -689,6 +679,32 @@ adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), a
   });
 }));
 
+// GET /api/admin/events (Server-Sent Events)
+adminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
+  // Setup SSE headers
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  });
+  
+  // Send initial connection payload
+  res.write('data: {"type": "connected"}\n\n');
+
+  // Define the listener
+  const onTuringHalt = (alertData) => {
+    res.write(`data: ${JSON.stringify({ type: 'turing_halt', alert: alertData })}\n\n`);
+  };
+
+  // Subscribe to the event bus
+  tbaisEvents.on('turing_halt', onTuringHalt);
+
+  // Cleanup on client disconnect
+  req.on('close', () => {
+    tbaisEvents.off('turing_halt', onTuringHalt);
+  });
+});
+
 // GET /api/admin/phasr/logs
 adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
@@ -849,6 +865,245 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
       findings
     }
   });
+}));
+
+// GET /api/admin/clients - List all users with role 'admin'
+adminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .query(`
+      SELECT id, email, role, purchased_modules, is_active, created_at
+      FROM dbo.Users
+      WHERE role = N'admin'
+      ORDER BY created_at DESC;
+    `);
+
+  const clients = result.recordset.map(client => {
+    let parsedModules = [];
+    try {
+      parsedModules = JSON.parse(client.purchased_modules || '[]');
+    } catch (e) {
+      parsedModules = [];
+    }
+    return {
+      id: client.id,
+      email: client.email,
+      role: client.role,
+      purchased_modules: parsedModules,
+      isActive: client.is_active,
+      createdAt: client.created_at
+    };
+  });
+
+  return ok(res, { clients });
+}));
+
+// POST /api/admin/clients - Create a new admin client
+adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+  const { email, password, purchased_modules } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
+  }
+
+  const pool = await getDbPool();
+
+  // Check if email already exists
+  const existingUser = await pool.request()
+    .input('email', sql.NVarChar(254), email.trim())
+    .query('SELECT TOP 1 id FROM dbo.Users WHERE email = @email');
+
+  if (existingUser.recordset[0]) {
+    return res.status(400).json({ success: false, error: 'A user with this email address already exists' });
+  }
+
+  const { hashPassword } = require('../services/auth.service');
+  const passwordHash = await hashPassword(password);
+  const modulesString = JSON.stringify(Array.isArray(purchased_modules) ? purchased_modules : []);
+
+  const insertResult = await pool.request()
+    .input('email', sql.NVarChar(254), email.trim())
+    .input('passwordHash', sql.NVarChar(sql.MAX), passwordHash)
+    .input('purchasedModules', sql.NVarChar(sql.MAX), modulesString)
+    .query(`
+      INSERT INTO dbo.Users (email, password_hash, role, purchased_modules, is_active, created_at)
+      OUTPUT INSERTED.id
+      VALUES (@email, @passwordHash, N'admin', @purchasedModules, 1, GETDATE());
+    `);
+
+  const newId = insertResult.recordset[0].id;
+
+  return ok(res, {
+    message: 'Client credentials generated successfully',
+    client: {
+      id: newId,
+      email: email.trim(),
+      role: 'admin',
+      purchased_modules: Array.isArray(purchased_modules) ? purchased_modules : []
+    }
+  });
+}));
+
+// PUT /api/admin/clients/:id - Update client's purchased modules
+adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+  const clientId = Number(req.params.id);
+  const { purchased_modules } = req.body;
+
+  if (!Array.isArray(purchased_modules)) {
+    return res.status(400).json({ success: false, error: 'purchased_modules must be an array' });
+  }
+
+  const pool = await getDbPool();
+  const modulesString = JSON.stringify(purchased_modules);
+
+  const updateResult = await pool.request()
+    .input('id', sql.Int, clientId)
+    .input('purchasedModules', sql.NVarChar(sql.MAX), modulesString)
+    .query(`
+      UPDATE dbo.Users
+      SET purchased_modules = @purchasedModules, updated_at = GETDATE()
+      WHERE id = @id AND role = N'admin';
+    `);
+
+  return ok(res, {
+    message: 'Client licenses updated successfully',
+    client: {
+      id: clientId,
+      purchased_modules
+    }
+  });
+}));
+
+// GET /api/admin/employees - Fetch all employee records for the current tenant user
+adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const pool = await getDbPool();
+
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+             date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no
+      FROM dbo.Employees
+      WHERE user_id = @userId
+      ORDER BY id DESC;
+    `);
+
+  const formatDbDate = (d) => {
+    if (!d) return null;
+    try {
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const employees = result.recordset.map(row => ({
+    ...row,
+    date_of_birth: formatDbDate(row.date_of_birth),
+    date_of_joining: formatDbDate(row.date_of_joining),
+    date_of_exit: formatDbDate(row.date_of_exit)
+  }));
+
+  return ok(res, { employees });
+}));
+
+// POST /api/admin/employees - Create a new employee record for the current tenant user
+adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const {
+    name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+    date_of_birth, date_of_joining, date_of_exit, bank_account_number,
+    ifsc_code, pf_status, uan_no
+  } = req.body;
+
+  // Enforce mandatory details (Name, Age, Gender, PAN, Aadhar, Date of Joining)
+  if (!name || !age || !gender || !pan || !aadhar || !date_of_joining) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields. Name, Age, Gender, PAN, Aadhar, and Date of Joining are mandatory.'
+    });
+  }
+
+  // Validate Marital Status and Spouse Name conditional mandatory rule
+  if (marital_status === 'Married' && (!spouse_name || !spouse_name.trim())) {
+    return res.status(400).json({
+      success: false,
+      error: 'Spouse Name is mandatory when Marital Status is Married.'
+    });
+  }
+
+  // Validate PF Status and UAN Number conditional mandatory rule
+  if (pf_status === 'Applicable' && (!uan_no || !uan_no.trim())) {
+    return res.status(400).json({
+      success: false,
+      error: 'UAN No is mandatory when PF Status is Applicable.'
+    });
+  }
+
+  const pool = await getDbPool();
+
+  const parseInputDate = (dStr) => {
+    if (!dStr) return null;
+    const parsed = new Date(dStr);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const insertResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('name', sql.NVarChar(255), name.trim())
+    .input('age', sql.Int, Number(age))
+    .input('status', sql.NVarChar(50), status || 'Active')
+    .input('gender', sql.NVarChar(50), gender.trim())
+    .input('pan', sql.NVarChar(50), pan.trim())
+    .input('maritalStatus', sql.NVarChar(50), marital_status || 'Unmarried')
+    .input('spouseName', sql.NVarChar(255), marital_status === 'Married' ? spouse_name.trim() : null)
+    .input('aadhar', sql.NVarChar(50), aadhar.trim())
+    .input('dateOfBirth', sql.Date, parseInputDate(date_of_birth))
+    .input('dateOfJoining', sql.Date, new Date(date_of_joining))
+    .input('dateOfExit', sql.Date, status === 'Terminated' ? parseInputDate(date_of_exit) : null)
+    .input('bankAccountNumber', sql.NVarChar(100), bank_account_number ? bank_account_number.trim() : null)
+    .input('ifscCode', sql.NVarChar(50), ifsc_code ? ifsc_code.trim() : null)
+    .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
+    .input('uanNo', sql.NVarChar(50), pf_status === 'Applicable' ? uan_no.trim() : null)
+    .query(`
+      INSERT INTO dbo.Employees (
+        user_id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+        date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no, created_at
+      )
+      OUTPUT INSERTED.id
+      VALUES (
+        @userId, @name, @age, @status, @gender, @pan, @maritalStatus, @spouseName, @aadhar,
+        @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo, SYSUTCDATETIME()
+      );
+    `);
+
+  const newId = insertResult.recordset[0].id;
+
+  return ok(res, {
+    message: 'Employee record created successfully',
+    employeeId: newId
+  });
+}));
+
+// DELETE /api/admin/employees/:id - Remove an employee record for the current tenant user
+adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const employeeId = Number(req.params.id);
+  const pool = await getDbPool();
+
+  const deleteResult = await pool.request()
+    .input('id', sql.Int, employeeId)
+    .input('userId', sql.Int, userId)
+    .query(`
+      DELETE FROM dbo.Employees
+      WHERE id = @id AND user_id = @userId;
+    `);
+
+  if (deleteResult.rowsAffected[0] === 0) {
+    return res.status(404).json({ success: false, error: 'Employee not found or unauthorized' });
+  }
+
+  return ok(res, { message: 'Employee record deleted successfully' });
 }));
 
 module.exports = { adminRoutes };

@@ -1,4 +1,5 @@
 const { writeAuditEvent } = require('./audit.service');
+const { tbaisEvents } = require('./event.service');
 
 // Turing DFA Q Constants
 const STATES = {
@@ -134,7 +135,7 @@ async function auditLoginSession(requestContext, credentialsValid) {
 
   if (isAnomalous) {
     // Record Irregular Login event in AuditLog
-    await writeAuditEvent({
+    const alertData = {
       action: 'auth.irregular_login_detected',
       ip: rawIp || '0.0.0.0',
       userAgent: userAgent,
@@ -147,6 +148,19 @@ async function auditLoginSession(requestContext, credentialsValid) {
         fpMismatch: isSuspiciousAgent,
         alertType: 'TURING_HALT_ANOMALY'
       }
+    };
+    
+    await writeAuditEvent(alertData);
+    
+    // Broadcast the halt instantly to all connected admin dashboards via SSE
+    tbaisEvents.emit('turing_halt', {
+      id: Date.now(), // transient ID for the SSE stream
+      action: alertData.action,
+      ipAddress: alertData.ip,
+      userAgent: alertData.userAgent,
+      success: alertData.success,
+      metadata: alertData.metadata,
+      createdAt: new Date().toISOString()
     });
   }
 

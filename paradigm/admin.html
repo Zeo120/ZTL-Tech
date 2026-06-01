@@ -3,324 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PARADIGM | Software Design Control Plane</title>
-    <meta name="description" content="Secure administrative control plane for the PARADIGM software architecture design and delivery framework.">
+    <title>Paradigm | Executive Business Console</title>
+    <meta name="description" content="Authorized executive operations dashboard for Paradigm enterprise planners, ledgers, and inventory controls.">
+    
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
+    
     <style>
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 5rem 2rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+        :root {
+            --bg-color: #08080a; /* deep obsidian graphite */
+            --surface-bg: rgba(16, 16, 20, 0.85); /* metallic translucent panel */
+            --surface-border: rgba(255, 255, 255, 0.08); /* brushed metal hairline border */
+            --metal-glow: rgba(255, 255, 255, 0.03);
+            
+            /* Platinum & Specular Metallics */
+            --accent-platinum: #f2f2f7;
+            --accent-palladium: #afafb7;
+            --accent-silver: #d1d1d6;
+            --accent-dark-metal: #2c2c2e;
+            
+            --accent-purple: #f2f2f7;
+            --accent-teal: #afafb7;
+            --accent-amber: #d1d1d6;
+            --accent-blue: #ffffff;
+            --accent-pink: #8e8e93;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .header-bar {
-            background: rgba(10, 10, 12, 0.9);
-            border: 1px solid var(--surface-border);
-            border-radius: 12px;
-            padding: 1.2rem 2rem;
+        body {
+            background: var(--bg-color);
+            font-family: var(--font-display);
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient background glow */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .glow-1 {
+            position: absolute;
+            top: -20%; left: -10%;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(80px);
+        }
+        .glow-2 {
+            position: absolute;
+            bottom: -10%; right: -5%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(176, 176, 184, 0.02) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(80px);
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.2rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            flex-wrap: wrap;
-            gap: 1rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
-        }
-
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--surface-border);
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: pulseGlow 1.5s infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { opacity: 0.5; box-shadow: 0 0 3px rgba(255, 255, 255, 0.3); }
-            100% { opacity: 1; box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
-        }
-
-        /* 2-Column Main Workspace */
-        .workspace-grid {
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1000px) {
-            .workspace-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .operator-panel {
-            background: rgba(8, 8, 10, 0.95);
-            border: 1px solid var(--surface-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-        }
-
-        .panel-header-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #ffffff;
+            background: rgba(8, 8, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--surface-border);
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            z-index: 1000;
         }
 
-        .text-neon {
-            color: #ffffff;
-            text-shadow: 0 0 4px rgba(255,255,255,0.4);
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.78rem;
-            padding: 0.4rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .telemetry-label {
-            color: var(--text-secondary);
-        }
-
-        .telemetry-value {
-            font-family: monospace;
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        /* Requirements Input */
-        .req-input-box {
+        /* Hamburger button style */
+        .hamburger-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 8px;
-            padding: 0.8rem;
-        }
-
-        .req-textarea {
-            width: 100%;
-            background: #050506;
-            border: 1px solid var(--surface-border);
-            border-radius: 6px;
-            color: #ffffff;
-            font-size: 0.8rem;
-            padding: 0.5rem;
-            resize: vertical;
-        }
-
-        .stack-picker {
-            background: #050506;
-            border: 1px solid var(--surface-border);
-            border-radius: 6px;
-            color: #ffffff;
-            font-size: 0.78rem;
-            padding: 0.4rem;
-        }
-
-        /* Debt Detector Toggles */
-        .debt-toggle-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.6rem;
-        }
-
-        .debt-checkbox-label {
-            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 0.5rem;
-            border-radius: 4px;
-        }
-
-        .debt-checkbox-label input {
-            cursor: pointer;
-        }
-
-        /* Code Boilerplate Generator */
-        .boilerplate-layout {
-            display: grid;
-            grid-template-columns: 0.8fr 1.2fr;
-            gap: 1rem;
-            min-height: 250px;
-        }
-
-        .file-tree-container {
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 6px;
-            background: rgba(0,0,0,0.3);
-            padding: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            text-align: left;
-        }
-
-        .tree-node {
-            font-size: 0.72rem;
-            font-family: monospace;
-            cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .tree-node:hover, .tree-node.active {
-            background: rgba(255,255,255,0.05);
-            color: #ffffff;
-        }
-
-        .code-preview-container {
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 6px;
-            background: #000000;
-            padding: 0.8rem;
-            overflow-x: auto;
-            text-align: left;
-        }
-
-        .code-block {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.7rem;
-            color: #d0d0d5;
-            white-space: pre;
-            line-height: 1.4;
-        }
-
-        /* Sprint Simulator Display */
-        .sprint-console {
-            background: #000000;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 0.8rem;
-            font-size: 0.75rem;
-            text-align: left;
-            font-family: monospace;
-            min-height: 90px;
-        }
-
-        /* Operations log terminal */
-        .terminal-box {
-            background: #000000;
-            border: 1px solid var(--surface-border);
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.78rem;
-            color: #ffffff;
-            height: 180px;
-            overflow-y: auto;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02);
-        }
-
-        .terminal-line {
-            line-height: 1.4;
-            word-break: break-all;
-        }
-
-        .terminal-info { color: #88c0d0; }
-        .terminal-warn { color: #ebcb8b; }
-        .terminal-error { color: #bf616a; }
-        .terminal-success { color: #a3be8c; }
-
-        /* Mobile Responsiveness Refinements */
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 5.5rem 1rem 1rem;
-                gap: 1rem;
-            }
-            .header-bar {
-                padding: 1rem 1.2rem;
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-                gap: 0.8rem;
-            }
-            .header-bar div {
-                text-align: center !important;
-            }
-            .header-bar h1 {
-                justify-content: center;
-                font-size: 1.2rem !important;
-            }
-            .boilerplate-layout {
-                grid-template-columns: 1fr;
-                gap: 0.8rem;
-                min-height: auto;
-            }
-            .operator-panel {
-                padding: 1rem;
-                gap: 1rem;
-            }
-            nav {
-                padding: 0.8rem 1rem;
-            }
-            nav .user-badge {
-                display: none; /* prevent header crowding / line wrap */
-            }
-        }
-        @media (max-width: 480px) {
-            .debt-toggle-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Paradigm Suite Cards */
-        .suite-card {
-            border: 1px solid var(--surface-border);
+            gap: 5px;
             cursor: pointer;
             transition: var(--transition);
         }
-        .suite-card:hover {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border-color: rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+        .hamburger-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
         }
+
+        .hamburger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Navigation Sidebar Navigation Drawer */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .sidebar-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 360px;
+            background: rgba(10, 10, 12, 0.98);
+            border-right: 1px solid var(--surface-border);
+            z-index: 2000;
+            padding: 2.5rem 2rem;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: 25px 0 50px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+
+        .sidebar-nav.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 1rem;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-silver);
+        }
+
+        .sidebar-close {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .suites-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 0.5rem;
+        }
+
+        /* Suite Cards styling inside sidebar */
+        .suite-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: left;
+        }
+
+        .suite-card:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
         .suite-card.active {
-            border-color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.07) !important;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
+        }
+
+        .suite-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #ffffff, #8e8e93);
+        }
+
+        .suite-card.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .suite-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-badge {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--accent-silver);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* Main container and full-width layout */
+        .dashboard-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 7rem 2rem 3rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header-bar {
+            background: var(--surface-bg);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 2rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #b0b0b8 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--surface-border);
+            color: #ffffff;
+            padding: 0.7rem 1.6rem;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .logout-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
+            border-color: #ffffff;
+        }
+
+        /* Full Width Workspace Console */
+        .workspace-grid {
+            width: 100%;
+        }
+
+        .console-panel {
+            background: var(--surface-bg);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 20px var(--metal-glow);
+            min-height: 550px;
+        }
+
+        .panel-title-group {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.2rem;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .panel-heading {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+        }
+
+        .panel-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        /* Form Controls */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            text-align: left;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Metallic Brushed Buttons */
+        .action-btn {
+            background: linear-gradient(180deg, #ffffff 0%, #d1d1d6 50%, #aeaeae 100%);
+            color: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 30px;
+            padding: 0.75rem 2rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 6px 20px rgba(255, 255, 255, 0.2);
+            border-color: #ffffff;
+        }
+
+        /* Receipt print layout style */
+        .voucher-receipt {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #00ffaa;
+            text-align: left;
+            box-shadow: inset 0 0 15px rgba(0, 255, 170, 0.05);
+            display: none;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+        .receipt-line {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            margin: 0.5rem 0;
+        }
+
+        /* Lock state absolute overlay */
+        .locked-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.82);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 5;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        /* Menu button and overlay close styles */
+        .locked-overlay svg {
+            stroke: var(--accent-palladium);
+            filter: drop-shadow(0 0 4px var(--accent-palladium));
+        }
+
+        .locked-overlay span {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 3rem 2rem 2rem;
+            border-top: 1px solid var(--surface-border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -330,431 +525,512 @@
         <div class="glow-2"></div>
     </div>
 
+    <!-- Navigation Header -->
     <nav>
-        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
-            <div class="logo-diamond"></div>
-            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
-        </a>
-        <div class="user-badge">
-            <div class="status-dot"></div>
-            <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #ffffff;">PARADIGM OPERATOR</span>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <button class="hamburger-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Sidebar">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="../ztl_tech/index.html" class="logo-group" aria-label="ZTL Tech Home">
+                <div class="logo-diamond"></div>
+                <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
+            </a>
+        </div>
+        <div class="user-badge" id="user-badge-details" style="display: flex; align-items: center; gap: 0.8rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.4rem 1.2rem; border-radius: 30px;">
+            <div class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 8px #ffffff;"></div>
+            <span style="font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">EXECUTIVE OFFICER</span>
         </div>
     </nav>
 
+    <!-- Sidebar Navigation Drawer -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-nav" id="sidebar-nav">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">Select Suite</h3>
+            <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="suites-stack" id="suites-stack-container">
+            
+            <!-- CRM Suite Card -->
+            <div class="suite-card crm active" id="card-crm" onclick="selectSuite('crm')">
+                <div class="card-header">
+                    <span class="card-badge">Customer Ingress</span>
+                    <div class="active-dot" id="dot-crm" style="width: 6px; height: 6px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 8px #ffffff;"></div>
+                </div>
+                <div style="text-align: left;">
+                    <h3 class="card-title">Custom CRM Suite</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
+                        Manage client pipelines and conversions.
+                    </p>
+                </div>
+            </div>
+
+            <!-- HR Suite Card -->
+            <div class="suite-card hr" id="card-hr" onclick="selectSuite('hr')">
+                <div class="card-header">
+                    <span class="card-badge">Shift Roster</span>
+                    <div class="active-dot" id="dot-hr" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
+                </div>
+                <div style="text-align: left;">
+                    <h3 class="card-title">Custom HR Suite</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
+                        Track shift timesheets and verification.
+                    </p>
+                </div>
+            </div>
+
+            <!-- OPS Suite Card -->
+            <div class="suite-card ops" id="card-ops" onclick="selectSuite('ops')">
+                <div class="card-header">
+                    <span class="card-badge">Fleet Logistics</span>
+                    <div class="active-dot" id="dot-ops" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
+                </div>
+                <div style="text-align: left;">
+                    <h3 class="card-title">Custom OPS Suite</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
+                        Supervise inventory sync and logistics tracks.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Payroll Suite Card -->
+            <div class="suite-card payroll" id="card-payroll" onclick="selectSuite('payroll')">
+                <div class="card-header">
+                    <span class="card-badge">Ledger & Accounting</span>
+                    <div class="active-dot" id="dot-payroll" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
+                </div>
+                <div style="text-align: left;">
+                    <h3 class="card-title">Custom Payroll Suite</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
+                        Verify ledger invariants and tax metrics.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
     <main class="dashboard-container">
-        <!-- Header Bar -->
+        
+        <!-- Welcome Header Bar -->
         <div class="header-bar">
             <div style="text-align: left;">
-                <h1 style="font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;" id="welcome-message">
-                    PARADIGM SOFTWARE DESIGN CONTROL PLANE
-                </h1>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Enterprise workspace for application planning: translating requirements, analyzing debt, and tracking sprint confidence.</p>
+                <h1 class="welcome-title" id="welcome-message">PARADIGM EXECUTIVE BUSINESS CONSOLE</h1>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Enterprise Resource Planning & Business Operations Dashboard.</p>
             </div>
-            <a href="login.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1.2rem; font-size: 0.8rem;" onclick="alert('PARADIGM software architect session securely closed.');">Logout Operator</a>
+            <a href="login.html" class="logout-btn" onclick="alert('Securing connection... Executive session terminated.');">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Secure Logout
+            </a>
         </div>
 
-        <!-- 2-Column Main Workspace -->
+        <!-- Workspace Full Width Layout -->
         <div class="workspace-grid">
-            <!-- LEFT COLUMN: The 3 Suite Cards -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                
-                <!-- Custom CRM Suite Card -->
-                <div class="operator-panel suite-card active" id="card-suite-crm" onclick="selectSuite('crm')">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <span class="badge" style="background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2); margin-bottom: 0;">Customer Relations</span>
-                        <span class="active-dot" id="dot-suite-crm" style="width: 8px; height: 8px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 8px #00ffaa;"></span>
-                    </div>
-                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.2rem; color: #ffffff;">Custom CRM Suite</h3>
-                    <h4 style="font-size: 0.82rem; font-weight: 600; color: var(--accent-primary); margin-bottom: 0.8rem; letter-spacing: 0.5px;">We Design Any Enterprise CRM</h4>
-                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Integrates customer sales pipelines, contact managers, automatic deal updates via background workers, and email notifications.</p>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
-                        <span>Complexity: <strong style="color: #ffffff;">Level 54</strong></span>
-                        <span>Risk Rating: <strong style="color: #00ffaa;">LOW</strong></span>
-                    </div>
-                </div>
-
-                <!-- Custom HR Suite Card -->
-                <div class="operator-panel suite-card" id="card-suite-hr" onclick="selectSuite('hr')">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <span class="badge" style="background: rgba(255, 170, 0, 0.1); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.2); margin-bottom: 0;">Human Resources</span>
-                        <span class="active-dot" id="dot-suite-hr" style="width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: none;"></span>
-                    </div>
-                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; color: #ffffff;">Custom HR Suite</h3>
-                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Supports staff rosters, active work shifts validator, payroll ledger databases, and employee timesheet approval workflows.</p>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
-                        <span>Complexity: <strong style="color: #ffffff;">Level 45</strong></span>
-                        <span>Risk Rating: <strong style="color: #ffaa00;">MODERATE</strong></span>
-                    </div>
-                </div>
-
-                <!-- Custom OPS Suite Card -->
-                <div class="operator-panel suite-card" id="card-suite-ops" onclick="selectSuite('ops')">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <span class="badge" style="background: rgba(255, 51, 102, 0.1); color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.2); margin-bottom: 0;">Operations Control</span>
-                        <span class="active-dot" id="dot-suite-ops" style="width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: none;"></span>
-                    </div>
-                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; color: #ffffff;">Custom OPS Suite</h3>
-                    <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; text-align: left;">Features real-time supply chain inventory sync, delivery dispatch logistics trackers, and background worker GPS logging.</p>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; border-top: 1px solid var(--surface-border); padding-top: 0.8rem; color: var(--text-secondary);">
-                        <span>Complexity: <strong style="color: #ffffff;">Level 62</strong></span>
-                        <span>Risk Rating: <strong style="color: #ff3366;">HIGH</strong></span>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: Active Specs, Architecture & Boilerplate Explorer -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                
-                <!-- Selected Suite Technical Blueprint -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">Technical Blueprint Specs</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Explore custom system architectures and runtime execution topologies.</p>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; text-align: left;">
-                        <span style="font-size: 0.8rem; color: #ffffff; font-weight: 600;">Active Platform Stack:</span>
-                        <select class="stack-picker" id="requirements-stack" onchange="changeStack(this.value)">
-                            <option value="node">Stack: Node / Express</option>
-                            <option value="go">Stack: Go / Gin</option>
-                            <option value="python">Stack: Python / FastAPI</option>
-                        </select>
-                    </div>
-
-                    <div class="consequence-box" id="requirements-report" style="font-size:0.75rem; text-align:left;">
-                        <!-- Dynamic analysis report -->
-                    </div>
-                </div>
-
-                <!-- Code Boilerplate Explorer -->
-                <div class="operator-panel">
-                    <h2 class="panel-header-title">Code Boilerplate Explorer</h2>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: -0.5rem; text-align: left;">Explore the generated folder directory structure and inspect file code baseline stubs.</p>
-                    
-                    <div class="boilerplate-layout">
-                        <div class="file-tree-container" id="tree-container">
-                            <!-- Tree nodes -->
-                        </div>
-                        <div class="code-preview-container">
-                            <div class="code-block" id="code-preview-view">
-                                // Select file to inspect boilerplate structure.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Console Panel -->
+            <div class="console-panel" id="workspace-console">
+                <!-- Loaded dynamically by selectSuite() -->
             </div>
         </div>
 
-        <!-- Terminal Output Log -->
-        <div style="display: flex; flex-direction: column; text-align: left; gap: 0.5rem;">
-            <h3 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 1px;">OPERATIONAL SIGNAL FEED</h3>
-            <div class="terminal-box" id="terminal">
-                <div class="terminal-line terminal-info">[SYSTEM] Accessing PARADIGM client-side architecture models...</div>
-                <div class="terminal-line terminal-success">[SUCCESS] Software blueprints aligned. Ready for audit analyzer.</div>
-            </div>
-        </div>
     </main>
 
-    <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
-        <p>© 2026 Zeo Thinking Labs. PARADIGM Software Design Control Plane.</p>
+    <footer>
+        <p>© 2026 Zeo Thinking Labs. Paradigm Corporate Ledger Control Plane.</p>
     </footer>
 
     <script>
-        const terminal = document.getElementById('terminal');
-        
-        const MAX_LOGS = 100;
-        function logEvent(text, type = '') {
-            const line = document.createElement('div');
-            line.className = `terminal-line ${type}`;
-            const timestamp = new Date().toLocaleTimeString();
-            line.innerHTML = `<span style="color: rgba(255,255,255,0.4)">[${timestamp}]</span> ${text}`;
-            terminal.appendChild(line);
-            
-            while (terminal.children.length > MAX_LOGS) {
-                terminal.removeChild(terminal.firstChild);
-            }
-            terminal.scrollTop = terminal.scrollHeight;
+        function logAudit(text, type = '') {
+            console.log(`[AUDIT] ${text}`);
         }
 
-        // Paradigm Custom Suites Configs
-        const suites = {
+        // Available packages mapping
+        let purchasedModules = []; // Dynamically loaded
+        let activeSuite = 'crm';
+
+        // Sidebar Navigation Toggles
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-nav');
+            const overlay = document.getElementById('sidebar-overlay');
+            const btn = document.getElementById('sidebar-toggle-btn');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            if (btn) btn.classList.toggle('active');
+        }
+
+        // Custom details and workspaces
+        const workspaces = {
             crm: {
-                name: "Custom CRM Suite",
-                requirements: "Custom CRM suite. Integrates customer sales pipelines, contact managers, automatic deal updates via background workers, and email notifications.",
-                stack: "node",
-                debt: { monolith: false, nocache: true, directdb: true, singleinstance: true },
-                architectures: {
-                    node: {
-                        map: "Client Portal → Ingress API Proxy → CRM Pipeline Service → Deals Transaction Manager → Winston Logs → PostgreSQL Primary",
-                        infra: "2x Node API servers, 1x CRM pipeline worker service, 1x PostgreSQL (Primary/Replica) cluster.",
-                        complexity: "Moderate (Level 54/100)",
-                        risk: "Low",
-                        files: [
-                            { name: "crm_pipeline.js", code: `const express = require('express');\nconst router = express.Router();\n\n// Track sales deals stages\nrouter.post('/deals/update', async (req, res) => {\n    const { dealId, stage } = req.body;\n    console.log(\`[CRM] Transitioning deal \${dealId} to \${stage}\`);\n    res.json({ success: true, dealId, stage });\n});` },
-                            { name: "contact_manager.js", code: `const db = require('./db');\n\nasync function createContact(contact) {\n    const { name, email, company } = contact;\n    return await db.query('INSERT INTO Contacts (name, email, company) VALUES ($1, $2, $3)', [name, email, company]);\n}` },
-                            { name: "deals_schema.sql", code: `CREATE TABLE Contacts (\n  id SERIAL PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  company VARCHAR(255)\n);\n\nCREATE TABLE Deals (\n  id SERIAL PRIMARY KEY,\n  contact_id INT REFERENCES Contacts(id) ON DELETE CASCADE,\n  amount DECIMAL(12, 2) NOT NULL,\n  stage VARCHAR(50) DEFAULT 'LEAD'\n);` },
-                            { name: "notification_worker.js", code: `const redis = require('redis');\nconst worker = redis.createClient({ url: process.env.REDIS_URL });\n\nworker.on('message', (channel, message) => {\n    console.log(\`[CRM-NOTIFY] Send deal updates alert: \${message}\`);\n});` }
-                        ]
-                    },
-                    go: {
-                        map: "Client Portal → Go Gin Gateway → CRM Router → Kafka Events → Pipeline Shard DB (Postgres)",
-                        infra: "2x Gin app hosts, 1x Kafka broker, 2x CRM worker nodes, 1x PostgreSQL storage.",
-                        complexity: "High (Level 75/100)",
-                        risk: "Moderate",
-                        files: [
-                            { name: "crm_gateway.go", code: `package main\n\nimport (\n\t"github.com/gin-gonic/gin"\n)\n\nfunc main() {\n\tr := gin.Default()\n\tr.POST("/crm/deals", handleCreateDeal)\n\tr.Run(":8080")\n}` },
-                            { name: "deals_handler.go", code: `package handlers\n\nimport "net/http"\n\nfunc handleCreateDeal(c *gin.Context) {\n\t// Process deals ingress\n\tc.JSON(http.StatusOK, gin.H{"status": "deal_queued"})\n}` },
-                            { name: "crm_schema.sql", code: `CREATE TABLE Deals (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  contact_email VARCHAR(255),\n  deal_val DOUBLE,\n  deal_stage VARCHAR(50)\n);` },
-                            { name: "kafka_deals.go", code: `package queue\n\nimport "github.com/segmentio/kafka-go"\n\nfunc PublishDealUpdated(dealID string) {\n\t// Publish deal progress events to CRM workers\n}` }
-                        ]
-                    },
-                    python: {
-                        map: "FASTAPI CRM → Authentication verify → Async pipeline logs → Celery notifications → Postgres Core",
-                        infra: "2x FastAPI worker hosts, 1x Redis instance, 1x Postgres DB.",
-                        complexity: "Low-Moderate (Level 42/100)",
-                        risk: "Low",
-                        files: [
-                            { name: "crm_main.py", code: `from fastapi import FastAPI\napp = FastAPI()\n\n@app.post("/deals")\ndef create_deal(deal: dict):\n    return {"status": "saved", "deal_id": deal.get("id")}` },
-                            { name: "crm_auth.py", code: `def check_permissions(user_role):\n    return user_role in ["sales", "admin"]` },
-                            { name: "crm_models.py", code: `from sqlalchemy import Column, Integer, String, Float\nfrom database import Base\n\nclass Deal(Base):\n    __tablename__ = "deals"\n    id = Column(Integer, primary_key=True)\n    val = Column(Float)\n    stage = Column(String)` },
-                            { name: "celery_crm.py", code: `from celery import Celery\n\napp = Celery('crm_tasks', broker='redis://localhost:6379/0')\n\n@app.task\ndef send_deal_email(email: str):\n    print(f"Sending email notification to {email}")` }
-                        ]
-                    }
-                }
+                title: "Custom CRM Suite Workspace",
+                sub: "Deal pipelines and customer sales indicators.",
+                render: () => `
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Record Client Deal Conversion</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="crm-email">Client Corporate Email</label>
+                                <input type="email" id="crm-email" placeholder="client@company.com" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="crm-amount">Deal Value ($ USD)</label>
+                                <input type="number" id="crm-amount" placeholder="25000" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="crm-stage">Sales Stage</label>
+                            <select id="crm-stage" class="form-select">
+                                <option value="LEAD">Incoming Lead Ingress</option>
+                                <option value="PROPOSAL">Proposal Review</option>
+                                <option value="WON">Deal Won (Convert Account)</option>
+                            </select>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <button onclick="submitCRMDeal()" class="action-btn">Submit Deal Entry</button>
+                        </div>
+                    </div>
+                `
             },
             hr: {
-                name: "Custom HR Suite",
-                requirements: "Custom HR suite. Supports staff rosters, active work shifts validator, payroll ledger databases, and employee timesheet approval workflows.",
-                stack: "node",
-                debt: { monolith: true, nocache: false, directdb: false, singleinstance: true },
-                architectures: {
-                    node: {
-                        map: "Admin Roster Dashboard → Ingress API Proxy → HR Employee Controller → Salary Ledger Sync → Winston Audit Log → Postgres DB Core",
-                        infra: "1x HR monolithic host server, 1x Postgres ledger db (strongly consistent transactions).",
-                        complexity: "Moderate (Level 45/100)",
-                        risk: "Moderate",
-                        files: [
-                            { name: "hr_controller.js", code: `const express = require('express');\nconst router = express.Router();\n\n// Manage active staff shifts\nrouter.post('/shifts/verify', (req, res) => {\n    const { staffId, hours } = req.body;\n    console.log(\`[HR] Verified \${hours} hours for Employee #\${staffId}\`);\n    res.json({ status: 'approved', staffId, hours });\n});` },
-                            { name: "timesheet.js", code: `const db = require('./db');\n\nasync function submitTimesheet(employeeId, weekCommencing, totalHours) {\n    return await db.query(\n        'INSERT INTO Timesheets (employee_id, week_commencing, hours) VALUES ($1, $2, $3)',\n        [employeeId, weekCommencing, totalHours]\n    );\n}` },
-                            { name: "payroll_schema.sql", code: `CREATE TABLE Employees (\n  id SERIAL PRIMARY KEY,\n  full_name VARCHAR(255) NOT NULL,\n  salary DECIMAL(10, 2) NOT NULL\n);\n\nCREATE TABLE Timesheets (\n  id SERIAL PRIMARY KEY,\n  employee_id INT REFERENCES Employees(id) ON DELETE CASCADE,\n  week_commencing DATE NOT NULL,\n  hours DECIMAL(4, 2) NOT NULL,\n  status VARCHAR(20) DEFAULT 'PENDING'\n);` },
-                            { name: "audit_ledger.js", code: `const winston = require('winston');\nconst logger = winston.createLogger({\n    transports: [\n        new winston.transports.File({ filename: 'payroll-audit.log' })\n    ]\n});\n\nfunction logPayrollAccess(operatorId, employeeId) {\n    logger.info(\`Payroll record of \${employeeId} viewed by \${operatorId}\`);\n}` }
-                        ]
-                    },
-                    go: {
-                        map: "Ingress Router → Go Gin HR Roster Service → Employee Controller → Timesheet Validation Middleware → Ledger DB (Postgres)",
-                        infra: "2x Go monolithic nodes, 1x Postgres Database with read replica.",
-                        complexity: "Moderate-High (Level 60/100)",
-                        risk: "High",
-                        files: [
-                            { name: "hr_roster.go", code: `package main\n\nimport "github.com/gin-gonic/gin"\n\nfunc main() {\n\tr := gin.Default()\n\tr.POST("/hr/roster", handleUpdateRoster)\n\tr.Run(":3000")\n}` },
-                            { name: "timesheet_validator.go", code: `package validation\n\nimport "errors"\n\nfunc ValidateShiftHours(hours float64) error {\n\tif hours < 0 || hours > 24 {\n\t\treturn errors.New("Invalid shift hours range")\n\t}\n\treturn nil\n}` },
-                            { name: "hr_schema.sql", code: `CREATE TABLE Timesheets (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  employee_id INT,\n  hours DECIMAL(4, 2),\n  verified_at TIMESTAMP\n);` },
-                            { name: "payroll_sync.go", code: `package sync\n\nfunc SyncShiftToLedger(staffID int, hours float64) {\n\t// Strongly consistent transaction update to payroll database\n}` }
-                        ]
-                    },
-                    python: {
-                        map: "FastAPI HR Suite → Timesheet check → Celery payroll calculation → SQLite / PostgreSQL Core",
-                        infra: "1x FastAPI backend server, 1x Redis instance, 1x PostgreSQL.",
-                        complexity: "Low-Moderate (Level 38/100)",
-                        risk: "Low",
-                        files: [
-                            { name: "hr_main.py", code: `from fastapi import FastAPI\napp = FastAPI()\n\n@app.post("/roster")\ndef submit_shift(employee_id: int, hours: float):\n    return {"status": "success", "employee_id": employee_id}` },
-                            { name: "hr_auth.py", code: `def check_admin_role(user_role):\n    return user_role in ["hr_admin", "super_admin"]` },
-                            { name: "hr_models.py", code: `from sqlalchemy import Column, Integer, String, Date\nfrom database import Base\n\nclass Staff(Base):\n    __tablename__ = "staff"\n    id = Column(Integer, primary_key=True)\n    name = Column(String)\n    joined_date = Column(Date)` },
-                            { name: "celery_payroll.py", code: `from celery import Celery\n\napp = Celery('payroll_tasks', broker='redis://localhost:6379/0')\n\n@app.task\ndef calculate_payroll_deductions(employee_id: int):\n    # Core payroll calculation task\n    pass` }
-                        ]
-                    }
-                }
+                title: "Custom HR Suite Workspace",
+                sub: "Rosters and timecard verification gateway.",
+                render: () => `
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Log Timesheet Shift Entry</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hr-employee">Employee Account ID</label>
+                                <input type="text" id="hr-employee" placeholder="EMP-4982" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="hr-hours">Total Weekly Worked Hours</label>
+                                <input type="number" id="hr-hours" placeholder="40" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="hr-week">Week Commencing Date</label>
+                            <input type="date" id="hr-week" class="form-input">
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <button onclick="submitHRShift()" class="action-btn">Verify & Submit Timesheet</button>
+                        </div>
+                    </div>
+                `
             },
             ops: {
-                name: "Custom OPS Suite",
-                requirements: "Custom OPS suite. Features real-time supply chain inventory sync, delivery dispatch logistics trackers, and background worker jobs for fleet coordinates logs.",
-                stack: "node",
-                debt: { monolith: false, nocache: true, directdb: true, singleinstance: false },
-                architectures: {
-                    node: {
-                        map: "Operator Live Telemetry → WebSocket Ingress Gateway → Real-time Supply Chain sync → Delivery Dispatch Tracker → Fleet Coordinates Log → Postgres DB",
-                        infra: "2x Node API servers, 1x WebSocket gateway server, 1x Redis pub-sub pipeline, 1x Postgres database.",
-                        complexity: "Moderate-High (Level 62/100)",
-                        risk: "High",
-                        files: [
-                            { name: "fleet_tracker.js", code: `const express = require('express');\nconst router = express.Router();\n\n// Manage active fleet coordinates log\nrouter.post('/gps/log', (req, res) => {\n    const { vehicleId, lat, lng } = req.body;\n    console.log(\`[OPS-GPS] Vehicle #\${vehicleId} location updated to \${lat}, \${lng}\`);\n    res.json({ status: 'logged', vehicleId });\n});` },
-                            { name: "inventory_sync.js", code: `const redis = require('redis');\nconst pub = redis.createClient({ url: process.env.REDIS_URL });\n\nasync function broadcastInventorySync(itemId, stockQty) {\n    await pub.connect();\n    await pub.publish('inventory-channel', JSON.stringify({ itemId, stockQty }));\n}` },
-                            { name: "orders_schema.sql", code: `CREATE TABLE Fleet (\n  id SERIAL PRIMARY KEY,\n  driver_name VARCHAR(255) NOT NULL,\n  status VARCHAR(50) DEFAULT 'AVAILABLE'\n);\n\nCREATE TABLE Orders (\n  id SERIAL PRIMARY KEY,\n  fleet_id INT REFERENCES Fleet(id) ON DELETE SET NULL,\n  destination VARCHAR(255) NOT NULL,\n  status VARCHAR(50) DEFAULT 'PREPARING'\n);` },
-                            { name: "dispatch_queue.js", code: `const winston = require('winston');\n\nfunction queueDispatchOrder(orderId, fleetId) {\n    console.log(\`[OPS-DISPATCH] Queuing Order #\${orderId} with Driver #\${fleetId}\`);\n}` }
-                        ]
-                    },
-                    go: {
-                        map: "Concentric Gateway → Go Gin OPS Roster Router → GPS Coords Validator → Kafka Events → Postgres OPS Database",
-                        infra: "1x Nginx load balancer, 3x Go microservice pods, 1x Kafka cluster, 1x Postgres master-slave pair.",
-                        complexity: "High (Level 80/100)",
-                        risk: "High",
-                        files: [
-                            { name: "ops_main.go", code: `package main\n\nimport "github.com/gin-gonic/gin"\n\nfunc main() {\n\tr := gin.Default()\n\tr.POST("/ops/inventory", handleSyncInventory)\n\tr.Run(":3000")\n}` },
-                            { name: "gps_validator.go", code: `package validation\n\nimport "errors"\n\nfunc ValidateGPS(lat, lng float64) error {\n\t// Lat/Lng validations\n\treturn nil\n}` },
-                            { name: "ops_schema.sql", code: `CREATE TABLE Inventory (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  item_sku VARCHAR(100),\n  quantity INT\n);` },
-                            { name: "dispatch_worker.go", code: `package dispatch\n\nimport "fmt"\n\nfunc ProcessDispatch(orderID string) {\n\tfmt.Printf("[OPS] Dispatching driver for order: %s\\n", orderID)\n}` }
-                        ]
-                    },
-                    python: {
-                        map: "FastAPI OPS → Realtime WebSocket inventory sync → Celery fleet tracker background workers → Postgres Core",
-                        infra: "2x Uvicorn app hosts, 1x Redis instance, 1x PostgreSQL.",
-                        complexity: "Moderate (Level 50/100)",
-                        risk: "Moderate",
-                        files: [
-                            { name: "ops_main.py", code: `from fastapi import FastAPI, WebSocket\napp = FastAPI()\n\n@app.websocket("/ws/telemetry")\nasync def websocket_endpoint(websocket: WebSocket):\n    await websocket.accept()\n    while True:\n        data = await websocket.receive_text()\n        await websocket.send_text(f"Processed telemetry: {data}")` },
-                            { name: "ops_auth.py", code: `def verify_dispatch_token(token):\n    return token == "dispatch-secret"` },
-                            { name: "ops_models.py", code: `from sqlalchemy import Column, Integer, String\nfrom database import Base\n\nclass Fleet(Base):\n    __tablename__ = "fleet"\n    id = Column(Integer, primary_key=True)\n    driver_name = Column(String)\n    license_plate = Column(String)` },
-                            { name: "celery_ops.py", code: `from celery import Celery\n\napp = Celery('ops_tasks', broker='redis://localhost:6379/0')\n\n@app.task\ndef recalculate_route_distance(lat1: float, lng1: float, lat2: float, lng2: float):\n    return ((lat1 - lat2)**2 + (lng1 - lng2)**2)**0.5` }
-                        ]
-                    }
-                }
+                title: "Custom OPS Suite Workspace",
+                sub: "Logistics control and vehicle fleet trackers.",
+                render: () => `
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Dispatch Fleet Coordinates</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ops-vehicle">Vehicle Dispatch ID</label>
+                                <input type="text" id="ops-vehicle" placeholder="FLEET-CARGO-08" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="ops-stock">Cargo Unit Load Qty</label>
+                                <input type="number" id="ops-stock" placeholder="450" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ops-lat">Latitude Coordinate</label>
+                                <input type="number" step="0.00001" id="ops-lat" placeholder="45.1098" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="ops-lng">Longitude Coordinate</label>
+                                <input type="number" step="0.00001" id="ops-lng" placeholder="-122.3892" class="form-input">
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <button onclick="submitOPSFleet()" class="action-btn">Update Fleet Geolocation</button>
+                        </div>
+                    </div>
+                `
+            },
+            payroll: {
+                title: "Custom Payroll Suite Workspace",
+                sub: "Double-entry general ledgers and paycheck tax calculators.",
+                render: () => `
+                    <div style="display: flex; flex-direction: column; gap: 2rem; text-align: left;">
+                        
+                        <!-- 1. Interactive Paycheck / Tax Deductions Calculator -->
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem;">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 1rem;">Paycheck & Tax Withholding Calculator</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pay-rate">Hourly Billing Rate ($ / hour)</label>
+                                    <input type="number" id="pay-rate" value="45" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pay-hours">Shift Hours Worked</label>
+                                    <input type="number" id="pay-hours" value="80" class="form-input">
+                                </div>
+                            </div>
+                            <button onclick="executePayrollCalculator()" class="action-btn" style="margin-top: 1rem;">
+                                Calculate Paycheck & Withholdings
+                            </button>
+                            
+                            <!-- Printed Voucher Receipt -->
+                            <div class="voucher-receipt" id="paycheck-voucher" style="margin-top: 1.5rem;">
+                                <!-- Voucher items appended dynamically -->
+                            </div>
+                        </div>
+ 
+                        <!-- 2. Interactive General Ledger Invariant Balancer -->
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem;">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 1rem;">General Ledger Invariant Verification</h4>
+                            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem; margin-top: -0.5rem;">
+                                Verify transaction balance safety constraint: Sum(Debits) must equal Sum(Credits).
+                            </p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="ledger-debits">Total Account Debits ($)</label>
+                                    <input type="number" id="ledger-debits" value="12500" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ledger-credits">Total Account Credits ($)</label>
+                                    <input type="number" id="ledger-credits" value="12500" class="form-input">
+                                </div>
+                            </div>
+                            <button onclick="verifyGeneralLedger()" class="action-btn" style="margin-top: 1rem;">
+                                Audit Ledger Balance
+                            </button>
+                        </div>
+ 
+                        <!-- 3. Employee Management Link -->
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 0.5rem;">Corporate Employee Roster</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                    Add, update, and manage employee profiles, marital records, and payroll financial metadata.
+                                </p>
+                            </div>
+                            <button onclick="window.location.href = 'employees.html'" class="action-btn" style="padding: 0.65rem 1.5rem; font-size: 0.82rem;">
+                                Open Employee Management Hub →
+                            </button>
+                        </div>
+                    </div>
+                `
             }
         };
 
-        // Active architectures mapping (mutable)
-        let architectures = {
-            node: {},
-            go: {},
-            python: {}
-        };
-
-        let currentSuite = 'crm';
-
         function selectSuite(suiteKey) {
-            currentSuite = suiteKey;
+            activeSuite = suiteKey;
             
             // Switch card active styling
             document.querySelectorAll('.suite-card').forEach(card => {
                 card.classList.remove('active');
             });
-            const selectedCard = document.getElementById(`card-suite-${suiteKey}`);
-            if (selectedCard) selectedCard.classList.add('active');
+            const card = document.getElementById(`card-${suiteKey}`);
+            if (card) card.classList.add('active');
 
             // Switch active dots
             const dots = {
-                crm: { id: 'dot-suite-crm', color: '#00ffaa' },
-                hr: { id: 'dot-suite-hr', color: '#ffaa00' },
-                ops: { id: 'dot-suite-ops', color: '#ff3366' }
+                crm: { id: 'dot-crm', color: '#ffffff' },
+                hr: { id: 'dot-hr', color: '#ffffff' },
+                ops: { id: 'dot-ops', color: '#ffffff' },
+                payroll: { id: 'dot-payroll', color: '#ffffff' }
             };
             for (const key in dots) {
-                const dotEl = document.getElementById(dots[key].id);
-                if (dotEl) {
-                    if (key === suiteKey) {
-                        dotEl.style.background = dots[key].color;
-                        dotEl.style.boxShadow = `0 0 8px ${dots[key].color}`;
+                const el = document.getElementById(dots[key].id);
+                if (el) {
+                    if (key === suiteKey && purchasedModules.includes(suiteKey)) {
+                        el.style.background = dots[key].color;
+                        el.style.boxShadow = `0 0 8px ${dots[key].color}`;
                     } else {
-                        dotEl.style.background = 'transparent';
-                        dotEl.style.boxShadow = 'none';
+                        el.style.background = 'transparent';
+                        el.style.boxShadow = 'none';
                     }
                 }
             }
-            
-            // Update active architectures definition
-            const suiteData = suites[suiteKey];
-            document.getElementById('requirements-stack').value = suiteData.stack;
-            activeStack = suiteData.stack;
-            
-            for (const stack in suiteData.architectures) {
-                architectures[stack] = JSON.parse(JSON.stringify(suiteData.architectures[stack]));
+
+            // Automatically close sidebar nav if it's active
+            const sidebar = document.getElementById('sidebar-nav');
+            const overlay = document.getElementById('sidebar-overlay');
+            const btn = document.getElementById('sidebar-toggle-btn');
+            if (sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                if (btn) btn.classList.remove('active');
             }
+
+            // Render right column workspace console
+            const consoleBox = document.getElementById('workspace-console');
             
-            logEvent(`[SUITE] Loaded suite: ${suiteData.name}. Configurations mapped.`, 'terminal-success');
-            
-            // Refresh calculations and views
-            analyzeRequirements();
+            // If the user has NOT purchased this module, render locked overlay
+            if (!purchasedModules.includes(suiteKey)) {
+                consoleBox.innerHTML = `
+                    <div class="panel-title-group">
+                        <h2 class="panel-heading" style="text-transform: uppercase;">${suiteKey} Workspace Locked</h2>
+                        <p class="panel-sub">Access requires a licensed active billing cycle.</p>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; border: 1px dashed rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-palladium)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px var(--accent-palladium));"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff;">Suite Upgrade Required</h3>
+                        <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 320px; text-align: center; line-height: 1.5;">
+                            The custom ${suiteKey.toUpperCase()} suite is not linked to your corporate account. Please contact your company's ZTL Super Admin to generate licenses.
+                        </p>
+                        <button onclick="requestUpgrade('${suiteKey}')" class="action-btn" style="background: rgba(255,255,255,0.03); border: 1px solid var(--surface-border); color: #ffffff; font-size: 0.8rem; margin-top: 0.5rem; text-shadow: none; box-shadow: none;">
+                            Request Module License
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // If purchased, render interactive console
+            const wspace = workspaces[suiteKey];
+            consoleBox.innerHTML = `
+                <div class="panel-title-group">
+                    <h2 class="panel-heading">${wspace.title}</h2>
+                    <p class="panel-sub">${wspace.sub}</p>
+                </div>
+                <div style="flex: 1;">
+                    ${wspace.render()}
+                </div>
+            `;
+            logAudit(`[WORKSPACE] Loaded active suite: ${suiteKey.toUpperCase()}`, 'terminal-info');
         }
 
-        let activeStack = 'node';
-
-        function changeStack(stackKey) {
-            activeStack = stackKey;
-            analyzeRequirements();
+        // Active operations triggers
+        function requestUpgrade(suiteKey) {
+            logAudit(`[REQUEST] Contacting root controller nodes to license custom suite: ${suiteKey.toUpperCase()}`, 'terminal-warn');
+            alert(`[LICENSE REQUEST SENT]\n\nA license request for the Custom ${suiteKey.toUpperCase()} Suite has been forwarded to the Super Admin.`);
         }
 
-        function analyzeRequirements() {
-            const req = suites[currentSuite].requirements;
-            const stack = activeStack;
-            const data = architectures[stack];
-            
-            logEvent(`[Analyzer] Parsing specs for suite: "${suites[currentSuite].name}" on stack "${stack}"`, 'terminal-info');
+        function submitCRMDeal() {
+            const email = document.getElementById('crm-email').value.trim();
+            const amount = document.getElementById('crm-amount').value;
+            const stage = document.getElementById('crm-stage').value;
+
+            if (!email || !amount) {
+                alert('All CRM fields are required.');
+                return;
+            }
+
+            logAudit(`[CRM TRANSACTION] Dispatching deal ingress pipeline...`, 'terminal-info');
+            setTimeout(() => {
+                logAudit(`[SUCCESS] Deal entry logged for client: ${email} | Value: $${Number(amount).toLocaleString()} | Stage: ${stage}`, 'terminal-success');
+                document.getElementById('crm-email').value = '';
+                document.getElementById('crm-amount').value = '';
+            }, 500);
+        }
+
+        function submitHRShift() {
+            const emp = document.getElementById('hr-employee').value.trim();
+            const hours = document.getElementById('hr-hours').value;
+            const week = document.getElementById('hr-week').value;
+
+            if (!emp || !hours || !week) {
+                alert('All timesheet fields are required.');
+                return;
+            }
+
+            const parsedHours = Number(hours);
+            if (parsedHours <= 0 || parsedHours > 80) {
+                logAudit(`[REJECTED] Timesheet validation failed. Hours: ${hours} exceeds roster limit boundary (0 - 80 hours).`, 'terminal-error');
+                alert('Hours worked must be between 1 and 80.');
+                return;
+            }
+
+            logAudit(`[HR ROSTER] Auditing shift timecard details for ${emp}...`, 'terminal-info');
+            setTimeout(() => {
+                logAudit(`[SUCCESS] Timesheet shift accepted for week starting ${week}: Employee ${emp} logged ${parsedHours} billing hours.`, 'terminal-success');
+                document.getElementById('hr-employee').value = '';
+                document.getElementById('hr-hours').value = '';
+                document.getElementById('hr-week').value = '';
+            }, 600);
+        }
+
+        function submitOPSFleet() {
+            const vehicle = document.getElementById('ops-vehicle').value.trim();
+            const stock = document.getElementById('ops-stock').value;
+            const lat = document.getElementById('ops-lat').value;
+            const lng = document.getElementById('ops-lng').value;
+
+            if (!vehicle || !stock || !lat || !lng) {
+                alert('All dispatch coordinates are required.');
+                return;
+            }
+
+            logAudit(`[LOGISTICS] Connecting vehicle telemetry sync ring...`, 'terminal-info');
+            setTimeout(() => {
+                logAudit(`[SUCCESS] Fleet GPS coordinates updated vehicle ${vehicle} -> LAT: ${lat}, LNG: ${lng} | Cargo: ${stock} Units`, 'terminal-success');
+                document.getElementById('ops-vehicle').value = '';
+                document.getElementById('ops-stock').value = '';
+                document.getElementById('ops-lat').value = '';
+                document.getElementById('ops-lng').value = '';
+            }, 500);
+        }
+
+        function executePayrollCalculator() {
+            const rate = Number(document.getElementById('pay-rate').value);
+            const hours = Number(document.getElementById('pay-hours').value);
+
+            if (!rate || !hours || rate <= 0 || hours <= 0) {
+                alert('Please enter positive billing rate and hours worked.');
+                return;
+            }
+
+            logAudit(`[PAYROLL] Executing paycheck calculations & statutory deductions...`, 'terminal-info');
             
             setTimeout(() => {
-                const report = document.getElementById('requirements-report');
-                
-                const suiteData = suites[currentSuite];
-                const monolith = suiteData.debt.monolith;
-                const nocache = suiteData.debt.nocache;
-                const directdb = suiteData.debt.directdb;
-                const singleinstance = suiteData.debt.singleinstance;
-                
-                let score = "Low";
-                let failure = "None predicted under standard test parameters.";
-                let recommendation = "Software blueprint optimized.";
+                const gross = rate * hours;
+                const fica = gross * 0.0765;      // 7.65% FICA
+                const fedTax = gross * 0.12;      // 12% Fed tax
+                const stateTax = gross * 0.04;    // 4% State tax
+                const net = gross - (fica + fedTax + stateTax);
 
-                let dangerCount = (monolith?1:0) + (nocache?1:0) + (directdb?1:0) + (singleinstance?1:0);
-
-                if (dangerCount >= 3) {
-                    score = "CRITICAL LIMIT RISK";
-                    failure = "Database saturation > 15k users; single point bottleneck collapse.";
-                    recommendation = "Introduce caching layers, sharded persistence, and scale instances.";
-                } else if (dangerCount >= 1) {
-                    score = "MODERATE RISK";
-                    failure = "Connection pools saturated under peak request concurrent loads.";
-                    recommendation = "Implement Redis caching on query layers to shield the database.";
-                }
-
-                let complexityLevel = stack === 'go' ? 72 : stack === 'node' ? 48 : 35;
-                if (currentSuite === 'crm') complexityLevel += 6;
-                else if (currentSuite === 'hr') complexityLevel -= 3;
-                else if (currentSuite === 'ops') complexityLevel += 14;
-
-                let confidence = Math.round(95 - (complexityLevel * 0.3) - (dangerCount * 6));
-                let burden = complexityLevel > 60 ? "High" : "Moderate";
-                let integration = complexityLevel > 50 ? "High" : "Low";
-                
-                report.innerHTML = `
-                    <div style="font-weight:bold; color:#ffffff; margin-bottom:0.4rem;">Suite Technical Specifications</div>
-                    <div class="detail-row"><span class="telemetry-label">Architecture Map</span><span style="color:#ffffff; font-size:0.7rem; font-family:monospace; max-width:65%; text-align:right;">${data.map}</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Infrastructure Needs</span><span style="color:#ffffff;">${data.infra}</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Estimated Complexity</span><span class="telemetry-value text-neon">${data.complexity}</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Security Risk Score</span><span style="color:${data.risk === 'Low' ? '#00ffaa' : data.risk === 'High' ? '#ff3366' : '#ffaa00'}; font-weight:bold;">${data.risk}</span></div>
-                    <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 0.5rem; padding-top: 0.5rem;"></div>
-                    <div class="detail-row"><span class="telemetry-label">Architecture Debt Rating</span><span class="telemetry-value" style="color:${dangerCount >= 3 ? '#ff3366' : dangerCount >= 1 ? '#ffaa00' : '#00ffaa'}; font-weight:bold;">${score}</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Predicted Failure Target</span><span class="telemetry-value" style="font-size:0.7rem; color:#ffffff; max-width:60%; text-align:right;">${failure}</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Delivery Confidence Score</span><span class="telemetry-value text-neon">${confidence}%</span></div>
-                    <div class="detail-row"><span class="telemetry-label">Integration / Delay Risk</span><span class="telemetry-value">${burden} / ${integration}</span></div>
-                    <div style="margin-top:0.4rem; font-size:0.7rem; color:var(--text-secondary);">Recommendation: <span style="color:#ffffff;">${recommendation}</span></div>
+                const voucher = document.getElementById('paycheck-voucher');
+                voucher.style.display = 'block';
+                voucher.innerHTML = `
+                    <div style="text-align: center; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">PARADIGM PAYSLIP RECEIPT</div>
+                    <div class="receipt-row"><span>DATE / TIMESTAMP</span><span>${new Date().toLocaleDateString()}</span></div>
+                    <div class="receipt-row"><span>HOURS WORKED</span><span>${hours} hrs</span></div>
+                    <div class="receipt-row"><span>BILLING RATE</span><span>$${rate.toFixed(2)}/hr</span></div>
+                    <div class="receipt-line"></div>
+                    <div class="receipt-row" style="color: #ffffff; font-weight: bold;"><span>GROSS PAYCHECK</span><span>$${gross.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span>FICA TAX WITHHELD</span><span>-$${fica.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span>FEDERAL INCOME TAX</span><span>-$${fedTax.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span>STATE INCOME TAX</span><span>-$${stateTax.toFixed(2)}</span></div>
+                    <div class="receipt-line"></div>
+                    <div class="receipt-row" style="color: #ffffff; font-weight: 800; font-size: 0.9rem;"><span>NET TAKE-HOME PAY</span><span>$${net.toFixed(2)}</span></div>
                 `;
 
-                // Regenerate file tree
-                const tree = document.getElementById('tree-container');
-                tree.innerHTML = '';
-                data.files.forEach((file, idx) => {
-                    const node = document.createElement('div');
-                    node.className = `tree-node${idx === 0 ? ' active' : ''}`;
-                    node.innerHTML = `📄 ${file.name}`;
-                    node.onclick = () => selectFileNode(idx);
-                    tree.appendChild(node);
-                });
-                
-                // Show first file preview
-                selectFileNode(0);
-                
-                logEvent(`[SUCCESS] Custom software architecture map rendered. Boilerplate ready.`, 'terminal-success');
-            }, 800);
+                logAudit(`[SUCCESS] Paycheck compiled: Gross $${gross.toFixed(2)} | Withholdings $${(fica + fedTax + stateTax).toFixed(2)} | Net $${net.toFixed(2)}`, 'terminal-success');
+            }, 600);
         }
 
-        function selectFileNode(idx) {
-            document.querySelectorAll('.tree-node').forEach((node, i) => {
-                if (i === idx) node.classList.add('active');
-                else node.classList.remove('active');
-            });
+        function verifyGeneralLedger() {
+            const debits = Number(document.getElementById('ledger-debits').value);
+            const credits = Number(document.getElementById('ledger-credits').value);
 
-            const file = architectures[activeStack].files[idx];
-            const preview = document.getElementById('code-preview-view');
-            preview.innerText = file.code;
-            logEvent(`[Boilerplate] Selected file template: ${file.name}`, 'terminal-info');
+            if (isNaN(debits) || isNaN(credits) || debits <= 0 || credits <= 0) {
+                alert('Please enter valid numeric debits and credits.');
+                return;
+            }
+
+            logAudit(`[LEDGER AUDIT] Reviewing double-entry bookkeeping constraints...`, 'terminal-info');
+
+            setTimeout(() => {
+                const diff = Math.abs(debits - credits);
+                if (diff < 0.0001) {
+                    logAudit(`[SUCCESS] General ledger is balanced (Invariant verified: Sum(Debits) == Sum(Credits) = $${debits.toLocaleString()})`, 'terminal-success');
+                    alert(`[AUDIT SUCCESS]\n\nGeneral Ledger is completely balanced.\nSum(Debits) == Sum(Credits)`);
+                } else {
+                    logAudit(`[ERROR] Ledger Invariant Violation! Debits: $${debits.toLocaleString()} | Credits: $${credits.toLocaleString()} | Balance Discrepancy: $${diff.toLocaleString()}`, 'terminal-error');
+                    alert(`[LEDGER INVARIANT VIOLATION]\n\nUnbalanced entry detected! Discrepancy of $${diff.toLocaleString()}.\nTransaction cannot be processed.`);
+                }
+            }, 550);
         }
 
         async function loadUserData() {
@@ -770,17 +1046,44 @@
                         const username = email.split('@')[0];
                         const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
                         
+                        purchasedModules = user.purchased_modules || [];
+                        if (user.role === 'super_admin' || user.role === 'super-admin' || user.role === 'admin' || user.email === 'admin@local.dev') {
+                            purchasedModules = ['crm', 'hr', 'ops', 'payroll'];
+                        }
+                        
                         document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to PARADIGM.`;
-                        document.getElementById('welcome-subtext').innerText = `Enterprise workspace for application planning. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                        document.getElementById('welcome-subtext').innerText = `Enterprise executive workspace. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+
+                        // Mark active cards style and overlay locks
+                        const suites = ['crm', 'hr', 'ops', 'payroll'];
+                        suites.forEach(suite => {
+                            const card = document.getElementById(`card-${suite}`);
+                            if (card && !purchasedModules.includes(suite)) {
+                                card.classList.add('locked');
+                                
+                                // Insert locked overlay inside the card
+                                const overlay = document.createElement('div');
+                                overlay.className = 'locked-overlay';
+                                overlay.innerHTML = `
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    <span style="font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px;">UNLICENSED</span>
+                                `;
+                                card.appendChild(overlay);
+                            }
+                        });
+
+                        // Select the first unlocked suite as default, or fallback to CRM
+                        const defaultSuite = suites.find(suite => purchasedModules.includes(suite)) || 'crm';
+                        selectSuite(defaultSuite);
                     }
                 }
             } catch (err) {
                 console.error("Failed to load user info", err);
+                logAudit(`[ERROR] Executive session verification failed. Verify backend connectivity.`, 'terminal-error');
             }
         }
 
-        // Initial setup loads
-        selectSuite('crm');
+        // Initialize loading sequence
         loadUserData();
     </script>
 </body>

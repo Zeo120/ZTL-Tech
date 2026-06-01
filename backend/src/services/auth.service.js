@@ -29,6 +29,7 @@ async function findUserByEmail(email) {
         email,
         password_hash,
         role,
+        purchased_modules,
         is_active
       FROM Users
       WHERE email = @email;
@@ -46,6 +47,7 @@ async function findUserById(id) {
         id,
         email,
         role,
+        purchased_modules,
         is_active
       FROM Users
       WHERE id = @id;
@@ -116,6 +118,13 @@ async function login(body, requestContext) {
     metadata: { tbais: tbaisResult }
   });
 
+  let parsedModules = [];
+  try {
+    parsedModules = JSON.parse(user.purchased_modules || '[]');
+  } catch (e) {
+    parsedModules = [];
+  }
+
   return {
     cookieName: env.sessionCookieName,
     csrfCookieName: env.csrfCookieName,
@@ -125,7 +134,8 @@ async function login(body, requestContext) {
     user: {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      purchased_modules: parsedModules
     }
   };
 }

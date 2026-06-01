@@ -1560,11 +1560,33 @@
 
                 const payload = await response.json();
                 if (response.ok && payload.success) {
-                    logEvent(`[SUCCESS] Codebase Static Scan dispatched!`, 'terminal-success');
-                    alert(`[SUCCESS] Codebase Scan Dispatched!\n\nStatic analysis is running in the background. Real-time parsed files and finding signals will log below.`);
+                    logEvent(`[SUCCESS] Codebase Static Scan queued to Worker Pool. Job ID: ${payload.jobId}`, 'terminal-success');
                     
-                    // Poll logs immediately
-                    setTimeout(pollRealLogs, 300);
+                    // Poll Worker Queue Status
+                    const pollStatus = async () => {
+                        try {
+                            const statRes = await fetch(`${apiBase}/api/admin/phasr/scan-status/${payload.jobId}`, {
+                                credentials: 'include'
+                            });
+                            const statData = await statRes.json();
+                            if (statData.success && statData.job) {
+                                const job = statData.job;
+                                logEvent(`[WORKER] Job ${job.jobId.slice(-4)}: ${job.status.toUpperCase()} (${job.progress}%)`, 'terminal-info');
+                                
+                                if (job.status === 'completed') {
+                                    logEvent(`[SUCCESS] AST parsing complete. ${job.result.summary.vulnerabilitiesCount} findings.`, 'terminal-success');
+                                    loadSavedScans();
+                                } else if (job.status === 'failed') {
+                                    logEvent(`[ERROR] Worker thread crashed: ${job.error}`, 'terminal-error');
+                                } else {
+                                    setTimeout(pollStatus, 800);
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Status poll failed', e);
+                        }
+                    };
+                    setTimeout(pollStatus, 800);
                 } else {
                     const err = payload.error || 'Failed to dispatch static scanner.';
                     logEvent(`[ERROR] Scan dispatch failed: ${err}`, 'terminal-error');
@@ -2030,12 +2052,33 @@
         }
         startPollingLoop();
 
-        // TBAIS background polling (every 15s when panel is visible)
-        setInterval(() => {
-            if (currentPhase === 'tbais') {
-                fetchSecurityAlerts();
-            }
-        }, 15000);
+        // TBAIS background polling replaced with Real-Time SSE
+        function setupTbaisEventStream() {
+            const source = new EventSource('/api/admin/events');
+            
+            source.onmessage = (event) => {
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (payload.type === 'turing_halt') {
+                        // Instantly trigger a refresh of the alerts if the panel is active
+                        if (currentPhase === 'tbais') {
+                            fetchSecurityAlerts();
+                            logEvent('[TBAIS] Turing Halt broadcast intercepted via SSE', 'warn');
+                        }
+                    } else if (payload.type === 'connected') {
+                        console.log('[SSE] Connected to TBAIS event bus');
+                    }
+                } catch (e) {
+                    console.error('SSE parsing error', e);
+                }
+            };
+
+            source.onerror = (err) => {
+                console.error('[SSE] Connection error, reconnecting...', err);
+                // EventSource automatically reconnects, no explicit code needed
+            };
+        }
+        setupTbaisEventStream();
     </script>
 </body>
 </html>

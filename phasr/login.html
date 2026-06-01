@@ -362,13 +362,17 @@
 
                 alert(`[SUCCESS] Credentials Verified!\n\nRedirecting to PHASR Operations Room...`);
                 const userRole = payload.data && payload.data.user && payload.data.user.role;
-                if (userRole === 'super_admin' || userRole === 'super-admin') {
+                if ((userRole === 'super_admin' || userRole === 'super-admin') && currentMode === 'super') {
                     window.location.href = '../ztl_tech/super_admin.html';
                 } else {
                     window.location.href = './admin.html';
                 }
             } catch (error) {
-                showError('Unable to connect to the authentication server. Confirm the backend is running.');
+                if (window.location.protocol === 'file:') {
+                    showError('Unable to connect to the authentication server. Since this page was loaded directly from the file system (file://), your browser blocks cookie authentication due to CORS security. Please access the application via http://localhost:3000/phasr/login.html instead.');
+                } else {
+                    showError('Unable to connect to the authentication server. Confirm the backend is running.');
+                }
             }
         }
     </script>

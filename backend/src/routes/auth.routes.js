@@ -47,11 +47,20 @@ authRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ success: false, error: 'User not found' });
   }
+
+  let parsedModules = [];
+  try {
+    parsedModules = JSON.parse(user.purchased_modules || '[]');
+  } catch (e) {
+    parsedModules = [];
+  }
+
   return ok(res, {
     user: {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      purchased_modules: parsedModules
     }
   });
 }));

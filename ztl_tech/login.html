@@ -139,7 +139,11 @@
                     window.location.href = './admin.html';
                 }
             } catch (error) {
-                setError('Unable to connect to the authentication server. Confirm the backend is running.');
+                if (window.location.protocol === 'file:') {
+                    setError('Unable to connect to the authentication server. Since this page was loaded directly from the file system (file://), your browser blocks cookie authentication due to CORS security. Please access the application via http://localhost:3000/ instead.');
+                } else {
+                    setError('Unable to connect to the authentication server. Confirm the backend is running.');
+                }
             } finally {
                 setLoading(false);
             }

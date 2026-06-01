@@ -25,6 +25,7 @@ const tables = [
       { name: 'email', sql: 'NVARCHAR(254) NOT NULL CONSTRAINT DF_Users_email DEFAULT N\'\'' },
       { name: 'password_hash', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_Users_password_hash DEFAULT N\'\'' },
       { name: 'role', sql: 'NVARCHAR(32) NOT NULL CONSTRAINT DF_Users_role DEFAULT N\'user\'' },
+      { name: 'purchased_modules', sql: 'NVARCHAR(MAX) NOT NULL CONSTRAINT DF_Users_purchased_modules DEFAULT N\'[]\'' },
       { name: 'is_active', sql: 'BIT NOT NULL CONSTRAINT DF_Users_is_active DEFAULT 1' },
       { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Users_created_at DEFAULT GETDATE()' },
       { name: 'updated_at', sql: 'DATETIME2 NULL' }
@@ -257,6 +258,61 @@ const tables = [
         sql: 'CREATE INDEX IX_CodebaseScanFindings_scan_id ON dbo.CodebaseScanFindings(scan_id);'
       }
     ]
+  },
+  {
+    name: 'Employees',
+    createSql: `
+      CREATE TABLE dbo.Employees (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Employees PRIMARY KEY,
+        user_id INT NOT NULL,
+        name NVARCHAR(255) NOT NULL,
+        age INT NOT NULL,
+        status NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_status DEFAULT 'Active',
+        gender NVARCHAR(50) NOT NULL,
+        pan NVARCHAR(50) NOT NULL,
+        marital_status NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_marital DEFAULT 'Unmarried',
+        spouse_name NVARCHAR(255) NULL,
+        aadhar NVARCHAR(50) NOT NULL,
+        date_of_birth DATE NULL,
+        date_of_joining DATE NOT NULL,
+        date_of_exit DATE NULL,
+        bank_account_number NVARCHAR(100) NULL,
+        ifsc_code NVARCHAR(50) NULL,
+        pf_status NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_pf DEFAULT 'Not Applicable',
+        uan_no NVARCHAR(50) NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT FK_Employees_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_Employees_user_id DEFAULT 0' },
+      { name: 'name', sql: 'NVARCHAR(255) NOT NULL CONSTRAINT DF_Employees_name DEFAULT N\'\'' },
+      { name: 'age', sql: 'INT NOT NULL CONSTRAINT DF_Employees_age DEFAULT 0' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_status DEFAULT N\'Active\'' },
+      { name: 'gender', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_gender DEFAULT N\'\'' },
+      { name: 'pan', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_pan DEFAULT N\'\'' },
+      { name: 'marital_status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_marital DEFAULT N\'Unmarried\'' },
+      { name: 'spouse_name', sql: 'NVARCHAR(255) NULL' },
+      { name: 'aadhar', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_aadhar DEFAULT N\'\'' },
+      { name: 'date_of_birth', sql: 'DATE NULL' },
+      { name: 'date_of_joining', sql: 'DATE NOT NULL' },
+      { name: 'date_of_exit', sql: 'DATE NULL' },
+      { name: 'bank_account_number', sql: 'NVARCHAR(100) NULL' },
+      { name: 'ifsc_code', sql: 'NVARCHAR(50) NULL' },
+      { name: 'pf_status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_pf DEFAULT N\'Not Applicable\'' },
+      { name: 'uan_no', sql: 'NVARCHAR(50) NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_Employees',
+    indexes: [
+      {
+        name: 'IX_Employees_user_id',
+        sql: 'CREATE INDEX IX_Employees_user_id ON dbo.Employees(user_id);'
+      }
+    ]
   }
 ];
 
@@ -460,6 +516,7 @@ async function initDb() {
   await ensureForeignKey(pool, 'CodebaseScans', 'FK_CodebaseScans_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'CodebaseDependencies', 'FK_CodebaseDependencies_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'CodebaseScanFindings', 'FK_CodebaseScanFindings_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'Employees', 'FK_Employees_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 
