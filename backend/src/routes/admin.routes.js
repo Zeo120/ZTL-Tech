@@ -982,7 +982,8 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
     .input('userId', sql.Int, userId)
     .query(`
       SELECT id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
-             date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no
+             date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
+             base_salary, hra, allowances, deductions
       FROM dbo.Employees
       WHERE user_id = @userId
       ORDER BY id DESC;
@@ -1001,7 +1002,11 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
     ...row,
     date_of_birth: formatDbDate(row.date_of_birth),
     date_of_joining: formatDbDate(row.date_of_joining),
-    date_of_exit: formatDbDate(row.date_of_exit)
+    date_of_exit: formatDbDate(row.date_of_exit),
+    base_salary: row.base_salary ? Number(row.base_salary) : 0,
+    hra: row.hra ? Number(row.hra) : 0,
+    allowances: row.allowances ? Number(row.allowances) : 0,
+    deductions: row.deductions ? Number(row.deductions) : 0
   }));
 
   return ok(res, { employees });
@@ -1013,7 +1018,7 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const {
     name, age, status, gender, pan, marital_status, spouse_name, aadhar,
     date_of_birth, date_of_joining, date_of_exit, bank_account_number,
-    ifsc_code, pf_status, uan_no
+    ifsc_code, pf_status, uan_no, base_salary, hra, allowances, deductions
   } = req.body;
 
   // Enforce mandatory details (Name, Age, Gender, PAN, Aadhar, Date of Joining)
@@ -1065,15 +1070,21 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     .input('ifscCode', sql.NVarChar(50), ifsc_code ? ifsc_code.trim() : null)
     .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
     .input('uanNo', sql.NVarChar(50), pf_status === 'Applicable' ? uan_no.trim() : null)
+    .input('baseSalary', sql.Decimal(18, 2), base_salary ? Number(base_salary) : 0)
+    .input('hra', sql.Decimal(18, 2), hra ? Number(hra) : 0)
+    .input('allowances', sql.Decimal(18, 2), allowances ? Number(allowances) : 0)
+    .input('deductions', sql.Decimal(18, 2), deductions ? Number(deductions) : 0)
     .query(`
       INSERT INTO dbo.Employees (
         user_id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
-        date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no, created_at
+        date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
+        base_salary, hra, allowances, deductions, created_at
       )
       OUTPUT INSERTED.id
       VALUES (
         @userId, @name, @age, @status, @gender, @pan, @maritalStatus, @spouseName, @aadhar,
-        @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo, SYSUTCDATETIME()
+        @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo,
+        @baseSalary, @hra, @allowances, @deductions, SYSUTCDATETIME()
       );
     `);
 
@@ -1083,6 +1094,38 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     message: 'Employee record created successfully',
     employeeId: newId
   });
+}));
+
+// PUT /api/admin/employees/:id/salary - Update salary details for an employee
+adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const employeeId = Number(req.params.id);
+  const { base_salary, hra, allowances, deductions } = req.body;
+
+  const pool = await getDbPool();
+
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('employeeId', sql.Int, employeeId)
+    .input('baseSalary', sql.Decimal(18, 2), base_salary ? Number(base_salary) : 0)
+    .input('hra', sql.Decimal(18, 2), hra ? Number(hra) : 0)
+    .input('allowances', sql.Decimal(18, 2), allowances ? Number(allowances) : 0)
+    .input('deductions', sql.Decimal(18, 2), deductions ? Number(deductions) : 0)
+    .query(`
+      UPDATE dbo.Employees
+      SET base_salary = @baseSalary,
+          hra = @hra,
+          allowances = @allowances,
+          deductions = @deductions,
+          updated_at = SYSUTCDATETIME()
+      WHERE id = @employeeId AND user_id = @userId;
+    `);
+
+  if (result.rowsAffected[0] === 0) {
+    return res.status(404).json({ success: false, error: 'Employee not found or unauthorized' });
+  }
+
+  return ok(res, { message: 'Salary details updated successfully' });
 }));
 
 // DELETE /api/admin/employees/:id - Remove an employee record for the current tenant user

@@ -610,11 +610,11 @@
         <!-- Dashboard Top Banner -->
         <div class="header-bar">
             <div class="header-title-group">
-                <h1>Employee Management</h1>
-                <p>Add, filter, and audit active client corporate employee details and tax profiles.</p>
+                <h1>Employee Center</h1>
+                <p>Manage corporate rosters, record employee information, and configure multi-field salary details.</p>
             </div>
             <div>
-                <button class="btn-action" onclick="switchTab('add')">
+                <button class="btn-action" onclick="toggleAddEmployeeForm(true)" style="background: #ffffff; color: #000000;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -630,26 +630,22 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
-                View Employee Registry
+                1. Employee Management
             </button>
-            <button class="tab-link" id="tab-btn-add" onclick="switchTab('add')">
+            <button class="tab-link" id="tab-btn-salary" onclick="switchTab('salary')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <line x1="19" y1="8" x2="19" y2="14"></line>
-                    <line x1="16" y1="11" x2="22" y2="11"></line>
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
-                Add New Employee
+                2. Salary Details
             </button>
         </div>
 
-        <!-- View Tab Panel -->
+        <!-- 1. Employee Management Panel -->
         <div id="tab-view-employees" class="tab-panel-view active">
-            <!-- Main Roster Card -->
-            <div class="roster-card">
+            <!-- Roster Table Card -->
+            <div class="roster-card" id="roster-list-card">
                 <div class="roster-card-header">
                     <h2 class="roster-title">Current Employee Roster</h2>
                     <div class="search-container">
@@ -685,12 +681,9 @@
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Add Tab Panel -->
-        <div id="tab-add-employee" class="tab-panel-view">
-            <!-- Inline Form Card -->
-            <div class="roster-card">
+            <!-- Inline Create Employee Form Card (Initially Hidden) -->
+            <div class="roster-card" id="roster-add-card" style="display: none;">
                 <div class="roster-card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 1.2rem; margin-bottom: 1rem;">
                     <h2 class="roster-title" style="font-weight: 800; letter-spacing: 0.5px;">Register New Employee</h2>
                 </div>
@@ -805,11 +798,75 @@
 
                         <!-- Submission buttons -->
                         <div class="form-actions">
-                            <button type="button" class="btn-action btn-secondary" onclick="switchTab('view')">Cancel</button>
+                            <button type="button" class="btn-action btn-secondary" onclick="toggleAddEmployeeForm(false)">Cancel</button>
                             <button type="submit" class="btn-action" style="background: var(--accent-primary); color: #000;">Save Employee</button>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- 2. Salary Details Panel -->
+        <div id="tab-salary-details" class="tab-panel-view">
+            <div class="roster-card">
+                <div class="roster-card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 1.2rem; margin-bottom: 1rem;">
+                    <h2 class="roster-title" style="font-weight: 800; letter-spacing: 0.5px;">Configure Employee Salary</h2>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="salary-employee-select">Select Database Employee<span class="required-star">*</span></label>
+                        <select id="salary-employee-select" class="form-control" onchange="loadEmployeeSalary()" required>
+                            <option value="">-- Choose Employee --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-banner-error" id="salary-error-banner"></div>
+                    <div class="form-banner-error" id="salary-success-banner" style="background: rgba(0, 255, 170, 0.08); border-color: rgba(0, 255, 170, 0.25); color: #00ffaa; display: none;"></div>
+
+                    <!-- Salary Breakdown Section -->
+                    <div class="form-section-title">Salary Elements Breakdown (USD / INR)</div>
+
+                    <div class="form-group">
+                        <label for="sal-base">Base Salary<span class="required-star">*</span></label>
+                        <input type="number" id="sal-base" class="form-control" placeholder="e.g. 4500" min="0" oninput="calculateTakeHome()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sal-hra">House Rent Allowance (HRA)</label>
+                        <input type="number" id="sal-hra" class="form-control" placeholder="e.g. 1500" min="0" oninput="calculateTakeHome()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sal-allowances">Other Special & Conveyance Allowances</label>
+                        <input type="number" id="sal-allowances" class="form-control" placeholder="e.g. 500" min="0" oninput="calculateTakeHome()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sal-deductions">Deductions (Income Tax, PF, insurance)</label>
+                        <input type="number" id="sal-deductions" class="form-control" placeholder="e.g. 800" min="0" oninput="calculateTakeHome()">
+                    </div>
+
+                    <!-- Net Monthly Summary -->
+                    <div class="form-group form-group-full" style="background: rgba(162, 89, 255, 0.04); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: row; justify-content: space-around; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Gross Monthly Salary</div>
+                            <div id="sal-display-gross" style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">$0.00</div>
+                        </div>
+                        <div style="text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 0 2rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Total Deductions</div>
+                            <div id="sal-display-deductions" style="font-size: 1.8rem; font-weight: 800; color: #ff5470;">$0.00</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: var(--accent-primary); text-transform: uppercase; font-weight: 700;">Net Monthly Take-Home</div>
+                            <div id="sal-display-net" style="font-size: 1.8rem; font-weight: 800; color: #00ffaa;">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-action" style="background: var(--accent-primary); color: #000; font-weight: 700;" onclick="submitSalaryDetails()">Save Salary Structure</button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -892,17 +949,146 @@
             if (tabId === 'view') {
                 document.getElementById('tab-btn-view').classList.add('active');
                 document.getElementById('tab-view-employees').classList.add('active');
+                toggleAddEmployeeForm(false);
                 fetchRoster(); // Refresh the roster
-            } else if (tabId === 'add') {
-                document.getElementById('tab-btn-add').classList.add('active');
-                document.getElementById('tab-add-employee').classList.add('active');
+            } else if (tabId === 'salary') {
+                document.getElementById('tab-btn-salary').classList.add('active');
+                document.getElementById('tab-salary-details').classList.add('active');
                 
-                // Reset form and hide conditionals
+                // Refresh selection lists and reset boxes
+                populateEmployeeSelect();
+                loadEmployeeSalary();
+            }
+        }
+
+        // Toggles Inline Employee Creation Form
+        function toggleAddEmployeeForm(show) {
+            const rosterListCard = document.getElementById('roster-list-card');
+            const rosterAddCard = document.getElementById('roster-add-card');
+            
+            if (show) {
+                switchTab('view');
+                rosterListCard.style.display = 'none';
+                rosterAddCard.style.display = 'block';
                 document.getElementById('create-employee-form').reset();
                 toggleSpouseField();
                 toggleExitDateField();
                 toggleUanField();
                 document.getElementById('form-error-banner').style.display = 'none';
+            } else {
+                rosterListCard.style.display = 'block';
+                rosterAddCard.style.display = 'none';
+            }
+        }
+
+        // Dropdown populating for salaries
+        function populateEmployeeSelect() {
+            const select = document.getElementById('salary-employee-select');
+            const curVal = select.value;
+            select.innerHTML = '<option value="">-- Choose Employee --</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                select.appendChild(opt);
+            });
+            select.value = curVal;
+        }
+
+        // Load salary details for chosen employee
+        function loadEmployeeSalary() {
+            const select = document.getElementById('salary-employee-select');
+            const empId = parseInt(select.value, 10);
+            const errBanner = document.getElementById('salary-error-banner');
+            const succBanner = document.getElementById('salary-success-banner');
+            errBanner.style.display = 'none';
+            succBanner.style.display = 'none';
+
+            if (!empId) {
+                document.getElementById('sal-base').value = '';
+                document.getElementById('sal-hra').value = '';
+                document.getElementById('sal-allowances').value = '';
+                document.getElementById('sal-deductions').value = '';
+                calculateTakeHome();
+                return;
+            }
+
+            const emp = allEmployees.find(e => e.id === empId);
+            if (emp) {
+                document.getElementById('sal-base').value = emp.base_salary || '';
+                document.getElementById('sal-hra').value = emp.hra || '';
+                document.getElementById('sal-allowances').value = emp.allowances || '';
+                document.getElementById('sal-deductions').value = emp.deductions || '';
+                calculateTakeHome();
+            }
+        }
+
+        // Calculate and Update Take Home UI
+        function calculateTakeHome() {
+            const base = parseFloat(document.getElementById('sal-base').value) || 0;
+            const hra = parseFloat(document.getElementById('sal-hra').value) || 0;
+            const allowances = parseFloat(document.getElementById('sal-allowances').value) || 0;
+            const deductions = parseFloat(document.getElementById('sal-deductions').value) || 0;
+
+            const gross = base + hra + allowances;
+            const net = gross - deductions;
+
+            document.getElementById('sal-display-gross').textContent = `$${gross.toFixed(2)}`;
+            document.getElementById('sal-display-deductions').textContent = `$${deductions.toFixed(2)}`;
+            document.getElementById('sal-display-net').textContent = `$${net.toFixed(2)}`;
+        }
+
+        // Submit Salary Details via PUT
+        async function submitSalaryDetails() {
+            const select = document.getElementById('salary-employee-select');
+            const empId = parseInt(select.value, 10);
+            const errBanner = document.getElementById('salary-error-banner');
+            const succBanner = document.getElementById('salary-success-banner');
+            errBanner.style.display = 'none';
+            succBanner.style.display = 'none';
+
+            if (!empId) {
+                errBanner.textContent = 'Please choose a corporate employee.';
+                errBanner.style.display = 'block';
+                return;
+            }
+
+            const base_salary = parseFloat(document.getElementById('sal-base').value) || 0;
+            const hra = parseFloat(document.getElementById('sal-hra').value) || 0;
+            const allowances = parseFloat(document.getElementById('sal-allowances').value) || 0;
+            const deductions = parseFloat(document.getElementById('sal-deductions').value) || 0;
+
+            try {
+                const response = await fetch(`${apiBase}/api/admin/employees/${empId}/salary`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        base_salary,
+                        hra,
+                        allowances,
+                        deductions
+                    })
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    succBanner.textContent = 'Employee salary structure updated successfully in database.';
+                    succBanner.style.display = 'block';
+                    
+                    // Refresh employee list in background
+                    await fetchRoster();
+                } else {
+                    errBanner.textContent = payload.error || 'Failed to update salary details.';
+                    errBanner.style.display = 'block';
+                }
+            } catch (err) {
+                errBanner.textContent = 'Connection error. Check backend server.';
+                errBanner.style.display = 'block';
+                console.error(err);
             }
         }
 
@@ -929,7 +1115,6 @@
             try {
                 const res = await fetch(`${apiBase}/api/admin/employees`, { credentials: 'include' });
                 if (res.status === 401) {
-                    // redirect back to login on auth failure
                     window.location.href = 'login.html';
                     return;
                 }
@@ -938,6 +1123,7 @@
                     if (payload.success && payload.data && payload.data.employees) {
                         allEmployees = payload.data.employees;
                         renderRoster(allEmployees);
+                        populateEmployeeSelect();
                     } else {
                         showTableError("Failed to fetch corporate roster.");
                     }
@@ -998,10 +1184,18 @@
                     ? `<span style="font-size: 0.72rem; display: block; color: var(--accent-primary); font-family: monospace;">UAN: ${emp.uan_no}</span>`
                     : `<span style="font-size: 0.72rem; display: block; color: var(--text-secondary);">No PF Contribution</span>`;
 
+                const baseSal = emp.base_salary || 0;
+                const hraSal = emp.hra || 0;
+                const allSal = emp.allowances || 0;
+                const dedSal = emp.deductions || 0;
+                const grossSal = baseSal + hraSal + allSal;
+                const netSal = grossSal - dedSal;
+
                 const financeDetails = `
                     <div style="font-size: 0.8rem;">
                         <span style="font-family: monospace; display: block;">A/C: ${bankNum}</span>
                         ${pfInfo}
+                        <span style="display: block; color: #00ffaa; font-weight: 700; margin-top: 0.2rem;">Net Pay: $${netSal.toFixed(2)}</span>
                     </div>
                 `;
 

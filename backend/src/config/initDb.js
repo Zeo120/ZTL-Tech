@@ -280,6 +280,10 @@ const tables = [
         ifsc_code NVARCHAR(50) NULL,
         pf_status NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_pf DEFAULT 'Not Applicable',
         uan_no NVARCHAR(50) NULL,
+        base_salary DECIMAL(18,2) NULL,
+        hra DECIMAL(18,2) NULL,
+        allowances DECIMAL(18,2) NULL,
+        deductions DECIMAL(18,2) NULL,
         created_at DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME(),
         updated_at DATETIME2 NULL,
         CONSTRAINT FK_Employees_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
@@ -303,6 +307,10 @@ const tables = [
       { name: 'ifsc_code', sql: 'NVARCHAR(50) NULL' },
       { name: 'pf_status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_pf DEFAULT N\'Not Applicable\'' },
       { name: 'uan_no', sql: 'NVARCHAR(50) NULL' },
+      { name: 'base_salary', sql: 'DECIMAL(18,2) NULL' },
+      { name: 'hra', sql: 'DECIMAL(18,2) NULL' },
+      { name: 'allowances', sql: 'DECIMAL(18,2) NULL' },
+      { name: 'deductions', sql: 'DECIMAL(18,2) NULL' },
       { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME()' },
       { name: 'updated_at', sql: 'DATETIME2 NULL' }
     ],
