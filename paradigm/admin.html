@@ -2401,8 +2401,9 @@
             const tdsInput = document.getElementById('admin-sal-tds');
 
             const gross = base + hra + allowances;
+            const netSalaryPayable = gross - deductions;
 
-            // Auto-calculate PT based on state rule
+            // Auto-calculate PT based on state rule using netSalaryPayable
             let pt = 0;
             const select = document.getElementById('admin-salary-employee-select');
             const empId = parseInt(select.value, 10);
@@ -2410,44 +2411,44 @@
             const gender = emp ? emp.gender : 'Male';
 
             if (state === 'Karnataka') {
-                pt = gross > 15000 ? 200 : 0;
+                pt = netSalaryPayable > 15000 ? 200 : 0;
             } else if (state === 'Maharashtra') {
                 if (gender === 'Female') {
-                    pt = gross > 25000 ? 200 : 0;
+                    pt = netSalaryPayable > 25000 ? 200 : 0;
                 } else {
-                    if (gross > 10000) pt = 200;
-                    else if (gross > 7500) pt = 175;
+                    if (netSalaryPayable > 10000) pt = 200;
+                    else if (netSalaryPayable > 7500) pt = 175;
                     else pt = 0;
                 }
             } else if (state === 'West Bengal') {
-                if (gross > 40000) pt = 200;
-                else if (gross > 25000) pt = 150;
-                else if (gross > 15000) pt = 130;
-                else if (gross > 10000) pt = 110;
+                if (netSalaryPayable > 40000) pt = 200;
+                else if (netSalaryPayable > 25000) pt = 150;
+                else if (netSalaryPayable > 15000) pt = 130;
+                else if (netSalaryPayable > 10000) pt = 110;
                 else pt = 0;
             } else if (state === 'Tamil Nadu') {
-                if (gross > 75000) pt = 208;
-                else if (gross > 60001) pt = 171;
-                else if (gross > 45001) pt = 155;
-                else if (gross > 30001) pt = 71;
-                else if (gross > 21001) pt = 30;
+                if (netSalaryPayable > 75000) pt = 208;
+                else if (netSalaryPayable > 60001) pt = 171;
+                else if (netSalaryPayable > 45001) pt = 155;
+                else if (netSalaryPayable > 30001) pt = 71;
+                else if (netSalaryPayable > 21001) pt = 30;
                 else pt = 0;
             } else if (state === 'Telangana') {
-                if (gross > 20000) pt = 200;
-                else if (gross > 15000) pt = 150;
+                if (netSalaryPayable > 20000) pt = 200;
+                else if (netSalaryPayable > 15000) pt = 150;
                 else pt = 0;
             } else if (state === 'Andhra Pradesh') {
-                pt = gross > 15000 ? 200 : 0;
+                pt = netSalaryPayable > 15000 ? 200 : 0;
             } else if (state === 'Gujarat') {
-                pt = gross > 12000 ? 200 : 0;
+                pt = netSalaryPayable > 12000 ? 200 : 0;
             } else if (state === 'Madhya Pradesh') {
-                if (gross > 25000) pt = 208;
-                else if (gross > 18750) pt = 125;
+                if (netSalaryPayable > 25000) pt = 208;
+                else if (netSalaryPayable > 18750) pt = 125;
                 else pt = 0;
             }
 
-            // Auto-calculate TDS based on New Tax Regime
-            let tds = calculateTDSNewRegime(gross);
+            // Auto-calculate TDS based on New Tax Regime using netSalaryPayable
+            let tds = calculateTDSNewRegime(netSalaryPayable);
 
             if (document.activeElement !== ptInput) {
                 ptInput.value = pt;
@@ -2461,7 +2462,7 @@
                 tds = parseFloat(tdsInput.value) || 0;
             }
 
-            // Calculate PF if applicable
+            // Calculate PF if applicable (PF is typically calculated on Basic or Base Salary + Allowances)
             let pf = 0;
             if (emp && emp.pf_status === 'Applicable') {
                 const pfRate = (typeof pfRateConfig !== 'undefined' ? pfRateConfig : 12.0) / 100;
