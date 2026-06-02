@@ -1045,35 +1045,94 @@
                 <div class="payroll-content">
                     <!-- Tab 1: Employee Center -->
                     <div class="tab-panel active" id="payroll-tab-employees">
-                        <div class="control-panel">
-                            <div class="search-wrapper">
-                                <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
-                                <input type="text" class="search-input" id="payroll-search-box" placeholder="Search name..." oninput="filterPayrollRoster()">
-                            </div>
-                            <button class="btn-action" onclick="openPayrollModal()">Add Employee</button>
+                        <!-- Sub-tab Selector inside Employee Center -->
+                        <div class="tab-nav" style="display: flex; gap: 1.5rem; border-bottom: 1px solid var(--surface-border); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                            <button class="tab-link active" id="payroll-sub-btn-view" onclick="switchPayrollSubTab('view')" style="background: transparent; border: none; color: #ffffff; border-bottom: 2px solid var(--accent-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 0.5rem 0.2rem; position: relative; transition: var(--transition);">
+                                1. Employee Management
+                            </button>
+                            <button class="tab-link" id="payroll-sub-btn-salary" onclick="switchPayrollSubTab('salary')" style="background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 0.5rem 0.2rem; position: relative; transition: var(--transition);">
+                                2. Salary Details
+                            </button>
                         </div>
 
-                        <div class="panel-card">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Employee Name</th>
-                                            <th>Status</th>
-                                            <th style="text-align: center;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="payroll-table-body">
-                                        <tr>
-                                            <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                Syncing database...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <!-- Sub-panel A: Employee Management -->
+                        <div id="payroll-sub-panel-view" style="display: block;">
+                            <div class="control-panel">
+                                <div class="search-wrapper">
+                                    <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input type="text" class="search-input" id="payroll-search-box" placeholder="Search name..." oninput="filterPayrollRoster()">
+                                </div>
+                                <button class="btn-action" onclick="openPayrollModal()">Add Employee</button>
+                            </div>
+
+                            <div class="panel-card">
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Employee Name</th>
+                                                <th>Status</th>
+                                                <th>Financial Detail</th>
+                                                <th style="text-align: center;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="payroll-table-body">
+                                            <tr>
+                                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                    Syncing database...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-panel B: Salary Details -->
+                        <div id="payroll-sub-panel-salary" style="display: none;">
+                            <div class="panel-card" style="max-width: 600px; margin: 0;">
+                                <div class="form-grid" style="display: grid; grid-template-columns: 1fr; gap: 1.2rem;">
+                                    <div class="form-group">
+                                        <label for="admin-salary-employee-select">Select Employee<span class="required-star">*</span></label>
+                                        <select id="admin-salary-employee-select" class="form-control" onchange="loadAdminEmployeeSalary()" required style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                            <option value="">-- Choose Employee --</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-banner-error" id="admin-salary-error-banner" style="color: #ff5470; display: none; font-size: 0.85rem;"></div>
+                                    <div class="form-banner-error" id="admin-salary-success-banner" style="color: #00ffaa; display: none; font-size: 0.85rem;"></div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-base">Base Salary</label>
+                                        <input type="number" id="admin-sal-base" class="form-control" placeholder="Base Salary" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-hra">House Rent Allowance (HRA)</label>
+                                        <input type="number" id="admin-sal-hra" class="form-control" placeholder="HRA" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-allowances">Allowances</label>
+                                        <input type="number" id="admin-sal-allowances" class="form-control" placeholder="Allowances" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-deductions">Deductions</label>
+                                        <input type="number" id="admin-sal-deductions" class="form-control" placeholder="Deductions" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
+                                    <div style="background: rgba(162, 89, 255, 0.04); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 700;">
+                                        <div>Gross: <span id="admin-sal-display-gross" style="color: #fff;">$0.00</span></div>
+                                        <div>Deductions: <span id="admin-sal-display-deductions" style="color: #ff5470;">$0.00</span></div>
+                                        <div>Net: <span id="admin-sal-display-net" style="color: #00ffaa;">$0.00</span></div>
+                                    </div>
+
+                                    <button class="btn-action" onclick="submitAdminSalaryDetails()" style="justify-content: center; background: var(--accent-primary); color: #000; font-weight: 700;">Save Salary Details</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1677,7 +1736,7 @@
             `;
         }
 
-        // Render ultra-minimalist employee list
+        // Render ultra-minimalist employee list with salary info
         function renderPayrollTable(employees) {
             const tbody = document.getElementById('payroll-table-body');
             tbody.innerHTML = '';
@@ -1685,7 +1744,7 @@
             if (employees.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
                             No corporate employees registered in system database.
                         </td>
                     </tr>
@@ -1698,9 +1757,23 @@
                 const statusClass = emp.status === 'Active' ? 'badge-active' : 'badge-terminated';
                 const statusBadge = `<span class="employee-badge ${statusClass}">${emp.status.toUpperCase()}</span>`;
 
+                const baseSal = emp.base_salary || 0;
+                const hraSal = emp.hra || 0;
+                const allSal = emp.allowances || 0;
+                const dedSal = emp.deductions || 0;
+                const grossSal = baseSal + hraSal + allSal;
+                const netSal = grossSal - dedSal;
+
+                const financeDetails = `
+                    <div style="font-size: 0.8rem; font-family: monospace;">
+                        <span style="display: block; color: #00ffaa; font-weight: 700;">Net Pay: $${netSal.toFixed(2)}</span>
+                    </div>
+                `;
+
                 tr.innerHTML = `
                     <td><strong>${emp.name}</strong></td>
                     <td>${statusBadge}</td>
+                    <td>${financeDetails}</td>
                     <td style="text-align: center;">
                         <button class="btn-delete" onclick="deletePayrollEmployee(${emp.id}, '${emp.name}')">Remove</button>
                     </td>
@@ -1713,6 +1786,145 @@
             const q = document.getElementById('payroll-search-box').value.toLowerCase().trim();
             const filtered = allEmployees.filter(emp => emp.name.toLowerCase().includes(q));
             renderPayrollTable(filtered);
+        }
+
+        // Sub-tab switching inside Employee Center
+        function switchPayrollSubTab(tabId) {
+            const btnView = document.getElementById('payroll-sub-btn-view');
+            const btnSal = document.getElementById('payroll-sub-btn-salary');
+            const panelView = document.getElementById('payroll-sub-panel-view');
+            const panelSal = document.getElementById('payroll-sub-panel-salary');
+
+            if (tabId === 'view') {
+                btnView.style.color = '#ffffff';
+                btnView.style.borderBottom = '2px solid var(--accent-primary)';
+                btnSal.style.color = 'var(--text-secondary)';
+                btnSal.style.borderBottom = 'none';
+                panelView.style.display = 'block';
+                panelSal.style.display = 'none';
+                fetchRoster();
+            } else if (tabId === 'salary') {
+                btnSal.style.color = '#ffffff';
+                btnSal.style.borderBottom = '2px solid var(--accent-primary)';
+                btnView.style.color = 'var(--text-secondary)';
+                btnView.style.borderBottom = 'none';
+                panelView.style.display = 'none';
+                panelSal.style.display = 'block';
+                
+                populateAdminEmployeeSelect();
+                loadAdminEmployeeSalary();
+            }
+        }
+
+        // Dropdown populator for admin salaries page
+        function populateAdminEmployeeSelect() {
+            const select = document.getElementById('admin-salary-employee-select');
+            const curVal = select.value;
+            select.innerHTML = '<option value="">-- Choose Employee --</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                select.appendChild(opt);
+            });
+            select.value = curVal;
+        }
+
+        // Load details for chosen employee on admin salaries page
+        function loadAdminEmployeeSalary() {
+            const select = document.getElementById('admin-salary-employee-select');
+            const empId = parseInt(select.value, 10);
+            const errBanner = document.getElementById('admin-salary-error-banner');
+            const succBanner = document.getElementById('admin-salary-success-banner');
+            errBanner.style.display = 'none';
+            succBanner.style.display = 'none';
+
+            if (!empId) {
+                document.getElementById('admin-sal-base').value = '';
+                document.getElementById('admin-sal-hra').value = '';
+                document.getElementById('admin-sal-allowances').value = '';
+                document.getElementById('admin-sal-deductions').value = '';
+                calculateAdminTakeHome();
+                return;
+            }
+
+            const emp = allEmployees.find(e => e.id === empId);
+            if (emp) {
+                document.getElementById('admin-sal-base').value = emp.base_salary || '';
+                document.getElementById('admin-sal-hra').value = emp.hra || '';
+                document.getElementById('admin-sal-allowances').value = emp.allowances || '';
+                document.getElementById('admin-sal-deductions').value = emp.deductions || '';
+                calculateAdminTakeHome();
+            }
+        }
+
+        // Calculate and update view take home
+        function calculateAdminTakeHome() {
+            const base = parseFloat(document.getElementById('admin-sal-base').value) || 0;
+            const hra = parseFloat(document.getElementById('admin-sal-hra').value) || 0;
+            const allowances = parseFloat(document.getElementById('admin-sal-allowances').value) || 0;
+            const deductions = parseFloat(document.getElementById('admin-sal-deductions').value) || 0;
+
+            const gross = base + hra + allowances;
+            const net = gross - deductions;
+
+            document.getElementById('admin-sal-display-gross').textContent = `$${gross.toFixed(2)}`;
+            document.getElementById('admin-sal-display-deductions').textContent = `$${deductions.toFixed(2)}`;
+            document.getElementById('admin-sal-display-net').textContent = `$${net.toFixed(2)}`;
+        }
+
+        // Submit Salary Details via PUT on admin dashboard
+        async function submitAdminSalaryDetails() {
+            const select = document.getElementById('admin-salary-employee-select');
+            const empId = parseInt(select.value, 10);
+            const errBanner = document.getElementById('admin-salary-error-banner');
+            const succBanner = document.getElementById('admin-salary-success-banner');
+            errBanner.style.display = 'none';
+            succBanner.style.display = 'none';
+
+            if (!empId) {
+                errBanner.textContent = 'Please choose a corporate employee.';
+                errBanner.style.display = 'block';
+                return;
+            }
+
+            const base_salary = parseFloat(document.getElementById('admin-sal-base').value) || 0;
+            const hra = parseFloat(document.getElementById('admin-sal-hra').value) || 0;
+            const allowances = parseFloat(document.getElementById('admin-sal-allowances').value) || 0;
+            const deductions = parseFloat(document.getElementById('admin-sal-deductions').value) || 0;
+
+            try {
+                const response = await fetch(`${apiBase}/api/admin/employees/${empId}/salary`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        base_salary,
+                        hra,
+                        allowances,
+                        deductions
+                    })
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    succBanner.textContent = 'Employee salary structure updated successfully.';
+                    succBanner.style.display = 'block';
+                    
+                    // Refresh employee list in background
+                    await fetchRoster();
+                } else {
+                    errBanner.textContent = payload.error || 'Failed to update salary details.';
+                    errBanner.style.display = 'block';
+                }
+            } catch (err) {
+                errBanner.textContent = 'Connection error. Check backend server.';
+                errBanner.style.display = 'block';
+                console.error(err);
+            }
         }
 
         // POST add employee record to DB
@@ -1751,14 +1963,20 @@
 
             const aadharClean = aadhar.replace(/\s+/g, '');
             if (!/^\d{12}$/.test(aadharClean)) {
-                errorBanner.textContent = "Aadhar Number must be exactly 12 numeric digits.";
+                errorBanner.textContent = "Aadhar Number must contain exactly 12 numeric digits.";
+                errorBanner.style.display = "block";
+                return;
+            }
+
+            if (marital_status === 'Married' && !spouse_name) {
+                errorBanner.textContent = "Spouse Full Name is mandatory when Married.";
                 errorBanner.style.display = "block";
                 return;
             }
 
             if (status === 'Terminated' && date_of_exit && date_of_joining) {
                 if (new Date(date_of_exit) < new Date(date_of_joining)) {
-                    errorBanner.textContent = "Date of exit cannot trigger prior to Date of Joining.";
+                    errorBanner.textContent = "Exit date cannot be prior to joining date.";
                     errorBanner.style.display = "block";
                     return;
                 }
