@@ -1037,6 +1037,11 @@
                 <!-- Sub-tab Selector Navigation Sidebar -->
                 <aside class="payroll-sidebar">
                     <button class="sub-tab-btn active" id="btn-tab-employees" onclick="switchPayrollTab('employees')">Employee Center</button>
+                    <!-- Dropdown Options under Employee Center -->
+                    <div id="employees-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
+                        <button class="sub-tab-btn active" id="btn-sub-tab-emp-manage" onclick="switchEmployeeSubTab('view')" style="font-size: 0.76rem; opacity: 0.85;">Employee Management</button>
+                        <button class="sub-tab-btn" id="btn-sub-tab-emp-salary" onclick="switchEmployeeSubTab('salary')" style="font-size: 0.76rem; opacity: 0.85;">Salary Details</button>
+                    </div>
                     <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
                     <button class="sub-tab-btn" id="btn-tab-ctc" onclick="switchPayrollTab('ctc')">CTC Calculation</button>
                 </aside>
@@ -1045,15 +1050,6 @@
                 <div class="payroll-content">
                     <!-- Tab 1: Employee Center -->
                     <div class="tab-panel active" id="payroll-tab-employees">
-                        <!-- Sub-tab Selector inside Employee Center -->
-                        <div class="tab-nav" style="display: flex; gap: 1.5rem; border-bottom: 1px solid var(--surface-border); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
-                            <button class="tab-link active" id="payroll-sub-btn-view" onclick="switchPayrollSubTab('view')" style="background: transparent; border: none; color: #ffffff; border-bottom: 2px solid var(--accent-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 0.5rem 0.2rem; position: relative; transition: var(--transition);">
-                                Employee Management
-                            </button>
-                            <button class="tab-link" id="payroll-sub-btn-salary" onclick="switchPayrollSubTab('salary')" style="background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 0.5rem 0.2rem; position: relative; transition: var(--transition);">
-                                Salary Details
-                            </button>
-                        </div>
 
                         <!-- Sub-panel A: Employee Management -->
                         <div id="payroll-sub-panel-view" style="display: block;">
@@ -1579,14 +1575,18 @@
             document.getElementById(`payroll-tab-${tabId}`).classList.add('active');
 
             if (tabId === 'employees') {
-                fetchRoster();
-            } else if (tabId === 'rates') {
-                // Populate forms with loaded rates
-                document.getElementById('rate-pf').value = pfRateConfig;
-                document.getElementById('rate-tds').value = tdsRateConfig;
-            } else if (tabId === 'ctc') {
-                populateEmployeeDropdown();
-                runCTCCalculations();
+                document.getElementById('employees-dropdown').style.display = 'flex';
+                switchEmployeeSubTab('view');
+            } else {
+                document.getElementById('employees-dropdown').style.display = 'none';
+                if (tabId === 'rates') {
+                    // Populate forms with loaded rates
+                    document.getElementById('rate-pf').value = pfRateConfig;
+                    document.getElementById('rate-tds').value = tdsRateConfig;
+                } else if (tabId === 'ctc') {
+                    populateEmployeeDropdown();
+                    runCTCCalculations();
+                }
             }
         }
 
@@ -1788,26 +1788,26 @@
             renderPayrollTable(filtered);
         }
 
-        // Sub-tab switching inside Employee Center
-        function switchPayrollSubTab(tabId) {
-            const btnView = document.getElementById('payroll-sub-btn-view');
-            const btnSal = document.getElementById('payroll-sub-btn-salary');
+        // Sub-tab switching inside Employee Center via Sidebar Dropdown
+        function switchEmployeeSubTab(tabId) {
+            const btnView = document.getElementById('btn-sub-tab-emp-manage');
+            const btnSal = document.getElementById('btn-sub-tab-emp-salary');
             const panelView = document.getElementById('payroll-sub-panel-view');
             const panelSal = document.getElementById('payroll-sub-panel-salary');
 
+            // Highlight parent tab and keep sub-tabs active
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-tab-employees').classList.add('active');
+
             if (tabId === 'view') {
-                btnView.style.color = '#ffffff';
-                btnView.style.borderBottom = '2px solid var(--accent-primary)';
-                btnSal.style.color = 'var(--text-secondary)';
-                btnSal.style.borderBottom = 'none';
+                btnView.classList.add('active');
+                btnSal.classList.remove('active');
                 panelView.style.display = 'block';
                 panelSal.style.display = 'none';
                 fetchRoster();
             } else if (tabId === 'salary') {
-                btnSal.style.color = '#ffffff';
-                btnSal.style.borderBottom = '2px solid var(--accent-primary)';
-                btnView.style.color = 'var(--text-secondary)';
-                btnView.style.borderBottom = 'none';
+                btnSal.classList.add('active');
+                btnView.classList.remove('active');
                 panelView.style.display = 'none';
                 panelSal.style.display = 'block';
                 
