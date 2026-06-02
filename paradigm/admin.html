@@ -2119,9 +2119,8 @@
             `;
 
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`/api/admin/employees/attendance?date=${dateVal}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`${apiBase}/api/admin/employees/attendance?date=${dateVal}`, {
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
@@ -2200,12 +2199,12 @@
             }
 
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/admin/employees/attendance', {
+                const response = await fetch(`${apiBase}/api/admin/employees/attendance`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'x-csrf-token': getCSRFToken()
                     },
                     body: JSON.stringify({
                         employee_id: employeeId,
