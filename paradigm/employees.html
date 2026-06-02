@@ -519,6 +519,64 @@
             text-align: left;
         }
 
+        /* Tab Navigation Bar */
+        .tab-nav {
+            display: flex;
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tab-link {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0.5rem 0.2rem;
+            position: relative;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-link:hover {
+            color: #ffffff;
+        }
+
+        .tab-link.active {
+            color: #ffffff;
+        }
+
+        .tab-link::after {
+            content: '';
+            position: absolute;
+            bottom: -0.6rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: left;
+        }
+
+        .tab-link.active::after {
+            transform: scaleX(1);
+        }
+
+        /* Tab Content panels */
+        .tab-panel-view {
+            display: none;
+        }
+        .tab-panel-view.active {
+            display: block;
+        }
+
         /* Footer styling */
         footer {
             margin-top: auto;
@@ -556,7 +614,7 @@
                 <p>Add, filter, and audit active client corporate employee details and tax profiles.</p>
             </div>
             <div>
-                <button class="btn-action" onclick="openCreateModal()">
+                <button class="btn-action" onclick="switchTab('add')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -566,175 +624,195 @@
             </div>
         </div>
 
-        <!-- Main Roster Card -->
-        <div class="roster-card">
-            <div class="roster-card-header">
-                <h2 class="roster-title">Current Employee Roster</h2>
-                <div class="search-container">
-                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" class="search-input" id="search-box" placeholder="Search employees by name, status..." oninput="handleSearch()">
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-link active" id="tab-btn-view" onclick="switchTab('view')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                View Employee Registry
+            </button>
+            <button class="tab-link" id="tab-btn-add" onclick="switchTab('add')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                    <line x1="16" y1="11" x2="22" y2="11"></line>
+                </svg>
+                Add New Employee
+            </button>
+        </div>
+
+        <!-- View Tab Panel -->
+        <div id="tab-view-employees" class="tab-panel-view active">
+            <!-- Main Roster Card -->
+            <div class="roster-card">
+                <div class="roster-card-header">
+                    <h2 class="roster-title">Current Employee Roster</h2>
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" class="search-input" id="search-box" placeholder="Search employees by name, status..." oninput="handleSearch()">
+                    </div>
+                </div>
+
+                <!-- Dynamic Table of Employees -->
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Age & Gender</th>
+                                <th>Status</th>
+                                <th>PAN / Aadhar</th>
+                                <th>Date of Joining</th>
+                                <th>Financial Detail</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                                    Loading roster database...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Dynamic Table of Employees -->
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Age & Gender</th>
-                            <th>Status</th>
-                            <th>PAN / Aadhar</th>
-                            <th>Date of Joining</th>
-                            <th>Financial Detail</th>
-                            <th style="text-align: center;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roster-table-body">
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                                Loading roster database...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Add Tab Panel -->
+        <div id="tab-add-employee" class="tab-panel-view">
+            <!-- Inline Form Card -->
+            <div class="roster-card">
+                <div class="roster-card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 1.2rem; margin-bottom: 1rem;">
+                    <h2 class="roster-title" style="font-weight: 800; letter-spacing: 0.5px;">Register New Employee</h2>
+                </div>
+
+                <form id="create-employee-form" onsubmit="event.preventDefault(); submitEmployeeForm();">
+                    <div class="form-grid">
+                        <div class="form-banner-error" id="form-error-banner"></div>
+
+                        <!-- Personal Info Section -->
+                        <div class="form-section-title">Personal Details</div>
+
+                        <div class="form-group">
+                            <label for="emp-name">Full Name<span class="required-star">*</span></label>
+                            <input type="text" id="emp-name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-age">Age (Years)<span class="required-star">*</span></label>
+                            <input type="number" id="emp-age" class="form-control" placeholder="e.g. 30" min="18" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-gender">Gender<span class="required-star">*</span></label>
+                            <select id="emp-gender" class="form-control" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-dob">Date of Birth</label>
+                            <input type="date" id="emp-dob" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-marital">Marital Status</label>
+                            <select id="emp-marital" class="form-control" onchange="toggleSpouseField()">
+                                <option value="Unmarried">Unmarried</option>
+                                <option value="Married">Married</option>
+                            </select>
+                        </div>
+
+                        <!-- Spouse Name: Conditional on Married -->
+                        <div class="form-group conditional-field" id="spouse-field-wrapper">
+                            <label for="emp-spouse">Spouse Name<span class="required-star">*</span></label>
+                            <input type="text" id="emp-spouse" class="form-control" placeholder="Spouse Full Name">
+                        </div>
+
+                        <!-- Gov Details Section -->
+                        <div class="form-section-title">Government Identity</div>
+
+                        <div class="form-group">
+                            <label for="emp-pan">PAN Number (Permanent Account)<span class="required-star">*</span></label>
+                            <input type="text" id="emp-pan" class="form-control" placeholder="e.g. ABCDE1234F" style="text-transform: uppercase;" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-aadhar">Aadhar Number (12 Digits)<span class="required-star">*</span></label>
+                            <input type="text" id="emp-aadhar" class="form-control" placeholder="e.g. 1234 5678 9012" required>
+                        </div>
+
+                        <!-- Employment Section -->
+                        <div class="form-section-title">Employment Specifics</div>
+
+                        <div class="form-group">
+                            <label for="emp-status">Employment Status</label>
+                            <select id="emp-status" class="form-control" onchange="toggleExitDateField()">
+                                <option value="Active">Active</option>
+                                <option value="Terminated">Terminated</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-doj">Date of Joining<span class="required-star">*</span></label>
+                            <input type="date" id="emp-doj" class="form-control" required>
+                        </div>
+
+                        <!-- Date of Exit: Conditional on Terminated -->
+                        <div class="form-group conditional-field" id="exit-date-field-wrapper">
+                            <label for="emp-doe">Date of Exit<span class="required-star">*</span></label>
+                            <input type="date" id="emp-doe" class="form-control">
+                        </div>
+
+                        <!-- Finance Section -->
+                        <div class="form-section-title">Financial Details</div>
+
+                        <div class="form-group">
+                            <label for="emp-bank">Bank Account Number</label>
+                            <input type="text" id="emp-bank" class="form-control" placeholder="Account Number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-ifsc">IFSC Code (Optional)</label>
+                            <input type="text" id="emp-ifsc" class="form-control" placeholder="e.g. SBIN0001234" style="text-transform: uppercase;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-pf">PF Status</label>
+                            <select id="emp-pf" class="form-control" onchange="toggleUanField()">
+                                <option value="Not Applicable">Not Applicable</option>
+                                <option value="Applicable">Applicable</option>
+                            </select>
+                        </div>
+
+                        <!-- UAN Number: Conditional on Applicable PF -->
+                        <div class="form-group conditional-field" id="uan-field-wrapper">
+                            <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
+                            <input type="text" id="emp-uan" class="form-control" placeholder="e.g. 100998877665">
+                        </div>
+
+                        <!-- Submission buttons -->
+                        <div class="form-actions">
+                            <button type="button" class="btn-action btn-secondary" onclick="switchTab('view')">Cancel</button>
+                            <button type="submit" class="btn-action" style="background: var(--accent-primary); color: #000;">Save Employee</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
-
-    <!-- Modal Form (Add Employee) -->
-    <div class="modal" id="employee-modal" onclick="closeOnBackdrop(event)">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-title" style="font-weight: 800; letter-spacing: 0.5px;">Add New Employee</h2>
-                <button class="modal-close" onclick="closeCreateModal()" aria-label="Close modal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-
-            <form id="create-employee-form" onsubmit="event.preventDefault(); submitEmployeeForm();">
-                <div class="form-grid">
-                    <div class="form-banner-error" id="form-error-banner"></div>
-
-                    <!-- Personal Info Section -->
-                    <div class="form-section-title">Personal Details</div>
-
-                    <div class="form-group">
-                        <label for="emp-name">Full Name<span class="required-star">*</span></label>
-                        <input type="text" id="emp-name" class="form-control" placeholder="e.g. Rahul Sharma" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-age">Age (Years)<span class="required-star">*</span></label>
-                        <input type="number" id="emp-age" class="form-control" placeholder="e.g. 30" min="18" max="100" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-gender">Gender<span class="required-star">*</span></label>
-                        <select id="emp-gender" class="form-control" required>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-dob">Date of Birth</label>
-                        <input type="date" id="emp-dob" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-marital">Marital Status</label>
-                        <select id="emp-marital" class="form-control" onchange="toggleSpouseField()">
-                            <option value="Unmarried">Unmarried</option>
-                            <option value="Married">Married</option>
-                        </select>
-                    </div>
-
-                    <!-- Spouse Name: Conditional on Married -->
-                    <div class="form-group conditional-field" id="spouse-field-wrapper">
-                        <label for="emp-spouse">Spouse Name<span class="required-star">*</span></label>
-                        <input type="text" id="emp-spouse" class="form-control" placeholder="Spouse Full Name">
-                    </div>
-
-                    <!-- Gov Details Section -->
-                    <div class="form-section-title">Government Identity</div>
-
-                    <div class="form-group">
-                        <label for="emp-pan">PAN Number (Permanent Account)<span class="required-star">*</span></label>
-                        <input type="text" id="emp-pan" class="form-control" placeholder="e.g. ABCDE1234F" style="text-transform: uppercase;" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-aadhar">Aadhar Number (12 Digits)<span class="required-star">*</span></label>
-                        <input type="text" id="emp-aadhar" class="form-control" placeholder="e.g. 1234 5678 9012" required>
-                    </div>
-
-                    <!-- Employment Section -->
-                    <div class="form-section-title">Employment Specifics</div>
-
-                    <div class="form-group">
-                        <label for="emp-status">Employment Status</label>
-                        <select id="emp-status" class="form-control" onchange="toggleExitDateField()">
-                            <option value="Active">Active</option>
-                            <option value="Terminated">Terminated</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-doj">Date of Joining<span class="required-star">*</span></label>
-                        <input type="date" id="emp-doj" class="form-control" required>
-                    </div>
-
-                    <!-- Date of Exit: Conditional on Terminated -->
-                    <div class="form-group conditional-field" id="exit-date-field-wrapper">
-                        <label for="emp-doe">Date of Exit<span class="required-star">*</span></label>
-                        <input type="date" id="emp-doe" class="form-control">
-                    </div>
-
-                    <!-- Finance Section -->
-                    <div class="form-section-title">Financial Details</div>
-
-                    <div class="form-group">
-                        <label for="emp-bank">Bank Account Number</label>
-                        <input type="text" id="emp-bank" class="form-control" placeholder="Account Number">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-ifsc">IFSC Code (Optional)</label>
-                        <input type="text" id="emp-ifsc" class="form-control" placeholder="e.g. SBIN0001234" style="text-transform: uppercase;">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-pf">PF Status</label>
-                        <select id="emp-pf" class="form-control" onchange="toggleUanField()">
-                            <option value="Not Applicable">Not Applicable</option>
-                            <option value="Applicable">Applicable</option>
-                        </select>
-                    </div>
-
-                    <!-- UAN Number: Conditional on Applicable PF -->
-                    <div class="form-group conditional-field" id="uan-field-wrapper">
-                        <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
-                        <input type="text" id="emp-uan" class="form-control" placeholder="e.g. 100998877665">
-                    </div>
-
-                    <!-- Submission buttons -->
-                    <div class="form-actions">
-                        <button type="button" class="btn-action btn-secondary" onclick="closeCreateModal()">Cancel</button>
-                        <button type="submit" class="btn-action" style="background: var(--accent-primary); color: #000;">Save Employee</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <footer>
         <p>© 2026 Zeo Thinking Labs. Paradigm Enterprise Business Suite Corporate Portal.</p>
@@ -804,25 +882,27 @@
             }
         }
 
-        // Modal triggers
-        function openCreateModal() {
-            document.getElementById('create-employee-form').reset();
-            // hide conditionals
-            toggleSpouseField();
-            toggleExitDateField();
-            toggleUanField();
-            
-            document.getElementById('form-error-banner').style.display = 'none';
-            document.getElementById('employee-modal').classList.add('active');
-        }
+        // Tab switching logic
+        function switchTab(tabId) {
+            // Remove active classes
+            document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel-view').forEach(panel => panel.classList.remove('active'));
 
-        function closeCreateModal() {
-            document.getElementById('employee-modal').classList.remove('active');
-        }
-
-        function closeOnBackdrop(e) {
-            if (e.target.id === 'employee-modal') {
-                closeCreateModal();
+            // Add active class to selected tab and panel
+            if (tabId === 'view') {
+                document.getElementById('tab-btn-view').classList.add('active');
+                document.getElementById('tab-view-employees').classList.add('active');
+                fetchRoster(); // Refresh the roster
+            } else if (tabId === 'add') {
+                document.getElementById('tab-btn-add').classList.add('active');
+                document.getElementById('tab-add-employee').classList.add('active');
+                
+                // Reset form and hide conditionals
+                document.getElementById('create-employee-form').reset();
+                toggleSpouseField();
+                toggleExitDateField();
+                toggleUanField();
+                document.getElementById('form-error-banner').style.display = 'none';
             }
         }
 
@@ -1053,8 +1133,7 @@
 
                 const payload = await response.json();
                 if (response.ok && payload.success) {
-                    closeCreateModal();
-                    fetchRoster();
+                    switchTab('view');
                 } else {
                     errorBanner.textContent = payload.error || 'Server rejected employee submission.';
                     errorBanner.style.display = 'block';
