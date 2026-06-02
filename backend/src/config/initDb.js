@@ -284,6 +284,9 @@ const tables = [
         hra DECIMAL(18,2) NULL,
         allowances DECIMAL(18,2) NULL,
         deductions DECIMAL(18,2) NULL,
+        state NVARCHAR(100) NULL CONSTRAINT DF_Employees_state DEFAULT 'Karnataka',
+        professional_tax DECIMAL(18,2) NULL CONSTRAINT DF_Employees_professional_tax DEFAULT 0,
+        tds DECIMAL(18,2) NULL CONSTRAINT DF_Employees_tds DEFAULT 0,
         created_at DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME(),
         updated_at DATETIME2 NULL,
         CONSTRAINT FK_Employees_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
@@ -311,6 +314,9 @@ const tables = [
       { name: 'hra', sql: 'DECIMAL(18,2) NULL' },
       { name: 'allowances', sql: 'DECIMAL(18,2) NULL' },
       { name: 'deductions', sql: 'DECIMAL(18,2) NULL' },
+      { name: 'state', sql: 'NVARCHAR(100) NULL CONSTRAINT DF_Employees_state DEFAULT N\'Karnataka\'' },
+      { name: 'professional_tax', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_Employees_professional_tax DEFAULT 0' },
+      { name: 'tds', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_Employees_tds DEFAULT 0' },
       { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME()' },
       { name: 'updated_at', sql: 'DATETIME2 NULL' }
     ],

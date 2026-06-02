@@ -1179,6 +1179,31 @@
                                         <input type="number" id="admin-sal-deductions" class="form-control" placeholder="Deductions" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="admin-sal-state">Work State (For Professional Tax)</label>
+                                        <select id="admin-sal-state" class="form-control" onchange="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                            <option value="Karnataka">Karnataka</option>
+                                            <option value="Maharashtra">Maharashtra</option>
+                                            <option value="West Bengal">West Bengal</option>
+                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                            <option value="Telangana">Telangana</option>
+                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                            <option value="Gujarat">Gujarat</option>
+                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                            <option value="Exempt">Exempt / Other (No PT)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-pt">Professional Tax (PT)</label>
+                                        <input type="number" id="admin-sal-pt" class="form-control" placeholder="PT" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="admin-sal-tds">Tax Deducted at Source (TDS)</label>
+                                        <input type="number" id="admin-sal-tds" class="form-control" placeholder="TDS" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                    </div>
+
                                     <div style="background: rgba(162, 89, 255, 0.04); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 700;">
                                         <div>Gross: <span id="admin-sal-display-gross" style="color: #fff;">$0.00</span></div>
                                         <div>Deductions: <span id="admin-sal-display-deductions" style="color: #ff5470;">$0.00</span></div>
@@ -1274,6 +1299,14 @@
                                 <div class="ctc-result-row">
                                     <span>Monthly PF Contribution:</span>
                                     <span id="ctc-monthly-pf">$0.00</span>
+                                </div>
+                                <div class="ctc-result-row">
+                                    <span>Professional Tax (PT):</span>
+                                    <span id="ctc-monthly-pt">$0.00</span>
+                                </div>
+                                <div class="ctc-result-row">
+                                    <span>TDS Income Tax:</span>
+                                    <span id="ctc-monthly-tds">$0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -1482,6 +1515,21 @@
                     <div class="form-group conditional-field" id="uan-field-wrapper">
                         <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
                         <input type="text" id="emp-uan" class="form-control" placeholder="100998877665">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emp-state">Work State (For Professional Tax)</label>
+                        <select id="emp-state" class="form-control">
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Exempt">Exempt / Other (No PT)</option>
+                        </select>
                     </div>
 
                     <!-- Submission -->
@@ -1829,31 +1877,46 @@
         // CTC calculations
         function runCTCCalculations() {
             const empId = document.getElementById('ctc-employee-select').value;
-            const grossVal = parseFloat(document.getElementById('ctc-monthly-salary').value) || 0;
             const resultBox = document.getElementById('ctc-result-box');
 
-            if (!empId || grossVal <= 0) {
+            if (!empId) {
+                resultBox.style.display = 'none';
+                return;
+            }
+
+            const emp = allEmployees.find(e => e.id === parseInt(empId, 10));
+            if (!emp) {
+                resultBox.style.display = 'none';
+                return;
+            }
+
+            const grossVal = (emp.base_salary || 0) + (emp.hra || 0) + (emp.allowances || 0);
+            document.getElementById('ctc-monthly-salary').value = grossVal;
+
+            if (grossVal <= 0) {
                 resultBox.style.display = 'none';
                 return;
             }
 
             // Calculations parameters
-            const pfRate = pfRateConfig / 100;
-            const tdsRate = tdsRateConfig / 100;
+            const pfRate = (typeof pfRateConfig !== 'undefined' ? pfRateConfig : 12.0) / 100;
+            const monthlyPfDeduction = emp.pf_status === 'Applicable' ? (grossVal * pfRate) : 0;
+            const ptDeduction = emp.professional_tax || 0;
+            const tdsDeduction = emp.tds || 0;
+            const customDeductions = emp.deductions || 0;
 
-            const monthlyPfDeduction = grossVal * pfRate;
-            const monthlyTdsDeduction = grossVal * tdsRate;
-            const totalDeductions = monthlyPfDeduction + monthlyTdsDeduction;
-
+            const totalDeductions = monthlyPfDeduction + ptDeduction + tdsDeduction + customDeductions;
             const netMonthlySalary = grossVal - totalDeductions;
-            const employerPfContribution = grossVal * pfRate;
+            const employerPfContribution = monthlyPfDeduction;
             const monthlyCTC = grossVal + employerPfContribution;
             const annualCTC = monthlyCTC * 12;
 
             // Output targets
-            document.getElementById('ctc-net-pay').textContent = `$${netMonthlySalary.toFixed(2)}`;
-            document.getElementById('ctc-annual-ctc').textContent = `$${annualCTC.toFixed(2)}`;
-            document.getElementById('ctc-monthly-pf').textContent = `$${monthlyPfDeduction.toFixed(2)}`;
+            document.getElementById('ctc-net-pay').textContent = `₹${netMonthlySalary.toFixed(2)}`;
+            document.getElementById('ctc-annual-ctc').textContent = `₹${annualCTC.toFixed(2)}`;
+            document.getElementById('ctc-monthly-pf').textContent = `₹${monthlyPfDeduction.toFixed(2)}`;
+            document.getElementById('ctc-monthly-pt').textContent = `₹${ptDeduction.toFixed(2)}`;
+            document.getElementById('ctc-monthly-tds').textContent = `₹${tdsDeduction.toFixed(2)}`;
             
             resultBox.style.display = 'block';
         }
@@ -2231,6 +2294,9 @@
                 document.getElementById('admin-sal-hra').value = '';
                 document.getElementById('admin-sal-allowances').value = '';
                 document.getElementById('admin-sal-deductions').value = '';
+                document.getElementById('admin-sal-state').value = 'Karnataka';
+                document.getElementById('admin-sal-pt').value = '';
+                document.getElementById('admin-sal-tds').value = '';
                 calculateAdminTakeHome();
                 return;
             }
@@ -2241,8 +2307,53 @@
                 document.getElementById('admin-sal-hra').value = emp.hra || '';
                 document.getElementById('admin-sal-allowances').value = emp.allowances || '';
                 document.getElementById('admin-sal-deductions').value = emp.deductions || '';
+                document.getElementById('admin-sal-state').value = emp.state || 'Karnataka';
+                document.getElementById('admin-sal-pt').value = emp.professional_tax || '';
+                document.getElementById('admin-sal-tds').value = emp.tds || '';
                 calculateAdminTakeHome();
             }
+        }
+
+        function calculateTDSNewRegime(monthlyGross) {
+            const annualGross = monthlyGross * 12;
+            const standardDeduction = 75000;
+            const taxableIncome = Math.max(0, annualGross - standardDeduction);
+            
+            // Rebate under 87A if taxable income <= 12,00,000 (12 Lakhs)
+            if (taxableIncome <= 1200000) {
+                return 0;
+            }
+            
+            let tax = 0;
+            
+            if (taxableIncome > 2400000) {
+                tax += (taxableIncome - 2400000) * 0.30;
+                tax += 400000 * 0.25; 
+                tax += 400000 * 0.20; 
+                tax += 400000 * 0.15; 
+                tax += 400000 * 0.10; 
+                tax += 400000 * 0.05; 
+            } else if (taxableIncome > 2000000) {
+                tax += (taxableIncome - 2000000) * 0.25;
+                tax += 400000 * 0.20;
+                tax += 400000 * 0.15;
+                tax += 400000 * 0.10;
+                tax += 400000 * 0.05;
+            } else if (taxableIncome > 1600000) {
+                tax += (taxableIncome - 1600000) * 0.20;
+                tax += 400000 * 0.15;
+                tax += 400000 * 0.10;
+                tax += 400000 * 0.05;
+            } else if (taxableIncome > 1200000) {
+                tax += (taxableIncome - 1200000) * 0.15;
+                tax += 400000 * 0.10;
+                tax += 400000 * 0.05;
+            }
+            
+            // Add 4% Cess
+            tax = tax * 1.04;
+            
+            return Math.round((tax / 12) * 100) / 100;
         }
 
         // Calculate and update view take home
@@ -2251,13 +2362,85 @@
             const hra = parseFloat(document.getElementById('admin-sal-hra').value) || 0;
             const allowances = parseFloat(document.getElementById('admin-sal-allowances').value) || 0;
             const deductions = parseFloat(document.getElementById('admin-sal-deductions').value) || 0;
+            
+            const state = document.getElementById('admin-sal-state').value;
+            const ptInput = document.getElementById('admin-sal-pt');
+            const tdsInput = document.getElementById('admin-sal-tds');
 
             const gross = base + hra + allowances;
-            const net = gross - deductions;
 
-            document.getElementById('admin-sal-display-gross').textContent = `$${gross.toFixed(2)}`;
-            document.getElementById('admin-sal-display-deductions').textContent = `$${deductions.toFixed(2)}`;
-            document.getElementById('admin-sal-display-net').textContent = `$${net.toFixed(2)}`;
+            // Auto-calculate PT based on state rule
+            let pt = 0;
+            const select = document.getElementById('admin-salary-employee-select');
+            const empId = parseInt(select.value, 10);
+            const emp = allEmployees.find(e => e.id === empId);
+            const gender = emp ? emp.gender : 'Male';
+
+            if (state === 'Karnataka') {
+                pt = gross > 15000 ? 200 : 0;
+            } else if (state === 'Maharashtra') {
+                if (gender === 'Female') {
+                    pt = gross > 25000 ? 200 : 0;
+                } else {
+                    if (gross > 10000) pt = 200;
+                    else if (gross > 7500) pt = 175;
+                    else pt = 0;
+                }
+            } else if (state === 'West Bengal') {
+                if (gross > 40000) pt = 200;
+                else if (gross > 25000) pt = 150;
+                else if (gross > 15000) pt = 130;
+                else if (gross > 10000) pt = 110;
+                else pt = 0;
+            } else if (state === 'Tamil Nadu') {
+                if (gross > 75000) pt = 208;
+                else if (gross > 60001) pt = 171;
+                else if (gross > 45001) pt = 155;
+                else if (gross > 30001) pt = 71;
+                else if (gross > 21001) pt = 30;
+                else pt = 0;
+            } else if (state === 'Telangana') {
+                if (gross > 20000) pt = 200;
+                else if (gross > 15000) pt = 150;
+                else pt = 0;
+            } else if (state === 'Andhra Pradesh') {
+                pt = gross > 15000 ? 200 : 0;
+            } else if (state === 'Gujarat') {
+                pt = gross > 12000 ? 200 : 0;
+            } else if (state === 'Madhya Pradesh') {
+                if (gross > 25000) pt = 208;
+                else if (gross > 18750) pt = 125;
+                else pt = 0;
+            }
+
+            // Auto-calculate TDS based on New Tax Regime
+            let tds = calculateTDSNewRegime(gross);
+
+            if (document.activeElement !== ptInput) {
+                ptInput.value = pt;
+            } else {
+                pt = parseFloat(ptInput.value) || 0;
+            }
+
+            if (document.activeElement !== tdsInput) {
+                tdsInput.value = tds;
+            } else {
+                tds = parseFloat(tdsInput.value) || 0;
+            }
+
+            // Calculate PF if applicable
+            let pf = 0;
+            if (emp && emp.pf_status === 'Applicable') {
+                const pfRate = (typeof pfRateConfig !== 'undefined' ? pfRateConfig : 12.0) / 100;
+                pf = gross * pfRate;
+            }
+
+            const totalDeductions = deductions + pf + pt + tds;
+            const net = gross - totalDeductions;
+
+            document.getElementById('admin-sal-display-gross').textContent = `₹${gross.toFixed(2)}`;
+            document.getElementById('admin-sal-display-deductions').textContent = `₹${totalDeductions.toFixed(2)} (Incl. PF: ₹${pf.toFixed(2)}, PT: ₹${pt.toFixed(2)}, TDS: ₹${tds.toFixed(2)})`;
+            document.getElementById('admin-sal-display-net').textContent = `₹${net.toFixed(2)}`;
         }
 
         // Submit Salary Details via PUT on admin dashboard
@@ -2279,6 +2462,9 @@
             const hra = parseFloat(document.getElementById('admin-sal-hra').value) || 0;
             const allowances = parseFloat(document.getElementById('admin-sal-allowances').value) || 0;
             const deductions = parseFloat(document.getElementById('admin-sal-deductions').value) || 0;
+            const state = document.getElementById('admin-sal-state').value;
+            const professional_tax = parseFloat(document.getElementById('admin-sal-pt').value) || 0;
+            const tds = parseFloat(document.getElementById('admin-sal-tds').value) || 0;
 
             try {
                 const response = await fetch(`${apiBase}/api/admin/employees/${empId}/salary`, {
@@ -2292,7 +2478,10 @@
                         base_salary,
                         hra,
                         allowances,
-                        deductions
+                        deductions,
+                        state,
+                        professional_tax,
+                        tds
                     })
                 });
 
@@ -2334,6 +2523,7 @@
             const ifsc_code = document.getElementById('emp-ifsc').value.trim();
             const pf_status = document.getElementById('emp-pf').value;
             const uan_no = document.getElementById('emp-uan').value.trim();
+            const state = document.getElementById('emp-state').value;
 
             const age = parseInt(ageStr, 10);
             if (isNaN(age) || age < 18 || age > 100) {
@@ -2384,7 +2574,8 @@
                 bank_account_number: bank_account_number || null,
                 ifsc_code: ifsc_code || null,
                 pf_status,
-                uan_no: pf_status === 'Applicable' ? uan_no : null
+                uan_no: pf_status === 'Applicable' ? uan_no : null,
+                state
             };
 
             try {
