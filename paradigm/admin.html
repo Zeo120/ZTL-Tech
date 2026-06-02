@@ -1036,10 +1036,10 @@
             <div class="payroll-split-container">
                 <!-- Sub-tab Selector Navigation Sidebar -->
                 <aside class="payroll-sidebar">
-                    <button class="sub-tab-btn active" id="btn-tab-employees" onclick="switchPayrollTab('employees')">Employee Center</button>
+                    <button class="sub-tab-btn" id="btn-tab-employees" onclick="switchPayrollTab('employees')">Employee Center</button>
                     <!-- Dropdown Options under Employee Center -->
                     <div id="employees-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
-                        <button class="sub-tab-btn active" id="btn-sub-tab-emp-manage" onclick="switchEmployeeSubTab('view')" style="font-size: 0.76rem; opacity: 0.85;">Employee Management</button>
+                        <button class="sub-tab-btn" id="btn-sub-tab-emp-manage" onclick="switchEmployeeSubTab('view')" style="font-size: 0.76rem; opacity: 0.85;">Employee Management</button>
                         <button class="sub-tab-btn" id="btn-sub-tab-emp-salary" onclick="switchEmployeeSubTab('salary')" style="font-size: 0.76rem; opacity: 0.85;">Salary Details</button>
                     </div>
                     <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
@@ -1048,8 +1048,22 @@
 
                 <!-- Active tab content area -->
                 <div class="payroll-content">
+                    <!-- Tab 0: Welcome / Neutral Overview -->
+                    <div class="tab-panel active" id="payroll-tab-welcome">
+                        <div class="panel-card" style="text-align: center; padding: 4rem 2rem; border: 1px dashed var(--surface-border); border-radius: 16px; background: rgba(162, 89, 255, 0.01);">
+                            <div style="background: rgba(162, 89, 255, 0.08); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid var(--surface-border);">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Custom Payroll System</h2>
+                            <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto; font-size: 0.9rem; line-height: 1.6;">Select an operation from the sidebar navigation menu to manage the employee registry, view salary structures, configure statutory rates, or execute CTC calculations.</p>
+                        </div>
+                    </div>
+
                     <!-- Tab 1: Employee Center -->
-                    <div class="tab-panel active" id="payroll-tab-employees">
+                    <div class="tab-panel" id="payroll-tab-employees">
 
                         <!-- Sub-panel A: Employee Management -->
                         <div id="payroll-sub-panel-view" style="display: block;">
@@ -1423,7 +1437,10 @@
             if (activePanel) activePanel.classList.add('active');
 
             if (viewId === 'payroll') {
-                switchPayrollTab('employees');
+                document.querySelectorAll('.payroll-sidebar .sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('employees-dropdown').style.display = 'none';
+                document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+                document.getElementById('payroll-tab-welcome').classList.add('active');
             } else if (viewId === 'crm') {
                 renderCRMTable();
             }
