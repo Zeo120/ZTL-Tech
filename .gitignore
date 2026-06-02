@@ -27,3 +27,4 @@ backend/.env
 *.obj
 *.exe
 *.bin
+backend/.env.*

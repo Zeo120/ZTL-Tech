@@ -931,7 +931,8 @@
         }
 
         function getCSRFToken() {
-            return getCookie('XSRF-TOKEN') || getCookie('xsrf-token');
+            const match = document.cookie.match(/(^|;)\s*ztl_csrf\s*=\s*([^;]+)/);
+            return match ? match[2] : '';
         }
 
         const origin = window.location.origin;
@@ -1456,6 +1457,86 @@
             }
         }
 
+        
+        // ============================================================================
+        // MINIMALIST UI TOGGLE (Display Information Only On Click)
+        // ============================================================================
+        function applyMinimalistUI() {
+            document.querySelectorAll('.panel-card').forEach(card => {
+                // Skip the dashboard metrics which are already minimal
+                if (card.closest('#view-welcome')) return;
+                
+                // Only target cards with forms or tables
+                const hasForm = card.querySelector('form');
+                const hasTable = card.querySelector('table');
+                const hasFormGrid = card.querySelector('.form-grid');
+                
+                if (hasForm || hasTable || hasFormGrid) {
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.display = 'none';
+                    contentWrapper.className = 'minimal-content';
+                    contentWrapper.style.animation = 'fadeIn 0.3s ease';
+                    
+                    // Move existing children to wrapper
+                    while(card.firstChild) {
+                        contentWrapper.appendChild(card.firstChild);
+                    }
+                    
+                    // Create toggle button
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-action btn-minimal-toggle';
+                    btn.style.width = '100%';
+                    btn.style.background = 'transparent';
+                    btn.style.border = '1px dashed var(--surface-border)';
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.style.padding = '1rem';
+                    btn.style.fontSize = '0.85rem';
+                    btn.style.letterSpacing = '1px';
+                    btn.style.textTransform = 'uppercase';
+                    btn.style.cursor = 'pointer';
+                    btn.style.transition = 'all 0.3s ease';
+                    
+                    let title = 'Reveal Information';
+                    if (hasForm && !hasTable) title = 'Reveal Form';
+                    if (hasTable && !hasForm) title = 'Reveal Data Table';
+                    
+                    btn.innerHTML = `<span style="margin-right:8px;">+</span> ${title}`;
+                    
+                    btn.onclick = (e) => {
+                        e.preventDefault(); // Prevent form submission if inside a form (though it's outside)
+                        if(contentWrapper.style.display === 'none') {
+                            contentWrapper.style.display = 'block';
+                            btn.innerHTML = `<span style="margin-right:8px;">-</span> Hide Information`;
+                            btn.style.marginBottom = '1.5rem';
+                            btn.style.borderStyle = 'solid';
+                            btn.style.background = 'rgba(255,255,255,0.02)';
+                        } else {
+                            contentWrapper.style.display = 'none';
+                            btn.innerHTML = `<span style="margin-right:8px;">+</span> ${title}`;
+                            btn.style.marginBottom = '0';
+                            btn.style.borderStyle = 'dashed';
+                            btn.style.background = 'transparent';
+                        }
+                    };
+                    
+                    btn.onmouseover = () => {
+                        btn.style.color = '#fff';
+                        btn.style.borderColor = 'var(--accent-primary)';
+                    };
+                    btn.onmouseout = () => {
+                        if(contentWrapper.style.display === 'none') {
+                            btn.style.color = 'var(--text-secondary)';
+                            btn.style.borderColor = 'var(--surface-border)';
+                        }
+                    };
+                    
+                    card.appendChild(btn);
+                    card.appendChild(contentWrapper);
+                }
+            });
+        }
+
+        applyMinimalistUI();
         // Initialize fetch
         fetchRoster();
     </script>

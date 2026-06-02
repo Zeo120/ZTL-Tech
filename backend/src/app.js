@@ -33,38 +33,29 @@ function createApp() {
 
   app.use(cookieParser());
 
-  // ROOT PROJECT PATH
   const frontendPath = path.join(__dirname, '../../');
 
-  console.log('Frontend Path:', frontendPath);
+  function mountStaticRoute(route, folderName) {
+    const staticDir = path.join(frontendPath, folderName);
 
-  // Serve static files from specific whitelisted directories only
-  // This prevents public access to backend source code, node_modules, and configuration (.env)
-  app.use('/grid', express.static(path.join(frontendPath, 'grid')));
-  app.use('/paradigm', express.static(path.join(frontendPath, 'paradigm')));
-  app.use('/phasr', express.static(path.join(frontendPath, 'phasr')));
-  app.use('/scalpel', express.static(path.join(frontendPath, 'scalpel')));
-  app.use('/ztl_tech', express.static(path.join(frontendPath, 'ztl_tech')));
+    app.use(route, express.static(staticDir));
+
+    app.get(route, (_req, res) => {
+      res.sendFile(path.join(staticDir, 'index.html'));
+    });
+  }
+
+  // Serve static files from specific whitelisted directories only.
+  // This keeps backend internals out of the public surface.
+  mountStaticRoute('/grid', 'grid');
+  mountStaticRoute('/paradigm', 'paradigm');
+  mountStaticRoute('/phasr', 'phasr');
+  mountStaticRoute('/scalpel', 'scalpel');
+  mountStaticRoute('/ztl_tech', 'ztl_tech');
 
   // Main pages
   app.get('/', (_req, res) => {
     res.redirect('/ztl_tech/index.html');
-  });
-
-  app.get('/phasr', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'phasr', 'index.html'));
-  });
-
-  app.get('/grid', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'grid', 'index.html'));
-  });
-
-  app.get('/paradigm', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'paradigm', 'index.html'));
-  });
-
-  app.get('/scalpel', (_req, res) => {
-    res.sendFile(path.join(frontendPath, 'scalpel', 'index.html'));
   });
 
   app.get('/ztl', (_req, res) => {

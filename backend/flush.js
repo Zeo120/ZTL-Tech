@@ -1,0 +1,1 @@
+const { getRedisClient } = require('./src/config/redis'); getRedisClient().then(async c => { const keys = await c.keys('ztl:session:*'); if (keys.length) { await c.del(keys); console.log('Cleared ' + keys.length + ' sessions'); } else { console.log('No sessions found'); } process.exit(0); });

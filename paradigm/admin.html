@@ -1954,7 +1954,8 @@
         }
 
         function getCSRFToken() {
-            return getCookie('XSRF-TOKEN') || getCookie('xsrf-token');
+            const match = document.cookie.match(/(^|;)\s*ztl_csrf\s*=\s*([^;]+)/);
+            return match ? match[2] : '';
         }
 
         // Drawer Controls
@@ -3068,7 +3069,7 @@
                     closePayrollModal();
                     fetchRoster();
                 } else {
-                    errorBanner.textContent = payload.error || "Database rejected employee fields.";
+                    errorBanner.textContent = payload.error || payload.message || "Database rejected employee fields.";
                     errorBanner.style.display = "block";
                 }
             } catch (err) {
