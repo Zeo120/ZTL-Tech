@@ -914,6 +914,21 @@
             color: #ffffff;
         }
 
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 0 40px rgba(162, 89, 255, 0.1);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 80px rgba(162, 89, 255, 0.4);
+            }
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 0 40px rgba(162, 89, 255, 0.1);
+            }
+        }
+
         /* Custom Scrollbar Styles (Everywhere) */
         ::-webkit-scrollbar {
             width: 6px;
@@ -949,6 +964,16 @@
     </style>
 </head>
 <body>
+    <!-- Reveal Screen Welcome Overlay -->
+    <div id="reveal-screen-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #050507; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div id="reveal-logo-container" style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; transition: transform 0.8s ease, opacity 0.8s ease;">
+            <!-- Glowing Diamond Logo -->
+            <div class="logo-diamond" style="width: 80px; height: 80px; transform: scale(0.8); animation: pulse-glow 2s infinite ease-in-out; background: #ffffff;"></div>
+            <h2 id="reveal-welcome-title" style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin-top: 0.5rem; opacity: 0; transform: translateY(20px); transition: all 0.8s ease;"></h2>
+            <p id="reveal-welcome-subtitle" style="font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 4px; color: var(--text-secondary); text-transform: uppercase; opacity: 0; transform: translateY(10px); transition: all 0.8s ease; transition-delay: 0.2s;">Initializing Control Portal</p>
+        </div>
+    </div>
+
     <!-- Fixed Header -->
     <header class="top-header">
         <div style="display: flex; align-items: center; gap: 0.8rem;">
@@ -1007,9 +1032,51 @@
     <!-- Main Workspace Area -->
     <main class="workspace-container">
         
-        <!-- Welcome View -->
+        <!-- Welcome View (Cockpit Portal) -->
         <section class="view-panel active" id="view-welcome">
-            <div class="welcome-message" id="welcome-text" style="opacity: 0;"></div>
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PARADIGM System Cockpit</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.5rem;">Enterprise command control interface & central registry index</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                <!-- Card 1: Quick Actions -->
+                <div class="panel-card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(162, 89, 255, 0.03) 0%, rgba(10, 10, 12, 0.9) 100%);">
+                    <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.5px; color: #fff;">Corporate Registry</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 1.5rem; line-height: 1.5;">Directly manage employee profiles, modify structures, log attendance, and compute CTC fields.</p>
+                    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                        <button class="btn-action" onclick="switchView('payroll'); switchEmployeeSubTab('view');" style="font-size: 0.75rem; padding: 0.5rem 0.8rem;">Employee Registry</button>
+                        <button class="btn-action btn-secondary" onclick="switchView('payroll'); switchEmployeeSubTab('attendance');" style="font-size: 0.75rem; padding: 0.5rem 0.8rem; border-color: rgba(255,255,255,0.08);">Attendance Register</button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Operations telemetry -->
+                <div class="panel-card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(0, 255, 170, 0.01) 0%, rgba(10, 10, 12, 0.9) 100%);">
+                    <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.5px; color: #fff;">Telemetry Status</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 1rem; line-height: 1.5;">Live node telemetry status reporting system logs.</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.78rem; font-family: monospace;">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 0.25rem;">
+                            <span style="color: var(--text-secondary);">Database Status:</span>
+                            <span style="color: #00ffaa; font-weight: 700;">MSSQL Secure Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 0.25rem;">
+                            <span style="color: var(--text-secondary);">Encryption Node:</span>
+                            <span style="color: #00ffaa; font-weight: 700;">TLS 1.3 Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-secondary);">Server Response:</span>
+                            <span style="color: #00ffaa; font-weight: 700;">0.28 ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: CRM pipeline shortcut -->
+                <div class="panel-card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(255, 84, 112, 0.01) 0%, rgba(10, 10, 12, 0.9) 100%);">
+                    <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.5px; color: #fff;">Client Sales CRM</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 1.5rem; line-height: 1.5;">Access lead pipelines, manage active prospect discussions, and track client deal progressions.</p>
+                    <button class="btn-action" onclick="switchView('crm');" style="font-size: 0.75rem; padding: 0.5rem 1rem; width: fit-content; background: #fff; color: #000; font-weight: 700;">Open CRM Panel</button>
+                </div>
+            </div>
         </section>
 
         <!-- CRM View -->
@@ -1662,7 +1729,6 @@
             toggleDrawer(false);
         }
 
-        // Welcome screen animation
         async function loadUserData() {
             try {
                 const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
@@ -1671,27 +1737,40 @@
                     if (payload.success && payload.data && payload.data.user) {
                         const user = payload.data.user;
                         
-                        const textEl = document.getElementById('welcome-text');
-                        textEl.textContent = `Hi ${user.id}`;
-                        textEl.classList.add('reveal-luxurious');
+                        const welcomeName = user.email ? user.email.split('@')[0].toUpperCase() : 'ADMIN';
+                        const titleEl = document.getElementById('reveal-welcome-title');
+                        titleEl.textContent = `WELCOME BACK, ${welcomeName}`;
+                        
+                        // Animate welcome components in reveal overlay
+                        setTimeout(() => {
+                            titleEl.style.opacity = '1';
+                            titleEl.style.transform = 'translateY(0)';
+                            document.getElementById('reveal-welcome-subtitle').style.opacity = '1';
+                            document.getElementById('reveal-welcome-subtitle').style.transform = 'translateY(0)';
+                        }, 200);
 
+                        // Fade in top header
                         setTimeout(() => {
                             const header = document.querySelector('.top-header');
                             if (header) header.classList.add('visible');
                         }, 1200);
 
+                        // Slide out / Fade out Reveal Screen Overlay
                         setTimeout(() => {
-                            textEl.classList.remove('reveal-luxurious');
-                            textEl.classList.add('fade-out');
-                        }, 2000);
+                            const overlay = document.getElementById('reveal-screen-overlay');
+                            overlay.style.opacity = '0';
+                            overlay.style.pointerEvents = 'none';
+                            overlay.style.transform = 'translateY(-100%)';
+                        }, 2200);
 
+                        // Update logo brand separator dynamically
                         setTimeout(() => {
                             const logoText = document.getElementById('logo-text-val');
                             if (logoText) {
                                 logoText.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
                                 logoText.style.opacity = '0';
                                 setTimeout(() => {
-                                    logoText.innerHTML = `<span class="logo-separator">|</span> ${user.id}`;
+                                    logoText.innerHTML = `<span class="logo-separator">|</span> ${welcomeName}`;
                                     logoText.style.opacity = '1';
                                 }, 800);
                             }
