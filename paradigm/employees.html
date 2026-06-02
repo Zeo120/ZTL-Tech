@@ -586,7 +586,38 @@
             font-size: 0.8rem;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
         }
-    </style>
+    
+        /* ===== UI FIXES ===== */
+        /* 1. Selection Drop down background to black */
+        select option {
+            background-color: #050507;
+            color: #ffffff;
+        }
+        
+        /* 2. Hide number input spinners (Decimal Increasers) */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+        
+        /* 3. Hide all scrollbars inside data entry elements */
+        .table-responsive::-webkit-scrollbar,
+        .form-control::-webkit-scrollbar,
+        form::-webkit-scrollbar,
+        .form-grid::-webkit-scrollbar,
+        .panel-card::-webkit-scrollbar,
+        select::-webkit-scrollbar {
+            display: none !important;
+        }
+        .table-responsive, .form-control, form, .form-grid, .panel-card, select {
+            -ms-overflow-style: none !important; /* IE and Edge */
+            scrollbar-width: none !important; /* Firefox */
+        }
+\n    </style>
 </head>
 <body>
     <div class="bg-glow">
@@ -679,6 +710,15 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding: 0.5rem 0;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        Showing <span id="pag-start">0</span> to <span id="pag-end">0</span> of <span id="pag-total">0</span> employees
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="btn-pag-prev" class="btn-sub-tab" style="padding: 0.35rem 0.8rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-primary); cursor: pointer;" onclick="changePage(-1)">Prev</button>
+                        <button id="btn-pag-next" class="btn-sub-tab" style="padding: 0.35rem 0.8rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-primary); cursor: pointer;" onclick="changePage(1)">Next</button>
+                    </div>
                 </div>
             </div>
 
@@ -877,6 +917,10 @@
 
     <script>
         let allEmployees = [];
+        let currentPage = 1;
+        const limitPerPage = 10;
+        let totalPages = 1;
+        let searchQuery = '';
 
         // Cookie reading helpers for CSRF
         function getCookie(name) {
@@ -1092,28 +1136,59 @@
             }
         }
 
-        // Search mechanism
+        // Search mechanism with 300ms debounce
+        let searchTimeout;
         function handleSearch() {
-            const query = document.getElementById('search-box').value.toLowerCase().trim();
-            if (!query) {
-                renderRoster(allEmployees);
-                return;
-            }
-            const filtered = allEmployees.filter(emp => {
-                const name = (emp.name || '').toLowerCase();
-                const status = (emp.status || '').toLowerCase();
-                const gender = (emp.gender || '').toLowerCase();
-                const pan = (emp.pan || '').toLowerCase();
-                const aadhar = (emp.aadhar || '').toLowerCase();
-                return name.includes(query) || status.includes(query) || gender.includes(query) || pan.includes(query) || aadhar.includes(query);
-            });
-            renderRoster(filtered);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = document.getElementById('search-box').value.trim();
+                currentPage = 1; // Reset to page 1 on new search
+                fetchRoster();
+            }, 300);
         }
 
-        // Load data from Backend
+        // Change page helper
+        function changePage(dir) {
+            const newPage = currentPage + dir;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                fetchRoster();
+            }
+        }
+
+        // Fetch dropdown menu list separately (bypass pagination)
+        async function fetchDropdownEmployees() {
+            try {
+                const res = await fetch(`${apiBase}/api/admin/employees?limit=all`, { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.employees) {
+                        populateEmployeeSelectWithOptions(payload.data.employees);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function populateEmployeeSelectWithOptions(employees) {
+            const select = document.getElementById('salary-employee-select');
+            const curVal = select.value;
+            select.innerHTML = '<option value="">-- Choose Employee --</option>';
+            employees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                select.appendChild(opt);
+            });
+            select.value = curVal;
+        }
+
+        // Load data from Backend with pagination
         async function fetchRoster() {
             try {
-                const res = await fetch(`${apiBase}/api/admin/employees`, { credentials: 'include' });
+                const url = `${apiBase}/api/admin/employees?page=${currentPage}&limit=${limitPerPage}&search=${encodeURIComponent(searchQuery)}`;
+                const res = await fetch(url, { credentials: 'include' });
                 if (res.status === 401) {
                     window.location.href = 'login.html';
                     return;
@@ -1123,7 +1198,23 @@
                     if (payload.success && payload.data && payload.data.employees) {
                         allEmployees = payload.data.employees;
                         renderRoster(allEmployees);
-                        populateEmployeeSelect();
+
+                        // Update pagination elements
+                        const pagination = payload.data.pagination || { total: allEmployees.length, page: 1, limit: limitPerPage, totalPages: 1 };
+                        totalPages = pagination.totalPages;
+                        const total = pagination.total;
+                        const start = total === 0 ? 0 : (currentPage - 1) * limitPerPage + 1;
+                        const end = Math.min(currentPage * limitPerPage, total);
+
+                        document.getElementById('pag-start').textContent = start;
+                        document.getElementById('pag-end').textContent = end;
+                        document.getElementById('pag-total').textContent = total;
+
+                        document.getElementById('btn-pag-prev').disabled = currentPage <= 1;
+                        document.getElementById('btn-pag-next').disabled = currentPage >= totalPages;
+
+                        // Load data for the dropdown
+                        fetchDropdownEmployees();
                     } else {
                         showTableError("Failed to fetch corporate roster.");
                     }

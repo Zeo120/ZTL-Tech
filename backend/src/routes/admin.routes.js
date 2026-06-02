@@ -973,21 +973,77 @@ adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeas
   });
 }));
 
-// GET /api/admin/employees - Fetch all employee records for the current tenant user
+// Custom lightweight validation helpers (No dependencies)
+function validateEmployeePayload(data) {
+  const errors = [];
+  const { name, age, gender, pan, aadhar, date_of_joining, marital_status, spouse_name, pf_status, uan_no, ifsc_code, base_salary, hra, allowances, deductions } = data;
+
+  if (!name || !name.trim()) errors.push('Name is required.');
+  if (!age || isNaN(Number(age)) || Number(age) <= 0) errors.push('Age must be a valid positive integer.');
+  if (!gender || !gender.trim()) errors.push('Gender is required.');
+
+  // PAN Check
+  if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(pan.trim())) {
+    errors.push('PAN must be a valid 10-character alphanumeric string (5 letters, 4 numbers, 1 letter).');
+  }
+
+  // Aadhar Check
+  if (!aadhar || !/^\d{12}$/.test(aadhar.trim())) {
+    errors.push('Aadhar must be a valid 12-digit number.');
+  }
+
+  // Date of joining Check
+  if (!date_of_joining || isNaN(Date.parse(date_of_joining))) {
+    errors.push('Date of Joining is invalid.');
+  }
+
+  // Conditional Married Check
+  if (marital_status === 'Married' && (!spouse_name || !spouse_name.trim())) {
+    errors.push('Spouse Name is mandatory when Marital Status is Married.');
+  }
+
+  // Conditional PF check
+  if (pf_status === 'Applicable' && (!uan_no || !/^\d{12}$/.test(uan_no.trim()))) {
+    errors.push('UAN No is mandatory and must be a valid 12-digit number when PF Status is Applicable.');
+  }
+
+  // IFSC Code check (optional, but if provided must be valid)
+  if (ifsc_code && !/^[A-Z]{4}0[A-Z0-9]{6}$/i.test(ifsc_code.trim())) {
+    errors.push('IFSC code must be a valid 11-character Indian Financial System Code.');
+  }
+
+  // Salary fields verification
+  const checkNonNegative = (val, name) => {
+    if (val !== undefined && val !== null && (isNaN(Number(val)) || Number(val) < 0)) {
+      errors.push(`${name} must be a non-negative number.`);
+    }
+  };
+  checkNonNegative(base_salary, 'Base Salary');
+  checkNonNegative(hra, 'HRA');
+  checkNonNegative(allowances, 'Allowances');
+  checkNonNegative(deductions, 'Deductions');
+
+  return errors;
+}
+
+// GET /api/admin/employees - Fetch employee records for the current tenant user with pagination/search support
 adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const pool = await getDbPool();
 
-  const result = await pool.request()
-    .input('userId', sql.Int, userId)
-    .query(`
-      SELECT id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
-             date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
-             base_salary, hra, allowances, deductions, state, professional_tax, tds
-      FROM dbo.Employees
-      WHERE user_id = @userId
-      ORDER BY id DESC;
-    `);
+  const searchStr = req.query.search ? req.query.search.trim() : '';
+  const hasPagination = req.query.page || req.query.limit;
+
+  let queryWhere = 'WHERE user_id = @userId';
+  if (searchStr) {
+    queryWhere += ' AND (name LIKE @search OR pan LIKE @search OR aadhar LIKE @search OR status LIKE @search OR gender LIKE @search)';
+  }
+
+  let employees = [];
+  let totalEmployees = 0;
+  let page = 1;
+  let limit = 10;
+  let totalPages = 1;
 
   const formatDbDate = (d) => {
     if (!d) return null;
@@ -998,7 +1054,57 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
     }
   };
 
-  const employees = result.recordset.map(row => ({
+  if (hasPagination) {
+    page = Math.max(1, parseInt(req.query.page) || 1);
+    limit = req.query.limit === 'all' ? 999999 : Math.max(1, parseInt(req.query.limit) || 10);
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .input('search', sql.NVarChar, `%${searchStr}%`)
+      .query(`
+        SELECT COUNT(*) as total
+        FROM dbo.Employees
+        ${queryWhere};
+      `);
+    totalEmployees = countResult.recordset[0].total;
+    totalPages = Math.ceil(totalEmployees / limit);
+
+    // Get records with offset and limit
+    const result = await pool.request()
+      .input('userId', sql.Int, userId)
+      .input('search', sql.NVarChar, `%${searchStr}%`)
+      .input('offset', sql.Int, offset)
+      .input('limit', sql.Int, limit)
+      .query(`
+        SELECT id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+               date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
+               base_salary, hra, allowances, deductions, state, professional_tax, tds, tax_regime, tax_declarations_json
+        FROM dbo.Employees
+        ${queryWhere}
+        ORDER BY id DESC
+        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY;
+      `);
+    employees = result.recordset;
+  } else {
+    // Return all records (backwards compatibility)
+    const result = await pool.request()
+      .input('userId', sql.Int, userId)
+      .input('search', sql.NVarChar, `%${searchStr}%`)
+      .query(`
+        SELECT id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+               date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
+               base_salary, hra, allowances, deductions, state, professional_tax, tds, tax_regime, tax_declarations_json
+        FROM dbo.Employees
+        ${queryWhere}
+        ORDER BY id DESC;
+      `);
+    employees = result.recordset;
+    totalEmployees = employees.length;
+  }
+
+  const mappedEmployees = employees.map(row => ({
     ...row,
     date_of_birth: formatDbDate(row.date_of_birth),
     date_of_joining: formatDbDate(row.date_of_joining),
@@ -1012,42 +1118,71 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
     tds: row.tds ? Number(row.tds) : 0
   }));
 
-  return ok(res, { employees });
+  return ok(res, {
+    employees: mappedEmployees,
+    pagination: {
+      total: totalEmployees,
+      page,
+      limit,
+      totalPages
+    }
+  });
+}));
+
+// GET /api/admin/employees/summary - Fetch server-side aggregate salary/tax metrics for reports
+adminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const pool = await getDbPool();
+
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT 
+        SUM(COALESCE(base_salary, 0) + COALESCE(hra, 0) + COALESCE(allowances, 0)) as totalGross,
+        SUM(COALESCE(deductions, 0)) as totalDeductions,
+        SUM(COALESCE(professional_tax, 0)) as totalPT,
+        SUM(COALESCE(tds, 0)) as totalTDS,
+        COUNT(*) as totalEmployees
+      FROM dbo.Employees
+      WHERE user_id = @userId;
+    `);
+
+  const row = result.recordset[0] || {};
+  const totalGross = row.totalGross ? Number(row.totalGross) : 0;
+  const totalDeductions = row.totalDeductions ? Number(row.totalDeductions) : 0;
+  const totalNet = totalGross - totalDeductions;
+  const totalPT = row.totalPT ? Number(row.totalPT) : 0;
+  const totalTDS = row.totalTDS ? Number(row.totalTDS) : 0;
+  const totalEmployees = row.totalEmployees ? Number(row.totalEmployees) : 0;
+
+  return ok(res, {
+    totalGross,
+    totalDeductions,
+    totalNet,
+    totalPT,
+    totalTDS,
+    totalEmployees
+  });
 }));
 
 // POST /api/admin/employees - Create a new employee record for the current tenant user
 adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
+  const validationErrors = validateEmployeePayload(req.body);
+
+  if (validationErrors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: validationErrors.join(' ')
+    });
+  }
+
   const {
     name, age, status, gender, pan, marital_status, spouse_name, aadhar,
     date_of_birth, date_of_joining, date_of_exit, bank_account_number,
     ifsc_code, pf_status, uan_no, base_salary, hra, allowances, deductions,
     state, professional_tax, tds
   } = req.body;
-
-  // Enforce mandatory details (Name, Age, Gender, PAN, Aadhar, Date of Joining)
-  if (!name || !age || !gender || !pan || !aadhar || !date_of_joining) {
-    return res.status(400).json({
-      success: false,
-      error: 'Missing required fields. Name, Age, Gender, PAN, Aadhar, and Date of Joining are mandatory.'
-    });
-  }
-
-  // Validate Marital Status and Spouse Name conditional mandatory rule
-  if (marital_status === 'Married' && (!spouse_name || !spouse_name.trim())) {
-    return res.status(400).json({
-      success: false,
-      error: 'Spouse Name is mandatory when Marital Status is Married.'
-    });
-  }
-
-  // Validate PF Status and UAN Number conditional mandatory rule
-  if (pf_status === 'Applicable' && (!uan_no || !uan_no.trim())) {
-    return res.status(400).json({
-      success: false,
-      error: 'UAN No is mandatory when PF Status is Applicable.'
-    });
-  }
 
   const pool = await getDbPool();
 
@@ -1107,7 +1242,27 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
 adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const employeeId = Number(req.params.id);
-  const { base_salary, hra, allowances, deductions, state, professional_tax, tds } = req.body;
+  const { base_salary, hra, allowances, deductions, state, professional_tax, tds, tax_regime, tax_declarations_json } = req.body;
+
+  const numericErrors = [];
+  const checkNonNegative = (val, name) => {
+    if (val !== undefined && val !== null && (isNaN(Number(val)) || Number(val) < 0)) {
+      numericErrors.push(`${name} must be a non-negative number.`);
+    }
+  };
+  checkNonNegative(base_salary, 'Base Salary');
+  checkNonNegative(hra, 'HRA');
+  checkNonNegative(allowances, 'Allowances');
+  checkNonNegative(deductions, 'Deductions');
+  checkNonNegative(professional_tax, 'Professional Tax');
+  checkNonNegative(tds, 'TDS');
+
+  if (numericErrors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: numericErrors.join(' ')
+    });
+  }
 
   const pool = await getDbPool();
 
@@ -1121,6 +1276,8 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
     .input('state', sql.NVarChar(100), state || 'Karnataka')
     .input('professionalTax', sql.Decimal(18, 2), professional_tax ? Number(professional_tax) : 0)
     .input('tds', sql.Decimal(18, 2), tds ? Number(tds) : 0)
+    .input('taxRegime', sql.NVarChar(20), tax_regime || 'New')
+    .input('taxDeclarations', sql.NVarChar(sql.MAX), tax_declarations_json ? JSON.stringify(tax_declarations_json) : null)
     .query(`
       UPDATE dbo.Employees
       SET base_salary = @baseSalary,
@@ -1130,6 +1287,8 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
           state = @state,
           professional_tax = @professionalTax,
           tds = @tds,
+          tax_regime = @taxRegime,
+          tax_declarations_json = @taxDeclarations,
           updated_at = SYSUTCDATETIME()
       WHERE id = @employeeId AND user_id = @userId;
     `);
@@ -1223,6 +1382,546 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
     `);
 
   return ok(res, { message: 'Attendance status recorded successfully' });
+}));
+
+// =============================================
+// PAYROLL ROUTES
+// =============================================
+
+// GET /api/admin/payroll/runs - Fetch all payroll runs for the current user
+adminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const pool = await getDbPool();
+
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT id, user_id, month, year, status,
+             total_gross, total_deductions, total_net,
+             total_pf, total_esi, total_pt, total_tds, total_lwp_deductions,
+             processed_at, created_at, updated_at
+      FROM dbo.PayrollRuns
+      WHERE user_id = @userId
+      ORDER BY year DESC, month DESC;
+    `);
+
+  return ok(res, {
+    runs: result.recordset.map(row => ({
+      id: row.id,
+      user_id: row.user_id,
+      month: row.month,
+      year: row.year,
+      status: row.status,
+      total_gross: row.total_gross ? Number(row.total_gross) : 0,
+      total_deductions: row.total_deductions ? Number(row.total_deductions) : 0,
+      total_net: row.total_net ? Number(row.total_net) : 0,
+      total_pf: row.total_pf ? Number(row.total_pf) : 0,
+      total_esi: row.total_esi ? Number(row.total_esi) : 0,
+      total_pt: row.total_pt ? Number(row.total_pt) : 0,
+      total_tds: row.total_tds ? Number(row.total_tds) : 0,
+      total_lwp_deductions: row.total_lwp_deductions ? Number(row.total_lwp_deductions) : 0,
+      processed_at: row.processed_at,
+      created_at: row.created_at,
+      updated_at: row.updated_at
+    }))
+  });
+}));
+
+// POST /api/admin/payroll/runs - Create a new payroll run
+adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { month, year } = req.body;
+
+  const monthNum = parseInt(month, 10);
+  const yearNum = parseInt(year, 10);
+
+  if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+    return res.status(400).json({ success: false, error: 'Month must be between 1 and 12.' });
+  }
+  if (isNaN(yearNum) || yearNum < 2020) {
+    return res.status(400).json({ success: false, error: 'Year must be 2020 or later.' });
+  }
+
+  const pool = await getDbPool();
+
+  // Check for duplicate
+  const existing = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('month', sql.Int, monthNum)
+    .input('year', sql.Int, yearNum)
+    .query(`
+      SELECT TOP 1 id FROM dbo.PayrollRuns
+      WHERE user_id = @userId AND month = @month AND year = @year;
+    `);
+
+  if (existing.recordset[0]) {
+    return res.status(409).json({ success: false, error: 'A payroll run already exists for this month and year.' });
+  }
+
+  const insertResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('month', sql.Int, monthNum)
+    .input('year', sql.Int, yearNum)
+    .query(`
+      INSERT INTO dbo.PayrollRuns (user_id, month, year, status, created_at)
+      OUTPUT INSERTED.id
+      VALUES (@userId, @month, @year, 'Draft', SYSUTCDATETIME());
+    `);
+
+  const newId = insertResult.recordset[0].id;
+
+  return ok(res, {
+    message: 'Payroll run created successfully',
+    run: { id: newId, month: monthNum, year: yearNum, status: 'Draft' }
+  });
+}));
+
+// POST /api/admin/payroll/runs/:id/process - Process a payroll run
+adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const runId = Number(req.params.id);
+
+  if (!runId || isNaN(runId)) {
+    return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
+  }
+
+  const pool = await getDbPool();
+
+  // Verify run belongs to user and is in Draft status
+  const runResult = await pool.request()
+    .input('runId', sql.Int, runId)
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT id, month, year, status
+      FROM dbo.PayrollRuns
+      WHERE id = @runId AND user_id = @userId;
+    `);
+
+  if (!runResult.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Payroll run not found or access denied.' });
+  }
+
+  const run = runResult.recordset[0];
+  if (run.status !== 'Draft') {
+    return res.status(400).json({ success: false, error: 'Only Draft payroll runs can be processed.' });
+  }
+
+  const payrollMonth = run.month;
+  const payrollYear = run.year;
+
+  // Fetch ALL employees for the user (not paginated)
+  const employeesResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT id, name, base_salary, hra, allowances, deductions,
+             professional_tax, tds, pf_status
+      FROM dbo.Employees
+      WHERE user_id = @userId AND status = 'Active';
+    `);
+
+  const employees = employeesResult.recordset;
+  if (employees.length === 0) {
+    return res.status(400).json({ success: false, error: 'No active employees found to process payroll.' });
+  }
+
+  // Build start/end dates for attendance LWP query
+  // Month is 1-indexed; build first and last day of that month
+  const startDate = `${payrollYear}-${String(payrollMonth).padStart(2, '0')}-01`;
+  const lastDay = new Date(payrollYear, payrollMonth, 0).getDate();
+  const endDate = `${payrollYear}-${String(payrollMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+  // Fetch LWP (Absent) counts for all employees in one query
+  const lwpResult = await pool.request()
+    .input('startDate', sql.Date, startDate)
+    .input('endDate', sql.Date, endDate)
+    .query(`
+      SELECT employee_id, COUNT(*) AS absent_count
+      FROM dbo.Attendance
+      WHERE attendance_date >= @startDate
+        AND attendance_date <= @endDate
+        AND status = 'Absent'
+      GROUP BY employee_id;
+    `);
+
+  const lwpMap = {};
+  for (const row of lwpResult.recordset) {
+    lwpMap[row.employee_id] = row.absent_count;
+  }
+
+  // Fetch pending approved expenses for all employees
+  const expensesResult = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT EX.id, EX.employee_id, EX.amount
+      FROM dbo.Expenses EX
+      JOIN dbo.Employees E ON EX.employee_id = E.id
+      WHERE E.user_id = @userId AND EX.status = 'Approved' AND EX.payroll_run_id IS NULL;
+    `);
+
+  const expenseMap = {};
+  const expenseIdsMap = {};
+  for (const row of expensesResult.recordset) {
+    if (!expenseMap[row.employee_id]) {
+      expenseMap[row.employee_id] = 0;
+      expenseIdsMap[row.employee_id] = [];
+    }
+    expenseMap[row.employee_id] += Number(row.amount);
+    expenseIdsMap[row.employee_id].push(row.id);
+  }
+
+  // Standard working days per month
+  const STANDARD_WORKING_DAYS = 26;
+
+  // Calculate payroll for each employee
+  const transactions = [];
+  let grandTotalGross = 0;
+  let grandTotalDeductions = 0;
+  let grandTotalNet = 0;
+  let grandTotalPf = 0;
+  let grandTotalEsi = 0;
+  let grandTotalPt = 0;
+  let grandTotalTds = 0;
+  let grandTotalLwp = 0;
+
+  for (const emp of employees) {
+    const baseSalary = emp.base_salary ? Number(emp.base_salary) : 0;
+    const empHra = emp.hra ? Number(emp.hra) : 0;
+    const baseEmpAllowances = emp.allowances ? Number(emp.allowances) : 0;
+    const expenseReimbursement = expenseMap[emp.id] || 0;
+    const empAllowances = baseEmpAllowances + expenseReimbursement;
+    const empDeductions = emp.deductions ? Number(emp.deductions) : 0;
+    const empPt = emp.professional_tax ? Number(emp.professional_tax) : 0;
+    const empTds = emp.tds ? Number(emp.tds) : 0;
+
+    const grossSalary = baseSalary + empHra + empAllowances;
+
+    // LWP calculation
+    const lwpDays = lwpMap[emp.id] || 0;
+    const lwpDeduction = Math.round((grossSalary / STANDARD_WORKING_DAYS) * lwpDays * 100) / 100;
+
+    // PF Employee: 12% of base_salary, capped at 1800 if base <= 15000
+    let pfEmployee = 0;
+    if (emp.pf_status === 'Applicable') {
+      if (baseSalary <= 15000) {
+        pfEmployee = Math.min(Math.round(baseSalary * 0.12 * 100) / 100, 1800);
+      } else {
+        pfEmployee = Math.round(baseSalary * 0.12 * 100) / 100;
+      }
+    }
+    // PF Employer: Same as PF Employee
+    const pfEmployer = pfEmployee;
+
+    // ESI Employee: 0.75% of gross if gross <= 21000, else 0
+    let esiEmployee = 0;
+    let esiEmployer = 0;
+    if (grossSalary <= 21000) {
+      esiEmployee = Math.round(grossSalary * 0.0075 * 100) / 100;
+      esiEmployer = Math.round(grossSalary * 0.0325 * 100) / 100;
+    }
+
+    // Net Salary = gross - lwp_deduction - pf_employee - esi_employee - professional_tax - tds - deductions
+    const netSalary = Math.round((grossSalary - lwpDeduction - pfEmployee - esiEmployee - empPt - empTds - empDeductions) * 100) / 100;
+
+    const totalDeductionsForEmp = Math.round((lwpDeduction + pfEmployee + esiEmployee + empPt + empTds + empDeductions) * 100) / 100;
+
+    transactions.push({
+      employeeId: emp.id,
+      baseSalary,
+      hra: empHra,
+      allowances: empAllowances,
+      grossSalary,
+      workingDays: STANDARD_WORKING_DAYS,
+      lwpDays,
+      lwpDeduction,
+      pfEmployee,
+      pfEmployer,
+      esiEmployee,
+      esiEmployer,
+      professionalTax: empPt,
+      tds: empTds,
+      deductions: empDeductions,
+      netSalary
+    });
+
+    grandTotalGross += grossSalary;
+    grandTotalDeductions += totalDeductionsForEmp;
+    grandTotalNet += netSalary;
+    grandTotalPf += pfEmployee + pfEmployer;
+    grandTotalEsi += esiEmployee + esiEmployer;
+    grandTotalPt += empPt;
+    grandTotalTds += empTds;
+    grandTotalLwp += lwpDeduction;
+  }
+
+  // Round grand totals
+  grandTotalGross = Math.round(grandTotalGross * 100) / 100;
+  grandTotalDeductions = Math.round(grandTotalDeductions * 100) / 100;
+  grandTotalNet = Math.round(grandTotalNet * 100) / 100;
+  grandTotalPf = Math.round(grandTotalPf * 100) / 100;
+  grandTotalEsi = Math.round(grandTotalEsi * 100) / 100;
+  grandTotalPt = Math.round(grandTotalPt * 100) / 100;
+  grandTotalTds = Math.round(grandTotalTds * 100) / 100;
+  grandTotalLwp = Math.round(grandTotalLwp * 100) / 100;
+
+  // Use SQL transaction for atomicity
+  const transaction = new sql.Transaction(pool);
+  await transaction.begin();
+  try {
+    // Insert a PayrollTransactions row for each employee
+    for (const txn of transactions) {
+      const request = new sql.Request(transaction);
+      await request
+        .input('payrollRunId', sql.Int, runId)
+        .input('employeeId', sql.Int, txn.employeeId)
+        .input('baseSalary', sql.Decimal(18, 2), txn.baseSalary)
+        .input('hra', sql.Decimal(18, 2), txn.hra)
+        .input('allowances', sql.Decimal(18, 2), txn.allowances)
+        .input('grossSalary', sql.Decimal(18, 2), txn.grossSalary)
+        .input('deductions', sql.Decimal(18, 2), txn.deductions)
+        .input('pfEmployee', sql.Decimal(18, 2), txn.pfEmployee)
+        .input('pfEmployer', sql.Decimal(18, 2), txn.pfEmployer)
+        .input('esiEmployee', sql.Decimal(18, 2), txn.esiEmployee)
+        .input('esiEmployer', sql.Decimal(18, 2), txn.esiEmployer)
+        .input('professionalTax', sql.Decimal(18, 2), txn.professionalTax)
+        .input('tds', sql.Decimal(18, 2), txn.tds)
+        .input('lwpDays', sql.Int, txn.lwpDays)
+        .input('lwpDeduction', sql.Decimal(18, 2), txn.lwpDeduction)
+        .input('workingDays', sql.Int, txn.workingDays)
+        .input('netSalary', sql.Decimal(18, 2), txn.netSalary)
+        .query(`
+          INSERT INTO dbo.PayrollTransactions (
+            payroll_run_id, employee_id, base_salary, hra, allowances, gross_salary,
+            deductions, pf_employee, pf_employer, esi_employee, esi_employer,
+            professional_tax, tds, lwp_days, lwp_deduction, working_days,
+            net_salary, payment_status, created_at
+          ) VALUES (
+            @payrollRunId, @employeeId, @baseSalary, @hra, @allowances, @grossSalary,
+            @deductions, @pfEmployee, @pfEmployer, @esiEmployee, @esiEmployer,
+            @professionalTax, @tds, @lwpDays, @lwpDeduction, @workingDays,
+            @netSalary, 'Pending', SYSUTCDATETIME()
+          );
+        `);
+
+      // Tag expenses if any
+      const expIds = expenseIdsMap[txn.employeeId];
+      if (expIds && expIds.length > 0) {
+        for (const expId of expIds) {
+          const expRequest = new sql.Request(transaction);
+          await expRequest
+            .input('expId', sql.Int, expId)
+            .input('runId', sql.Int, runId)
+            .query(`UPDATE dbo.Expenses SET payroll_run_id = @runId WHERE id = @expId`);
+        }
+      }
+    }
+
+    // Update the PayrollRuns row with totals and status = 'Completed'
+    const updateRequest = new sql.Request(transaction);
+    await updateRequest
+      .input('runId', sql.Int, runId)
+      .input('totalGross', sql.Decimal(18, 2), grandTotalGross)
+      .input('totalDeductions', sql.Decimal(18, 2), grandTotalDeductions)
+      .input('totalNet', sql.Decimal(18, 2), grandTotalNet)
+      .input('totalPf', sql.Decimal(18, 2), grandTotalPf)
+      .input('totalEsi', sql.Decimal(18, 2), grandTotalEsi)
+      .input('totalPt', sql.Decimal(18, 2), grandTotalPt)
+      .input('totalTds', sql.Decimal(18, 2), grandTotalTds)
+      .input('totalLwpDeductions', sql.Decimal(18, 2), grandTotalLwp)
+      .query(`
+        UPDATE dbo.PayrollRuns
+        SET status = 'Completed',
+            total_gross = @totalGross,
+            total_deductions = @totalDeductions,
+            total_net = @totalNet,
+            total_pf = @totalPf,
+            total_esi = @totalEsi,
+            total_pt = @totalPt,
+            total_tds = @totalTds,
+            total_lwp_deductions = @totalLwpDeductions,
+            processed_at = SYSUTCDATETIME(),
+            updated_at = SYSUTCDATETIME()
+        WHERE id = @runId;
+      `);
+
+    await transaction.commit();
+  } catch (err) {
+    await transaction.rollback();
+    throw err;
+  }
+
+  return ok(res, {
+    message: 'Payroll run processed successfully',
+    summary: {
+      runId,
+      month: payrollMonth,
+      year: payrollYear,
+      employeeCount: transactions.length,
+      totalGross: grandTotalGross,
+      totalDeductions: grandTotalDeductions,
+      totalNet: grandTotalNet,
+      totalPf: grandTotalPf,
+      totalEsi: grandTotalEsi,
+      totalPt: grandTotalPt,
+      totalTds: grandTotalTds,
+      totalLwpDeductions: grandTotalLwp
+    }
+  });
+}));
+
+// GET /api/admin/payroll/runs/:id/transactions - Fetch all transactions for a payroll run
+adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const runId = Number(req.params.id);
+
+  if (!runId || isNaN(runId)) {
+    return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
+  }
+
+  const pool = await getDbPool();
+
+  // Verify run belongs to user
+  const runCheck = await pool.request()
+    .input('runId', sql.Int, runId)
+    .input('userId', sql.Int, userId)
+    .query('SELECT TOP 1 id FROM dbo.PayrollRuns WHERE id = @runId AND user_id = @userId;');
+
+  if (!runCheck.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Payroll run not found or access denied.' });
+  }
+
+  const result = await pool.request()
+    .input('runId', sql.Int, runId)
+    .query(`
+      SELECT pt.id, pt.payroll_run_id, pt.employee_id,
+             e.name AS employee_name,
+             pt.base_salary, pt.hra, pt.allowances, pt.gross_salary,
+             pt.deductions, pt.pf_employee, pt.pf_employer,
+             pt.esi_employee, pt.esi_employer,
+             pt.professional_tax, pt.tds,
+             pt.lwp_days, pt.lwp_deduction, pt.working_days,
+             pt.net_salary, pt.payment_status, pt.created_at
+      FROM dbo.PayrollTransactions pt
+      INNER JOIN dbo.Employees e ON pt.employee_id = e.id
+      WHERE pt.payroll_run_id = @runId
+      ORDER BY e.name ASC;
+    `);
+
+  return ok(res, {
+    transactions: result.recordset.map(row => ({
+      id: row.id,
+      payroll_run_id: row.payroll_run_id,
+      employee_id: row.employee_id,
+      employee_name: row.employee_name,
+      base_salary: row.base_salary ? Number(row.base_salary) : 0,
+      hra: row.hra ? Number(row.hra) : 0,
+      allowances: row.allowances ? Number(row.allowances) : 0,
+      gross_salary: row.gross_salary ? Number(row.gross_salary) : 0,
+      deductions: row.deductions ? Number(row.deductions) : 0,
+      pf_employee: row.pf_employee ? Number(row.pf_employee) : 0,
+      pf_employer: row.pf_employer ? Number(row.pf_employer) : 0,
+      esi_employee: row.esi_employee ? Number(row.esi_employee) : 0,
+      esi_employer: row.esi_employer ? Number(row.esi_employer) : 0,
+      professional_tax: row.professional_tax ? Number(row.professional_tax) : 0,
+      tds: row.tds ? Number(row.tds) : 0,
+      lwp_days: row.lwp_days || 0,
+      lwp_deduction: row.lwp_deduction ? Number(row.lwp_deduction) : 0,
+      working_days: row.working_days || 26,
+      net_salary: row.net_salary ? Number(row.net_salary) : 0,
+      payment_status: row.payment_status,
+      created_at: row.created_at
+    }))
+  });
+}));
+
+// GET /api/admin/payroll/runs/:id/payslip/:employeeId - Fetch single transaction for payslip
+adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const runId = Number(req.params.id);
+  const employeeId = Number(req.params.employeeId);
+
+  if (!runId || isNaN(runId) || !employeeId || isNaN(employeeId)) {
+    return res.status(400).json({ success: false, error: 'Invalid payroll run ID or employee ID.' });
+  }
+
+  const pool = await getDbPool();
+
+  // Verify run belongs to user
+  const runCheck = await pool.request()
+    .input('runId', sql.Int, runId)
+    .input('userId', sql.Int, userId)
+    .query('SELECT TOP 1 id, month, year FROM dbo.PayrollRuns WHERE id = @runId AND user_id = @userId;');
+
+  if (!runCheck.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Payroll run not found or access denied.' });
+  }
+
+  const payrollRun = runCheck.recordset[0];
+
+  const result = await pool.request()
+    .input('runId', sql.Int, runId)
+    .input('employeeId', sql.Int, employeeId)
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT pt.id, pt.payroll_run_id, pt.employee_id,
+             pt.base_salary, pt.hra, pt.allowances, pt.gross_salary,
+             pt.deductions, pt.pf_employee, pt.pf_employer,
+             pt.esi_employee, pt.esi_employer,
+             pt.professional_tax, pt.tds,
+             pt.lwp_days, pt.lwp_deduction, pt.working_days,
+             pt.net_salary, pt.payment_status, pt.created_at,
+             e.name AS employee_name, e.pan, e.bank_account_number,
+             e.ifsc_code, e.date_of_joining, e.uan_no, e.pf_status
+      FROM dbo.PayrollTransactions pt
+      INNER JOIN dbo.Employees e ON pt.employee_id = e.id
+      WHERE pt.payroll_run_id = @runId
+        AND pt.employee_id = @employeeId
+        AND e.user_id = @userId;
+    `);
+
+  if (!result.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Payslip not found for this employee in the specified payroll run.' });
+  }
+
+  const row = result.recordset[0];
+
+  const formatDbDate = (d) => {
+    if (!d) return null;
+    try { return d.toISOString().split('T')[0]; } catch (e) { return null; }
+  };
+
+  return ok(res, {
+    payslip: {
+      id: row.id,
+      payroll_run_id: row.payroll_run_id,
+      month: payrollRun.month,
+      year: payrollRun.year,
+      employee_id: row.employee_id,
+      employee_name: row.employee_name,
+      pan: row.pan,
+      bank_account_number: row.bank_account_number,
+      ifsc_code: row.ifsc_code,
+      date_of_joining: formatDbDate(row.date_of_joining),
+      uan_no: row.uan_no,
+      pf_status: row.pf_status,
+      base_salary: row.base_salary ? Number(row.base_salary) : 0,
+      hra: row.hra ? Number(row.hra) : 0,
+      allowances: row.allowances ? Number(row.allowances) : 0,
+      gross_salary: row.gross_salary ? Number(row.gross_salary) : 0,
+      deductions: row.deductions ? Number(row.deductions) : 0,
+      pf_employee: row.pf_employee ? Number(row.pf_employee) : 0,
+      pf_employer: row.pf_employer ? Number(row.pf_employer) : 0,
+      esi_employee: row.esi_employee ? Number(row.esi_employee) : 0,
+      esi_employer: row.esi_employer ? Number(row.esi_employer) : 0,
+      professional_tax: row.professional_tax ? Number(row.professional_tax) : 0,
+      tds: row.tds ? Number(row.tds) : 0,
+      lwp_days: row.lwp_days || 0,
+      lwp_deduction: row.lwp_deduction ? Number(row.lwp_deduction) : 0,
+      working_days: row.working_days || 26,
+      net_salary: row.net_salary ? Number(row.net_salary) : 0,
+      payment_status: row.payment_status,
+      created_at: row.created_at
+    }
+  });
 }));
 
 module.exports = { adminRoutes };

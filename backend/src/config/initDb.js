@@ -317,6 +317,8 @@ const tables = [
       { name: 'state', sql: 'NVARCHAR(100) NULL CONSTRAINT DF_Employees_state DEFAULT N\'Karnataka\'' },
       { name: 'professional_tax', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_Employees_professional_tax DEFAULT 0' },
       { name: 'tds', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_Employees_tds DEFAULT 0' },
+      { name: 'tax_regime', sql: 'NVARCHAR(20) NULL CONSTRAINT DF_Employees_tax_regime DEFAULT N\'New\'' },
+      { name: 'tax_declarations_json', sql: 'NVARCHAR(MAX) NULL' },
       { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Employees_created_at DEFAULT SYSUTCDATETIME()' },
       { name: 'updated_at', sql: 'DATETIME2 NULL' }
     ],
@@ -354,6 +356,242 @@ const tables = [
       {
         name: 'IX_Attendance_employee_date',
         sql: 'CREATE UNIQUE INDEX IX_Attendance_employee_date ON dbo.Attendance(employee_id, attendance_date);'
+      }
+    ]
+  },
+  {
+    name: 'PayrollRuns',
+    createSql: `
+      CREATE TABLE dbo.PayrollRuns (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollRuns PRIMARY KEY,
+        user_id INT NOT NULL,
+        month INT NOT NULL,
+        year INT NOT NULL,
+        status NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollRuns_status DEFAULT 'Draft',
+        total_gross DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_gross DEFAULT 0,
+        total_deductions DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_deductions DEFAULT 0,
+        total_net DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_net DEFAULT 0,
+        total_pf DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_pf DEFAULT 0,
+        total_esi DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_esi DEFAULT 0,
+        total_pt DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_pt DEFAULT 0,
+        total_tds DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_tds DEFAULT 0,
+        total_lwp_deductions DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_lwp_deductions DEFAULT 0,
+        processed_at DATETIME2 NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_PayrollRuns_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT UC_PayrollRuns_user_month_year UNIQUE (user_id, month, year),
+        CONSTRAINT FK_PayrollRuns_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_user_id DEFAULT 0' },
+      { name: 'month', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_month DEFAULT 1' },
+      { name: 'year', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_year DEFAULT 2024' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollRuns_status DEFAULT N\'Draft\'' },
+      { name: 'total_gross', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_gross DEFAULT 0' },
+      { name: 'total_deductions', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_deductions DEFAULT 0' },
+      { name: 'total_net', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_net DEFAULT 0' },
+      { name: 'total_pf', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_pf DEFAULT 0' },
+      { name: 'total_esi', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_esi DEFAULT 0' },
+      { name: 'total_pt', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_pt DEFAULT 0' },
+      { name: 'total_tds', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_tds DEFAULT 0' },
+      { name: 'total_lwp_deductions', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollRuns_total_lwp_deductions DEFAULT 0' },
+      { name: 'processed_at', sql: 'DATETIME2 NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PayrollRuns_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_PayrollRuns',
+    indexes: [
+      {
+        name: 'IX_PayrollRuns_user_id',
+        sql: 'CREATE INDEX IX_PayrollRuns_user_id ON dbo.PayrollRuns(user_id);'
+      },
+      {
+        name: 'UX_PayrollRuns_user_month_year',
+        sql: 'CREATE UNIQUE INDEX UX_PayrollRuns_user_month_year ON dbo.PayrollRuns(user_id, month, year);'
+      }
+    ]
+  },
+  {
+    name: 'PayrollTransactions',
+    createSql: `
+      CREATE TABLE dbo.PayrollTransactions (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollTransactions PRIMARY KEY,
+        payroll_run_id INT NOT NULL,
+        employee_id INT NOT NULL,
+        base_salary DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_base_salary DEFAULT 0,
+        hra DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_hra DEFAULT 0,
+        allowances DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_allowances DEFAULT 0,
+        gross_salary DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_gross_salary DEFAULT 0,
+        deductions DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_deductions DEFAULT 0,
+        pf_employee DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_pf_employee DEFAULT 0,
+        pf_employer DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_pf_employer DEFAULT 0,
+        esi_employee DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_esi_employee DEFAULT 0,
+        esi_employer DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_esi_employer DEFAULT 0,
+        professional_tax DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_professional_tax DEFAULT 0,
+        tds DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_tds DEFAULT 0,
+        lwp_days INT NULL CONSTRAINT DF_PayrollTx_lwp_days DEFAULT 0,
+        lwp_deduction DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_lwp_deduction DEFAULT 0,
+        working_days INT NULL CONSTRAINT DF_PayrollTx_working_days DEFAULT 0,
+        net_salary DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_net_salary DEFAULT 0,
+        payment_status NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollTx_payment_status DEFAULT 'Pending',
+        tax_regime NVARCHAR(20) NULL CONSTRAINT DF_PayrollTx_tax_regime DEFAULT 'New',
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_PayrollTx_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT UC_PayrollTx_run_employee UNIQUE (payroll_run_id, employee_id),
+        CONSTRAINT FK_PayrollTx_PayrollRuns FOREIGN KEY (payroll_run_id) REFERENCES dbo.PayrollRuns(id) ON DELETE CASCADE,
+        CONSTRAINT FK_PayrollTx_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'payroll_run_id', sql: 'INT NOT NULL CONSTRAINT DF_PayrollTx_payroll_run_id DEFAULT 0' },
+      { name: 'employee_id', sql: 'INT NOT NULL CONSTRAINT DF_PayrollTx_employee_id DEFAULT 0' },
+      { name: 'base_salary', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_base_salary DEFAULT 0' },
+      { name: 'hra', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_hra DEFAULT 0' },
+      { name: 'allowances', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_allowances DEFAULT 0' },
+      { name: 'gross_salary', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_gross_salary DEFAULT 0' },
+      { name: 'deductions', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_deductions DEFAULT 0' },
+      { name: 'pf_employee', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_pf_employee DEFAULT 0' },
+      { name: 'pf_employer', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_pf_employer DEFAULT 0' },
+      { name: 'esi_employee', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_esi_employee DEFAULT 0' },
+      { name: 'esi_employer', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_esi_employer DEFAULT 0' },
+      { name: 'professional_tax', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_professional_tax DEFAULT 0' },
+      { name: 'tds', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_tds DEFAULT 0' },
+      { name: 'lwp_days', sql: 'INT NULL CONSTRAINT DF_PayrollTx_lwp_days DEFAULT 0' },
+      { name: 'lwp_deduction', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_lwp_deduction DEFAULT 0' },
+      { name: 'working_days', sql: 'INT NULL CONSTRAINT DF_PayrollTx_working_days DEFAULT 0' },
+      { name: 'net_salary', sql: 'DECIMAL(18,2) NULL CONSTRAINT DF_PayrollTx_net_salary DEFAULT 0' },
+      { name: 'payment_status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollTx_payment_status DEFAULT N\'Pending\'' },
+      { name: 'tax_regime', sql: 'NVARCHAR(20) NULL CONSTRAINT DF_PayrollTx_tax_regime DEFAULT N\'New\'' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PayrollTx_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_PayrollTransactions',
+    indexes: [
+      {
+        name: 'IX_PayrollTx_payroll_run_id',
+        sql: 'CREATE INDEX IX_PayrollTx_payroll_run_id ON dbo.PayrollTransactions(payroll_run_id);'
+      },
+      {
+        name: 'IX_PayrollTx_employee_id',
+        sql: 'CREATE INDEX IX_PayrollTx_employee_id ON dbo.PayrollTransactions(employee_id);'
+      },
+      {
+        name: 'UX_PayrollTx_run_employee',
+        sql: 'CREATE UNIQUE INDEX UX_PayrollTx_run_employee ON dbo.PayrollTransactions(payroll_run_id, employee_id);'
+      }
+    ]
+  },
+  {
+    name: 'Leaves',
+    createSql: `
+      CREATE TABLE dbo.Leaves (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Leaves PRIMARY KEY,
+        employee_id INT NOT NULL,
+        type NVARCHAR(50) NOT NULL,
+        start_date DATE NOT NULL,
+        end_date DATE NOT NULL,
+        reason NVARCHAR(500) NULL,
+        status NVARCHAR(50) NOT NULL CONSTRAINT DF_Leaves_status DEFAULT 'Pending',
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Leaves_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT FK_Leaves_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'employee_id', sql: 'INT NOT NULL' },
+      { name: 'type', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'start_date', sql: 'DATE NOT NULL' },
+      { name: 'end_date', sql: 'DATE NOT NULL' },
+      { name: 'reason', sql: 'NVARCHAR(500) NULL' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Leaves_status DEFAULT N\'Pending\'' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Leaves_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_Leaves',
+    indexes: [
+      {
+        name: 'IX_Leaves_employee_id',
+        sql: 'CREATE INDEX IX_Leaves_employee_id ON dbo.Leaves(employee_id);'
+      }
+    ]
+  },
+  {
+    name: 'Expenses',
+    createSql: `
+      CREATE TABLE dbo.Expenses (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Expenses PRIMARY KEY,
+        employee_id INT NOT NULL,
+        category NVARCHAR(50) NOT NULL,
+        amount DECIMAL(18,2) NOT NULL,
+        description NVARCHAR(500) NULL,
+        receipt_url NVARCHAR(MAX) NULL,
+        status NVARCHAR(50) NOT NULL CONSTRAINT DF_Expenses_status DEFAULT 'Pending',
+        payroll_run_id INT NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Expenses_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT FK_Expenses_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE,
+        CONSTRAINT FK_Expenses_PayrollRuns FOREIGN KEY (payroll_run_id) REFERENCES dbo.PayrollRuns(id)
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'employee_id', sql: 'INT NOT NULL' },
+      { name: 'category', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL' },
+      { name: 'description', sql: 'NVARCHAR(500) NULL' },
+      { name: 'receipt_url', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Expenses_status DEFAULT N\'Pending\'' },
+      { name: 'payroll_run_id', sql: 'INT NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Expenses_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_Expenses',
+    indexes: [
+      {
+        name: 'IX_Expenses_employee_id',
+        sql: 'CREATE INDEX IX_Expenses_employee_id ON dbo.Expenses(employee_id);'
+      },
+      {
+        name: 'IX_Expenses_payroll_run_id',
+        sql: 'CREATE INDEX IX_Expenses_payroll_run_id ON dbo.Expenses(payroll_run_id);'
+      }
+    ]
+  },
+  {
+    name: 'Documents',
+    createSql: `
+      CREATE TABLE dbo.Documents (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Documents PRIMARY KEY,
+        user_id INT NOT NULL,
+        employee_id INT NULL,
+        type NVARCHAR(100) NOT NULL,
+        file_path NVARCHAR(MAX) NOT NULL,
+        generated_at DATETIME2 NOT NULL CONSTRAINT DF_Documents_generated_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_Documents_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE,
+        CONSTRAINT FK_Documents_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL' },
+      { name: 'employee_id', sql: 'INT NULL' },
+      { name: 'type', sql: 'NVARCHAR(100) NOT NULL' },
+      { name: 'file_path', sql: 'NVARCHAR(MAX) NOT NULL' },
+      { name: 'generated_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Documents_generated_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_Documents',
+    indexes: [
+      {
+        name: 'IX_Documents_user_id',
+        sql: 'CREATE INDEX IX_Documents_user_id ON dbo.Documents(user_id);'
+      },
+      {
+        name: 'IX_Documents_employee_id',
+        sql: 'CREATE INDEX IX_Documents_employee_id ON dbo.Documents(employee_id);'
       }
     ]
   }
@@ -561,6 +799,9 @@ async function initDb() {
   await ensureForeignKey(pool, 'CodebaseScanFindings', 'FK_CodebaseScanFindings_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Employees', 'FK_Employees_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Attendance', 'FK_Attendance_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'PayrollRuns', 'FK_PayrollRuns_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_PayrollRuns', 'FOREIGN KEY (payroll_run_id) REFERENCES dbo.PayrollRuns(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
 
   await seedAdmin(pool);
 
