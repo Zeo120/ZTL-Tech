@@ -1149,4 +1149,67 @@ adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res)
   return ok(res, { message: 'Employee record deleted successfully' });
 }));
 
+// GET /api/admin/employees/attendance - Fetch attendance records for a specific date
+adminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const dateStr = req.query.date; // YYYY-MM-DD
+  if (!dateStr) {
+    return res.status(400).json({ success: false, error: 'Date is required' });
+  }
+
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .input('attendanceDate', sql.Date, dateStr)
+    .query(`
+      SELECT e.id AS employee_id, e.name, a.status, a.attendance_date
+      FROM dbo.Employees e
+      LEFT JOIN dbo.Attendance a ON e.id = a.employee_id AND a.attendance_date = @attendanceDate
+      WHERE e.user_id = @userId
+      ORDER BY e.id DESC;
+    `);
+
+  return ok(res, { attendance: result.recordset });
+}));
+
+// POST /api/admin/employees/attendance - Update or record attendance for a specific date
+adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { employee_id, attendance_date, status } = req.body;
+
+  if (!employee_id || !attendance_date || !status) {
+    return res.status(400).json({ success: false, error: 'employee_id, attendance_date, and status are required' });
+  }
+
+  const pool = await getDbPool();
+
+  // First verify employee belongs to user
+  const checkEmp = await pool.request()
+    .input('employeeId', sql.Int, employee_id)
+    .input('userId', sql.Int, userId)
+    .query('SELECT 1 FROM dbo.Employees WHERE id = @employeeId AND user_id = @userId');
+
+  if (checkEmp.rowsAffected[0] === 0) {
+    return res.status(404).json({ success: false, error: 'Employee not found or unauthorized' });
+  }
+
+  // Upsert using MERGE
+  await pool.request()
+    .input('employeeId', sql.Int, employee_id)
+    .input('attendanceDate', sql.Date, attendance_date)
+    .input('status', sql.NVarChar(50), status)
+    .query(`
+      MERGE dbo.Attendance AS target
+      USING (SELECT @employeeId AS employee_id, @attendanceDate AS attendance_date) AS source
+      ON (target.employee_id = source.employee_id AND target.attendance_date = source.attendance_date)
+      WHEN MATCHED THEN
+          UPDATE SET status = @status, updated_at = SYSUTCDATETIME()
+      WHEN NOT MATCHED THEN
+          INSERT (employee_id, attendance_date, status, created_at)
+          VALUES (source.employee_id, source.attendance_date, @status, SYSUTCDATETIME());
+    `);
+
+  return ok(res, { message: 'Attendance status recorded successfully' });
+}));
+
 module.exports = { adminRoutes };

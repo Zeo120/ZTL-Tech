@@ -873,7 +873,44 @@
             transition: var(--transition);
         }
 
-        .modal-close:hover {
+         .modal-close:hover {
+            color: #ffffff;
+        }
+
+        /* Attendance Segmented Toggle */
+        .attendance-toggle-group {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .attendance-btn {
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .attendance-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .attendance-btn.active.present {
+            background: #00ffaa;
+            color: #000000;
+        }
+
+        .attendance-btn.active.absent {
+            background: #ff5470;
             color: #ffffff;
         }
     </style>
@@ -1041,6 +1078,7 @@
                     <div id="employees-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
                         <button class="sub-tab-btn" id="btn-sub-tab-emp-manage" onclick="switchEmployeeSubTab('view')" style="font-size: 0.76rem; opacity: 0.85;">Employee Management</button>
                         <button class="sub-tab-btn" id="btn-sub-tab-emp-salary" onclick="switchEmployeeSubTab('salary')" style="font-size: 0.76rem; opacity: 0.85;">Salary Details</button>
+                        <button class="sub-tab-btn" id="btn-sub-tab-emp-attendance" onclick="switchEmployeeSubTab('attendance')" style="font-size: 0.76rem; opacity: 0.85;">Attendance</button>
                     </div>
                     <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
                     <button class="sub-tab-btn" id="btn-tab-ctc" onclick="switchPayrollTab('ctc')">CTC Calculation</button>
@@ -1148,6 +1186,43 @@
                                     </div>
 
                                     <button class="btn-action" onclick="submitAdminSalaryDetails()" style="justify-content: center; background: var(--accent-primary); color: #000; font-weight: 700;">Save Salary Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-panel C: Attendance -->
+                        <div id="payroll-sub-panel-attendance" style="display: none;">
+                            <div class="panel-card" style="margin: 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                                    <div>
+                                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">Daily Attendance Register</h3>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Mark daily attendance status for employees</p>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="admin-attendance-date" style="margin-bottom: 0; font-size: 0.85rem; font-weight: 600;">Select Date:</label>
+                                        <input type="date" id="admin-attendance-date" class="form-control" onchange="loadDailyAttendance()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: auto; font-size: 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <div class="form-banner-error" id="admin-attendance-error-banner" style="color: #ff5470; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
+                                <div class="form-banner-error" id="admin-attendance-success-banner" style="color: #00ffaa; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Employee Name</th>
+                                                <th style="text-align: right; padding-right: 2rem;">Mark Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="attendance-table-body">
+                                            <tr>
+                                                <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                    Loading employees registry...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -1874,8 +1949,10 @@
         function switchEmployeeSubTab(tabId) {
             const btnView = document.getElementById('btn-sub-tab-emp-manage');
             const btnSal = document.getElementById('btn-sub-tab-emp-salary');
+            const btnAtt = document.getElementById('btn-sub-tab-emp-attendance');
             const panelView = document.getElementById('payroll-sub-panel-view');
             const panelSal = document.getElementById('payroll-sub-panel-salary');
+            const panelAtt = document.getElementById('payroll-sub-panel-attendance');
 
             // Highlight parent tab and keep sub-tabs active
             document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -1884,17 +1961,183 @@
             if (tabId === 'view') {
                 btnView.classList.add('active');
                 btnSal.classList.remove('active');
+                btnAtt.classList.remove('active');
                 panelView.style.display = 'block';
                 panelSal.style.display = 'none';
+                panelAtt.style.display = 'none';
                 fetchRoster();
             } else if (tabId === 'salary') {
                 btnSal.classList.add('active');
                 btnView.classList.remove('active');
+                btnAtt.classList.remove('active');
                 panelView.style.display = 'none';
                 panelSal.style.display = 'block';
+                panelAtt.style.display = 'none';
                 
                 populateAdminEmployeeSelect();
                 loadAdminEmployeeSalary();
+            } else if (tabId === 'attendance') {
+                btnAtt.classList.add('active');
+                btnView.classList.remove('active');
+                btnSal.classList.remove('active');
+                panelView.style.display = 'none';
+                panelSal.style.display = 'none';
+                panelAtt.style.display = 'block';
+
+                // Set attendance date to today's date if empty
+                const dateInput = document.getElementById('admin-attendance-date');
+                if (!dateInput.value) {
+                    const today = new Date().toISOString().split('T')[0];
+                    dateInput.value = today;
+                }
+                loadDailyAttendance();
+            }
+        }
+
+        async function loadDailyAttendance() {
+            const dateVal = document.getElementById('admin-attendance-date').value;
+            const errBanner = document.getElementById('admin-attendance-error-banner');
+            const successBanner = document.getElementById('admin-attendance-success-banner');
+            const tbody = document.getElementById('attendance-table-body');
+
+            errBanner.style.display = 'none';
+            successBanner.style.display = 'none';
+
+            if (!dateVal) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 2rem; color: #ff5470;">
+                            Please select a valid date.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        Fetching attendance status...
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/employees/attendance?date=${dateVal}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const attendance = data.attendance || [];
+                    if (attendance.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                    No registered employees found. Please register employees first in Employee Management.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    attendance.forEach(record => {
+                        const tr = document.createElement('tr');
+                        
+                        const tdName = document.createElement('td');
+                        tdName.textContent = record.name;
+                        tdName.style.padding = '1rem 0.5rem';
+                        
+                        const tdActions = document.createElement('td');
+                        tdActions.style.textAlign = 'right';
+                        tdActions.style.paddingRight = '2rem';
+                        
+                        const isPresent = record.status === 'Present';
+                        const isAbsent = record.status === 'Absent';
+                        
+                        tdActions.innerHTML = `
+                            <div class="attendance-toggle-group">
+                                <button class="attendance-btn present ${isPresent ? 'active' : ''}" onclick="markAttendance(${record.employee_id}, 'Present', this)">Present</button>
+                                <button class="attendance-btn absent ${isAbsent ? 'active' : ''}" onclick="markAttendance(${record.employee_id}, 'Absent', this)">Absent</button>
+                            </div>
+                        `;
+                        
+                        tr.appendChild(tdName);
+                        tr.appendChild(tdActions);
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    const errData = await response.json();
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="2" style="text-align: center; padding: 2rem; color: #ff5470;">
+                                Failed to load attendance: ${errData.error || 'Server error'}
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 2rem; color: #ff5470;">
+                            Failed to connect to backend server.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function markAttendance(employeeId, status, btnElement) {
+            const dateVal = document.getElementById('admin-attendance-date').value;
+            const errBanner = document.getElementById('admin-attendance-error-banner');
+            const successBanner = document.getElementById('admin-attendance-success-banner');
+
+            errBanner.style.display = 'none';
+            successBanner.style.display = 'none';
+
+            if (!dateVal) {
+                alert('Please select a date first');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/employees/attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        employee_id: employeeId,
+                        attendance_date: dateVal,
+                        status: status
+                    })
+                });
+
+                if (response.ok) {
+                    // Update active button state locally without reloading the whole table
+                    const group = btnElement.closest('.attendance-toggle-group');
+                    if (group) {
+                        group.querySelectorAll('.attendance-btn').forEach(btn => btn.classList.remove('active'));
+                        btnElement.classList.add('active');
+                    }
+                    
+                    successBanner.textContent = `Attendance updated successfully.`;
+                    successBanner.style.display = 'block';
+                    setTimeout(() => { successBanner.style.display = 'none'; }, 3000);
+                } else {
+                    const errData = await response.json();
+                    errBanner.textContent = errData.error || 'Failed to update attendance status.';
+                    errBanner.style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                errBanner.textContent = 'Error connecting to backend server.';
+                errBanner.style.display = 'block';
             }
         }
 

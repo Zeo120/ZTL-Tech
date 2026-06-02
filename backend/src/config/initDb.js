@@ -321,6 +321,35 @@ const tables = [
         sql: 'CREATE INDEX IX_Employees_user_id ON dbo.Employees(user_id);'
       }
     ]
+  },
+  {
+    name: 'Attendance',
+    createSql: `
+      CREATE TABLE dbo.Attendance (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Attendance PRIMARY KEY,
+        employee_id INT NOT NULL,
+        attendance_date DATE NOT NULL,
+        status NVARCHAR(50) NOT NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Attendance_created_at DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2 NULL,
+        CONSTRAINT UC_Employee_Date UNIQUE (employee_id, attendance_date)
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'employee_id', sql: 'INT NOT NULL' },
+      { name: 'attendance_date', sql: 'DATE NOT NULL' },
+      { name: 'status', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Attendance_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_Attendance',
+    indexes: [
+      {
+        name: 'IX_Attendance_employee_date',
+        sql: 'CREATE UNIQUE INDEX IX_Attendance_employee_date ON dbo.Attendance(employee_id, attendance_date);'
+      }
+    ]
   }
 ];
 
@@ -525,6 +554,7 @@ async function initDb() {
   await ensureForeignKey(pool, 'CodebaseDependencies', 'FK_CodebaseDependencies_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'CodebaseScanFindings', 'FK_CodebaseScanFindings_CodebaseScans', 'FOREIGN KEY (scan_id) REFERENCES dbo.CodebaseScans(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Employees', 'FK_Employees_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'Attendance', 'FK_Attendance_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE');
 
   await seedAdmin(pool);
 
