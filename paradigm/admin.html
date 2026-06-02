@@ -958,12 +958,38 @@
         .panel-card form::-webkit-scrollbar,
         .panel-card .form-grid::-webkit-scrollbar,
         #payroll-employee-form::-webkit-scrollbar,
-        .modal-content::-webkit-scrollbar {
-            display: none; /* Chrome/Safari/Opera */
+        /* Epic Portal Handshake Transition Overlay */
+        #reveal-screen-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #050507;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #reveal-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+    <!-- Epic Portal Welcome Reveal Screen -->
+    <div id="reveal-screen-overlay">
+        <div id="reveal-logo-container">
+            <div class="logo-diamond" style="width: 80px; height: 80px; animation: pulse-glow 2s infinite ease-in-out; background: #ffffff;"></div>
+            <h2 id="reveal-welcome-title" style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin-top: 0.5rem; opacity: 0; transform: translateY(15px); transition: all 0.5s ease;">INITIALIZING SESSION</h2>
+            <p id="reveal-welcome-status" style="font-family: monospace; font-size: 0.8rem; letter-spacing: 1px; color: var(--accent-primary); text-transform: uppercase;">CONNECTING...</p>
+        </div>
+    </div>
+
     <!-- Fixed Header -->
     <header class="top-header">
         <div style="display: flex; align-items: center; gap: 0.8rem;">
@@ -1675,9 +1701,7 @@
                 renderCRMTable();
             }
             toggleDrawer(false);
-        }
-
-        async function loadUserData() {
+               async function loadUserData() {
             try {
                 const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
                 if (res.ok) {
@@ -1685,13 +1709,51 @@
                     if (payload.success && payload.data && payload.data.user) {
                         const user = payload.data.user;
                         
-                        const header = document.querySelector('.top-header');
-                        if (header) header.classList.add('visible');
+                        const welcomeName = user.email ? user.email.split('@')[0].toUpperCase() : 'ADMIN';
+                        const titleEl = document.getElementById('reveal-welcome-title');
+                        const statusEl = document.getElementById('reveal-welcome-status');
 
-                        const logoText = document.getElementById('logo-text-val');
-                        if (logoText) {
-                            logoText.innerHTML = `<span class="logo-separator">|</span> ${user.id}`;
-                        }
+                        // Animate title in
+                        setTimeout(() => {
+                            titleEl.textContent = `AUTHENTICATED: ${welcomeName}`;
+                            titleEl.style.opacity = '1';
+                            titleEl.style.transform = 'translateY(0)';
+                        }, 200);
+
+                        // Telemetry steps
+                        const steps = [
+                            { delay: 400, msg: "SECURITY CHECK VERIFIED..." },
+                            { delay: 800, msg: "DECRYPTING REGISTRY DATABASE..." },
+                            { delay: 1200, msg: "LOADING SECURE SHELL INTERFACE..." },
+                            { delay: 1600, msg: "WORKSPACE COCKPIT READY." }
+                        ];
+
+                        steps.forEach(step => {
+                            setTimeout(() => {
+                                statusEl.textContent = step.msg;
+                            }, step.delay);
+                        });
+
+                        // Show header and transition page out of overlay
+                        setTimeout(() => {
+                            const header = document.querySelector('.top-header');
+                            if (header) header.classList.add('visible');
+                            
+                            const overlay = document.getElementById('reveal-screen-overlay');
+                            if (overlay) {
+                                overlay.style.opacity = '0';
+                                overlay.style.pointerEvents = 'none';
+                                overlay.style.transform = 'scale(1.05)';
+                            }
+                        }, 2100);
+
+                        // Set top bar logo text
+                        setTimeout(() => {
+                            const logoText = document.getElementById('logo-text-val');
+                            if (logoText) {
+                                logoText.innerHTML = `<span class="logo-separator">|</span> ${welcomeName}`;
+                            }
+                        }, 2400);
                     } else {
                         window.location.href = 'login.html';
                     }
@@ -1702,7 +1764,6 @@
                 window.location.href = 'login.html';
             }
         }
-
 
         /* ------------------ CRM CONTROLLER ------------------ */
         function renderCRMTable() {
