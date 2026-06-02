@@ -1044,6 +1044,12 @@
                     </div>
                     <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
                     <button class="sub-tab-btn" id="btn-tab-ctc" onclick="switchPayrollTab('ctc')">CTC Calculation</button>
+                    <button class="sub-tab-btn" id="btn-tab-reports" onclick="switchPayrollTab('reports')">Reports</button>
+                    <!-- Dropdown Options under Reports -->
+                    <div id="reports-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
+                        <button class="sub-tab-btn" id="btn-sub-tab-rep-summary" onclick="switchReportsSubTab('summary')" style="font-size: 0.76rem; opacity: 0.85;">Payroll Summary</button>
+                        <button class="sub-tab-btn" id="btn-sub-tab-rep-audit" onclick="switchReportsSubTab('audit')" style="font-size: 0.76rem; opacity: 0.85;">Tax Audit Trail</button>
+                    </div>
                 </aside>
 
                 <!-- Active tab content area -->
@@ -1193,6 +1199,58 @@
                                 <div class="ctc-result-row">
                                     <span>Monthly PF Contribution:</span>
                                     <span id="ctc-monthly-pf">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Reports Panel -->
+                    <div class="tab-panel" id="payroll-tab-reports">
+                        <!-- Sub-panel A: Payroll Summary -->
+                        <div id="reports-sub-panel-summary" style="display: block;">
+                            <div class="panel-card">
+                                <h2 class="roster-title" style="margin-bottom: 1rem;">Payroll Summary Report</h2>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Overview of total corporate payout, HRA, allowances, and statutory tax deductions for the current cycle.</p>
+                                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Total Net Payout</div>
+                                        <div id="rep-total-net" style="font-size: 1.6rem; font-weight: 800; color: #00ffaa; margin-top: 0.3rem;">$0.00</div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Gross Disbursements</div>
+                                        <div id="rep-total-gross" style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin-top: 0.3rem;">$0.00</div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Total Tax Deducted</div>
+                                        <div id="rep-total-deductions" style="font-size: 1.6rem; font-weight: 800; color: #ff5470; margin-top: 0.3rem;">$0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-panel B: Tax Audit Trail -->
+                        <div id="reports-sub-panel-audit" style="display: none;">
+                            <div class="panel-card">
+                                <h2 class="roster-title" style="margin-bottom: 1rem;">Tax Audit Trail</h2>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Corporate PF status verification, Permanent Account Numbers (PAN), and Aadhar IDs register log.</p>
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Employee</th>
+                                                <th>PAN Status</th>
+                                                <th>Aadhar Status</th>
+                                                <th>PF Registration</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reports-audit-table-body">
+                                            <tr>
+                                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                    No audit data available.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -1439,6 +1497,7 @@
             if (viewId === 'payroll') {
                 document.querySelectorAll('.payroll-sidebar .sub-tab-btn').forEach(btn => btn.classList.remove('active'));
                 document.getElementById('employees-dropdown').style.display = 'none';
+                document.getElementById('reports-dropdown').style.display = 'none';
                 document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
                 document.getElementById('payroll-tab-welcome').classList.add('active');
             } else if (viewId === 'crm') {
@@ -1593,9 +1652,15 @@
 
             if (tabId === 'employees') {
                 document.getElementById('employees-dropdown').style.display = 'flex';
+                document.getElementById('reports-dropdown').style.display = 'none';
                 switchEmployeeSubTab('view');
+            } else if (tabId === 'reports') {
+                document.getElementById('reports-dropdown').style.display = 'flex';
+                document.getElementById('employees-dropdown').style.display = 'none';
+                switchReportsSubTab('summary');
             } else {
                 document.getElementById('employees-dropdown').style.display = 'none';
+                document.getElementById('reports-dropdown').style.display = 'none';
                 if (tabId === 'rates') {
                     // Populate forms with loaded rates
                     document.getElementById('rate-pf').value = pfRateConfig;
@@ -1830,6 +1895,68 @@
                 
                 populateAdminEmployeeSelect();
                 loadAdminEmployeeSalary();
+            }
+        }
+
+        // Sub-tab switching inside Reports via Sidebar Dropdown
+        function switchReportsSubTab(tabId) {
+            const btnSummary = document.getElementById('btn-sub-tab-rep-summary');
+            const btnAudit = document.getElementById('btn-sub-tab-rep-audit');
+            const panelSummary = document.getElementById('reports-sub-panel-summary');
+            const panelAudit = document.getElementById('reports-sub-panel-audit');
+
+            // Highlight parent tab
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-tab-reports').classList.add('active');
+
+            if (tabId === 'summary') {
+                btnSummary.classList.add('active');
+                btnAudit.classList.remove('active');
+                panelSummary.style.display = 'block';
+                panelAudit.style.display = 'none';
+                
+                // Calculate corporate payout sums from allEmployees list
+                let sumGross = 0;
+                let sumDeductions = 0;
+                allEmployees.forEach(emp => {
+                    const base = emp.base_salary || 0;
+                    const hra = emp.hra || 0;
+                    const allowances = emp.allowances || 0;
+                    const deductions = emp.deductions || 0;
+                    sumGross += (base + hra + allowances);
+                    sumDeductions += deductions;
+                });
+                const sumNet = sumGross - sumDeductions;
+                document.getElementById('rep-total-net').textContent = `$${sumNet.toFixed(2)}`;
+                document.getElementById('rep-total-gross').textContent = `$${sumGross.toFixed(2)}`;
+                document.getElementById('rep-total-deductions').textContent = `$${sumDeductions.toFixed(2)}`;
+            } else if (tabId === 'audit') {
+                btnAudit.classList.add('active');
+                btnSummary.classList.remove('active');
+                panelSummary.style.display = 'none';
+                panelAudit.style.display = 'block';
+
+                // Populate Tax Audit Trail table
+                const tbody = document.getElementById('reports-audit-table-body');
+                tbody.innerHTML = '';
+                if (allEmployees.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No corporate employees to audit.</td></tr>`;
+                    return;
+                }
+                allEmployees.forEach(emp => {
+                    const tr = document.createElement('tr');
+                    const panStatus = emp.pan ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">${emp.pan.toUpperCase()} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
+                    const aadharStatus = emp.aadhar ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">UID: ${emp.aadhar} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
+                    const pfReg = emp.pf_status === 'Applicable' ? `<span style="color: var(--accent-primary); font-family: monospace;">UAN: ${emp.uan_no}</span>` : `<span style="color: var(--text-secondary);">Exempt / Inactive</span>`;
+
+                    tr.innerHTML = `
+                        <td><strong>${emp.name}</strong></td>
+                        <td>${panStatus}</td>
+                        <td>${aadharStatus}</td>
+                        <td>${pfReg}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             }
         }
 
