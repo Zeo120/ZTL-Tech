@@ -3,1087 +3,1836 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paradigm | Executive Business Console</title>
-    <meta name="description" content="Authorized executive operations dashboard for Paradigm enterprise planners, ledgers, and inventory controls.">
-    
-    <!-- Modern Typography -->
+    <title>Paradigm | Welcome</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #08080a; /* deep obsidian graphite */
-            --surface-bg: rgba(16, 16, 20, 0.85); /* metallic translucent panel */
-            --surface-border: rgba(255, 255, 255, 0.08); /* brushed metal hairline border */
-            --metal-glow: rgba(255, 255, 255, 0.03);
-            
-            /* Platinum & Specular Metallics */
-            --accent-platinum: #f2f2f7;
-            --accent-palladium: #afafb7;
-            --accent-silver: #d1d1d6;
-            --accent-dark-metal: #2c2c2e;
-            
-            --accent-purple: #f2f2f7;
-            --accent-teal: #afafb7;
-            --accent-amber: #d1d1d6;
-            --accent-blue: #ffffff;
-            --accent-pink: #8e8e93;
-
+            --bg-color: #050507;
+            --surface-color: rgba(10, 10, 12, 0.9);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #9090a0;
+            --accent-platinum: #f5f5f7;
+            --accent-palladium: #afafb8;
             --font-display: 'Outfit', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             background: var(--bg-color);
+            color: var(--text-primary);
             font-family: var(--font-display);
-            color: #ffffff;
-            line-height: 1.5;
+            line-height: 1.6;
+            overflow-x: hidden;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Ambient background glow */
-        .bg-glow {
+        /* Fixed Header */
+        .top-header {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .glow-1 {
-            position: absolute;
-            top: -20%; left: -10%;
-            width: 60vw; height: 60vw;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(0,0,0,0) 70%);
-            filter: blur(80px);
-        }
-        .glow-2 {
-            position: absolute;
-            bottom: -10%; right: -5%;
-            width: 50vw; height: 50vw;
-            background: radial-gradient(circle, rgba(176, 176, 184, 0.02) 0%, rgba(0,0,0,0) 70%);
-            filter: blur(80px);
-        }
-
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1.2rem 2.5rem;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(8, 8, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(5, 5, 7, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--surface-border);
             z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Hamburger button style */
-        .hamburger-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--surface-border);
-            border-radius: 10px;
-            width: 44px;
-            height: 44px;
+        .top-header.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .logo-group {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            gap: 5px;
+            gap: 0.6rem;
+        }
+
+        .logo-diamond {
+            width: 24px;
+            height: 24px;
+            background: #ffffff;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            animation: logoSpin 12s infinite linear;
+            animation-play-state: paused;
+        }
+
+        .logo-group:hover .logo-diamond {
+            animation-play-state: running;
+        }
+
+        @keyframes logoSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #terminate-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 84, 112, 0.15);
+            color: #ff5470;
             cursor: pointer;
+            padding: 0.35rem 0.7rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            transition: var(--transition);
+            display: none;
+        }
+
+        #terminate-btn:hover {
+            background: rgba(255, 84, 112, 0.06);
+            border-color: #ff5470;
+        }
+
+        #terminate-btn.visible {
+            display: inline-block;
+            animation: slideInFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInFade {
+            from {
+                opacity: 0;
+                transform: translateX(-8px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+
+        .logo-separator {
+            color: #000000;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+        }
+
+        .hamburger-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: var(--transition);
         }
 
         .hamburger-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-palladium);
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .hamburger-btn span {
-            display: block;
-            width: 20px;
-            height: 2px;
-            background: #ffffff;
-            border-radius: 2px;
-            transition: var(--transition);
-        }
-
-        .hamburger-btn.active span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
-        .hamburger-btn.active span:nth-child(2) {
-            opacity: 0;
-        }
-        .hamburger-btn.active span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-        }
-
-        /* Navigation Sidebar Navigation Drawer */
-        .sidebar-overlay {
+        /* Right Drawer Navigation */
+        .drawer-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1999;
-            display: none;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .sidebar-overlay.active {
-            display: block;
+        .drawer-backdrop.active {
             opacity: 1;
+            pointer-events: auto;
         }
 
-        .sidebar-nav {
+        .sidebar-drawer {
             position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 360px;
-            background: rgba(10, 10, 12, 0.98);
-            border-right: 1px solid var(--surface-border);
+            top: 0; right: 0; bottom: 0;
+            width: 300px;
+            background: rgba(5, 5, 7, 0.95);
+            border-left: 1px solid var(--surface-border);
             z-index: 2000;
-            padding: 2.5rem 2rem;
-            transform: translateX(-100%);
-            transition: var(--transition);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
-            box-shadow: 25px 0 50px rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            gap: 1.5rem;
         }
 
-        .sidebar-nav.active {
+        .sidebar-drawer.active {
             transform: translateX(0);
         }
 
-        .sidebar-header {
+        .drawer-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 1rem;
         }
 
-        .sidebar-title {
-            font-size: 1rem;
+        .drawer-header h3 {
+            font-size: 0.8rem;
             font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--accent-palladium);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--accent-silver);
         }
 
-        .sidebar-close {
+        .drawer-close-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .sidebar-close:hover {
+        .drawer-close-btn:hover {
             color: #ffffff;
-            transform: scale(1.1);
         }
 
-        .suites-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 0.5rem;
-        }
-
-        /* Suite Cards styling inside sidebar */
-        .suite-card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 1.3rem;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+        .drawer-nav {
             display: flex;
             flex-direction: column;
             gap: 0.6rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .drawer-item {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
             text-align: left;
-        }
-
-        .suite-card:hover {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .suite-card.active {
-            border-color: rgba(255, 255, 255, 0.35);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
-        }
-
-        .suite-card.active::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, #ffffff, #8e8e93);
-        }
-
-        .suite-card.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .suite-card.locked:hover {
-            transform: none;
-            box-shadow: none;
-            border-color: rgba(255, 255, 255, 0.06);
-            background: rgba(255, 255, 255, 0.01);
-        }
-
-        .card-header {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-
-        .card-badge {
-            font-size: 0.68rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            padding: 0.25rem 0.7rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--accent-silver);
-        }
-
-        .card-title {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        /* Main container and full-width layout */
-        .dashboard-container {
-            max-width: 1200px;
+            gap: 0.6rem;
+            transition: var(--transition);
             width: 100%;
-            margin: 0 auto;
-            padding: 7rem 2rem 3rem;
+        }
+
+        .drawer-item:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .drawer-item.active {
+            color: #000000;
+            background: var(--accent-platinum);
+            font-weight: 700;
+        }
+
+        .drawer-separator {
+            height: 1px;
+            background: var(--surface-border);
+            margin: 0.5rem 0;
+        }
+
+        .btn-logout {
+            border: 1px solid rgba(255, 84, 112, 0.15);
+            color: #ff5470;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 84, 112, 0.04);
+            border-color: #ff5470;
+        }
+
+        /* Workspace Core Container */
+        .workspace-container {
             flex: 1;
+            margin-top: 60px;
+            padding: 3rem 2rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            align-items: flex-start;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: 0;
+            margin-right: auto;
         }
 
-        .header-bar {
-            background: var(--surface-bg);
-            border: 1px solid var(--surface-border);
-            border-radius: 24px;
-            padding: 2rem 2.5rem;
+        .view-panel {
+            display: none;
+            width: 100%;
+        }
+
+        .view-panel.active {
+            display: block;
+            animation: slideInView 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInView {
+            from {
+                opacity: 0;
+                transform: translateX(-16px);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+                filter: blur(0);
+            }
+        }
+
+        /* Welcome view landing */
+        #view-welcome {
+            display: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        #view-welcome.active {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            align-items: flex-start;
+            justify-content: flex-start;
+            height: auto;
+            margin-top: 12vh;
         }
 
-        .welcome-title {
-            font-size: 1.8rem;
+        .welcome-message {
+            font-size: 2.5rem;
             font-weight: 800;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #ffffff 0%, #b0b0b8 50%, #ffffff 100%);
+            text-align: left;
+            background: linear-gradient(135deg, #ffffff 0%, #afafb7 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(15px) scale(0.98);
+            filter: blur(12px);
         }
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--surface-border);
-            color: #ffffff;
-            padding: 0.7rem 1.6rem;
-            border-radius: 30px;
-            font-size: 0.82rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .logout-btn:hover {
-            background: #ffffff;
-            color: #000000;
-            box-shadow: 0 0 15px rgba(255,255,255,0.4);
-            border-color: #ffffff;
+        .welcome-message.reveal-luxurious {
+            animation: slowReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Full Width Workspace Console */
-        .workspace-grid {
-            width: 100%;
+        .welcome-message.fade-out {
+            animation: slowFadeOut 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .console-panel {
-            background: var(--surface-bg);
-            border: 1px solid var(--surface-border);
-            border-radius: 24px;
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 20px var(--metal-glow);
-            min-height: 550px;
+        @keyframes slowReveal {
+            0% {
+                opacity: 0;
+                filter: blur(15px);
+                letter-spacing: 0.12em;
+                transform: translateY(15px) scale(0.98);
+            }
+            30% {
+                opacity: 0.4;
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
+                letter-spacing: -0.02em;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        .panel-title-group {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 1.2rem;
-            text-align: left;
+        @keyframes slowFadeOut {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateY(-15px) scale(0.98);
+            }
+        }
+
+        /* Minimal Header block */
+        .view-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
         }
 
-        .panel-heading {
-            font-size: 1.5rem;
+        .view-header h1 {
+            font-size: 1.3rem;
             font-weight: 800;
-            letter-spacing: -0.01em;
+        }
+
+        /* Payroll Split Layout */
+        .payroll-split-container {
+            display: flex;
+            width: 100%;
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .payroll-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.2rem;
+            min-width: 200px;
+            border-right: 1px solid var(--surface-border);
+            padding-right: 2rem;
+        }
+
+        .payroll-content {
+            flex: 1;
+            width: 100%;
+        }
+
+        .sub-tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0.4rem 0;
+            position: relative;
+            transition: var(--transition);
+            width: 100%;
+            text-align: left;
+        }
+
+        .sub-tab-btn:hover {
             color: #ffffff;
         }
 
-        .panel-sub {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 0.3rem;
+        .sub-tab-btn.active {
+            color: #ffffff;
         }
 
-        /* Form Controls */
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .sub-tab-btn::after {
+            content: '';
+            position: absolute;
+            left: -1rem;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: var(--text-primary);
+            transform: scaleY(0);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: top;
+        }
+
+        .sub-tab-btn.active::after {
+            transform: scaleY(1);
+        }
+
+        @media (max-width: 768px) {
+            .payroll-split-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .payroll-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--surface-border);
+                padding-right: 0;
+                padding-bottom: 1rem;
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 1.5rem;
+                min-width: auto;
+            }
+
+            .sub-tab-btn {
+                width: auto;
+                text-align: center;
+                padding: 0.2rem 0;
+            }
+
+            .sub-tab-btn::after {
+                left: 0; right: 0;
+                top: auto; bottom: -0.6rem;
+                width: 100%;
+                height: 2px;
+                transform: scaleX(0);
+                transform-origin: left;
+            }
+
+            .sub-tab-btn.active::after {
+                transform: scaleX(1);
+            }
+        }
+
+        .tab-panel {
+            display: none;
+            width: 100%;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: slideInTab 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInTab {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Minimal Buttons */
+        .btn-action {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-action:hover {
+            background: #e0e0e5;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.02);
+            color: #ffffff;
+            border: 1px solid var(--surface-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 1px solid rgba(255, 84, 112, 0.15);
+            color: #ff5470;
+            cursor: pointer;
+            padding: 0.35rem 0.7rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 84, 112, 0.06);
+        }
+
+        /* Control Panel Header */
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 260px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 0.45rem 0.8rem 0.45rem 2rem;
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-palladium);
+        }
+
+        .search-icon-svg {
+            position: absolute;
+            left: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        /* Minimal Statistics Panel */
+        .summary-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            display: flex;
             gap: 1.5rem;
+        }
+
+        .summary-label span strong {
+            color: #ffffff;
+        }
+
+        /* Minimal Cards */
+        .panel-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            width: 100%;
+        }
+
+        /* Table Renders */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             text-align: left;
         }
-        @media (max-width: 600px) {
-            .form-row {
+
+        th {
+            padding: 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--surface-border);
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .employee-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.4rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid transparent;
+        }
+
+        .badge-active {
+            background: rgba(0, 255, 170, 0.03);
+            color: #00ffaa;
+            border-color: rgba(0, 255, 170, 0.1);
+        }
+
+        .badge-terminated {
+            background: rgba(255, 84, 112, 0.03);
+            color: #ff5470;
+            border-color: rgba(255, 84, 112, 0.1);
+        }
+
+        /* Operations Split Layout */
+        .ops-split {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.2rem;
+            width: 100%;
+        }
+
+        @media (max-width: 800px) {
+            .ops-split {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Single line status box for Operations */
+        .status-box {
+            background: #030304;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            font-family: monospace;
+            padding: 0.8rem 1rem;
+            color: #00ff66;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            word-break: break-all;
+        }
+
+        /* Form Configuration elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 580px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section-title {
+            grid-column: 1 / -1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent-palladium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.2rem;
+            margin-top: 0.2rem;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.3rem;
             text-align: left;
         }
 
-        .form-group label {
-            font-size: 0.82rem;
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-secondary);
         }
 
-        .form-input, .form-select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
+        .required-star {
+            color: #ff5470;
+            margin-left: 0.2rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--surface-border);
+            border-radius: 5px;
+            padding: 0.5rem 0.7rem;
             color: #ffffff;
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
+            font-family: var(--font-display);
+            font-size: 0.78rem;
             transition: var(--transition);
+            width: 100%;
         }
-        .form-input:focus, .form-select:focus {
+
+        .form-control:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.04);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-palladium);
         }
 
-        /* Metallic Brushed Buttons */
-        .action-btn {
-            background: linear-gradient(180deg, #ffffff 0%, #d1d1d6 50%, #aeaeae 100%);
-            color: #000000;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 30px;
-            padding: 0.75rem 2rem;
-            font-size: 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.5);
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 6px 20px rgba(255, 255, 255, 0.2);
-            border-color: #ffffff;
-        }
-
-        /* Receipt print layout style */
-        .voucher-receipt {
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 1.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: #00ffaa;
-            text-align: left;
-            box-shadow: inset 0 0 15px rgba(0, 255, 170, 0.05);
+        .conditional-field {
             display: none;
-        }
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.25rem 0;
-        }
-        .receipt-line {
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
-            margin: 0.5rem 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        /* Lock state absolute overlay */
-        .locked-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(5, 5, 8, 0.82);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+        .conditional-field.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .form-banner-error {
+            grid-column: 1 / -1;
+            background: rgba(255, 84, 112, 0.05);
+            border: 1px solid rgba(255, 84, 112, 0.15);
+            color: #ff8b9e;
+            padding: 0.5rem 0.8rem;
+            border-radius: 5px;
+            font-size: 0.78rem;
+            display: none;
+            text-align: left;
+        }
+
+        /* CTC Output text styling */
+        .ctc-result-box {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px dashed var(--surface-border);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .ctc-result-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ctc-result-row span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .ctc-result-row span:last-child {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2100;
+            display: none;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            z-index: 5;
-            padding: 0.5rem;
-            text-align: center;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        /* Menu button and overlay close styles */
-        .locked-overlay svg {
-            stroke: var(--accent-palladium);
-            filter: drop-shadow(0 0 4px var(--accent-palladium));
+        .modal.active {
+            display: flex;
+            opacity: 1;
         }
 
-        .locked-overlay span {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .modal-content {
+            background: rgba(6, 6, 8, 0.98);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            max-width: 660px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.8rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            transform: scale(0.96);
+            transition: transform 0.3s ease;
+            position: relative;
         }
 
-        /* Footer */
-        footer {
-            margin-top: auto;
-            padding: 3rem 2rem 2rem;
-            border-top: 1px solid var(--surface-border);
-            text-align: center;
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow">
-        <div class="glow-1"></div>
-        <div class="glow-2"></div>
-    </div>
-
-    <!-- Navigation Header -->
-    <nav>
-        <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <button class="hamburger-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Sidebar">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <a href="../ztl_tech/index.html" class="logo-group" aria-label="ZTL Tech Home">
+    <!-- Fixed Header -->
+    <header class="top-header">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div class="logo-group" onclick="toggleTerminateBtn()" style="cursor: pointer; display: flex; align-items: center; gap: 0.6rem;">
                 <div class="logo-diamond"></div>
-                <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
-            </a>
+                <span class="logo-text" id="logo-text-val"><span class="logo-separator">|</span> PARADIGM</span>
+            </div>
+            <button id="terminate-btn" onclick="handleLogout()">Terminate Session</button>
         </div>
-        <div class="user-badge" id="user-badge-details" style="display: flex; align-items: center; gap: 0.8rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.4rem 1.2rem; border-radius: 30px;">
-            <div class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 8px #ffffff;"></div>
-            <span style="font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">EXECUTIVE OFFICER</span>
-        </div>
-    </nav>
+        <button class="hamburger-btn" id="hamburger-toggle" onclick="toggleDrawer(true)" aria-label="Open Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+    </header>
 
-    <!-- Sidebar Navigation Drawer -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar-nav" id="sidebar-nav">
-        <div class="sidebar-header">
-            <h3 class="sidebar-title">Select Suite</h3>
-            <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Right Drawer menu -->
+    <div class="drawer-backdrop" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+    <aside class="sidebar-drawer" id="sidebar-drawer">
+        <div class="drawer-header">
+            <h3>Navigate</h3>
+            <button class="drawer-close-btn" onclick="toggleDrawer(false)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
-        <div class="suites-stack" id="suites-stack-container">
-            
-            <!-- CRM Suite Card -->
-            <div class="suite-card crm active" id="card-crm" onclick="selectSuite('crm')">
-                <div class="card-header">
-                    <span class="card-badge">Customer Ingress</span>
-                    <div class="active-dot" id="dot-crm" style="width: 6px; height: 6px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 8px #ffffff;"></div>
-                </div>
-                <div style="text-align: left;">
-                    <h3 class="card-title">Custom CRM Suite</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
-                        Manage client pipelines and conversions.
-                    </p>
-                </div>
-            </div>
+        <nav class="drawer-nav">
+            <button class="drawer-item active" id="nav-welcome" onclick="switchView('welcome')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                Portal Welcome
+            </button>
+            <button class="drawer-item" id="nav-crm" onclick="switchView('crm')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Custom CRM Module
+            </button>
+            <button class="drawer-item" id="nav-ops" onclick="switchView('ops')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                Custom Operations
+            </button>
+            <button class="drawer-item" id="nav-payroll" onclick="switchView('payroll')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Custom Payroll Module
+            </button>
+            <div class="drawer-separator"></div>
+            <button class="drawer-item btn-logout" onclick="handleLogout()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
+                Logout Session
+            </button>
+        </nav>
+    </aside>
 
-            <!-- HR Suite Card -->
-            <div class="suite-card hr" id="card-hr" onclick="selectSuite('hr')">
-                <div class="card-header">
-                    <span class="card-badge">Shift Roster</span>
-                    <div class="active-dot" id="dot-hr" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
-                </div>
-                <div style="text-align: left;">
-                    <h3 class="card-title">Custom HR Suite</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
-                        Track shift timesheets and verification.
-                    </p>
-                </div>
-            </div>
-
-            <!-- OPS Suite Card -->
-            <div class="suite-card ops" id="card-ops" onclick="selectSuite('ops')">
-                <div class="card-header">
-                    <span class="card-badge">Fleet Logistics</span>
-                    <div class="active-dot" id="dot-ops" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
-                </div>
-                <div style="text-align: left;">
-                    <h3 class="card-title">Custom OPS Suite</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
-                        Supervise inventory sync and logistics tracks.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Payroll Suite Card -->
-            <div class="suite-card payroll" id="card-payroll" onclick="selectSuite('payroll')">
-                <div class="card-header">
-                    <span class="card-badge">Ledger & Accounting</span>
-                    <div class="active-dot" id="dot-payroll" style="width: 6px; height: 6px; border-radius: 50%; background: transparent; box-shadow: none;"></div>
-                </div>
-                <div style="text-align: left;">
-                    <h3 class="card-title">Custom Payroll Suite</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.2rem;">
-                        Verify ledger invariants and tax metrics.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Main Content Container -->
-    <main class="dashboard-container">
+    <!-- Main Workspace Area -->
+    <main class="workspace-container">
         
-        <!-- Welcome Header Bar -->
-        <div class="header-bar">
-            <div style="text-align: left;">
-                <h1 class="welcome-title" id="welcome-message">PARADIGM EXECUTIVE BUSINESS CONSOLE</h1>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;" id="welcome-subtext">Enterprise Resource Planning & Business Operations Dashboard.</p>
-            </div>
-            <a href="login.html" class="logout-btn" onclick="alert('Securing connection... Executive session terminated.');">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                Secure Logout
-            </a>
-        </div>
+        <!-- Welcome View -->
+        <section class="view-panel active" id="view-welcome">
+            <div class="welcome-message" id="welcome-text" style="opacity: 0;"></div>
+        </section>
 
-        <!-- Workspace Full Width Layout -->
-        <div class="workspace-grid">
-            <!-- Console Panel -->
-            <div class="console-panel" id="workspace-console">
-                <!-- Loaded dynamically by selectSuite() -->
+        <!-- CRM View -->
+        <section class="view-panel" id="view-crm">
+            <div class="view-header">
+                <h1>Custom CRM</h1>
+                <button class="btn-action" onclick="openCRMModal()">Add Lead</button>
             </div>
-        </div>
+
+            <!-- Stats Label -->
+            <div class="summary-label">
+                <span>Pipeline: <strong id="crm-total-pipeline">$0</strong></span>
+                <span>Active Leads: <strong id="crm-active-leads">0</strong></span>
+            </div>
+
+            <!-- Client leads grid -->
+            <div class="control-panel">
+                <div class="search-wrapper">
+                    <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" class="search-input" id="crm-search-box" placeholder="Search client name..." oninput="filterCRMLeads()">
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Deal Stage</th>
+                                <th>Contract Value</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crm-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Operations View -->
+        <section class="view-panel" id="view-ops">
+            <div class="view-header">
+                <h1>Custom Operations</h1>
+            </div>
+
+            <div class="ops-split">
+                <!-- Dispatch Form -->
+                <div class="panel-card">
+                    <form id="ops-dispatch-form" onsubmit="event.preventDefault(); triggerOpsDispatch();" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="ops-carrier">Fleet Carrier</label>
+                            <select id="ops-carrier" class="form-control" required>
+                                <option value="Carrier drone v4">Hyper-V Drone Unit</option>
+                                <option value="Heavy persistence loader">Heavy Cargo Loader</option>
+                                <option value="Reflex breaker core">Reflex Breaker Cruiser</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ops-destination">Destination Hub</label>
+                            <select id="ops-destination" class="form-control" required>
+                                <option value="Beta persistent database cluster">Beta DB Cluster Nodes</option>
+                                <option value="East shard server gateway">East Shard Server Gateway</option>
+                                <option value="Zero-trust perimeter control nodes">Zero-Trust Perimeter A</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ops-payload">Cargo Load (kg)</label>
+                            <input type="number" id="ops-payload" class="form-control" placeholder="e.g. 500" required min="1">
+                        </div>
+                        <button type="submit" class="btn-action" style="justify-content: center;">Launch</button>
+                    </form>
+                </div>
+
+                <!-- Single Line terminal console status -->
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; justify-content: center;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Status Telemetry</div>
+                    <div class="status-box" id="ops-status-box">
+                        [STATUS] Telemetry Offline. Launch unit to sync.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payroll View (Roster with Sub-tabs) -->
+        <section class="view-panel" id="view-payroll">
+            <div class="view-header">
+                <h1>Custom Payroll</h1>
+            </div>
+
+            <div class="payroll-split-container">
+                <!-- Sub-tab Selector Navigation Sidebar -->
+                <aside class="payroll-sidebar">
+                    <button class="sub-tab-btn active" id="btn-tab-employees" onclick="switchPayrollTab('employees')">Employee Center</button>
+                    <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
+                    <button class="sub-tab-btn" id="btn-tab-ctc" onclick="switchPayrollTab('ctc')">CTC Calculation</button>
+                </aside>
+
+                <!-- Active tab content area -->
+                <div class="payroll-content">
+                    <!-- Tab 1: Employee Center -->
+                    <div class="tab-panel active" id="payroll-tab-employees">
+                        <div class="control-panel">
+                            <div class="search-wrapper">
+                                <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input type="text" class="search-input" id="payroll-search-box" placeholder="Search name..." oninput="filterPayrollRoster()">
+                            </div>
+                            <button class="btn-action" onclick="openPayrollModal()">Add Employee</button>
+                        </div>
+
+                        <div class="panel-card">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Employee Name</th>
+                                            <th>Status</th>
+                                            <th style="text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="payroll-table-body">
+                                        <tr>
+                                            <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                Syncing database...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Deductions & Rates -->
+                    <div class="tab-panel" id="payroll-tab-rates">
+                        <div class="panel-card" style="max-width: 500px; margin: 0;">
+                            <form id="payroll-rates-form" onsubmit="event.preventDefault(); savePayrollRates();" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                                <div class="form-group">
+                                    <label for="rate-pf">Provident Fund (PF) Contribution Rate (%)</label>
+                                    <input type="number" step="0.1" id="rate-pf" class="form-control" value="12.0" required min="0" max="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="rate-tds">TDS Income Tax Slab Estimate (%)</label>
+                                    <input type="number" step="0.1" id="rate-tds" class="form-control" value="15.0" required min="0" max="50">
+                                </div>
+                                <button type="submit" class="btn-action" style="justify-content: center; width: 100%;">Save Rates</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: CTC Calculator -->
+                    <div class="tab-panel" id="payroll-tab-ctc">
+                        <div class="panel-card" style="max-width: 500px; margin: 0;">
+                            <form style="display: flex; flex-direction: column; gap: 1.2rem;">
+                                <div class="form-group">
+                                    <label for="ctc-employee-select">Select Employee</label>
+                                    <select id="ctc-employee-select" class="form-control" onchange="runCTCCalculations()">
+                                        <option value="">-- Choose Employee --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ctc-monthly-salary">Monthly Salary Gross (USD)</label>
+                                    <input type="number" id="ctc-monthly-salary" class="form-control" placeholder="e.g. 5000" min="0" oninput="runCTCCalculations()">
+                                </div>
+                            </form>
+
+                            <!-- Ultra Minimalist Output results -->
+                            <div class="ctc-result-box" id="ctc-result-box" style="display: none;">
+                                <div class="ctc-result-row">
+                                    <span>Monthly Take-Home:</span>
+                                    <span id="ctc-net-pay">$0.00</span>
+                                </div>
+                                <div class="ctc-result-row">
+                                    <span>Annual CTC:</span>
+                                    <span id="ctc-annual-ctc">$0.00</span>
+                                </div>
+                                <div class="ctc-result-row">
+                                    <span>Monthly PF Contribution:</span>
+                                    <span id="ctc-monthly-pf">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <footer>
-        <p>© 2026 Zeo Thinking Labs. Paradigm Corporate Ledger Control Plane.</p>
-    </footer>
+    <!-- Modal CRM Add Lead -->
+    <div class="modal" id="crm-modal" onclick="closeCRMModalOnBackdrop(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="font-size: 1.1rem; font-weight: 800;">Register New Account Lead</h2>
+                <button class="modal-close" onclick="closeCRMModal()">✕</button>
+            </div>
+            <form id="crm-lead-form" onsubmit="event.preventDefault(); submitCRMForm();">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="crm-name">Client Name<span class="required-star">*</span></label>
+                        <input type="text" id="crm-name" class="form-control" placeholder="Acme Corp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="crm-contact">Contact Person<span class="required-star">*</span></label>
+                        <input type="text" id="crm-contact" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="crm-industry">Industry<span class="required-star">*</span></label>
+                        <select id="crm-industry" class="form-control" required>
+                            <option value="SaaS / Software">SaaS / Software</option>
+                            <option value="Finance & Banking">Finance & Banking</option>
+                            <option value="Aerospace / Logistics">Aerospace / Logistics</option>
+                            <option value="Medical Technology">Medical Technology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="crm-stage">Stage</label>
+                        <select id="crm-stage" class="form-control">
+                            <option value="Lead Qualification">Lead Qualification</option>
+                            <option value="Active Proposal">Active Proposal</option>
+                            <option value="Contract Negotiation">Contract Negotiation</option>
+                            <option value="Closed-Won">Closed-Won</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="crm-value">Contract Value ($)<span class="required-star">*</span></label>
+                        <input type="number" id="crm-value" class="form-control" placeholder="50000" min="0" required>
+                    </div>
+                    <div class="form-actions" style="grid-column: 1/-1; display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
+                        <button type="button" class="btn-action btn-secondary" onclick="closeCRMModal()">Cancel</button>
+                        <button type="submit" class="btn-action">Save Lead</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- Modal Payroll Add Employee -->
+    <div class="modal" id="payroll-modal" onclick="closePayrollModalOnBackdrop(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="font-size: 1.1rem; font-weight: 800;">Add Corporate Employee</h2>
+                <button class="modal-close" onclick="closePayrollModal()">✕</button>
+            </div>
+            <form id="payroll-employee-form" onsubmit="event.preventDefault(); submitPayrollForm();">
+                <div class="form-grid">
+                    <div class="form-banner-error" id="payroll-form-error"></div>
+
+                    <!-- Personal -->
+                    <div class="form-section-title">Personal Details</div>
+                    <div class="form-group">
+                        <label for="emp-name">Full Name<span class="required-star">*</span></label>
+                        <input type="text" id="emp-name" class="form-control" placeholder="Rahul Sharma" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-age">Age<span class="required-star">*</span></label>
+                        <input type="number" id="emp-age" class="form-control" placeholder="30" min="18" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-gender">Gender<span class="required-star">*</span></label>
+                        <select id="emp-gender" class="form-control" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-dob">Date of Birth</label>
+                        <input type="date" id="emp-dob" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-marital">Marital Status</label>
+                        <select id="emp-marital" class="form-control" onchange="toggleSpouseField()">
+                            <option value="Unmarried">Unmarried</option>
+                            <option value="Married">Married</option>
+                        </select>
+                    </div>
+                    <!-- Spouse Name (Conditional) -->
+                    <div class="form-group conditional-field" id="spouse-field-wrapper">
+                        <label for="emp-spouse">Spouse Name<span class="required-star">*</span></label>
+                        <input type="text" id="emp-spouse" class="form-control" placeholder="Spouse Full Name">
+                    </div>
+
+                    <!-- Gov Details -->
+                    <div class="form-section-title">Identity Parameters</div>
+                    <div class="form-group">
+                        <label for="emp-pan">PAN Number<span class="required-star">*</span></label>
+                        <input type="text" id="emp-pan" class="form-control" placeholder="ABCDE1234F" style="text-transform: uppercase;" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-aadhar">Aadhar Number (12 Digits)<span class="required-star">*</span></label>
+                        <input type="text" id="emp-aadhar" class="form-control" placeholder="123456789012" required>
+                    </div>
+
+                    <!-- Employment -->
+                    <div class="form-section-title">Employment Profile</div>
+                    <div class="form-group">
+                        <label for="emp-status">Status</label>
+                        <select id="emp-status" class="form-control" onchange="toggleExitDateField()">
+                            <option value="Active">Active</option>
+                            <option value="Terminated">Terminated</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-doj">Date of Joining<span class="required-star">*</span></label>
+                        <input type="date" id="emp-doj" class="form-control" required>
+                    </div>
+                    <!-- Date of Exit (Conditional) -->
+                    <div class="form-group conditional-field" id="exit-date-field-wrapper">
+                        <label for="emp-doe">Date of Exit<span class="required-star">*</span></label>
+                        <input type="date" id="emp-doe" class="form-control">
+                    </div>
+
+                    <!-- Finance -->
+                    <div class="form-section-title">Financial Profile</div>
+                    <div class="form-group">
+                        <label for="emp-bank">Bank Account</label>
+                        <input type="text" id="emp-bank" class="form-control" placeholder="Account Number">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-ifsc">IFSC (Optional)</label>
+                        <input type="text" id="emp-ifsc" class="form-control" placeholder="SBIN0001234" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-pf">PF Status</label>
+                        <select id="emp-pf" class="form-control" onchange="toggleUanField()">
+                            <option value="Not Applicable">Not Applicable</option>
+                            <option value="Applicable">Applicable</option>
+                        </select>
+                    </div>
+                    <!-- UAN Number (Conditional) -->
+                    <div class="form-group conditional-field" id="uan-field-wrapper">
+                        <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
+                        <input type="text" id="emp-uan" class="form-control" placeholder="100998877665">
+                    </div>
+
+                    <!-- Submission -->
+                    <div class="form-actions" style="grid-column: 1/-1; display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
+                        <button type="button" class="btn-action btn-secondary" onclick="closePayrollModal()">Cancel</button>
+                        <button type="submit" class="btn-action">Save Employee</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Module Logic -->
     <script>
-        function logAudit(text, type = '') {
-            console.log(`[AUDIT] ${text}`);
+        let currentView = 'welcome';
+        let currentPayrollTab = 'employees';
+        let allEmployees = [];
+        
+        // Settings rates store
+        let pfRateConfig = 12.0;
+        let tdsRateConfig = 15.0;
+
+        let mockCRMLeads = [
+            { id: 1, name: 'Solis Energy Partners', stage: 'Active Proposal', value: 85000 },
+            { id: 2, name: 'Hexagon Global Systems', stage: 'Closed-Won', value: 110000 },
+            { id: 3, name: 'Apex Medicom', stage: 'Contract Negotiation', value: 45000 }
+        ];
+
+        // Backend connectivity base URL config
+        const origin = window.location.origin;
+        const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
         }
 
-        // Available packages mapping
-        let purchasedModules = []; // Dynamically loaded
-        let activeSuite = 'crm';
-
-        // Sidebar Navigation Toggles
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar-nav');
-            const overlay = document.getElementById('sidebar-overlay');
-            const btn = document.getElementById('sidebar-toggle-btn');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            if (btn) btn.classList.toggle('active');
+        function getCSRFToken() {
+            return getCookie('XSRF-TOKEN') || getCookie('xsrf-token');
         }
 
-        // Custom details and workspaces
-        const workspaces = {
-            crm: {
-                title: "Custom CRM Suite Workspace",
-                sub: "Deal pipelines and customer sales indicators.",
-                render: () => `
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
-                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Record Client Deal Conversion</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="crm-email">Client Corporate Email</label>
-                                <input type="email" id="crm-email" placeholder="client@company.com" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="crm-amount">Deal Value ($ USD)</label>
-                                <input type="number" id="crm-amount" placeholder="25000" class="form-input">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="crm-stage">Sales Stage</label>
-                            <select id="crm-stage" class="form-select">
-                                <option value="LEAD">Incoming Lead Ingress</option>
-                                <option value="PROPOSAL">Proposal Review</option>
-                                <option value="WON">Deal Won (Convert Account)</option>
-                            </select>
-                        </div>
-                        <div style="margin-top: 0.5rem;">
-                            <button onclick="submitCRMDeal()" class="action-btn">Submit Deal Entry</button>
-                        </div>
-                    </div>
-                `
-            },
-            hr: {
-                title: "Custom HR Suite Workspace",
-                sub: "Rosters and timecard verification gateway.",
-                render: () => `
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
-                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Log Timesheet Shift Entry</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="hr-employee">Employee Account ID</label>
-                                <input type="text" id="hr-employee" placeholder="EMP-4982" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="hr-hours">Total Weekly Worked Hours</label>
-                                <input type="number" id="hr-hours" placeholder="40" class="form-input">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="hr-week">Week Commencing Date</label>
-                            <input type="date" id="hr-week" class="form-input">
-                        </div>
-                        <div style="margin-top: 0.5rem;">
-                            <button onclick="submitHRShift()" class="action-btn">Verify & Submit Timesheet</button>
-                        </div>
-                    </div>
-                `
-            },
-            ops: {
-                title: "Custom OPS Suite Workspace",
-                sub: "Logistics control and vehicle fleet trackers.",
-                render: () => `
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
-                        <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Dispatch Fleet Coordinates</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="ops-vehicle">Vehicle Dispatch ID</label>
-                                <input type="text" id="ops-vehicle" placeholder="FLEET-CARGO-08" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="ops-stock">Cargo Unit Load Qty</label>
-                                <input type="number" id="ops-stock" placeholder="450" class="form-input">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="ops-lat">Latitude Coordinate</label>
-                                <input type="number" step="0.00001" id="ops-lat" placeholder="45.1098" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="ops-lng">Longitude Coordinate</label>
-                                <input type="number" step="0.00001" id="ops-lng" placeholder="-122.3892" class="form-input">
-                            </div>
-                        </div>
-                        <div style="margin-top: 0.5rem;">
-                            <button onclick="submitOPSFleet()" class="action-btn">Update Fleet Geolocation</button>
-                        </div>
-                    </div>
-                `
-            },
-            payroll: {
-                title: "Custom Payroll Suite Workspace",
-                sub: "Double-entry general ledgers and paycheck tax calculators.",
-                render: () => `
-                    <div style="display: flex; flex-direction: column; gap: 2rem; text-align: left;">
-                        
-                        <!-- 1. Interactive Paycheck / Tax Deductions Calculator -->
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem;">
-                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 1rem;">Paycheck & Tax Withholding Calculator</h4>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="pay-rate">Hourly Billing Rate ($ / hour)</label>
-                                    <input type="number" id="pay-rate" value="45" class="form-input">
-                                </div>
-                                <div class="form-group">
-                                    <label for="pay-hours">Shift Hours Worked</label>
-                                    <input type="number" id="pay-hours" value="80" class="form-input">
-                                </div>
-                            </div>
-                            <button onclick="executePayrollCalculator()" class="action-btn" style="margin-top: 1rem;">
-                                Calculate Paycheck & Withholdings
-                            </button>
-                            
-                            <!-- Printed Voucher Receipt -->
-                            <div class="voucher-receipt" id="paycheck-voucher" style="margin-top: 1.5rem;">
-                                <!-- Voucher items appended dynamically -->
-                            </div>
-                        </div>
- 
-                        <!-- 2. Interactive General Ledger Invariant Balancer -->
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem;">
-                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 1rem;">General Ledger Invariant Verification</h4>
-                            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem; margin-top: -0.5rem;">
-                                Verify transaction balance safety constraint: Sum(Debits) must equal Sum(Credits).
-                            </p>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="ledger-debits">Total Account Debits ($)</label>
-                                    <input type="number" id="ledger-debits" value="12500" class="form-input">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ledger-credits">Total Account Credits ($)</label>
-                                    <input type="number" id="ledger-credits" value="12500" class="form-input">
-                                </div>
-                            </div>
-                            <button onclick="verifyGeneralLedger()" class="action-btn" style="margin-top: 1rem;">
-                                Audit Ledger Balance
-                            </button>
-                        </div>
- 
-                        <!-- 3. Employee Management Link -->
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                            <div>
-                                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--accent-silver); margin-bottom: 0.5rem;">Corporate Employee Roster</h4>
-                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
-                                    Add, update, and manage employee profiles, marital records, and payroll financial metadata.
-                                </p>
-                            </div>
-                            <button onclick="window.location.href = 'employees.html'" class="action-btn" style="padding: 0.65rem 1.5rem; font-size: 0.82rem;">
-                                Open Employee Management Hub →
-                            </button>
-                        </div>
-                    </div>
-                `
+        // Drawer Controls
+        function toggleDrawer(isOpen) {
+            const drawer = document.getElementById('sidebar-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+            if (isOpen) {
+                drawer.classList.add('active');
+                backdrop.classList.add('active');
+            } else {
+                drawer.classList.remove('active');
+                backdrop.classList.remove('active');
             }
-        };
-
-        function selectSuite(suiteKey) {
-            activeSuite = suiteKey;
-            
-            // Switch card active styling
-            document.querySelectorAll('.suite-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            const card = document.getElementById(`card-${suiteKey}`);
-            if (card) card.classList.add('active');
-
-            // Switch active dots
-            const dots = {
-                crm: { id: 'dot-crm', color: '#ffffff' },
-                hr: { id: 'dot-hr', color: '#ffffff' },
-                ops: { id: 'dot-ops', color: '#ffffff' },
-                payroll: { id: 'dot-payroll', color: '#ffffff' }
-            };
-            for (const key in dots) {
-                const el = document.getElementById(dots[key].id);
-                if (el) {
-                    if (key === suiteKey && purchasedModules.includes(suiteKey)) {
-                        el.style.background = dots[key].color;
-                        el.style.boxShadow = `0 0 8px ${dots[key].color}`;
-                    } else {
-                        el.style.background = 'transparent';
-                        el.style.boxShadow = 'none';
-                    }
-                }
-            }
-
-            // Automatically close sidebar nav if it's active
-            const sidebar = document.getElementById('sidebar-nav');
-            const overlay = document.getElementById('sidebar-overlay');
-            const btn = document.getElementById('sidebar-toggle-btn');
-            if (sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                if (btn) btn.classList.remove('active');
-            }
-
-            // Render right column workspace console
-            const consoleBox = document.getElementById('workspace-console');
-            
-            // If the user has NOT purchased this module, render locked overlay
-            if (!purchasedModules.includes(suiteKey)) {
-                consoleBox.innerHTML = `
-                    <div class="panel-title-group">
-                        <h2 class="panel-heading" style="text-transform: uppercase;">${suiteKey} Workspace Locked</h2>
-                        <p class="panel-sub">Access requires a licensed active billing cycle.</p>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; border: 1px dashed rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-palladium)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px var(--accent-palladium));"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff;">Suite Upgrade Required</h3>
-                        <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 320px; text-align: center; line-height: 1.5;">
-                            The custom ${suiteKey.toUpperCase()} suite is not linked to your corporate account. Please contact your company's ZTL Super Admin to generate licenses.
-                        </p>
-                        <button onclick="requestUpgrade('${suiteKey}')" class="action-btn" style="background: rgba(255,255,255,0.03); border: 1px solid var(--surface-border); color: #ffffff; font-size: 0.8rem; margin-top: 0.5rem; text-shadow: none; box-shadow: none;">
-                            Request Module License
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            // If purchased, render interactive console
-            const wspace = workspaces[suiteKey];
-            consoleBox.innerHTML = `
-                <div class="panel-title-group">
-                    <h2 class="panel-heading">${wspace.title}</h2>
-                    <p class="panel-sub">${wspace.sub}</p>
-                </div>
-                <div style="flex: 1;">
-                    ${wspace.render()}
-                </div>
-            `;
-            logAudit(`[WORKSPACE] Loaded active suite: ${suiteKey.toUpperCase()}`, 'terminal-info');
         }
 
-        // Active operations triggers
-        function requestUpgrade(suiteKey) {
-            logAudit(`[REQUEST] Contacting root controller nodes to license custom suite: ${suiteKey.toUpperCase()}`, 'terminal-warn');
-            alert(`[LICENSE REQUEST SENT]\n\nA license request for the Custom ${suiteKey.toUpperCase()} Suite has been forwarded to the Super Admin.`);
+        function toggleTerminateBtn() {
+            const btn = document.getElementById('terminate-btn');
+            if (btn) {
+                btn.classList.toggle('visible');
+            }
         }
 
-        function submitCRMDeal() {
-            const email = document.getElementById('crm-email').value.trim();
-            const amount = document.getElementById('crm-amount').value;
-            const stage = document.getElementById('crm-stage').value;
-
-            if (!email || !amount) {
-                alert('All CRM fields are required.');
-                return;
+        async function handleLogout() {
+            try {
+                await fetch(`${apiBase}/api/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'x-csrf-token': getCSRFToken() }
+                });
+                window.location.href = 'login.html';
+            } catch (err) {
+                window.location.href = 'login.html';
             }
-
-            logAudit(`[CRM TRANSACTION] Dispatching deal ingress pipeline...`, 'terminal-info');
-            setTimeout(() => {
-                logAudit(`[SUCCESS] Deal entry logged for client: ${email} | Value: $${Number(amount).toLocaleString()} | Stage: ${stage}`, 'terminal-success');
-                document.getElementById('crm-email').value = '';
-                document.getElementById('crm-amount').value = '';
-            }, 500);
         }
 
-        function submitHRShift() {
-            const emp = document.getElementById('hr-employee').value.trim();
-            const hours = document.getElementById('hr-hours').value;
-            const week = document.getElementById('hr-week').value;
+        // View Toggling
+        function switchView(viewId) {
+            currentView = viewId;
+            document.querySelectorAll('.drawer-item').forEach(item => item.classList.remove('active'));
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) activeNav.classList.add('active');
 
-            if (!emp || !hours || !week) {
-                alert('All timesheet fields are required.');
-                return;
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            const activePanel = document.getElementById(`view-${viewId}`);
+            if (activePanel) activePanel.classList.add('active');
+
+            if (viewId === 'payroll') {
+                switchPayrollTab('employees');
+            } else if (viewId === 'crm') {
+                renderCRMTable();
             }
-
-            const parsedHours = Number(hours);
-            if (parsedHours <= 0 || parsedHours > 80) {
-                logAudit(`[REJECTED] Timesheet validation failed. Hours: ${hours} exceeds roster limit boundary (0 - 80 hours).`, 'terminal-error');
-                alert('Hours worked must be between 1 and 80.');
-                return;
-            }
-
-            logAudit(`[HR ROSTER] Auditing shift timecard details for ${emp}...`, 'terminal-info');
-            setTimeout(() => {
-                logAudit(`[SUCCESS] Timesheet shift accepted for week starting ${week}: Employee ${emp} logged ${parsedHours} billing hours.`, 'terminal-success');
-                document.getElementById('hr-employee').value = '';
-                document.getElementById('hr-hours').value = '';
-                document.getElementById('hr-week').value = '';
-            }, 600);
+            toggleDrawer(false);
         }
 
-        function submitOPSFleet() {
-            const vehicle = document.getElementById('ops-vehicle').value.trim();
-            const stock = document.getElementById('ops-stock').value;
-            const lat = document.getElementById('ops-lat').value;
-            const lng = document.getElementById('ops-lng').value;
-
-            if (!vehicle || !stock || !lat || !lng) {
-                alert('All dispatch coordinates are required.');
-                return;
-            }
-
-            logAudit(`[LOGISTICS] Connecting vehicle telemetry sync ring...`, 'terminal-info');
-            setTimeout(() => {
-                logAudit(`[SUCCESS] Fleet GPS coordinates updated vehicle ${vehicle} -> LAT: ${lat}, LNG: ${lng} | Cargo: ${stock} Units`, 'terminal-success');
-                document.getElementById('ops-vehicle').value = '';
-                document.getElementById('ops-stock').value = '';
-                document.getElementById('ops-lat').value = '';
-                document.getElementById('ops-lng').value = '';
-            }, 500);
-        }
-
-        function executePayrollCalculator() {
-            const rate = Number(document.getElementById('pay-rate').value);
-            const hours = Number(document.getElementById('pay-hours').value);
-
-            if (!rate || !hours || rate <= 0 || hours <= 0) {
-                alert('Please enter positive billing rate and hours worked.');
-                return;
-            }
-
-            logAudit(`[PAYROLL] Executing paycheck calculations & statutory deductions...`, 'terminal-info');
-            
-            setTimeout(() => {
-                const gross = rate * hours;
-                const fica = gross * 0.0765;      // 7.65% FICA
-                const fedTax = gross * 0.12;      // 12% Fed tax
-                const stateTax = gross * 0.04;    // 4% State tax
-                const net = gross - (fica + fedTax + stateTax);
-
-                const voucher = document.getElementById('paycheck-voucher');
-                voucher.style.display = 'block';
-                voucher.innerHTML = `
-                    <div style="text-align: center; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">PARADIGM PAYSLIP RECEIPT</div>
-                    <div class="receipt-row"><span>DATE / TIMESTAMP</span><span>${new Date().toLocaleDateString()}</span></div>
-                    <div class="receipt-row"><span>HOURS WORKED</span><span>${hours} hrs</span></div>
-                    <div class="receipt-row"><span>BILLING RATE</span><span>$${rate.toFixed(2)}/hr</span></div>
-                    <div class="receipt-line"></div>
-                    <div class="receipt-row" style="color: #ffffff; font-weight: bold;"><span>GROSS PAYCHECK</span><span>$${gross.toFixed(2)}</span></div>
-                    <div class="receipt-row"><span>FICA TAX WITHHELD</span><span>-$${fica.toFixed(2)}</span></div>
-                    <div class="receipt-row"><span>FEDERAL INCOME TAX</span><span>-$${fedTax.toFixed(2)}</span></div>
-                    <div class="receipt-row"><span>STATE INCOME TAX</span><span>-$${stateTax.toFixed(2)}</span></div>
-                    <div class="receipt-line"></div>
-                    <div class="receipt-row" style="color: #ffffff; font-weight: 800; font-size: 0.9rem;"><span>NET TAKE-HOME PAY</span><span>$${net.toFixed(2)}</span></div>
-                `;
-
-                logAudit(`[SUCCESS] Paycheck compiled: Gross $${gross.toFixed(2)} | Withholdings $${(fica + fedTax + stateTax).toFixed(2)} | Net $${net.toFixed(2)}`, 'terminal-success');
-            }, 600);
-        }
-
-        function verifyGeneralLedger() {
-            const debits = Number(document.getElementById('ledger-debits').value);
-            const credits = Number(document.getElementById('ledger-credits').value);
-
-            if (isNaN(debits) || isNaN(credits) || debits <= 0 || credits <= 0) {
-                alert('Please enter valid numeric debits and credits.');
-                return;
-            }
-
-            logAudit(`[LEDGER AUDIT] Reviewing double-entry bookkeeping constraints...`, 'terminal-info');
-
-            setTimeout(() => {
-                const diff = Math.abs(debits - credits);
-                if (diff < 0.0001) {
-                    logAudit(`[SUCCESS] General ledger is balanced (Invariant verified: Sum(Debits) == Sum(Credits) = $${debits.toLocaleString()})`, 'terminal-success');
-                    alert(`[AUDIT SUCCESS]\n\nGeneral Ledger is completely balanced.\nSum(Debits) == Sum(Credits)`);
-                } else {
-                    logAudit(`[ERROR] Ledger Invariant Violation! Debits: $${debits.toLocaleString()} | Credits: $${credits.toLocaleString()} | Balance Discrepancy: $${diff.toLocaleString()}`, 'terminal-error');
-                    alert(`[LEDGER INVARIANT VIOLATION]\n\nUnbalanced entry detected! Discrepancy of $${diff.toLocaleString()}.\nTransaction cannot be processed.`);
-                }
-            }, 550);
-        }
-
+        // Welcome screen animation
         async function loadUserData() {
             try {
-                const origin = window.location.origin;
-                const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
                 const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
                 if (res.ok) {
                     const payload = await res.json();
                     if (payload.success && payload.data && payload.data.user) {
                         const user = payload.data.user;
-                        const email = user.email || '';
-                        const username = email.split('@')[0];
-                        const userNameCapitalized = username.charAt(0).toUpperCase() + username.slice(1);
                         
-                        purchasedModules = user.purchased_modules || [];
-                        if (user.role === 'super_admin' || user.role === 'super-admin' || user.role === 'admin' || user.email === 'admin@local.dev') {
-                            purchasedModules = ['crm', 'hr', 'ops', 'payroll'];
-                        }
-                        
-                        document.getElementById('welcome-message').innerHTML = `Hi, ${userNameCapitalized}. Welcome to PARADIGM.`;
-                        document.getElementById('welcome-subtext').innerText = `Enterprise executive workspace. Session: ${user.role.toUpperCase()} (ID: ${user.id})`;
+                        const textEl = document.getElementById('welcome-text');
+                        textEl.textContent = `Hi ${user.id}`;
+                        textEl.classList.add('reveal-luxurious');
 
-                        // Mark active cards style and overlay locks
-                        const suites = ['crm', 'hr', 'ops', 'payroll'];
-                        suites.forEach(suite => {
-                            const card = document.getElementById(`card-${suite}`);
-                            if (card && !purchasedModules.includes(suite)) {
-                                card.classList.add('locked');
-                                
-                                // Insert locked overlay inside the card
-                                const overlay = document.createElement('div');
-                                overlay.className = 'locked-overlay';
-                                overlay.innerHTML = `
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                    <span style="font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px;">UNLICENSED</span>
-                                `;
-                                card.appendChild(overlay);
+                        setTimeout(() => {
+                            const header = document.querySelector('.top-header');
+                            if (header) header.classList.add('visible');
+                        }, 1200);
+
+                        setTimeout(() => {
+                            textEl.classList.remove('reveal-luxurious');
+                            textEl.classList.add('fade-out');
+                        }, 2000);
+
+                        setTimeout(() => {
+                            const logoText = document.getElementById('logo-text-val');
+                            if (logoText) {
+                                logoText.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                                logoText.style.opacity = '0';
+                                setTimeout(() => {
+                                    logoText.innerHTML = `<span class="logo-separator">|</span> ${user.id}`;
+                                    logoText.style.opacity = '1';
+                                }, 800);
                             }
-                        });
-
-                        // Select the first unlocked suite as default, or fallback to CRM
-                        const defaultSuite = suites.find(suite => purchasedModules.includes(suite)) || 'crm';
-                        selectSuite(defaultSuite);
+                        }, 2300);
+                    } else {
+                        window.location.href = 'login.html';
                     }
+                } else {
+                    window.location.href = 'login.html';
                 }
             } catch (err) {
-                console.error("Failed to load user info", err);
-                logAudit(`[ERROR] Executive session verification failed. Verify backend connectivity.`, 'terminal-error');
+                window.location.href = 'login.html';
             }
         }
 
-        // Initialize loading sequence
+
+        /* ------------------ CRM CONTROLLER ------------------ */
+        function renderCRMTable() {
+            const tbody = document.getElementById('crm-table-body');
+            tbody.innerHTML = '';
+            let totalVal = 0;
+
+            if (mockCRMLeads.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-secondary);">No leads found.</td></tr>`;
+                document.getElementById('crm-total-pipeline').textContent = '$0';
+                document.getElementById('crm-active-leads').textContent = '0';
+                return;
+            }
+
+            mockCRMLeads.forEach(lead => {
+                totalVal += Number(lead.value);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${lead.name}</strong></td>
+                    <td><span class="employee-badge" style="background:rgba(255,255,255,0.02); color:#fff;">${lead.stage}</span></td>
+                    <td style="font-family: monospace;">$${Number(lead.value).toLocaleString()}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-delete" onclick="deleteCRMLead(${lead.id})">Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('crm-total-pipeline').textContent = `$${totalVal.toLocaleString()}`;
+            document.getElementById('crm-active-leads').textContent = mockCRMLeads.length;
+        }
+
+        function filterCRMLeads() {
+            const q = document.getElementById('crm-search-box').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#crm-table-body tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function openCRMModal() {
+            document.getElementById('crm-lead-form').reset();
+            document.getElementById('crm-modal').classList.add('active');
+        }
+
+        function closeCRMModal() {
+            document.getElementById('crm-modal').classList.remove('active');
+        }
+
+        function closeCRMModalOnBackdrop(e) {
+            if (e.target.id === 'crm-modal') closeCRMModal();
+        }
+
+        function submitCRMForm() {
+            const name = document.getElementById('crm-name').value.trim();
+            const stage = document.getElementById('crm-stage').value;
+            const value = document.getElementById('crm-value').value;
+
+            const newId = mockCRMLeads.length > 0 ? Math.max(...mockCRMLeads.map(l => l.id)) + 1 : 1;
+            mockCRMLeads.unshift({ id: newId, name, stage, value: Number(value) });
+            closeCRMModal();
+            renderCRMTable();
+        }
+
+        function deleteCRMLead(id) {
+            if (confirm("Subtract lead entry from database?")) {
+                mockCRMLeads = mockCRMLeads.filter(l => l.id !== id);
+                renderCRMTable();
+            }
+        }
+
+
+        /* ------------------ OPERATIONS CONTROLLER ------------------ */
+        function triggerOpsDispatch() {
+            const carrier = document.getElementById('ops-carrier').value;
+            const dest = document.getElementById('ops-destination').value;
+            const weight = document.getElementById('ops-payload').value;
+            const statusBox = document.getElementById('ops-status-box');
+
+            statusBox.style.color = '#ffaa00';
+            statusBox.textContent = `[ROUTING] Dispatched ${carrier} targeting ${dest} | Cargo: ${weight} kg. Launching node telemetry connection...`;
+
+            setTimeout(() => {
+                statusBox.style.color = '#00ff66';
+                statusBox.textContent = `[SUCCESS] ${carrier} verified at target destination. Telemetry stream synchronized.`;
+            }, 1500);
+        }
+
+
+        /* ------------------ PAYROLL MODULE CONTROLLER ------------------ */
+        // Sub-tab toggling
+        function switchPayrollTab(tabId) {
+            currentPayrollTab = tabId;
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-tab-${tabId}`).classList.add('active');
+
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(`payroll-tab-${tabId}`).classList.add('active');
+
+            if (tabId === 'employees') {
+                fetchRoster();
+            } else if (tabId === 'rates') {
+                // Populate forms with loaded rates
+                document.getElementById('rate-pf').value = pfRateConfig;
+                document.getElementById('rate-tds').value = tdsRateConfig;
+            } else if (tabId === 'ctc') {
+                populateEmployeeDropdown();
+                runCTCCalculations();
+            }
+        }
+
+        // Conditional forms toggles
+        function toggleSpouseField() {
+            const marital = document.getElementById('emp-marital').value;
+            const wrapper = document.getElementById('spouse-field-wrapper');
+            const input = document.getElementById('emp-spouse');
+            if (marital === 'Married') {
+                wrapper.classList.add('visible');
+                input.required = true;
+            } else {
+                wrapper.classList.remove('visible');
+                input.required = false;
+                input.value = '';
+            }
+        }
+
+        function toggleExitDateField() {
+            const status = document.getElementById('emp-status').value;
+            const wrapper = document.getElementById('exit-date-field-wrapper');
+            const input = document.getElementById('emp-doe');
+            if (status === 'Terminated') {
+                wrapper.classList.add('visible');
+                input.required = true;
+            } else {
+                wrapper.classList.remove('visible');
+                input.required = false;
+                input.value = '';
+            }
+        }
+
+        function toggleUanField() {
+            const pf = document.getElementById('emp-pf').value;
+            const wrapper = document.getElementById('uan-field-wrapper');
+            const input = document.getElementById('emp-uan');
+            if (pf === 'Applicable') {
+                wrapper.classList.add('visible');
+                input.required = true;
+            } else {
+                wrapper.classList.remove('visible');
+                input.required = false;
+                input.value = '';
+            }
+        }
+
+        function openPayrollModal() {
+            document.getElementById('payroll-employee-form').reset();
+            toggleSpouseField();
+            toggleExitDateField();
+            toggleUanField();
+            document.getElementById('payroll-form-error').style.display = 'none';
+            document.getElementById('payroll-modal').classList.add('active');
+        }
+
+        function closePayrollModal() {
+            document.getElementById('payroll-modal').classList.remove('active');
+        }
+
+        function closePayrollModalOnBackdrop(e) {
+            if (e.target.id === 'payroll-modal') closePayrollModal();
+        }
+
+        // Save rates settings
+        function savePayrollRates() {
+            pfRateConfig = parseFloat(document.getElementById('rate-pf').value) || 12.0;
+            tdsRateConfig = parseFloat(document.getElementById('rate-tds').value) || 15.0;
+            alert("Statutory rates updated successfully.");
+        }
+
+        // Populate employees inside CTC dropdown
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('ctc-employee-select');
+            select.innerHTML = '<option value="">-- Choose Employee --</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = `${emp.name} (${emp.status})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // CTC calculations
+        function runCTCCalculations() {
+            const empId = document.getElementById('ctc-employee-select').value;
+            const grossVal = parseFloat(document.getElementById('ctc-monthly-salary').value) || 0;
+            const resultBox = document.getElementById('ctc-result-box');
+
+            if (!empId || grossVal <= 0) {
+                resultBox.style.display = 'none';
+                return;
+            }
+
+            // Calculations parameters
+            const pfRate = pfRateConfig / 100;
+            const tdsRate = tdsRateConfig / 100;
+
+            const monthlyPfDeduction = grossVal * pfRate;
+            const monthlyTdsDeduction = grossVal * tdsRate;
+            const totalDeductions = monthlyPfDeduction + monthlyTdsDeduction;
+
+            const netMonthlySalary = grossVal - totalDeductions;
+            const employerPfContribution = grossVal * pfRate;
+            const monthlyCTC = grossVal + employerPfContribution;
+            const annualCTC = monthlyCTC * 12;
+
+            // Output targets
+            document.getElementById('ctc-net-pay').textContent = `$${netMonthlySalary.toFixed(2)}`;
+            document.getElementById('ctc-annual-ctc').textContent = `$${annualCTC.toFixed(2)}`;
+            document.getElementById('ctc-monthly-pf').textContent = `$${monthlyPfDeduction.toFixed(2)}`;
+            
+            resultBox.style.display = 'block';
+        }
+
+        // Fetch DB roster
+        async function fetchRoster() {
+            try {
+                const res = await fetch(`${apiBase}/api/admin/employees`, { credentials: 'include' });
+                if (res.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.success && payload.data && payload.data.employees) {
+                        allEmployees = payload.data.employees;
+                        renderPayrollTable(allEmployees);
+                    } else {
+                        showPayrollTableError("Failed to fetch database roster.");
+                    }
+                } else {
+                    showPayrollTableError("Server responded with error status.");
+                }
+            } catch (err) {
+                console.error(err);
+                showPayrollTableError("Error connecting to backend database server.");
+            }
+        }
+
+        function showPayrollTableError(msg) {
+            document.getElementById('payroll-table-body').innerHTML = `
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 2rem; color: #ff5470; font-weight: 600;">
+                        [!] ${msg}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Render ultra-minimalist employee list
+        function renderPayrollTable(employees) {
+            const tbody = document.getElementById('payroll-table-body');
+            tbody.innerHTML = '';
+
+            if (employees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            No corporate employees registered in system database.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            employees.forEach(emp => {
+                const tr = document.createElement('tr');
+                const statusClass = emp.status === 'Active' ? 'badge-active' : 'badge-terminated';
+                const statusBadge = `<span class="employee-badge ${statusClass}">${emp.status.toUpperCase()}</span>`;
+
+                tr.innerHTML = `
+                    <td><strong>${emp.name}</strong></td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-delete" onclick="deletePayrollEmployee(${emp.id}, '${emp.name}')">Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterPayrollRoster() {
+            const q = document.getElementById('payroll-search-box').value.toLowerCase().trim();
+            const filtered = allEmployees.filter(emp => emp.name.toLowerCase().includes(q));
+            renderPayrollTable(filtered);
+        }
+
+        // POST add employee record to DB
+        async function submitPayrollForm() {
+            const errorBanner = document.getElementById('payroll-form-error');
+            errorBanner.style.display = 'none';
+
+            const name = document.getElementById('emp-name').value.trim();
+            const ageStr = document.getElementById('emp-age').value;
+            const gender = document.getElementById('emp-gender').value;
+            const dob = document.getElementById('emp-dob').value;
+            const marital_status = document.getElementById('emp-marital').value;
+            const spouse_name = document.getElementById('emp-spouse').value.trim();
+            const pan = document.getElementById('emp-pan').value.trim();
+            const aadhar = document.getElementById('emp-aadhar').value.trim();
+            const status = document.getElementById('emp-status').value;
+            const date_of_joining = document.getElementById('emp-doj').value;
+            const date_of_exit = document.getElementById('emp-doe').value;
+            const bank_account_number = document.getElementById('emp-bank').value.trim();
+            const ifsc_code = document.getElementById('emp-ifsc').value.trim();
+            const pf_status = document.getElementById('emp-pf').value;
+            const uan_no = document.getElementById('emp-uan').value.trim();
+
+            const age = parseInt(ageStr, 10);
+            if (isNaN(age) || age < 18 || age > 100) {
+                errorBanner.textContent = "Employee age must be a valid number between 18 and 100.";
+                errorBanner.style.display = "block";
+                return;
+            }
+
+            if (pan.length < 5) {
+                errorBanner.textContent = "Please verify the PAN Details.";
+                errorBanner.style.display = "block";
+                return;
+            }
+
+            const aadharClean = aadhar.replace(/\s+/g, '');
+            if (!/^\d{12}$/.test(aadharClean)) {
+                errorBanner.textContent = "Aadhar Number must be exactly 12 numeric digits.";
+                errorBanner.style.display = "block";
+                return;
+            }
+
+            if (status === 'Terminated' && date_of_exit && date_of_joining) {
+                if (new Date(date_of_exit) < new Date(date_of_joining)) {
+                    errorBanner.textContent = "Date of exit cannot trigger prior to Date of Joining.";
+                    errorBanner.style.display = "block";
+                    return;
+                }
+            }
+
+            const reqBody = {
+                name,
+                age,
+                gender,
+                date_of_birth: dob || null,
+                marital_status,
+                spouse_name: marital_status === 'Married' ? spouse_name : null,
+                pan,
+                aadhar: aadharClean,
+                status,
+                date_of_joining,
+                date_of_exit: status === 'Terminated' ? date_of_exit : null,
+                bank_account_number: bank_account_number || null,
+                ifsc_code: ifsc_code || null,
+                pf_status,
+                uan_no: pf_status === 'Applicable' ? uan_no : null
+            };
+
+            try {
+                const response = await fetch(`${apiBase}/api/admin/employees`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': getCSRFToken()
+                    },
+                    body: JSON.stringify(reqBody)
+                });
+
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    closePayrollModal();
+                    fetchRoster();
+                } else {
+                    errorBanner.textContent = payload.error || "Database rejected employee fields.";
+                    errorBanner.style.display = "block";
+                }
+            } catch (err) {
+                console.error(err);
+                errorBanner.textContent = "Network error communicating with DB server.";
+                errorBanner.style.display = "block";
+            }
+        }
+
+        // DELETE remove employee record from DB
+        async function deletePayrollEmployee(id, name) {
+            if (!confirm(`Are you sure you want to permanently remove employee "${name}" from the database?`)) return;
+
+            try {
+                const response = await fetch(`${apiBase}/api/admin/employees/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'x-csrf-token': getCSRFToken()
+                    }
+                });
+                const payload = await response.json();
+                if (response.ok && payload.success) {
+                    fetchRoster();
+                } else {
+                    alert(payload.error || "Failed to delete employee database entry.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Connection failed trying to connect to server database.");
+            }
+        }
+
+        // Start validation on page load
         loadUserData();
     </script>
 </body>

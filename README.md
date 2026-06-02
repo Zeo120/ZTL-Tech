@@ -7,12 +7,12 @@ This repository contains the ZTL Tech web experience, a Node.js backend, and sev
 ZTL Tech is presented as a high-safety software systems company with several product areas:
 
 - `ztl_tech/` - main corporate website, login page, admin hub, and super-admin console.
-- `phasr/` - security audit platform, codebase analyzer UI, validator engines, and simulation tools.
+- `phasr/` - security audit platform, codebase analyzer UI, validator engines, simulation tools, TBAIS sentinel, and Pandemoniums-Halt deciders.
 - `grid/` - network architecture blueprinting and traffic simulation UI.
-- `paradigm/` - custom business software design simulator UI.
+- `paradigm/` - custom business software design simulator UI, plus Employee Payroll & Management Registry.
 - `scalpel/` - supervised automation and approval-gated workflow UI.
-- `backend/` - Express API server for authentication, admin operations, database setup, audits, and scanner execution.
-- `docs/` - architecture notes, PHASR phase requirements, and mathematical model documentation.
+- `backend/` - Express API server for authentication, admin operations, database setup, security audits, static code analysis scans, and employee records database management.
+- `docs/` - architecture notes, onboarding guides, PHASR phase requirements, and mathematical model documentation.
 
 ## Repository Layout
 
@@ -36,7 +36,7 @@ ZTL Tech is presented as a high-safety software systems company with several pro
 
 ## Backend
 
-The backend is a CommonJS Node.js application using Express. It serves API routes and also exposes the static frontend folders through whitelisted paths.
+The backend is a CommonJS Node.js application using Express. It serves API routes (supporting secure authentication, admin controls, security scanner runs, and employee record workflows) and exposes the static frontend folders through whitelisted paths.
 
 Important backend files:
 
@@ -44,12 +44,21 @@ Important backend files:
 - `backend/src/app.js` - Express app factory; configures middleware, static frontend routes, page redirects, API routes, and error handlers.
 - `backend/src/config/env.js` - validates environment configuration.
 - `backend/src/config/db.js` - manages SQL Server connections.
-- `backend/src/config/initDb.js` - creates required SQL tables when the server starts.
+- `backend/src/config/initDb.js` - creates required SQL tables (such as `Users`, `AuditLog`, `PhasrAudits`, `CodebaseScans`, and `Employees`) when the server starts.
 - `backend/src/config/redis.js` - manages Redis session storage.
 - `backend/src/routes/auth.routes.js` - login, logout, session, and CSRF-related endpoints.
-- `backend/src/routes/admin.routes.js` - admin workflows including PHASR scan operations and audit access.
+- `backend/src/routes/admin.routes.js` - admin workflows including PHASR scan operations, audit access, security alerts, and employee CRUD operations (`/api/admin/employees`).
 - `backend/src/routes/health.routes.js` - health check endpoint.
-- `backend/src/services/scanner.service.js` - codebase scanner that records scan metadata, dependencies, and findings.
+- `backend/src/services/` - backend application service layer:
+  - `audit.service.js` - records security audits and database events.
+  - `auth.service.js` - handles user login, password hashing, and session creation.
+  - `event.service.js` - manages the live node cluster event bus (SSE signals).
+  - `ownership.service.js` - validates tenant boundary checks and authorization.
+  - `queue.service.js` - queues static scanner jobs using V8 Worker Thread isolates.
+  - `scanner.service.js` - parses target codebases to extract dependencies and vulnerabilities.
+  - `session.service.js` - performs session token creation, rotation, and revocation.
+  - `tbais.service.js` - runs the Turing FSM anomaly detection logic.
+  - `user.service.js` - handles user lookups and operations.
 - `backend/src/middleware/` - authentication, CSRF, rate limiting, role checks, security headers, 404 handling, and centralized error handling.
 - `backend/src/utils/` - shared helpers for cookies, errors, logging, validation, and responses.
 
@@ -120,7 +129,9 @@ Each product section is currently a static HTML/CSS experience:
 - `admin.html` - operator console or dashboard.
 - `style.css` - section-specific styling.
 
-`ztl_tech/` also includes `super_admin.html` for privileged database and administrative controls.
+Additional views:
+- `ztl_tech/super_admin.html` - database/server admin dashboard.
+- `paradigm/employees.html` - Employee Payroll & Management Registry console (supports user profile CRUD, Aadhar/PAN entry, and PF configurations).
 
 ## PHASR Structure
 
@@ -131,6 +142,8 @@ Top-level PHASR files include:
 - `phasr/index.html` - PHASR landing page.
 - `phasr/login.html` - PHASR login page.
 - `phasr/admin.html` - PHASR admin dashboard.
+- `phasr/business.html` - enterprise landing page for business operations.
+- `phasr/try-nerds.html` - sandbox codebase analysis console.
 - `phasr/nerd-stats.html` - codebase analyzer UI with finding list and code pane.
 - `phasr/style.css` - PHASR styling.
 - `phasr/ztl_consent_agreement.txt` - consent text used by the scanner workflow.
@@ -151,6 +164,8 @@ PHASR validation and simulation modules:
 - `phasr/Satan-Recursion/` - curved spacetime wave solver with chunked generated routines.
 - `phasr/Primordial-Sin/` - primordial engine driver and assembly backends.
 - `phasr/Lucifers-Blessing/` - Lucifer engine driver and assembly backends.
+- `phasr/Pandemoniums-Halt/` - Turing halting state-transition validator and decider (contains native x86-64/ARM64 assemblies and the `turing_decider` executable).
+- `phasr/TBAIS/` - Turing-Based Anomaly Interception System (TBAIS) assembly engine.
 
 ## Building PHASR Modules
 
@@ -171,7 +186,7 @@ make
 ./phase_fsm
 ```
 
-The same pattern applies to `Nine-Circles` through `Legions-Consensus`, `Satan-Recursion`, `Primordial-Sin`, and `Lucifers-Blessing`, with each module producing its own executable.
+The same pattern applies to `Nine-Circles` through `Legions-Consensus`, `Satan-Recursion`, `Primordial-Sin`, `Lucifers-Blessing`, `Pandemoniums-Halt`, and `TBAIS`, with each module producing its own compiled executables/objects.
 
 Architecture support varies by module:
 
@@ -206,6 +221,7 @@ Useful documentation entry points:
 
 - `docs/architecture/ARCHITECTURE.md`
 - `docs/architecture/COMPUTE_BALANCER.md`
+- `docs/architecture/Intern_Onboarding.md` - comprehensive team onboarding guide (covers DFAs, FDTD wave physics, N-API, and system internals).
 - `docs/phasr/PHASR_CORE_CONTEXT.md`
 - `docs/phasr/Acherons-Gate.md`
 - `docs/phasr/Nine-Circles.md`
