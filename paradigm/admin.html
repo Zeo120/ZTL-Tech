@@ -1701,7 +1701,9 @@
                 renderCRMTable();
             }
             toggleDrawer(false);
-               async function loadUserData() {
+        }
+
+        async function loadUserData() {
             try {
                 const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
                 if (res.ok) {
