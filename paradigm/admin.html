@@ -913,6 +913,39 @@
             background: #ff5470;
             color: #ffffff;
         }
+
+        /* Custom Scrollbar Styles (Everywhere) */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Hide scrollbars inside entry cards/forms */
+        .panel-card,
+        .panel-card form,
+        .panel-card .form-grid,
+        #payroll-employee-form,
+        .modal-content {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .panel-card::-webkit-scrollbar,
+        .panel-card form::-webkit-scrollbar,
+        .panel-card .form-grid::-webkit-scrollbar,
+        #payroll-employee-form::-webkit-scrollbar,
+        .modal-content::-webkit-scrollbar {
+            display: none; /* Chrome/Safari/Opera */
+        }
     </style>
 </head>
 <body>
