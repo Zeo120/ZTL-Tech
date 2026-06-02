@@ -1192,50 +1192,55 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     return isNaN(parsed.getTime()) ? null : parsed;
   };
 
-  const insertResult = await pool.request()
-    .input('userId', sql.Int, userId)
-    .input('name', sql.NVarChar(255), name.trim())
-    .input('age', sql.Int, Number(age))
-    .input('status', sql.NVarChar(50), status || 'Active')
-    .input('gender', sql.NVarChar(50), gender.trim())
-    .input('pan', sql.NVarChar(50), pan.trim())
-    .input('maritalStatus', sql.NVarChar(50), marital_status || 'Unmarried')
-    .input('spouseName', sql.NVarChar(255), marital_status === 'Married' ? spouse_name.trim() : null)
-    .input('aadhar', sql.NVarChar(50), aadhar.trim())
-    .input('dateOfBirth', sql.Date, parseInputDate(date_of_birth))
-    .input('dateOfJoining', sql.Date, new Date(date_of_joining))
-    .input('dateOfExit', sql.Date, status === 'Terminated' ? parseInputDate(date_of_exit) : null)
-    .input('bankAccountNumber', sql.NVarChar(100), bank_account_number ? bank_account_number.trim() : null)
-    .input('ifscCode', sql.NVarChar(50), ifsc_code ? ifsc_code.trim() : null)
-    .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
-    .input('uanNo', sql.NVarChar(50), pf_status === 'Applicable' ? uan_no.trim() : null)
-    .input('baseSalary', sql.Decimal(18, 2), base_salary ? Number(base_salary) : 0)
-    .input('hra', sql.Decimal(18, 2), hra ? Number(hra) : 0)
-    .input('allowances', sql.Decimal(18, 2), allowances ? Number(allowances) : 0)
-    .input('deductions', sql.Decimal(18, 2), deductions ? Number(deductions) : 0)
-    .input('state', sql.NVarChar(100), state || 'Karnataka')
-    .input('professionalTax', sql.Decimal(18, 2), professional_tax ? Number(professional_tax) : 0)
-    .input('tds', sql.Decimal(18, 2), tds ? Number(tds) : 0)
-    .query(`
-      INSERT INTO dbo.Employees (
-        user_id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
-        date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
-        base_salary, hra, allowances, deductions, state, professional_tax, tds, created_at
-      )
-      OUTPUT INSERTED.id
-      VALUES (
-        @userId, @name, @age, @status, @gender, @pan, @maritalStatus, @spouseName, @aadhar,
-        @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo,
-        @baseSalary, @hra, @allowances, @deductions, @state, @professionalTax, @tds, SYSUTCDATETIME()
-      );
-    `);
+  try {
+    const insertResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .input('name', sql.NVarChar(255), name.trim())
+      .input('age', sql.Int, Number(age))
+      .input('status', sql.NVarChar(50), status || 'Active')
+      .input('gender', sql.NVarChar(50), gender.trim())
+      .input('pan', sql.NVarChar(50), pan.trim())
+      .input('maritalStatus', sql.NVarChar(50), marital_status || 'Unmarried')
+      .input('spouseName', sql.NVarChar(255), marital_status === 'Married' ? spouse_name.trim() : null)
+      .input('aadhar', sql.NVarChar(50), aadhar.trim())
+      .input('dateOfBirth', sql.Date, parseInputDate(date_of_birth))
+      .input('dateOfJoining', sql.Date, new Date(date_of_joining))
+      .input('dateOfExit', sql.Date, status === 'Terminated' ? parseInputDate(date_of_exit) : null)
+      .input('bankAccountNumber', sql.NVarChar(100), bank_account_number ? bank_account_number.trim() : null)
+      .input('ifscCode', sql.NVarChar(50), ifsc_code ? ifsc_code.trim() : null)
+      .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
+      .input('uanNo', sql.NVarChar(50), pf_status === 'Applicable' ? uan_no.trim() : null)
+      .input('baseSalary', sql.Decimal(18, 2), base_salary ? Number(base_salary) : 0)
+      .input('hra', sql.Decimal(18, 2), hra ? Number(hra) : 0)
+      .input('allowances', sql.Decimal(18, 2), allowances ? Number(allowances) : 0)
+      .input('deductions', sql.Decimal(18, 2), deductions ? Number(deductions) : 0)
+      .input('state', sql.NVarChar(100), state || 'Karnataka')
+      .input('professionalTax', sql.Decimal(18, 2), professional_tax ? Number(professional_tax) : 0)
+      .input('tds', sql.Decimal(18, 2), tds ? Number(tds) : 0)
+      .query(`
+        INSERT INTO dbo.Employees (
+          user_id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+          date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
+          base_salary, hra, allowances, deductions, state, professional_tax, tds, created_at
+        )
+        OUTPUT INSERTED.id
+        VALUES (
+          @userId, @name, @age, @status, @gender, @pan, @maritalStatus, @spouseName, @aadhar,
+          @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo,
+          @baseSalary, @hra, @allowances, @deductions, @state, @professionalTax, @tds, SYSUTCDATETIME()
+        );
+      `);
 
-  const newId = insertResult.recordset[0].id;
+    const newId = insertResult.recordset[0].id;
 
-  return ok(res, {
-    message: 'Employee record created successfully',
-    employeeId: newId
-  });
+    return ok(res, {
+      message: 'Employee record created successfully',
+      employeeId: newId
+    });
+  } catch (err) {
+    console.error('SQL INSERT ERROR:', err.message);
+    return res.status(400).json({ success: false, error: 'DB Error: ' + err.message });
+  }
 }));
 
 // PUT /api/admin/employees/:id/salary - Update salary details for an employee
