@@ -66,7 +66,6 @@ authRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
 }));
 
 const crypto = require('crypto');
-const env = require('../config/env');
 const { decryptPII } = require('../utils/cryptoVault');
 
 authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
