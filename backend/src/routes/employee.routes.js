@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const express = require('express');
-const { sql, getDbPool } = require('../config/db');
+const { sql, getParadigmDbPool } = require('../config/db');
 const { env } = require('../config/env');
 const { authenticateCookie } = require('../middleware/auth');
 const { requireCsrf } = require('../middleware/csrf');
@@ -27,7 +27,7 @@ employeeRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) throw httpError(400, 'Email and password required');
 
-  const pool = await getDbPool();
+  const pool = await getParadigmDbPool();
   const result = await pool.request()
     .input('email', sql.NVarChar(255), email)
     .query(`
@@ -82,7 +82,7 @@ const employeeAuth = [authenticateCookie, (req, res, next) => {
 }];
 
 employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+  const pool = await getParadigmDbPool();
   const result = await pool.request()
     .input('id', sql.Int, req.auth.userId)
     .query(`
@@ -128,7 +128,7 @@ employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async
     }
   }
 
-  const pool = await getDbPool();
+  const pool = await getParadigmDbPool();
   
   // Upsert attendance
   await pool.request()
@@ -152,7 +152,7 @@ employeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (re
   const { type, start_date, end_date, reason } = req.body;
   if (!type || !start_date || !end_date) throw httpError(400, 'Missing required fields');
 
-  const pool = await getDbPool();
+  const pool = await getParadigmDbPool();
   await pool.request()
     .input('empId', sql.Int, req.auth.userId)
     .input('type', sql.NVarChar(50), type)
@@ -168,7 +168,7 @@ employeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (re
 }));
 
 employeeRoutes.get('/payslips', employeeAuth, asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+  const pool = await getParadigmDbPool();
   const result = await pool.request()
     .input('empId', sql.Int, req.auth.userId)
     .query(`

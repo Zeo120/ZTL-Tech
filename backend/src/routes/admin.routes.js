@@ -13,7 +13,7 @@ const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
 const { writeAuditEvent } = require('../services/audit.service');
 const { rotateSession } = require('../services/session.service');
 const { signSessionToken } = require('../services/auth.service');
-const { sql, getDbPool } = require('../config/db');
+const { sql, getDbPool, getParadigmDbPool } = require('../config/db');
 const { tbaisEvents } = require('../services/event.service');
 const { encryptPII, decryptPII } = require('../utils/cryptoVault');
 
@@ -35,17 +35,19 @@ const superAdminLimiter = ipRateLimit({
 });
 
 adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const [userRes, empRes, leavesRes, expensesRes] = await Promise.all([
-    pool.request()
+    suitePool.request()
       .input('id', sql.Int, req.auth.userId)
       .query(`SELECT id, name, email, role, last_login_at, status FROM dbo.Users WHERE id = @id`),
-    pool.request()
+    suitePool.request()
       .query(`SELECT * FROM dbo.Employees ORDER BY name ASC`),
-    pool.request()
+    suitePool.request()
       .query(`SELECT L.*, E.name as employee_name FROM dbo.Leaves L JOIN dbo.Employees E ON L.employee_id = E.id ORDER BY L.created_at DESC`),
-    pool.request()
+    suitePool.request()
       .query(`SELECT EX.*, E.name as employee_name FROM dbo.Expenses EX JOIN dbo.Employees E ON EX.employee_id = E.id ORDER BY EX.created_at DESC`)
   ]);
 
@@ -104,10 +106,12 @@ adminRoutes.post('/phasr/free-audit', adminLimiter, requireAtLeastRole('admin'),
   }
 
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Create Audit record
-  const insertResult = await pool.request()
+  const insertResult = await suitePool.request()
     .input('userId', sql.Int, userId)
     .input('domainName', sql.NVarChar(255), domainName)
     .input('proofDetails', sql.NVarChar(sql.MAX), proofDetails)
@@ -682,8 +686,10 @@ adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), 
 
 // GET /api/admin/security-alerts
 adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
-  const result = await pool.request()
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
+  const result = await suitePool.request()
     .query(`
       SELECT id, action, ip_address, user_agent, success, metadata_json, created_at
       FROM dbo.AuditLog
@@ -733,7 +739,9 @@ adminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res)
 // GET /api/admin/phasr/logs
 adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const logsResult = await pool.request()
     .input('userId', sql.Int, userId)
@@ -760,7 +768,9 @@ adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncH
 // GET /api/admin/phasr/scans — list all historical codebase scans for this operator
 adminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const scansResult = await pool.request()
     .input('userId', sql.Int, userId)
@@ -806,7 +816,9 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
     return res.status(400).json({ success: false, error: 'Invalid scan ID.' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Fetch the scan metadata and verify ownership
   const scanResult = await pool.request()
@@ -894,7 +906,9 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
 
 // GET /api/admin/clients - List all users with role 'admin'
 adminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   const result = await pool.request()
     .query(`
       SELECT id, email, role, purchased_modules, is_active, created_at
@@ -930,7 +944,9 @@ adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('
     return res.status(400).json({ success: false, error: 'Email and password are required' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Check if email already exists
   const existingUser = await pool.request()
@@ -977,7 +993,9 @@ adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeas
     return res.status(400).json({ success: false, error: 'purchased_modules must be an array' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   const modulesString = JSON.stringify(purchased_modules);
 
   const updateResult = await pool.request()
@@ -1054,7 +1072,9 @@ function validateEmployeePayload(data) {
 // GET /api/admin/employees - Fetch employee records for the current tenant user with pagination/search support
 adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const searchStr = req.query.search ? req.query.search.trim() : '';
   const hasPagination = req.query.page || req.query.limit;
@@ -1162,7 +1182,9 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
 // GET /api/admin/employees/summary - Fetch server-side aggregate salary/tax metrics for reports
 adminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -1214,7 +1236,9 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     state, professional_tax, tds
   } = req.body;
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const parseInputDate = (dStr) => {
     if (!dStr) return null;
@@ -1299,7 +1323,9 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
     });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -1339,9 +1365,11 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
 adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const employeeId = Number(req.params.id);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
-  const deleteResult = await pool.request()
+  const deleteResult = await suitePool.request()
     .input('id', sql.Int, employeeId)
     .input('userId', sql.Int, userId)
     .query(`
@@ -1364,7 +1392,9 @@ adminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, 
     return res.status(400).json({ success: false, error: 'Date is required' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   const result = await pool.request()
     .input('userId', sql.Int, userId)
     .input('attendanceDate', sql.Date, dateStr)
@@ -1388,7 +1418,9 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
     return res.status(400).json({ success: false, error: 'employee_id, attendance_date, and status are required' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // First verify employee belongs to user
   const checkEmp = await pool.request()
@@ -1426,7 +1458,9 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
 // GET /api/admin/payroll/runs - Fetch all payroll runs for the current user
 adminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -1477,7 +1511,9 @@ adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) =>
     return res.status(400).json({ success: false, error: 'Year must be 2020 or later.' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Check for duplicate
   const existing = await pool.request()
@@ -1493,7 +1529,7 @@ adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) =>
     return res.status(409).json({ success: false, error: 'A payroll run already exists for this month and year.' });
   }
 
-  const insertResult = await pool.request()
+  const insertResult = await suitePool.request()
     .input('userId', sql.Int, userId)
     .input('month', sql.Int, monthNum)
     .input('year', sql.Int, yearNum)
@@ -1520,7 +1556,9 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Verify run belongs to user and is in Draft status
   const runResult = await pool.request()
@@ -1702,7 +1740,7 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
   grandTotalLwp = Math.round(grandTotalLwp * 100) / 100;
 
   // Use SQL transaction for atomicity
-  const transaction = new sql.Transaction(pool);
+  const transaction = new sql.Transaction(suitePool);
   await transaction.begin();
   try {
     // Insert a PayrollTransactions row for each employee
@@ -1815,7 +1853,9 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Verify run belongs to user
   const runCheck = await pool.request()
@@ -1879,7 +1919,9 @@ const crypto = require('crypto');
 adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   const runCheck = await pool.request()
     .input('runId', sql.Int, runId)
@@ -1941,7 +1983,9 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID or employee ID.' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
 
   // Verify run belongs to user
   const runCheck = await pool.request()
@@ -2033,7 +2077,9 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
     return res.status(400).json({ success: false, error: 'Email and password required' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   
   // Verify employee belongs to admin
   const empRes = await pool.request()
@@ -2060,7 +2106,9 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
 // GET /api/admin/leaves - Fetch all leaves
 adminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -2084,7 +2132,9 @@ adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   
   // Verify ownership
   const empRes = await pool.request()
@@ -2118,7 +2168,9 @@ adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res
     return res.status(400).json({ success: false, error: 'Status must be Approved or Rejected' });
   }
 
-  const pool = await getDbPool();
+  const corePool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
+  const pool = corePool;
   
   // Update if owned
   const updateRes = await pool.request()

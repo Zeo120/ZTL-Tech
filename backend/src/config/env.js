@@ -80,6 +80,17 @@ const env = {
       trustServerCertificate: process.env.SQL_TRUST_SERVER_CERTIFICATE === 'true'
     }
   },
+  paradigmSql: {
+    server: required('PARADIGM_SQL_SERVER'),
+    port: parsePositiveInt('PARADIGM_SQL_PORT', 1433),
+    database: required('PARADIGM_SQL_DATABASE'),
+    user: optional('PARADIGM_SQL_USER'),
+    password: optional('PARADIGM_SQL_PASSWORD'),
+    options: {
+      encrypt: process.env.SQL_ENCRYPT !== 'false',
+      trustServerCertificate: process.env.SQL_TRUST_SERVER_CERTIFICATE === 'true'
+    }
+  },
   redisUrl: required('REDIS_URL'),
   rateLimitFallback: process.env.RATE_LIMIT_REDIS_REQUIRED !== 'true'
     && process.env.RATE_LIMIT_FALLBACK !== 'closed'

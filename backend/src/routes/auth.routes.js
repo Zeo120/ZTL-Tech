@@ -77,6 +77,7 @@ authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
   if (token !== expectedToken) throw httpError(403, 'Invalid or expired magic link.');
 
   const pool = await getDbPool();
+  const suitePool = await getParadigmDbPool();
   const runCheck = await pool.request()
     .input('runId', sql.Int, Number(runId))
     .query("SELECT TOP 1 id, month, year FROM dbo.PayrollRuns WHERE id = @runId AND status = 'Completed';");
