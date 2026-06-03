@@ -1096,6 +1096,53 @@
             document.getElementById('sal-display-net').textContent = `$${net.toFixed(2)}`;
         }
 
+        
+        function openCredentialsModal(empId) {
+            document.getElementById('cred-emp-id').value = empId;
+            document.getElementById('cred-email').value = '';
+            document.getElementById('cred-password').value = '';
+            document.getElementById('cred-error-banner').style.display = 'none';
+            document.getElementById('cred-success-banner').style.display = 'none';
+            document.getElementById('credentials-modal').classList.add('active');
+        }
+        function closeCredentialsModal() {
+            document.getElementById('credentials-modal').classList.remove('active');
+        }
+        function closeCredentialsModalOnBackdrop(e) {
+            if (e.target.id === 'credentials-modal') closeCredentialsModal();
+        }
+        async function submitCredentialsForm() {
+            const empId = document.getElementById('cred-emp-id').value;
+            const email = document.getElementById('cred-email').value.trim();
+            const password = document.getElementById('cred-password').value;
+            const errBanner = document.getElementById('cred-error-banner');
+            const succBanner = document.getElementById('cred-success-banner');
+            
+            errBanner.style.display = 'none';
+            succBanner.style.display = 'none';
+            
+            try {
+                const res = await fetch(`${apiBase}/api/admin/employees/${empId}/credentials`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCSRFToken() },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                const payload = await res.json();
+                if (res.ok && payload.success) {
+                    succBanner.textContent = 'Credentials set successfully.';
+                    succBanner.style.display = 'block';
+                    setTimeout(closeCredentialsModal, 1500);
+                } else {
+                    errBanner.textContent = payload.error || 'Failed to set credentials';
+                    errBanner.style.display = 'block';
+                }
+            } catch(e) {
+                errBanner.textContent = 'Network error';
+                errBanner.style.display = 'block';
+            }
+        }
+
         // Submit Salary Details via PUT
         async function submitSalaryDetails() {
             const select = document.getElementById('salary-employee-select');
@@ -1344,7 +1391,8 @@
                     <td style="font-family: monospace; font-size: 0.82rem;">${emp.date_of_joining}</td>
                     <td>${financeDetails}</td>
                     <td style="text-align: center;">
-                        <button class="btn-delete" onclick="deleteEmployee(${emp.id}, '${escapeHTML(emp.name)}')">Remove</button>
+                        <button class="btn-action" style="font-size: 0.7rem; padding: 0.3rem 0.6rem; margin-right: 0.5rem;" onclick="openCredentialsModal(${emp.id})">Credentials</button>
+  <button class="btn-delete" onclick="deleteEmployee(${emp.id}, '${escapeHTML(emp.name)}')">Remove</button>
                     </td>
                 `;
 
@@ -1558,5 +1606,34 @@
         // Initialize fetch
         fetchRoster();
     </script>
+
+    <!-- Modal Employee Credentials -->
+    <div class="modal" id="credentials-modal" onclick="closeCredentialsModalOnBackdrop(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="font-size: 1.1rem; font-weight: 800;">Set Employee Portal Credentials</h2>
+                <button class="modal-close" onclick="closeCredentialsModal()">✕</button>
+            </div>
+            <form id="credentials-form" onsubmit="event.preventDefault(); submitCredentialsForm();">
+                <input type="hidden" id="cred-emp-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="cred-email" class="form-control" required placeholder="employee@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="cred-password" class="form-control" required minlength="6" placeholder="******">
+                    </div>
+                </div>
+                <div id="cred-error-banner" class="error-banner" style="display: none; margin-bottom: 1rem;"></div>
+                <div id="cred-success-banner" class="success-banner" style="display: none; margin-bottom: 1rem;"></div>
+                <div class="modal-footer" style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn-action">Save Credentials</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>
