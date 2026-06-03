@@ -11,6 +11,7 @@ const { httpError } = require('../utils/httpError');
 const { verifyPassword, signSessionToken } = require('../services/auth.service');
 const { createSession, revokeSession } = require('../services/session.service');
 const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
+const { decryptPII } = require('../utils/cryptoVault');
 
 const employeeRoutes = express.Router();
 
@@ -92,7 +93,13 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
     `);
 
   if (!result.recordset[0]) throw httpError(404, 'Employee not found');
-  return ok(res, { employee: result.recordset[0] });
+  
+  const emp = result.recordset[0];
+  emp.pan = decryptPII(emp.pan);
+  emp.aadhar = decryptPII(emp.aadhar);
+  emp.bank_account_number = decryptPII(emp.bank_account_number);
+
+  return ok(res, { employee: emp });
 }));
 
 employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {

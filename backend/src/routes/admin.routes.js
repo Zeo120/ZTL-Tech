@@ -15,6 +15,7 @@ const { rotateSession } = require('../services/session.service');
 const { signSessionToken } = require('../services/auth.service');
 const { sql, getDbPool } = require('../config/db');
 const { tbaisEvents } = require('../services/event.service');
+const { encryptPII, decryptPII } = require('../utils/cryptoVault');
 
 const adminRoutes = express.Router();
 
@@ -50,7 +51,14 @@ adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), a
 
   return ok(res, {
     user: userRes.recordset[0],
-    employees: empRes.recordset,
+    employees: empRes.recordset.map(emp => ({
+      ...emp,
+      pan: decryptPII(emp.pan),
+      aadhar: decryptPII(emp.aadhar),
+      bank_account_number: decryptPII(emp.bank_account_number),
+      ifsc_code: decryptPII(emp.ifsc_code),
+      uan_no: decryptPII(emp.uan_no)
+    })),
     leaves: leavesRes.recordset,
     expenses: expensesRes.recordset
   });
@@ -1123,6 +1131,11 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
 
   const mappedEmployees = employees.map(row => ({
     ...row,
+    pan: decryptPII(row.pan),
+    aadhar: decryptPII(row.aadhar),
+    bank_account_number: decryptPII(row.bank_account_number),
+    ifsc_code: decryptPII(row.ifsc_code),
+    uan_no: decryptPII(row.uan_no),
     date_of_birth: formatDbDate(row.date_of_birth),
     date_of_joining: formatDbDate(row.date_of_joining),
     date_of_exit: formatDbDate(row.date_of_exit),
@@ -1216,17 +1229,17 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
       .input('age', sql.Int, Number(age))
       .input('status', sql.NVarChar(50), status || 'Active')
       .input('gender', sql.NVarChar(50), gender.trim())
-      .input('pan', sql.NVarChar(50), pan.trim())
+      .input('pan', sql.NVarChar(255), encryptPII(pan ? pan.trim() : null))
       .input('maritalStatus', sql.NVarChar(50), marital_status || 'Unmarried')
       .input('spouseName', sql.NVarChar(255), marital_status === 'Married' ? spouse_name.trim() : null)
-      .input('aadhar', sql.NVarChar(50), aadhar.trim())
+      .input('aadhar', sql.NVarChar(255), encryptPII(aadhar ? aadhar.trim() : null))
       .input('dateOfBirth', sql.Date, parseInputDate(date_of_birth))
       .input('dateOfJoining', sql.Date, new Date(date_of_joining))
       .input('dateOfExit', sql.Date, status === 'Terminated' ? parseInputDate(date_of_exit) : null)
-      .input('bankAccountNumber', sql.NVarChar(100), bank_account_number ? bank_account_number.trim() : null)
-      .input('ifscCode', sql.NVarChar(50), ifsc_code ? ifsc_code.trim() : null)
+      .input('bankAccountNumber', sql.NVarChar(255), encryptPII(bank_account_number ? bank_account_number.trim() : null))
+      .input('ifscCode', sql.NVarChar(255), encryptPII(ifsc_code ? ifsc_code.trim() : null))
       .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
-      .input('uanNo', sql.NVarChar(50), pf_status === 'Applicable' ? uan_no.trim() : null)
+      .input('uanNo', sql.NVarChar(255), encryptPII(pf_status === 'Applicable' && uan_no ? uan_no.trim() : null))
       .input('baseSalary', sql.Decimal(18, 2), base_salary ? Number(base_salary) : 0)
       .input('hra', sql.Decimal(18, 2), hra ? Number(hra) : 0)
       .input('allowances', sql.Decimal(18, 2), allowances ? Number(allowances) : 0)

@@ -1,5 +1,6 @@
 const { sql, getDbPool } = require('../config/db');
 const { logger } = require('../utils/logger');
+const crypto = require('crypto');
 
 async function writeAuditEvent({
   actorUserId = null,
@@ -14,6 +15,20 @@ async function writeAuditEvent({
 }) {
   try {
     const pool = await getDbPool();
+
+    const prevHashResult = await pool.request().query(`
+      SELECT TOP 1 current_hash 
+      FROM AuditLog 
+      ORDER BY id DESC
+    `);
+    
+    const prevHash = prevHashResult.recordset.length > 0 && prevHashResult.recordset[0].current_hash 
+      ? prevHashResult.recordset[0].current_hash 
+      : '0000000000000000000000000000000000000000000000000000000000000000';
+    
+    const hashData = JSON.stringify({ prevHash, actorUserId, action, targetType, targetId, ip, success });
+    const currentHash = crypto.createHash('sha256').update(hashData).digest('hex');
+
     await pool.request()
       .input('actorUserId', sql.Int, actorUserId)
       .input('action', sql.NVarChar(100), action)
@@ -23,6 +38,8 @@ async function writeAuditEvent({
       .input('userAgent', sql.NVarChar(512), userAgent)
       .input('success', sql.Bit, success)
       .input('metadataJson', sql.NVarChar(sql.MAX), JSON.stringify(metadata))
+      .input('previousHash', sql.NVarChar(64), prevHash)
+      .input('currentHash', sql.NVarChar(64), currentHash)
       .query(`
         INSERT INTO AuditLog (
           actor_user_id,
@@ -33,6 +50,8 @@ async function writeAuditEvent({
           user_agent,
           success,
           metadata_json,
+          previous_hash,
+          current_hash,
           created_at
         )
         VALUES (
@@ -44,6 +63,8 @@ async function writeAuditEvent({
           @userAgent,
           @success,
           @metadataJson,
+          @previousHash,
+          @currentHash,
           SYSUTCDATETIME()
         );
       `);
