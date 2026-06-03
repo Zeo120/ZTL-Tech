@@ -3260,6 +3260,7 @@
                 } else if (run.status === 'Completed') {
                     actionsHtml = `
                         <button class="btn-action" onclick="viewPayrollTransactions(${run.id}, ${run.month}, ${run.year})" style="padding: 0.3rem 0.7rem; font-size: 0.75rem; background: var(--accent-primary); color: #000; font-weight: 700; border-radius: 6px;">View</button>
+                        <button class="btn-action" onclick="dispatchPayrollRun(${run.id})" style="padding: 0.3rem 0.7rem; font-size: 0.75rem; background: #fff; color: #000; font-weight: 700; border-radius: 6px; margin-left: 5px;">Dispatch Email</button>
                     `;
                 }
 
@@ -3308,7 +3309,28 @@
                 const res = await fetch(`${apiBase}/api/admin/payroll/runs/${runId}/process`, {
                     method: 'POST', credentials: 'include',
                     headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCSRFToken() }
+                }
+
+        async function dispatchPayrollRun(runId) {
+            if (!confirm('Dispatch cryptographically signed payslips via Native Email to all employees in this run?')) return;
+            showPayrollRunMsg('Dispatching native emails over TCP sockets... Please wait.', false);
+            try {
+                const res = await fetch(`${apiBase}/api/admin/payroll/runs/${runId}/dispatch`, {
+                    method: 'POST', credentials: 'include',
+                    headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCSRFToken() }
                 });
+                const payload = await res.json();
+                if (res.ok) {
+                    showPayrollRunMsg(payload.data?.message || 'Emails dispatched successfully.', false);
+                } else {
+                    showPayrollRunMsg(payload.error || 'Failed to dispatch emails.', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showPayrollRunMsg('Connection error during dispatch.', true);
+            }
+        }
+);
                 const payload = await res.json();
                 if (res.ok && payload.success) {
                     showPayrollRunMsg('Payroll processed successfully! PF, ESI, LWP, PT, and TDS have been computed.', false);

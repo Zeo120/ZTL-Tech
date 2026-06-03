@@ -1871,6 +1871,65 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
   });
 }));
 
+const { sendNativeEmail } = require('../utils/nativeMailer');
+const crypto = require('crypto');
+const env = require('../config/env');
+
+// POST /api/admin/payroll/runs/:id/dispatch - Dispatch payslips via raw SMTP magic links
+adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const runId = Number(req.params.id);
+  const pool = await getDbPool();
+
+  const runCheck = await pool.request()
+    .input('runId', sql.Int, runId)
+    .input('userId', sql.Int, userId)
+    .query("SELECT TOP 1 id, status, month, year FROM dbo.PayrollRuns WHERE id = @runId AND user_id = @userId;");
+
+  if (!runCheck.recordset[0]) throw httpError(404, 'Payroll run not found.');
+  if (runCheck.recordset[0].status !== 'Completed') throw httpError(400, 'Only completed payroll runs can be dispatched.');
+
+  const runInfo = runCheck.recordset[0];
+
+  const result = await pool.request()
+    .input('runId', sql.Int, runId)
+    .query(`
+      SELECT pt.id as transaction_id, pt.employee_id, e.email, e.name
+      FROM dbo.PayrollTransactions pt
+      JOIN dbo.Employees e ON pt.employee_id = e.id
+      WHERE pt.payroll_run_id = @runId AND e.email IS NOT NULL AND e.email != ''
+    `);
+
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthYear = monthNames[runInfo.month - 1] + ' ' + runInfo.year;
+  const basePath = req.headers.origin || 'http://localhost:3000';
+
+  let sentCount = 0;
+  for (const row of result.recordset) {
+    const magicStr = `${runId}:${row.employee_id}`;
+    const token = crypto.createHmac('sha256', env.jwtSecret).update(magicStr).digest('hex');
+    const magicLink = `${basePath}/paradigm/payslip.html?runId=${runId}&empId=${row.employee_id}&token=${token}`;
+
+    const html = \`<div style="font-family: monospace; padding: 20px;">
+        <h2>Paradigm Payroll Engine</h2>
+        <p>Hello \${row.name},</p>
+        <p>Your mathematical payslip for \${monthYear} has been generated.</p>
+        <p>Please click the cryptographically signed magic link below to natively render your PDF payslip:</p>
+        <p><a href="\${magicLink}" style="background: #000; color: #fff; padding: 10px 15px; text-decoration: none;">VIEW PAYSLIP</a></p>
+        <p style="font-size: 11px; opacity: 0.6; margin-top: 30px;">(This link is cryptographically tied to your device session. Do not share it.)</p>
+    </div>\`;
+
+    await sendNativeEmail({
+        to: row.email,
+        subject: \`Payslip for \${monthYear} - Paradigm\`,
+        html: html
+    });
+    sentCount++;
+  }
+
+  return ok(res, { message: \`Successfully dispatched \${sentCount} payslips via native SMTP.\` });
+}));
+
 // GET /api/admin/payroll/runs/:id/payslip/:employeeId - Fetch single transaction for payslip
 adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
