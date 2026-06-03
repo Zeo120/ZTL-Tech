@@ -6,6 +6,14 @@
     <title>Employee Portal - Paradigm</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
     <style>
         :root {
             --bg-color: #050505;
@@ -337,38 +345,52 @@
     // Handle Attendance Form
     document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(now - offset)).toISOString().slice(0, -1);
-        const date = localISOTime.split('T')[0];
-        const status = 'Present';
-        const deviceTime = now.toString();
         const msg = document.getElementById('attMessage');
-        
         msg.textContent = 'Submitting...';
         msg.className = 'message';
 
-        try {
-            const res = await apiRequest('/api/employee/attendance', {
-                method: 'POST',
-                body: JSON.stringify({ date, status, device_time: deviceTime })
-            });
-
-            if (res.ok) {
-                msg.textContent = 'Attendance submitted successfully!';
-                msg.className = 'message success';
-                setTimeout(() => msg.textContent = '', 3000);
-            } else {
-                const err = await res.json().catch(() => ({}));
-                msg.textContent = err.error || 'Failed to submit attendance.';
-                msg.className = 'message error';
-            }
-        } catch (error) {
-            if (error.message !== 'Unauthorized') {
-                msg.textContent = 'Network error occurred.';
-                msg.className = 'message error';
-            }
+        if (!navigator.geolocation) {
+            msg.textContent = 'Geolocation is not supported by your browser.';
+            msg.className = 'message error';
+            return;
         }
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - offset)).toISOString().slice(0, -1);
+            const date = localISOTime.split('T')[0];
+            const status = 'Present';
+            const deviceTime = now.toString();
+
+            try {
+                const res = await apiRequest('/api/employee/attendance', {
+                    method: 'POST',
+                    body: JSON.stringify({ date, status, device_time: deviceTime, latitude, longitude })
+                });
+
+                if (res.ok) {
+                    msg.textContent = 'Attendance submitted successfully!';
+                    msg.className = 'message success';
+                    setTimeout(() => msg.textContent = '', 3000);
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    msg.textContent = err.error || 'Failed to submit attendance.';
+                    msg.className = 'message error';
+                }
+            } catch (error) {
+                if (error.message !== 'Unauthorized') {
+                    msg.textContent = 'Network error occurred.';
+                    msg.className = 'message error';
+                }
+            }
+        }, (error) => {
+            msg.textContent = 'Location access is required to punch in.';
+            msg.className = 'message error';
+        });
     });
 
     // Handle Leave Form

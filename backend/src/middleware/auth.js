@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const { fail } = require('../utils/responses');
-const { getSession, touchSession } = require('../services/session.service');
+const crypto = require('crypto');
+const { getSession, touchSession, revokeSession } = require('../services/session.service');
 
 function readAuthInputs(req) {
   const header = req.get('authorization') || '';
@@ -48,6 +49,15 @@ function authenticate(options = {}) {
 
     if (!payload.sub || !payload.sid || !session || session.userId !== String(payload.sub)) {
       return fail(res, 401, 'Invalid or expired session');
+    }
+
+    const currentIp = req.ip || '';
+    const currentUserAgent = req.get('user-agent') || '';
+    const currentDeviceHash = crypto.createHash('sha256').update(`${currentIp}-${currentUserAgent}`).digest('hex');
+
+    if (currentDeviceHash !== session.deviceHash) {
+      await revokeSession(session.sid);
+      return fail(res, 401, 'Device fingerprint mismatch. Session hijacked.');
     }
 
     await touchSession(session.sid);

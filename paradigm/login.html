@@ -6,6 +6,14 @@
     <title>Paradigm | Executive Portal Login</title>
     <meta name="description" content="Secure credential verification gateway for Paradigm enterprise business suites.">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
     <style>
         .login-container {
             display: flex;

@@ -30,7 +30,7 @@ async function getUserSessionVersion(userId) {
   return Number(version || 0);
 }
 
-async function createSession({ userId, role, ip, userAgent }) {
+async function createSession({ userId, role, ip, userAgent, deviceHash }) {
   const sid = crypto.randomUUID();
   const csrfToken = crypto.randomBytes(32).toString('base64url');
   const issuedAt = nowSeconds();
@@ -47,6 +47,7 @@ async function createSession({ userId, role, ip, userAgent }) {
     csrfToken,
     userAgentHash: hashContext(userAgent),
     ipHash: hashContext(ip),
+    deviceHash,
     revoked: false,
     version
   };
@@ -131,12 +132,15 @@ async function rotateSession({ sid, ip, userAgent }) {
   const current = await getSession(sid);
   if (!current) return null;
 
+  const deviceHash = crypto.createHash('sha256').update(`${ip || ''}-${userAgent || ''}`).digest('hex');
+
   await revokeSession(sid);
   return createSession({
     userId: current.userId,
     role: current.role,
     ip,
-    userAgent
+    userAgent,
+    deviceHash
   });
 }
 

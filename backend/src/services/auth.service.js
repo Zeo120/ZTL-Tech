@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const { sql, getDbPool } = require('../config/db');
@@ -102,11 +103,16 @@ async function login(body, requestContext) {
     throw httpError(401, 'Invalid email or password');
   }
 
+  const ip = requestContext.ip || '';
+  const userAgent = requestContext.userAgent || '';
+  const deviceHash = crypto.createHash('sha256').update(`${ip}-${userAgent}`).digest('hex');
+
   const session = await createSession({
     userId: user.id,
     role: user.role,
-    ip: requestContext.ip,
-    userAgent: requestContext.userAgent
+    ip,
+    userAgent,
+    deviceHash
   });
 
   await writeAuditEvent({

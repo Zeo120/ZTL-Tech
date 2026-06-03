@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const express = require('express');
 const { sql, getDbPool } = require('../config/db');
 const { env } = require('../config/env');
@@ -46,11 +47,16 @@ employeeRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
     throw httpError(401, 'Invalid email or password');
   }
 
+  const ip = req.ip || '';
+  const userAgent = req.get('user-agent') || '';
+  const deviceHash = crypto.createHash('sha256').update(`${ip}-${userAgent}`).digest('hex');
+
   const session = await createSession({
     userId: emp.id,
     role: 'employee',
-    ip: req.ip || '',
-    userAgent: req.get('user-agent') || ''
+    ip,
+    userAgent,
+    deviceHash
   });
 
   const token = signSessionToken({ id: emp.id, role: 'employee' }, session);
@@ -90,8 +96,28 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
 }));
 
 employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
-  const { date, status, device_time } = req.body;
+  const { date, status, device_time, latitude, longitude } = req.body;
   if (!date || !status) throw httpError(400, 'Date and status required');
+
+  if (latitude != null && longitude != null) {
+    const lat1 = 12.9716;
+    const lon1 = 77.5946;
+    const lat2 = parseFloat(latitude);
+    const lon2 = parseFloat(longitude);
+    
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const d = R * c; // in km
+    
+    if (d > 0.05) {
+      throw httpError(403, 'Geofence strictly breached. Punch rejected.');
+    }
+  }
 
   const pool = await getDbPool();
   
@@ -101,11 +127,13 @@ employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async
     .input('date', sql.Date, date)
     .input('status', sql.NVarChar(50), status)
     .input('deviceTime', sql.NVarChar(100), device_time || null)
+    .input('latitude', sql.Decimal(9, 6), latitude != null ? latitude : null)
+    .input('longitude', sql.Decimal(9, 6), longitude != null ? longitude : null)
     .query(`
       IF EXISTS (SELECT 1 FROM dbo.Attendance WHERE employee_id = @empId AND attendance_date = @date)
-        UPDATE dbo.Attendance SET status = @status, device_time = ISNULL(@deviceTime, device_time), updated_at = SYSUTCDATETIME() WHERE employee_id = @empId AND attendance_date = @date;
+        UPDATE dbo.Attendance SET status = @status, device_time = ISNULL(@deviceTime, device_time), latitude = ISNULL(@latitude, latitude), longitude = ISNULL(@longitude, longitude), updated_at = SYSUTCDATETIME() WHERE employee_id = @empId AND attendance_date = @date;
       ELSE
-        INSERT INTO dbo.Attendance (employee_id, attendance_date, status, device_time) VALUES (@empId, @date, @status, @deviceTime);
+        INSERT INTO dbo.Attendance (employee_id, attendance_date, status, device_time, latitude, longitude) VALUES (@empId, @date, @status, @deviceTime, @latitude, @longitude);
     `);
 
   return ok(res, { message: 'Attendance recorded' });

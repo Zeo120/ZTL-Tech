@@ -341,6 +341,8 @@ const tables = [
         attendance_date DATE NOT NULL,
         status NVARCHAR(50) NOT NULL,
         device_time NVARCHAR(100) NULL,
+        latitude DECIMAL(9,6) NULL,
+        longitude DECIMAL(9,6) NULL,
         created_at DATETIME2 NOT NULL CONSTRAINT DF_Attendance_created_at DEFAULT SYSUTCDATETIME(),
         updated_at DATETIME2 NULL,
         CONSTRAINT UC_Employee_Date UNIQUE (employee_id, attendance_date)
@@ -352,6 +354,8 @@ const tables = [
       { name: 'attendance_date', sql: 'DATE NOT NULL' },
       { name: 'status', sql: 'NVARCHAR(50) NOT NULL' },
       { name: 'device_time', sql: 'NVARCHAR(100) NULL' },
+      { name: 'latitude', sql: 'DECIMAL(9,6) NULL' },
+      { name: 'longitude', sql: 'DECIMAL(9,6) NULL' },
       { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Attendance_created_at DEFAULT SYSUTCDATETIME()' },
       { name: 'updated_at', sql: 'DATETIME2 NULL' }
     ],
