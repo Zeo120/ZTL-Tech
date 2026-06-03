@@ -10,6 +10,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const { healthRoutes } = require('./routes/health.routes');
 const { authRoutes } = require('./routes/auth.routes');
 const { adminRoutes } = require('./routes/admin.routes');
+const { employeeRoutes } = require('./routes/employee.routes');
 
 function createApp() {
   const app = express();
@@ -66,6 +67,7 @@ function createApp() {
   app.use('/api/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/employee', employeeRoutes);
 
   // Error handlers
   app.use(notFound);

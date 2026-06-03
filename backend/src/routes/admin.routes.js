@@ -1932,4 +1932,118 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
   });
 }));
 
+
+// POST /api/admin/employees/:id/credentials - Set employee credentials
+adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const empId = Number(req.params.id);
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password required' });
+  }
+
+  const pool = await getDbPool();
+  
+  // Verify employee belongs to admin
+  const empRes = await pool.request()
+    .input('empId', sql.Int, empId)
+    .input('userId', sql.Int, userId)
+    .query(`SELECT id FROM dbo.Employees WHERE id = @empId AND user_id = @userId`);
+    
+  if (!empRes.recordset[0]) {
+    return res.status(404).json({ success: false, error: 'Employee not found' });
+  }
+
+  const { hashPassword } = require('../services/auth.service');
+  const passwordHash = await hashPassword(password);
+
+  await pool.request()
+    .input('empId', sql.Int, empId)
+    .input('email', sql.NVarChar(255), email)
+    .input('passwordHash', sql.NVarChar(255), passwordHash)
+    .query(`UPDATE dbo.Employees SET email = @email, password_hash = @passwordHash WHERE id = @empId`);
+
+  return ok(res, { message: 'Credentials generated successfully' });
+}));
+
+// GET /api/admin/leaves - Fetch all leaves
+adminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const pool = await getDbPool();
+  
+  const result = await pool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT L.id, L.employee_id, E.name AS employee_name, L.type, L.start_date, L.end_date, L.reason, L.status, L.created_at
+      FROM dbo.Leaves L
+      JOIN dbo.Employees E ON L.employee_id = E.id
+      WHERE E.user_id = @userId
+      ORDER BY L.created_at DESC;
+    `);
+
+  return ok(res, { leaves: result.recordset });
+}));
+
+// POST /api/admin/leaves - Admin creates a leave for employee
+adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { employee_id, type, start_date, end_date, reason } = req.body;
+  
+  if (!employee_id || !type || !start_date || !end_date) {
+    return res.status(400).json({ success: false, error: 'Missing required fields' });
+  }
+
+  const pool = await getDbPool();
+  
+  // Verify ownership
+  const empRes = await pool.request()
+    .input('empId', sql.Int, employee_id)
+    .input('userId', sql.Int, userId)
+    .query(`SELECT id FROM dbo.Employees WHERE id = @empId AND user_id = @userId`);
+    
+  if (!empRes.recordset[0]) return res.status(404).json({ success: false, error: 'Employee not found' });
+
+  await pool.request()
+    .input('empId', sql.Int, employee_id)
+    .input('type', sql.NVarChar(50), type)
+    .input('start', sql.Date, start_date)
+    .input('end', sql.Date, end_date)
+    .input('reason', sql.NVarChar(500), reason || null)
+    .query(`
+      INSERT INTO dbo.Leaves (employee_id, type, start_date, end_date, reason, status)
+      VALUES (@empId, @type, @start, @end, @reason, 'Approved');
+    `);
+
+  return ok(res, { message: 'Leave created and approved' });
+}));
+
+// PUT /api/admin/leaves/:id/status - Approve or reject leave
+adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const leaveId = Number(req.params.id);
+  const { status } = req.body;
+  
+  if (status !== 'Approved' && status !== 'Rejected') {
+    return res.status(400).json({ success: false, error: 'Status must be Approved or Rejected' });
+  }
+
+  const pool = await getDbPool();
+  
+  // Update if owned
+  const updateRes = await pool.request()
+    .input('leaveId', sql.Int, leaveId)
+    .input('userId', sql.Int, userId)
+    .input('status', sql.NVarChar(50), status)
+    .query(`
+      UPDATE L
+      SET L.status = @status, L.updated_at = SYSUTCDATETIME()
+      FROM dbo.Leaves L
+      JOIN dbo.Employees E ON L.employee_id = E.id
+      WHERE L.id = @leaveId AND E.user_id = @userId;
+    `);
+    
+  return ok(res, { message: 'Leave status updated' });
+}));
+
 module.exports = { adminRoutes };
