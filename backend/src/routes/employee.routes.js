@@ -87,7 +87,7 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
     .input('id', sql.Int, req.auth.userId)
     .query(`
       SELECT id, name, email, age, gender, pan, aadhar, marital_status,
-             date_of_joining, bank_account_number, pf_status, base_salary, status
+             date_of_joining, bank_account_number, ifsc_code, uan_no, pf_status, base_salary, status
       FROM dbo.Employees
       WHERE id = @id;
     `);
@@ -98,6 +98,8 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
   emp.pan = decryptPII(emp.pan);
   emp.aadhar = decryptPII(emp.aadhar);
   emp.bank_account_number = decryptPII(emp.bank_account_number);
+  emp.ifsc_code = decryptPII(emp.ifsc_code);
+  emp.uan_no = decryptPII(emp.uan_no);
 
   return ok(res, { employee: emp });
 }));
@@ -162,7 +164,21 @@ employeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (re
       VALUES (@empId, @type, @start, @end, @reason, 'Pending');
     `);
 
-  return ok(res, { message: 'Leave requested successfully' });
+  return ok(res, { message: 'Leave request submitted' });
+}));
+
+employeeRoutes.get('/payslips', employeeAuth, asyncHandler(async (req, res) => {
+  const pool = await getDbPool();
+  const result = await pool.request()
+    .input('empId', sql.Int, req.auth.userId)
+    .query(`
+      SELECT T.*, R.month, R.year 
+      FROM dbo.PayrollTransactions T
+      JOIN dbo.PayrollRuns R ON T.payroll_run_id = R.id
+      WHERE T.employee_id = @empId AND R.status = 'Completed'
+      ORDER BY R.year DESC, R.month DESC
+    `);
+  return ok(res, { payslips: result.recordset });
 }));
 
 module.exports = { employeeRoutes };
