@@ -33,11 +33,28 @@ const superAdminLimiter = ipRateLimit({
   keyPrefix: 'super-admin'
 });
 
-adminRoutes.get('/dashboard', adminLimiter, requireAtLeastRole('admin'), revalidateRoleAtLeast('admin'), (req, res) => {
+adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const pool = await getDbPool();
+
+  const [userRes, empRes, leavesRes, expensesRes] = await Promise.all([
+    pool.request()
+      .input('id', sql.Int, req.auth.userId)
+      .query(`SELECT id, name, email, role, last_login_at, status FROM dbo.Users WHERE id = @id`),
+    pool.request()
+      .query(`SELECT * FROM dbo.Employees ORDER BY name ASC`),
+    pool.request()
+      .query(`SELECT L.*, E.name as employee_name FROM dbo.Leaves L JOIN dbo.Employees E ON L.employee_id = E.id ORDER BY L.created_at DESC`),
+    pool.request()
+      .query(`SELECT EX.*, E.name as employee_name FROM dbo.Expenses EX JOIN dbo.Employees E ON EX.employee_id = E.id ORDER BY EX.created_at DESC`)
+  ]);
+
   return ok(res, {
-    message: 'Admin dashboard data endpoint is ready for implementation'
+    user: userRes.recordset[0],
+    employees: empRes.recordset,
+    leaves: leavesRes.recordset,
+    expenses: expensesRes.recordset
   });
-});
+}));
 
 adminRoutes.post('/super-admin/actions', superAdminLimiter, requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
   await writeAuditEvent({

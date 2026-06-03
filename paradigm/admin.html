@@ -2065,59 +2065,43 @@
 
         async function loadUserData() {
             try {
-                const res = await fetch(`${apiBase}/api/auth/me`, { credentials: 'include' });
+                const res = await fetch(`${apiBase}/api/admin/dashboard/batch`, { credentials: 'include' });
                 if (res.ok) {
                     const payload = await res.json();
                     if (payload.success && payload.data && payload.data.user) {
                         const user = payload.data.user;
                         
+                        // Populate Global Caches from Batch payload
+                        allEmployeesFull = payload.data.employees || [];
+                        allEmployees = payload.data.employees || [];
+                        dropdownCached = true;
+                        populateAdminEmployeeSelect();
+                        renderPayrollTable(allEmployees);
+
                         const welcomeName = user.email ? user.email.split('@')[0].toUpperCase() : 'ADMIN';
                         const titleEl = document.getElementById('reveal-welcome-title');
                         const statusEl = document.getElementById('reveal-welcome-status');
 
-                        // Animate title in
-                        setTimeout(() => {
-                            titleEl.textContent = `AUTHENTICATED: ${welcomeName}`;
-                            titleEl.style.opacity = '1';
-                            titleEl.style.transform = 'translateY(0)';
-                        }, 200);
+                        titleEl.textContent = `AUTHENTICATED: ${welcomeName}`;
+                        titleEl.style.opacity = '1';
+                        titleEl.style.transform = 'translateY(0)';
 
-                        // Telemetry steps
-                        const steps = [
-                            { delay: 400, msg: "SECURITY CHECK VERIFIED..." },
-                            { delay: 800, msg: "DECRYPTING REGISTRY DATABASE..." },
-                            { delay: 1200, msg: "LOADING SECURE SHELL INTERFACE..." },
-                            { delay: 1600, msg: "WORKSPACE COCKPIT READY." }
-                        ];
+                        statusEl.textContent = "WORKSPACE COCKPIT READY.";
 
-                        steps.forEach(step => {
-                            setTimeout(() => {
-                                statusEl.textContent = step.msg;
-                            }, step.delay);
-                        });
+                        const header = document.querySelector('.top-header');
+                        if (header) header.classList.add('visible');
+                        
+                        const overlay = document.getElementById('reveal-screen-overlay');
+                        if (overlay) {
+                            overlay.style.opacity = '0';
+                            overlay.style.pointerEvents = 'none';
+                            overlay.style.transform = 'scale(1.05)';
+                        }
 
-                        // Show header and transition page out of overlay
-                        setTimeout(() => {
-                            const header = document.querySelector('.top-header');
-                            if (header) header.classList.add('visible');
-                            
-                            const overlay = document.getElementById('reveal-screen-overlay');
-
-                            
-                            if (overlay) {
-                                overlay.style.opacity = '0';
-                                overlay.style.pointerEvents = 'none';
-                                overlay.style.transform = 'scale(1.05)';
-                            }
-                        }, 2100);
-
-                        // Set top bar logo text
-                        setTimeout(() => {
-                            const logoText = document.getElementById('logo-text-val');
-                            if (logoText) {
-                                logoText.innerHTML = `<span class="logo-separator">|</span> ${welcomeName}`;
-                            }
-                        }, 2400);
+                        const logoText = document.getElementById('logo-text-val');
+                        if (logoText) {
+                            logoText.innerHTML = `<span class="logo-separator">|</span> ${welcomeName}`;
+                        }
                     } else {
                         window.location.href = 'login.html';
                     }
