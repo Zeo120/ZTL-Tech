@@ -207,22 +207,13 @@
     </div>
 
     <div class="card">
-        <h2>Submit Attendance</h2>
+        <h2>Live Attendance</h2>
+        <div style="text-align: center; margin: 16px 0;">
+            <div id="liveClock" style="font-size: 24px; font-weight: 600; font-family: monospace; letter-spacing: 2px; color: var(--accent);">--:--:--</div>
+            <div id="liveDate" style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">---</div>
+        </div>
         <form id="attendanceForm">
-            <div class="form-group">
-                <label for="attDate">Date</label>
-                <input type="date" id="attDate" required>
-            </div>
-            <div class="form-group">
-                <label for="attStatus">Status</label>
-                <select id="attStatus" required>
-                    <option value="">Select status...</option>
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
-                    <option value="Half-Day">Half-Day</option>
-                </select>
-            </div>
-            <button type="submit" class="submit-btn">Submit Attendance</button>
+            <button type="submit" class="submit-btn" style="padding: 14px; font-weight: 600; font-size: 15px;">MARK PRESENT NOW</button>
         </form>
         <div id="attMessage" class="message"></div>
     </div>
@@ -329,17 +320,29 @@
         }
     }
 
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').textContent = now.toLocaleTimeString();
+        document.getElementById('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     // Set today's date as default for date inputs
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('attDate').value = today;
     document.getElementById('leaveStart').value = today;
     document.getElementById('leaveEnd').value = today;
 
     // Handle Attendance Form
     document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const date = document.getElementById('attDate').value;
-        const status = document.getElementById('attStatus').value;
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(now - offset)).toISOString().slice(0, -1);
+        const date = localISOTime.split('T')[0];
+        const status = 'Present';
+        const deviceTime = now.toString();
         const msg = document.getElementById('attMessage');
         
         msg.textContent = 'Submitting...';
@@ -348,7 +351,7 @@
         try {
             const res = await apiRequest('/api/employee/attendance', {
                 method: 'POST',
-                body: JSON.stringify({ date, status })
+                body: JSON.stringify({ date, status, device_time: deviceTime })
             });
 
             if (res.ok) {

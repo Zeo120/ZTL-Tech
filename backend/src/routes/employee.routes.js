@@ -90,7 +90,7 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
 }));
 
 employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
-  const { date, status } = req.body;
+  const { date, status, device_time } = req.body;
   if (!date || !status) throw httpError(400, 'Date and status required');
 
   const pool = await getDbPool();
@@ -100,11 +100,12 @@ employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async
     .input('empId', sql.Int, req.auth.userId)
     .input('date', sql.Date, date)
     .input('status', sql.NVarChar(50), status)
+    .input('deviceTime', sql.NVarChar(100), device_time || null)
     .query(`
       IF EXISTS (SELECT 1 FROM dbo.Attendance WHERE employee_id = @empId AND attendance_date = @date)
-        UPDATE dbo.Attendance SET status = @status, updated_at = SYSUTCDATETIME() WHERE employee_id = @empId AND attendance_date = @date;
+        UPDATE dbo.Attendance SET status = @status, device_time = ISNULL(@deviceTime, device_time), updated_at = SYSUTCDATETIME() WHERE employee_id = @empId AND attendance_date = @date;
       ELSE
-        INSERT INTO dbo.Attendance (employee_id, attendance_date, status) VALUES (@empId, @date, @status);
+        INSERT INTO dbo.Attendance (employee_id, attendance_date, status, device_time) VALUES (@empId, @date, @status, @deviceTime);
     `);
 
   return ok(res, { message: 'Attendance recorded' });
