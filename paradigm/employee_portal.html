@@ -299,7 +299,7 @@
         
         // Handle unauthorized
         if (response.status === 401 || response.status === 403) {
-            window.location.href = '/employee_login.html';
+            window.location.href = '/paradigm/login.html';
             throw new Error('Unauthorized');
         }
         
@@ -409,7 +409,7 @@
     // Logout
     function logout() {
         document.cookie = 'ztl_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = '/employee_login.html';
+        window.location.href = '/paradigm/login.html';
     }
 
     // Initialize
