@@ -254,6 +254,7 @@
             <div class="login-tabs">
                 <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Executive Portal</button>
                 <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
+                <button class="login-tab" id="tab-employee" onclick="switchMode('employee')">Employee</button>
             </div>
  
             <!-- Mode Header -->
@@ -320,7 +321,7 @@
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                     <line x1="1" y1="1" x2="23" y2="23"></line>
                 `;
-            } else {
+            } else if (mode === 'super') {
                 passwordInput.type = 'password';
                 // Standard eye icon path
                 eyeIcon.innerHTML = `
@@ -335,6 +336,7 @@
             currentMode = mode;
             const tabAdmin = document.getElementById('tab-admin');
             const tabSuper = document.getElementById('tab-super');
+            const tabEmployee = document.getElementById('tab-employee');
             const headerTitle = document.getElementById('header-title');
             const headerDesc = document.getElementById('header-desc');
             const superBanner = document.getElementById('super-banner');
@@ -347,7 +349,7 @@
                 headerDesc.textContent = 'Provide authorized executive credentials to access the Paradigm control workspace.';
                 superBanner.style.display = 'none';
                 accessIdInput.placeholder = 'cfo@company.com';
-            } else {
+            } else if (mode === 'super') {
                 tabAdmin.classList.remove('active');
                 tabSuper.classList.add('active');
                 headerTitle.textContent = 'SUPER ADMIN CONSOLE';
@@ -398,7 +400,8 @@
             try {
                 const origin = window.location.origin;
                 const apiBase = (origin.startsWith('file:') || origin === 'null' || !origin) ? 'http://localhost:3000' : '';
-                const response = await fetch(`${apiBase}/api/auth/login`, {
+                const endpoint = currentMode === 'employee' ? '/api/employee/login' : '/api/auth/login';
+                const response = await fetch(`${apiBase}${endpoint}`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: {
@@ -443,14 +446,14 @@
                     const userRole = payload.data && payload.data.user && payload.data.user.role;
                     if ((userRole === 'super_admin' || userRole === 'super-admin') && currentMode === 'super') {
                         window.location.href = '../ztl_tech/super_admin.html';
-                    } else {
+                    } else if (mode === 'super') {
                         window.location.href = './admin.html';
                     }
                 }, 1900);
             } catch (error) {
                 if (window.location.protocol === 'file:') {
                     showError('Unable to connect to the authentication server. Since this page was loaded directly from the file system (file://), your browser blocks cookie authentication due to CORS security. Please access the application via http://localhost:3000/paradigm/login.html instead.');
-                } else {
+                } else if (mode === 'super') {
                     showError('Unable to connect to the authentication server. Confirm the backend is running.');
                 }
             }
