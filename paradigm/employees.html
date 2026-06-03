@@ -916,7 +916,20 @@
     </footer>
 
     <script>
+        
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         let allEmployees = [];
+        let dropdownCached = false;
+        let allEmployeesFull = [];
         let currentPage = 1;
         const limitPerPage = 10;
         let totalPages = 1;
@@ -1001,7 +1014,7 @@
                 document.getElementById('tab-salary-details').classList.add('active');
                 
                 // Refresh selection lists and reset boxes
-                populateEmployeeSelect();
+                fetchDropdownEmployees();
                 loadEmployeeSalary();
             }
         }
@@ -1034,7 +1047,7 @@
             allEmployees.forEach(emp => {
                 const opt = document.createElement('option');
                 opt.value = emp.id;
-                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                opt.textContent = `${escapeHTML(emp.name)} (PAN: ${escapeHTML(emp.pan).toUpperCase()})`;
                 select.appendChild(opt);
             });
             select.value = curVal;
@@ -1058,7 +1071,7 @@
                 return;
             }
 
-            const emp = allEmployees.find(e => e.id === empId);
+            const emp = allEmployeesFull.find(e => e.id === empId);
             if (emp) {
                 document.getElementById('sal-base').value = emp.base_salary || '';
                 document.getElementById('sal-hra').value = emp.hra || '';
@@ -1159,12 +1172,18 @@
 
         // Fetch dropdown menu list separately (bypass pagination)
         async function fetchDropdownEmployees() {
+            if (dropdownCached) {
+                populateEmployeeSelectWithOptions(allEmployeesFull);
+                return;
+            }
             try {
                 const res = await fetch(`${apiBase}/api/admin/employees?limit=all`, { credentials: 'include' });
                 if (res.ok) {
                     const payload = await res.json();
                     if (payload.success && payload.data && payload.data.employees) {
-                        populateEmployeeSelectWithOptions(payload.data.employees);
+                        allEmployeesFull = payload.data.employees;
+                        dropdownCached = true;
+                        populateEmployeeSelectWithOptions(allEmployeesFull);
                     }
                 }
             } catch (err) {
@@ -1179,7 +1198,7 @@
             employees.forEach(emp => {
                 const opt = document.createElement('option');
                 opt.value = emp.id;
-                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                opt.textContent = `${escapeHTML(emp.name)} (PAN: ${escapeHTML(emp.pan).toUpperCase()})`;
                 select.appendChild(opt);
             });
             select.value = curVal;
@@ -1214,8 +1233,7 @@
                         document.getElementById('btn-pag-prev').disabled = currentPage <= 1;
                         document.getElementById('btn-pag-next').disabled = currentPage >= totalPages;
 
-                        // Load data for the dropdown
-                        fetchDropdownEmployees();
+                        // Load data for the dropdown (Removed to save memory)
                     } else {
                         showTableError("Failed to fetch corporate roster.");
                     }
@@ -1267,13 +1285,13 @@
 
                 // Marital Details string
                 const maritalInfo = emp.marital_status === 'Married' 
-                    ? `<span style="font-size: 0.75rem; display: block; color: var(--text-secondary);">Spouse: ${emp.spouse_name}</span>`
+                    ? `<span style="font-size: 0.75rem; display: block; color: var(--text-secondary);">Spouse: ${escapeHTML(emp.spouse_name)}</span>`
                     : '';
 
                 // Financial details view
-                const bankNum = emp.bank_account_number || '-';
+                const bankNum = escapeHTML(emp.bank_account_number) || '-';
                 const pfInfo = emp.pf_status === 'Applicable' 
-                    ? `<span style="font-size: 0.72rem; display: block; color: var(--accent-primary); font-family: monospace;">UAN: ${emp.uan_no}</span>`
+                    ? `<span style="font-size: 0.72rem; display: block; color: var(--accent-primary); font-family: monospace;">UAN: ${escapeHTML(emp.uan_no)}</span>`
                     : `<span style="font-size: 0.72rem; display: block; color: var(--text-secondary);">No PF Contribution</span>`;
 
                 const baseSal = emp.base_salary || 0;
@@ -1294,8 +1312,8 @@
                 // Gov details
                 const govInfo = `
                     <div style="font-family: monospace; font-size: 0.8rem;">
-                        <span>PAN: ${emp.pan.toUpperCase()}</span>
-                        <span style="display: block; color: var(--text-secondary);">UID: ${emp.aadhar}</span>
+                        <span>PAN: ${escapeHTML(emp.pan).toUpperCase()}</span>
+                        <span style="display: block; color: var(--text-secondary);">UID: ${escapeHTML(emp.aadhar)}</span>
                     </div>
                 `;
 
@@ -1314,7 +1332,7 @@
 
                 tr.innerHTML = `
                     <td style="padding: 1.1rem 1rem;">
-                        <strong style="color: #fff; font-size: 0.95rem;">${emp.name}</strong>
+                        <strong style="color: #fff; font-size: 0.95rem;">${escapeHTML(emp.name)}</strong>
                         ${maritalInfo}
                     </td>
                     <td>${ageGender}</td>
@@ -1326,7 +1344,7 @@
                     <td style="font-family: monospace; font-size: 0.82rem;">${emp.date_of_joining}</td>
                     <td>${financeDetails}</td>
                     <td style="text-align: center;">
-                        <button class="btn-delete" onclick="deleteEmployee(${emp.id}, '${emp.name}')">Remove</button>
+                        <button class="btn-delete" onclick="deleteEmployee(${emp.id}, '${escapeHTML(emp.name)}')">Remove</button>
                     </td>
                 `;
 

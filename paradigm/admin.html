@@ -1923,10 +1923,22 @@
 
     <!-- JavaScript Module Logic -->
     <script>
+        
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         let currentView = 'payroll';
         let currentPayrollTab = 'employees';
         let allEmployees = [];
         let allEmployeesFull = [];
+        let dropdownCached = false;
         let currentPage = 1;
         const limitPerPage = 10;
         let totalPages = 1;
@@ -2199,8 +2211,10 @@
                 } else if (tabId === 'processing') {
                     fetchPayrollRuns();
                 } else if (tabId === 'leaves') {
+                fetchDropdownEmployees();
                     populateAllEnterpriseDropdowns(); fetchLeaves();
                 } else if (tabId === 'expenses') {
+                fetchDropdownEmployees();
                     populateAllEnterpriseDropdowns(); fetchExpenses();
                 } else if (tabId === 'documents') {
                     populateDocEmployees();
@@ -2284,7 +2298,7 @@
             allEmployees.forEach(emp => {
                 const opt = document.createElement('option');
                 opt.value = emp.id;
-                opt.textContent = `${emp.name} (${emp.status})`;
+                opt.textContent = `${escapeHTML(emp.name)} (${emp.status})`;
                 select.appendChild(opt);
             });
         }
@@ -2359,12 +2373,17 @@
 
         // Fetch dropdown menu list separately (bypass pagination)
         async function fetchDropdownEmployees() {
+            if (dropdownCached) {
+                populateAdminEmployeeSelect();
+                return;
+            }
             try {
                 const res = await fetch(`${apiBase}/api/admin/employees?limit=all`, { credentials: 'include' });
                 if (res.ok) {
                     const payload = await res.json();
                     if (payload.success && payload.data && payload.data.employees) {
                         allEmployeesFull = payload.data.employees;
+                        dropdownCached = true;
                         populateAdminEmployeeSelect();
                     }
                 }
@@ -2402,8 +2421,7 @@
                         document.getElementById('btn-pag-prev').disabled = currentPage <= 1;
                         document.getElementById('btn-pag-next').disabled = currentPage >= totalPages;
 
-                        // Fetch dropdown list async
-                        fetchDropdownEmployees();
+                        // Fetch dropdown list async (Removed to save memory)
                     } else {
                         showPayrollTableError("Failed to fetch database roster.");
                     }
@@ -2461,11 +2479,11 @@
                 `;
 
                 tr.innerHTML = `
-                    <td><strong>${emp.name}</strong></td>
+                    <td><strong>${escapeHTML(emp.name)}</strong></td>
                     <td>${statusBadge}</td>
                     <td>${financeDetails}</td>
                     <td style="text-align: center;">
-                        <button class="btn-delete" onclick="deletePayrollEmployee(${emp.id}, '${emp.name}')">Remove</button>
+                        <button class="btn-delete" onclick="deletePayrollEmployee(${emp.id}, '${escapeHTML(emp.name)}')">Remove</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -2711,12 +2729,12 @@
                 }
                 allEmployeesFull.forEach(emp => {
                     const tr = document.createElement('tr');
-                    const panStatus = emp.pan ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">${emp.pan.toUpperCase()} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
-                    const aadharStatus = emp.aadhar ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">UID: ${emp.aadhar} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
-                    const pfReg = emp.pf_status === 'Applicable' ? `<span style="color: var(--accent-primary); font-family: monospace;">UAN: ${emp.uan_no}</span>` : `<span style="color: var(--text-secondary);">Exempt / Inactive</span>`;
+                    const panStatus = emp.pan ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">${escapeHTML(emp.pan).toUpperCase()} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
+                    const aadharStatus = emp.aadhar ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">UID: ${escapeHTML(emp.aadhar)} (VERIFIED)</span>` : `<span style="color: #ff5470;">MISSING</span>`;
+                    const pfReg = emp.pf_status === 'Applicable' ? `<span style="color: var(--accent-primary); font-family: monospace;">UAN: ${escapeHTML(emp.uan_no)}</span>` : `<span style="color: var(--text-secondary);">Exempt / Inactive</span>`;
 
                     tr.innerHTML = `
-                        <td><strong>${emp.name}</strong></td>
+                        <td><strong>${escapeHTML(emp.name)}</strong></td>
                         <td>${panStatus}</td>
                         <td>${aadharStatus}</td>
                         <td>${pfReg}</td>
@@ -2734,7 +2752,7 @@
             allEmployeesFull.forEach(emp => {
                 const opt = document.createElement('option');
                 opt.value = emp.id;
-                opt.textContent = `${emp.name} (PAN: ${emp.pan.toUpperCase()})`;
+                opt.textContent = `${escapeHTML(emp.name)} (PAN: ${escapeHTML(emp.pan).toUpperCase()})`;
                 select.appendChild(opt);
             });
             select.value = curVal;
@@ -3459,7 +3477,7 @@
             
             let opts = '<option value="">-- Choose Employee --</option>';
             allEmployeesFull.forEach(emp => {
-                opts += `<option value="${emp.id}">${emp.name}</option>`;
+                opts += `<option value="${emp.id}">${escapeHTML(emp.name)}</option>`;
             });
 
             if (leaveSelect) leaveSelect.innerHTML = opts;

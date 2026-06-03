@@ -1537,15 +1537,18 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
 
   // Fetch LWP (Absent) counts for all employees in one query
   const lwpResult = await pool.request()
+    .input('userId', sql.Int, userId)
     .input('startDate', sql.Date, startDate)
     .input('endDate', sql.Date, endDate)
     .query(`
-      SELECT employee_id, COUNT(*) AS absent_count
-      FROM dbo.Attendance
-      WHERE attendance_date >= @startDate
-        AND attendance_date <= @endDate
-        AND status = 'Absent'
-      GROUP BY employee_id;
+      SELECT A.employee_id, COUNT(*) AS absent_count
+      FROM dbo.Attendance A
+      JOIN dbo.Employees E ON A.employee_id = E.id
+      WHERE E.user_id = @userId
+        AND A.attendance_date >= @startDate
+        AND A.attendance_date <= @endDate
+        AND A.status = 'Absent'
+      GROUP BY A.employee_id;
     `);
 
   const lwpMap = {};

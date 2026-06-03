@@ -1,285 +1,101 @@
-# ZTL Tech Codebase Guide
+# ZTL Tech - Intern Onboarding & Codebase Guide
 
-This repository contains the ZTL Tech web experience, a Node.js backend, and several PHASR validation and simulation engines. It is organized as a mixed application workspace: static frontend sections live at the project root, the API server lives in `backend/`, and PHASR native-code modules live under `phasr/`.
+Welcome to ZTL Tech! If you're a new intern, this is the first document you should read. We've designed this guide to help you navigate the codebase, understand how the pieces fit together, and start shipping code without needing to guess or ask an AI what a file does.
 
-## Project Overview
+---
 
-ZTL Tech is presented as a high-safety software systems company with several product areas:
+## 🏗️ 1. High-Level Architecture
 
-- `ztl_tech/` - main corporate website, login page, admin hub, and super-admin console.
-- `phasr/` - security audit platform, codebase analyzer UI, validator engines, simulation tools, TBAIS sentinel, and Pandemoniums-Halt deciders.
-- `grid/` - network architecture blueprinting and traffic simulation UI.
-- `paradigm/` - custom business software design simulator UI, plus Employee Payroll & Management Registry.
-- `scalpel/` - supervised automation and approval-gated workflow UI.
-- `backend/` - Express API server for authentication, admin operations, database setup, security audits, static code analysis scans, and employee records database management.
-- `docs/` - architecture notes, onboarding guides, PHASR phase requirements, and mathematical model documentation.
+This repository is a **Monorepo**. That means we have several different frontend applications (for different products) and a single, unified Node.js backend server that powers all of them.
 
-## Repository Layout
+*   **The Backend** serves APIs (like login, employee management, security scans).
+*   **The Frontends** are simple, lightweight, static HTML/CSS/JS files (No React, No Next.js). The backend serves these frontend files directly.
 
-```text
-.
-+-- backend/                         Node.js Express API
-+-- docs/
-|   +-- architecture/                 System architecture documentation
-|   +-- equations/                    Mathematical model notes
-|   +-- phasr/                        PHASR phase documentation
-+-- grid/                             GRID static frontend
-+-- paradigm/                         PARADIGM static frontend
-+-- phasr/                            PHASR frontend, engines, generated assets
-+-- scalpel/                          SCALPEL static frontend
-+-- ztl_tech/                         Main ZTL Tech frontend
-+-- codebase_scan_findings_report.txt Latest scanner findings report
-+-- phasr_transition_attestation_summary.txt
-+-- setup_git.bat
-+-- README.md
-```
+---
 
-## Backend
+## 📁 2. Where is Everything? (Directory Structure)
 
-The backend is a CommonJS Node.js application using Express. It serves API routes (supporting secure authentication, admin controls, security scanner runs, and employee record workflows) and exposes the static frontend folders through whitelisted paths.
+Don't let the number of folders intimidate you. Here is exactly what each folder does:
 
-Important backend files:
+### 🖥️ The Frontends
+These folders contain the UI for our different products. They all follow the same pattern (`index.html` for the landing page, `login.html`, and `admin.html` for the dashboard).
+*   `ztl_tech/` - Our main corporate website and Super Admin console.
+*   `paradigm/` - Our Enterprise Business Software & Payroll Management system.
+*   `grid/` - Network architecture and traffic simulation UI.
+*   `scalpel/` - Automated workflow approval UI.
+*   `phasr/` - Our flagship security auditing tool.
 
-- `backend/server.js` - process entry point; initializes the database, starts the HTTP server, and handles graceful shutdown.
-- `backend/src/app.js` - Express app factory; configures middleware, static frontend routes, page redirects, API routes, and error handlers.
-- `backend/src/config/env.js` - validates environment configuration.
-- `backend/src/config/db.js` - manages SQL Server connections.
-- `backend/src/config/initDb.js` - creates required SQL tables (such as `Users`, `AuditLog`, `PhasrAudits`, `CodebaseScans`, and `Employees`) when the server starts.
-- `backend/src/config/redis.js` - manages Redis session storage.
-- `backend/src/routes/auth.routes.js` - login, logout, session, and CSRF-related endpoints.
-- `backend/src/routes/admin.routes.js` - admin workflows including PHASR scan operations, audit access, security alerts, and employee CRUD operations (`/api/admin/employees`).
-- `backend/src/routes/health.routes.js` - health check endpoint.
-- `backend/src/services/` - backend application service layer:
-  - `audit.service.js` - records security audits and database events.
-  - `auth.service.js` - handles user login, password hashing, and session creation.
-  - `event.service.js` - manages the live node cluster event bus (SSE signals).
-  - `ownership.service.js` - validates tenant boundary checks and authorization.
-  - `queue.service.js` - queues static scanner jobs using V8 Worker Thread isolates.
-  - `scanner.service.js` - parses target codebases to extract dependencies and vulnerabilities.
-  - `session.service.js` - performs session token creation, rotation, and revocation.
-  - `tbais.service.js` - runs the Turing FSM anomaly detection logic.
-  - `user.service.js` - handles user lookups and operations.
-- `backend/src/middleware/` - authentication, CSRF, rate limiting, role checks, security headers, 404 handling, and centralized error handling.
-- `backend/src/utils/` - shared helpers for cookies, errors, logging, validation, and responses.
+### ⚙️ The Backend (`/backend`)
+This is the brains of the operation. It's an Express.js server connected to Microsoft SQL Server and Redis.
+*   `server.js` - The entry point. It starts the server and connects to the DB.
+*   `src/app.js` - Connects all the routes and middleware together.
+*   `src/routes/` - API Endpoints (e.g., `/api/admin/...`). This is where HTTP requests land.
+*   `src/services/` - The heavy lifting. If a route needs to calculate payroll, do a security scan, or query the DB, it calls a function in here.
+*   `src/middleware/` - Security checkpoints (CSRF protection, authentication checks) that run *before* a route is hit.
+*   `src/config/` - Database (`db.js`, `initDb.js`), Redis (`redis.js`), and Environment Variables (`env.js`) setup.
 
-## Requirements
+### 📚 The Docs (`/docs`)
+Contains deep-dive architectural documents, mathematical models for PHASR, and detailed engine specs.
 
-For the backend:
+---
 
-- Node.js with support for `node --env-file`
-- npm
-- Microsoft SQL Server
-- Redis
+## 🔒 3. Security & Data Flow (How Things Actually Work)
 
-For PHASR native modules:
+### Authentication & Sessions
+When a user logs in, we don't use simple JWTs in LocalStorage. We use **Secure Sessions stored in Redis**:
+1. User logs in (`auth.service.js`).
+2. Backend generates a Session ID, stores the user's data in **Redis**, and sets an `HttpOnly` cookie in the user's browser.
+3. Every subsequent request automatically sends this cookie.
 
-- Windows: Visual Studio Build Tools with MSVC and MASM where required.
-- Linux x86-64 or ARM64: GCC/G++, GNU assembler, and `make`.
-- Python is needed for selected rendering scripts.
-- FFmpeg or equivalent tooling may be needed if regenerating video artifacts from frame outputs.
+### CSRF Protection (Crucial!)
+To prevent cross-site request forgery, every `POST`, `PUT`, or `DELETE` request requires a CSRF token:
+1. On login, the backend sets a `ztl_csrf` cookie (which *can* be read by frontend JavaScript).
+2. Whenever the frontend makes a request (like saving an employee), it must manually read the `ztl_csrf` cookie and attach it as the `x-csrf-token` header.
+3. The backend (`middleware/csrf.js`) checks if the Header matches the Cookie. If they don't match, you get a `403 CSRF Validation Failed` error.
 
-## Backend Setup
+### Database (MS SQL Server)
+We use Microsoft SQL Server. If you need to add a new table:
+1. Open `backend/src/config/initDb.js`.
+2. Add your table definition to the `tables` array. The server will automatically create it on startup if it doesn't exist.
+3. Use parameterized queries (e.g., `request.input('id', sql.Int, myId)`) everywhere to prevent SQL injection.
 
-```powershell
-cd backend
-npm install
-Copy-Item .env.example .env
-```
+---
 
-Edit `backend/.env` with local values:
+## 🚀 4. How to Run the Project Locally
 
-- `PORT`
-- `JWT_SECRET`
-- SQL Server settings
-- `REDIS_URL`
-- session and CSRF settings
+### Prerequisites
+1. **Node.js** (v20+)
+2. **Redis** (Running locally on port 6379)
+3. **Microsoft SQL Server** (Running locally on port 1433)
 
-Run the backend:
+### Setup Steps
+1. Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up your environment file:
+   Copy `.env.example` to `.env`. Fill in your SQL Server credentials, Redis URL, and a random string for `JWT_SECRET`.
+   *(Note: For isolated Paradigm development, you might be instructed to use `.env.paradigm` instead).*
 
-```powershell
+### Start the Server
+```bash
 npm run dev
 ```
+The server will boot up, initialize the database tables automatically, and serve the application at `http://localhost:3000`.
 
-or:
+*To visit the ZTL Tech Homepage:* Go to `http://localhost:3000/ztl_tech`
+*To visit Paradigm:* Go to `http://localhost:3000/paradigm`
 
-```powershell
-npm start
-```
+---
 
-By default, the server redirects `/` to `/ztl_tech/index.html` and serves the product frontends from:
+## 💡 5. Common Gotchas for Interns
 
-- `/ztl_tech`
-- `/phasr`
-- `/grid`
-- `/paradigm`
-- `/scalpel`
+*   **My form submission was rejected!** Check your browser's network tab. If it's a 403 error, your frontend fetch call is probably missing the `x-csrf-token` header or the `credentials: 'include'` flag.
+*   **My database changes aren't showing!** Make sure you didn't just update the frontend UI. You need to update the Schema in `initDb.js` and ensure the backend route (`admin.routes.js`) is actually executing the SQL `INSERT`/`UPDATE`.
+*   **Where do I put my CSS?** We don't use Tailwind. We use Vanilla CSS. Put it in the `style.css` file inside the respective product folder (e.g., `paradigm/style.css`). Keep designs sleek and symmetrical.
 
-The health check is available at:
-
-```text
-/api/health
-```
-
-## Frontend Sections
-
-Each product section is currently a static HTML/CSS experience:
-
-- `index.html` - public-facing product page.
-- `login.html` - login page for that product area.
-- `admin.html` - operator console or dashboard.
-- `style.css` - section-specific styling.
-
-Additional views:
-- `ztl_tech/super_admin.html` - database/server admin dashboard.
-- `paradigm/employees.html` - Employee Payroll & Management Registry console (supports user profile CRUD, Aadhar/PAN entry, and PF configurations).
-
-## PHASR Structure
-
-PHASR combines static UI pages, native validation engines, generated assembly, generated visualizations, and documentation.
-
-Top-level PHASR files include:
-
-- `phasr/index.html` - PHASR landing page.
-- `phasr/login.html` - PHASR login page.
-- `phasr/admin.html` - PHASR admin dashboard.
-- `phasr/business.html` - enterprise landing page for business operations.
-- `phasr/try-nerds.html` - sandbox codebase analysis console.
-- `phasr/nerd-stats.html` - codebase analyzer UI with finding list and code pane.
-- `phasr/style.css` - PHASR styling.
-- `phasr/ztl_consent_agreement.txt` - consent text used by the scanner workflow.
-- `phasr/compute_balancer.h` - compute-balancing support header.
-- `phasr/render_exploit_paths.py` - exploit path visualization renderer.
-- `phasr/exploit_video_gen.cpp` - native exploit visualization generator.
-- `phasr/build_exploit_video.bat` - Windows video build helper.
-- `phasr/*.gif` and `phasr/*.mp4` - generated visualization outputs.
-- `phasr/frames_*/` - generated PPM frame directories.
-
-PHASR validation and simulation modules:
-
-- `phasr/Acherons-Gate/` - temporal FSM transition validation.
-- `phasr/Nine-Circles/` - hierarchy reachability and access-boundary verification.
-- `phasr/Brimstone-Drift/` - invariant drift and telemetry monitoring.
-- `phasr/Abaddons-Chasm/` - mitigation and chaos verification.
-- `phasr/Legions-Consensus/` - redundancy failover and consensus attestation.
-- `phasr/Satan-Recursion/` - curved spacetime wave solver with chunked generated routines.
-- `phasr/Primordial-Sin/` - primordial engine driver and assembly backends.
-- `phasr/Lucifers-Blessing/` - Lucifer engine driver and assembly backends.
-- `phasr/Pandemoniums-Halt/` - Turing halting state-transition validator and decider (contains native x86-64/ARM64 assemblies and the `turing_decider` executable).
-- `phasr/TBAIS/` - Turing-Based Anomaly Interception System (TBAIS) assembly engine.
-
-## Building PHASR Modules
-
-Most PHASR engine folders provide both a Windows `build.bat` and a Linux/Unix `Makefile`.
-
-Windows example:
-
-```cmd
-cd phasr\Acherons-Gate
-build.bat
-```
-
-Linux example:
-
-```bash
-cd phasr/Acherons-Gate
-make
-./phase_fsm
-```
-
-The same pattern applies to `Nine-Circles` through `Legions-Consensus`, `Satan-Recursion`, `Primordial-Sin`, `Lucifers-Blessing`, `Pandemoniums-Halt`, and `TBAIS`, with each module producing its own compiled executables/objects.
-
-Architecture support varies by module:
-
-- x86-64 Linux assembly backends are present across the generated PHASR engines.
-- ARM64 Linux assembly backends are present for several phase modules and Satan's Recursion.
-- Windows builds generally use MSVC, MASM where present, or portable C/C++ fallbacks.
-
-## Satan's Recursion Visualization
-
-To run a large simulation and export a binary state file:
-
-```cmd
-cd phasr\Satan-Recursion
-satan_recursion.exe --steps 1000000 --export spacetime_simulation.bin --silent
-```
-
-To render an animation:
-
-```cmd
-python render_video.py spacetime_simulation.bin gif
-```
-
-The generated Satan's Recursion helper files can be regenerated with:
-
-```bash
-node generate_satan.js --chunks 10 --routines 10000
-```
-
-## Documentation
-
-Useful documentation entry points:
-
-- `docs/architecture/ARCHITECTURE.md`
-- `docs/architecture/COMPUTE_BALANCER.md`
-- `docs/architecture/Intern_Onboarding.md` - comprehensive team onboarding guide (covers DFAs, FDTD wave physics, N-API, and system internals).
-- `docs/phasr/PHASR_CORE_CONTEXT.md`
-- `docs/phasr/Acherons-Gate.md`
-- `docs/phasr/Nine-Circles.md`
-- `docs/phasr/Brimstone-Drift.md`
-- `docs/phasr/Abaddons-Chasm.md`
-- `docs/phasr/Legions-Consensus.md`
-- `docs/phasr/Satan-Recursion.md`
-- `docs/equations/Equations.md`
-
-## Security Notes
-
-- Do not commit `backend/.env`; use `backend/.env.example` as the template.
-- Static files are intentionally served only from approved frontend directories.
-- Authentication uses secure cookies and session tracking through Redis.
-- CSRF protection is handled by backend middleware and token headers.
-- Scanner findings are persisted to SQL Server and mirrored into `codebase_scan_findings_report.txt`.
-- Keep generated reports and visualization artifacts under review before committing them, because they can become large or stale.
-
-## Common Development Commands
-
-Install backend dependencies:
-
-```powershell
-cd backend
-npm install
-```
-
-Run backend in watch mode:
-
-```powershell
-cd backend
-npm run dev
-```
-
-Run backend normally:
-
-```powershell
-cd backend
-npm start
-```
-
-Build a PHASR module on Windows:
-
-```cmd
-cd phasr\Abaddons-Chasm
-build.bat
-```
-
-Build a PHASR module on Linux:
-
-```bash
-cd phasr/Abaddons-Chasm
-make
-./chaos_verifier
-```
-
-## Maintenance Guidance
-
-- Keep generated assembly and generated frame/video outputs separate from handwritten source when possible.
-- Update this README whenever a new top-level product folder, backend route group, PHASR engine, or required service is added.
-- Prefer documenting generated-code regeneration commands in the module-specific docs rather than expanding this root README with every generated file.
+Good luck, and welcome to the team!
