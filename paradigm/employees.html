@@ -10,12 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000;
+            --bg-color: #0b0c10;
             --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --accent-primary: #a259ff; /* premium purple tone */
-            --accent-secondary: #6f2dbd;
-            --surface-border: rgba(162, 89, 255, 0.15);
+            --text-secondary: #94a3b8;
+            --accent-primary: #4f46e5; /* premium purple tone */
+            --accent-secondary: #ec4899;
+            --surface-border: rgba(255, 255, 255, 0.08);
             --accent-glow: rgba(162, 89, 255, 0.2);
             --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
             --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -28,7 +28,7 @@
         }
 
         body {
-            background: var(--bg-color);
+            background: var(--bg-color); background-image: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 40%), radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15) 0%, transparent 40%); background-attachment: fixed;
             color: var(--text-primary);
             font-family: var(--font-main);
             line-height: 1.6;
@@ -242,7 +242,7 @@
 
         .search-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--surface-border);
             border-radius: 10px;
             padding: 0.6rem 1rem 0.6rem 2.2rem;
@@ -455,7 +455,7 @@
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 0.75rem 1rem;
@@ -590,7 +590,7 @@
         /* ===== UI FIXES ===== */
         /* 1. Selection Drop down background to black */
         select option {
-            background-color: #050507;
+            background-color: #0b0c10;
             color: #ffffff;
         }
         
