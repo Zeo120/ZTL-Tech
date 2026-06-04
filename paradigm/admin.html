@@ -1021,13 +1021,7 @@
 </head>
 <body>
     <!-- Epic Portal Welcome Reveal Screen -->
-    <div id="reveal-screen-overlay">
-        <div id="reveal-logo-container">
-            <div class="logo-diamond" style="width: 80px; height: 80px; animation: pulse-glow 2s infinite ease-in-out; background: #ffffff;"></div>
-            <h2 id="reveal-welcome-title" style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin-top: 0.5rem; opacity: 0; transform: translateY(15px); transition: all 0.5s ease;">INITIALIZING SESSION</h2>
-            <p id="reveal-welcome-status" style="font-family: monospace; font-size: 0.8rem; letter-spacing: 1px; color: var(--accent-primary); text-transform: uppercase;">CONNECTING...</p>
-        </div>
-    </div>
+    
 
     <!-- Fixed Header -->
     <header class="top-header">
@@ -2091,13 +2085,7 @@
                         const header = document.querySelector('.top-header');
                         if (header) header.classList.add('visible');
                         
-                        const overlay = document.getElementById('reveal-screen-overlay');
-                        if (overlay) {
-                            overlay.style.opacity = '0';
-                            overlay.style.pointerEvents = 'none';
-                            overlay.style.transform = 'scale(1.05)';
-                            setTimeout(() => { overlay.style.display = 'none'; }, 800);
-                        }
+                        
 
                         const logoText = document.getElementById('logo-text-val');
                         if (logoText) {
