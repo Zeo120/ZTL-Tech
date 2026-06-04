@@ -17,11 +17,11 @@
     </script>
     <style>
         :root {
-            --bg-color: #0b0c10;\n            --accent-primary: #4f46e5;\n            --accent-secondary: #ec4899;\n            --accent-tertiary: #06b6d4;
-            --surface-color: rgba(30, 41, 59, 0.5);
+            --bg-color: #050507;
+            --surface-color: rgba(10, 10, 12, 0.9);
             --surface-border: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
+            --text-secondary: #9090a0;
             --accent-platinum: #f5f5f7;
             --accent-palladium: #afafb8;
             --font-display: 'Outfit', sans-serif;
@@ -35,7 +35,7 @@
         }
 
         body {
-            background: var(--bg-color); background-image: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 40%), radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15) 0%, transparent 40%); background-attachment: fixed;
+            background: var(--bg-color);
             color: var(--text-primary);
             font-family: var(--font-display);
             line-height: 1.6;
@@ -54,7 +54,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(11, 12, 16, 0.7);
+            background: rgba(5, 5, 7, 0.8);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--surface-border);
@@ -156,7 +156,7 @@
 
         .hamburger-btn:hover {
             border-color: var(--accent-palladium);
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         /* Right Drawer Navigation */
@@ -248,7 +248,7 @@
 
         .drawer-item:hover {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .drawer-item.active {
@@ -534,7 +534,7 @@
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
             color: #ffffff;
             border: 1px solid var(--surface-border);
         }
@@ -970,7 +970,7 @@
         #reveal-screen-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: #0b0c10;
+            background: #050507;
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -990,7 +990,7 @@
         /* ===== UI FIXES ===== */
         /* 1. Selection Drop down background to black */
         select option {
-            background-color: #0b0c10;
+            background-color: #050507;
             color: #ffffff;
         }
         
@@ -1263,7 +1263,7 @@
                                 <div class="form-grid" style="display: grid; grid-template-columns: 1fr; gap: 1.2rem;">
                                     <div class="form-group">
                                         <label for="admin-salary-employee-select">Select Employee<span class="required-star">*</span></label>
-                                        <select id="admin-salary-employee-select" class="form-control" onchange="loadAdminEmployeeSalary()" required style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <select id="admin-salary-employee-select" class="form-control" onchange="loadAdminEmployeeSalary()" required style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                             <option value="">-- Choose Employee --</option>
                                         </select>
                                     </div>
@@ -1273,27 +1273,27 @@
 
                                     <div class="form-group">
                                         <label for="admin-sal-base">Base Salary</label>
-                                        <input type="number" id="admin-sal-base" class="form-control" placeholder="Base Salary" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-base" class="form-control" placeholder="Base Salary" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="admin-sal-hra">House Rent Allowance (HRA)</label>
-                                        <input type="number" id="admin-sal-hra" class="form-control" placeholder="HRA" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-hra" class="form-control" placeholder="HRA" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="admin-sal-allowances">Allowances</label>
-                                        <input type="number" id="admin-sal-allowances" class="form-control" placeholder="Allowances" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-allowances" class="form-control" placeholder="Allowances" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="admin-sal-deductions">Deductions</label>
-                                        <input type="number" id="admin-sal-deductions" class="form-control" placeholder="Deductions" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-deductions" class="form-control" placeholder="Deductions" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="admin-sal-state">Work State (For Professional Tax)</label>
-                                        <select id="admin-sal-state" class="form-control" onchange="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <select id="admin-sal-state" class="form-control" onchange="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                             <option value="Karnataka">Karnataka</option>
                                             <option value="Maharashtra">Maharashtra</option>
                                             <option value="West Bengal">West Bengal</option>
@@ -1308,12 +1308,12 @@
 
                                     <div class="form-group">
                                         <label for="admin-sal-pt">Professional Tax (PT)</label>
-                                        <input type="number" id="admin-sal-pt" class="form-control" placeholder="PT" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-pt" class="form-control" placeholder="PT" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="admin-sal-tax-regime">Tax Regime</label>
-                                        <select id="admin-sal-tax-regime" class="form-control" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <select id="admin-sal-tax-regime" class="form-control" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                             <option value="New">New Tax Regime</option>
                                             <option value="Old">Old Tax Regime</option>
                                         </select>
@@ -1321,7 +1321,7 @@
 
                                     <div class="form-group">
                                         <label for="admin-sal-tds">Tax Deducted at Source (TDS)</label>
-                                        <input type="number" id="admin-sal-tds" class="form-control" placeholder="TDS" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
+                                        <input type="number" id="admin-sal-tds" class="form-control" placeholder="TDS" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
                                     </div>
 
                                     <div style="background: rgba(162, 89, 255, 0.04); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 700;">
@@ -1345,7 +1345,7 @@
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem;">
                                         <label for="admin-attendance-date" style="margin-bottom: 0; font-size: 0.85rem; font-weight: 600;">Select Date:</label>
-                                        <input type="date" id="admin-attendance-date" class="form-control" onchange="loadDailyAttendance()" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: auto; font-size: 0.85rem;">
+                                        <input type="date" id="admin-attendance-date" class="form-control" onchange="loadDailyAttendance()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: auto; font-size: 0.85rem;">
                                     </div>
                                 </div>
 

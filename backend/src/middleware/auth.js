@@ -51,7 +51,7 @@ function authenticate(options = {}) {
       return fail(res, 401, 'Invalid or expired session');
     }
 
-    let currentIp = req.ip || ''; if (currentIp === '::1') currentIp = '127.0.0.1';
+    const currentIp = req.ip || '';
     const currentUserAgent = req.get('user-agent') || '';
     const currentDeviceHash = crypto.createHash('sha256').update(`${currentIp}-${currentUserAgent}`).digest('hex');
 

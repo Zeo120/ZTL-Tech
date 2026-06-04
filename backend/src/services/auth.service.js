@@ -103,7 +103,7 @@ async function login(body, requestContext) {
     throw httpError(401, 'Invalid email or password');
   }
 
-  let ip = requestContext.ip || ''; if (ip === '::1') ip = '127.0.0.1';
+  const ip = requestContext.ip || '';
   const userAgent = requestContext.userAgent || '';
   const deviceHash = crypto.createHash('sha256').update(`${ip}-${userAgent}`).digest('hex');
 
