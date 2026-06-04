@@ -42,7 +42,7 @@ adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), a
   const [userRes, empRes, leavesRes, expensesRes] = await Promise.all([
     suitePool.request()
       .input('id', sql.Int, req.auth.userId)
-      .query(`SELECT id, name, email, role, last_login_at, status FROM dbo.Users WHERE id = @id`),
+      .query(`SELECT id, email, role, is_active FROM dbo.Users WHERE id = @id`),
     suitePool.request()
       .query(`SELECT * FROM dbo.Employees ORDER BY name ASC`),
     suitePool.request()
