@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paradigm | Executive Portal Login</title>
+    <title>Paradigm | Admin Portal Login</title>
     <meta name="description" content="Secure credential verification gateway for Paradigm enterprise business suites.">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
@@ -260,15 +260,15 @@
 
             <!-- Mode Tabs (Visible but Hidden form trigger) -->
             <div class="login-tabs">
-                <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Executive Portal</button>
+                <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Portal</button>
                 <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
                 <button class="login-tab" id="tab-employee" onclick="switchMode('employee')">Employee</button>
             </div>
  
             <!-- Mode Header -->
             <div class="mode-header" id="login-header">
-                <h2 class="mode-title" id="header-title">EXECUTIVE PORTAL</h2>
-                <p class="mode-desc" id="header-desc">Provide authorized executive credentials to access the Paradigm control workspace.</p>
+                <h2 class="mode-title" id="header-title">ADMIN PORTAL</h2>
+                <p class="mode-desc" id="header-desc">Provide authorized admin credentials to access the Paradigm control workspace.</p>
             </div>
  
             <!-- Out-of-band security warning banner (Hidden by default) -->
@@ -279,7 +279,7 @@
             <!-- Login Form (Only Access ID and Password) -->
             <form id="login-form" onsubmit="event.preventDefault(); handleAuth();" style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
                 <div class="form-group">
-                    <label for="access-id">Executive Email Address</label>
+                    <label for="access-id">Admin Email Address</label>
                     <input type="email" id="access-id" required placeholder="cfo@company.com" autocomplete="username">
                 </div>
  
@@ -297,7 +297,7 @@
                     </div>
                 </div>
  
-                <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authorize Executive Session</button>
+                <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authorize Admin Session</button>
             </form>
 
             <!-- Epic verification overlay -->
@@ -311,7 +311,7 @@
     </main>
  
     <footer style="margin-top: auto; padding: 4rem 10% 2rem; text-align: center; color: var(--text-secondary);">
-        <p>© 2026 Zeo Thinking Labs. Paradigm Executive Business Suite Management Console.</p>
+        <p>© 2026 Zeo Thinking Labs. Paradigm Admin Business Suite Management Console.</p>
     </footer>
 
     <script>
@@ -354,8 +354,8 @@
                 tabAdmin.classList.add('active');
                 tabSuper.classList.remove('active');
                 if (tabEmployee) tabEmployee.classList.remove('active');
-                headerTitle.textContent = 'EXECUTIVE PORTAL';
-                headerDesc.textContent = 'Provide authorized executive credentials to access the Paradigm control workspace.';
+                headerTitle.textContent = 'ADMIN PORTAL';
+                headerDesc.textContent = 'Provide authorized admin credentials to access the Paradigm control workspace.';
                 superBanner.style.display = 'none';
                 accessIdInput.placeholder = 'cfo@company.com';
             } else if (mode === 'super') {
