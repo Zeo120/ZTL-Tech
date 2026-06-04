@@ -2073,14 +2073,7 @@
                         renderPayrollTable(allEmployees);
 
                         const welcomeName = user.email ? user.email.split('@')[0].toUpperCase() : 'ADMIN';
-                        const titleEl = document.getElementById('reveal-welcome-title');
-                        const statusEl = document.getElementById('reveal-welcome-status');
-
-                        titleEl.textContent = `AUTHENTICATED: ${welcomeName}`;
-                        titleEl.style.opacity = '1';
-                        titleEl.style.transform = 'translateY(0)';
-
-                        statusEl.textContent = "WORKSPACE COCKPIT READY.";
+                        
 
                         const header = document.querySelector('.top-header');
                         if (header) header.classList.add('visible');
