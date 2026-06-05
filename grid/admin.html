@@ -379,6 +379,48 @@
             <!-- LEFT COLUMN: The 3 Systems Consultation Blueprint Cards -->
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 
+                <!-- ARCHITECTURE INGESTION MODULE -->
+                <div class="operator-panel">
+                    <div class="panel-header-title">
+                        <span>[1] ARCHITECTURE INGESTION</span>
+                        <span class="text-neon">AWAITING TARGET</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <button class="fail-btn" style="flex: 1; border-color: var(--accent-primary); background: rgba(255,170,0,0.05); color: #fff;" onclick="toggleIngestion('github')">GITHUB REPO</button>
+                        <button class="fail-btn" style="flex: 1;" onclick="toggleIngestion('local')">LOCAL FOLDER</button>
+                    </div>
+
+                    <div id="ingest-github" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                        <div class="detail-row" style="border:none; padding:0;">
+                            <span class="telemetry-label">Repository URL</span>
+                        </div>
+                        <input type="url" class="custom-slider" style="height: 35px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,170,0,0.2); color: #fff; padding: 0 10px; border-radius: 4px;" placeholder="https://github.com/Zeo120/ZTL-Tech" />
+                    </div>
+
+                    <div id="ingest-local" style="display: none; flex-direction: column; gap: 0.8rem;">
+                        <div class="detail-row" style="border:none; padding:0;">
+                            <span class="telemetry-label">Massive Codebase Directory (Not Single Files)</span>
+                        </div>
+                        <input type="file" webkitdirectory directory multiple class="custom-slider" style="height: 35px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,170,0,0.2); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem;" />
+                    </div>
+
+                    <button class="fail-btn" style="margin-top: 0.5rem; padding: 0.8rem; font-size: 0.8rem; background: rgba(255,170,0,0.1); border-color: var(--accent-primary); color: #ffaa00;" onclick="alert('Initiating Deterministic Architecture Scan...')">INITIATE DETERMINISTIC CALCULUS</button>
+
+                    <script>
+                        function toggleIngestion(type) {
+                            const btns = document.querySelectorAll('.operator-panel:first-child .fail-btn');
+                            btns[0].style.borderColor = type === 'github' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.08)';
+                            btns[0].style.color = type === 'github' ? '#fff' : 'var(--text-secondary)';
+                            btns[1].style.borderColor = type === 'local' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.08)';
+                            btns[1].style.color = type === 'local' ? '#fff' : 'var(--text-secondary)';
+                            
+                            document.getElementById('ingest-github').style.display = type === 'github' ? 'flex' : 'none';
+                            document.getElementById('ingest-local').style.display = type === 'local' ? 'flex' : 'none';
+                        }
+                    </script>
+                </div>
+                
                 <!-- Global API Gateway & Cache Card -->
                 <div class="operator-panel suite-card active" id="card-suite-api" onclick="selectSuite('api')">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
