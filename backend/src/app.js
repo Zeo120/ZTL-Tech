@@ -11,6 +11,9 @@ const { healthRoutes } = require('./routes/health.routes');
 const { authRoutes } = require('./routes/auth.routes');
 const { adminRoutes } = require('./routes/admin.routes');
 const { employeeRoutes } = require('./routes/employee.routes');
+const { gridAdminRoutes } = require('./grid/routes/admin.routes');
+const { gridEmployeeRoutes } = require('./grid/routes/employee.routes');
+const { gridAuthRoutes } = require('./grid/routes/auth.routes');
 
 function createApp() {
   const app = express();
@@ -48,7 +51,6 @@ function createApp() {
 
   // Serve static files from specific whitelisted directories only.
   // This keeps backend internals out of the public surface.
-  mountStaticRoute('/grid', 'grid');
   mountStaticRoute('/paradigm', 'paradigm');
   mountStaticRoute('/phasr', 'phasr');
   mountStaticRoute('/scalpel', 'scalpel');
@@ -68,6 +70,11 @@ function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/employee', employeeRoutes);
+
+  // Grid API routes
+  app.use('/api/grid/auth', gridAuthRoutes);
+  app.use('/api/grid/admin', gridAdminRoutes);
+  app.use('/api/grid/employee', gridEmployeeRoutes);
 
   // Error handlers
   app.use(notFound);

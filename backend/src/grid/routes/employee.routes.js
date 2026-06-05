@@ -1,19 +1,19 @@
 const crypto = require('crypto');
 const express = require('express');
-const { sql, getDbPool } = require('../config/db');
-const { env } = require('../config/env');
-const { authenticateCookie } = require('../middleware/auth');
-const { requireCsrf } = require('../middleware/csrf');
-const { loginRateLimit } = require('../middleware/rateLimit');
-const { asyncHandler } = require('../utils/asyncHandler');
-const { ok } = require('../utils/responses');
-const { httpError } = require('../utils/httpError');
-const { verifyPassword, signSessionToken } = require('../services/auth.service');
-const { createSession, revokeSession } = require('../services/session.service');
-const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
-const { decryptPII } = require('../utils/cryptoVault');
+const { sql, getGridDbPool } = require('../../config/db');
+const { env } = require('../../config/env');
+const { authenticateCookie } = require('../../middleware/auth');
+const { requireCsrf } = require('../../middleware/csrf');
+const { loginRateLimit } = require('../../middleware/rateLimit');
+const { asyncHandler } = require('../../utils/asyncHandler');
+const { ok } = require('../../utils/responses');
+const { httpError } = require('../../utils/httpError');
+const { verifyPassword, signSessionToken } = require('../../services/auth.service');
+const { createSession, revokeSession } = require('../../services/session.service');
+const { sessionCookieOptions, csrfCookieOptions } = require('../../utils/cookies');
+const { decryptPII } = require('../../utils/cryptoVault');
 
-const employeeRoutes = express.Router();
+const gridEmployeeRoutes = express.Router();
 
 const loginLimiter = loginRateLimit({
   windowMs: 15 * 60 * 1000,
@@ -23,11 +23,11 @@ const loginLimiter = loginRateLimit({
 
 const DUMMY_HASH = '$argon2id$v=19$m=65536,t=3,p=4$7aUA7GPkSnBru/DiJ4uB5g$HcLVIJt4kCEjmaXMKhAzeAWeq3Uc90CeTvxAe9wxOtI';
 
-employeeRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
+gridEmployeeRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) throw httpError(400, 'Email and password required');
 
-  const pool = await getDbPool();
+  const pool = await getGridDbPool();
   const result = await pool.request()
     .input('email', sql.NVarChar(255), email)
     .query(`
@@ -68,7 +68,7 @@ employeeRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   return ok(res, { employee: { id: emp.id, name: emp.name, email: emp.email } });
 }));
 
-employeeRoutes.post('/logout', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
+gridEmployeeRoutes.post('/logout', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
   if (req.auth.role !== 'employee') throw httpError(403, 'Not an employee');
   await revokeSession(req.auth.sessionId);
   res.clearCookie(env.sessionCookieName, sessionCookieOptions());
@@ -81,8 +81,8 @@ const employeeAuth = [authenticateCookie, (req, res, next) => {
   next();
 }];
 
-employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+gridEmployeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
+  const pool = await getGridDbPool();
   const result = await pool.request()
     .input('id', sql.Int, req.auth.userId)
     .query(`
@@ -104,7 +104,7 @@ employeeRoutes.get('/me', employeeAuth, asyncHandler(async (req, res) => {
   return ok(res, { employee: emp });
 }));
 
-employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
+gridEmployeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
   const { date, status, device_time, latitude, longitude } = req.body;
   if (!date || !status) throw httpError(400, 'Date and status required');
 
@@ -128,7 +128,7 @@ employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async
     }
   }
 
-  const pool = await getDbPool();
+  const pool = await getGridDbPool();
   
   // Upsert attendance
   await pool.request()
@@ -148,11 +148,11 @@ employeeRoutes.post('/attendance', employeeAuth, requireCsrf, asyncHandler(async
   return ok(res, { message: 'Attendance recorded' });
 }));
 
-employeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
+gridEmployeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (req, res) => {
   const { type, start_date, end_date, reason } = req.body;
   if (!type || !start_date || !end_date) throw httpError(400, 'Missing required fields');
 
-  const pool = await getDbPool();
+  const pool = await getGridDbPool();
   await pool.request()
     .input('empId', sql.Int, req.auth.userId)
     .input('type', sql.NVarChar(50), type)
@@ -167,8 +167,8 @@ employeeRoutes.post('/leaves', employeeAuth, requireCsrf, asyncHandler(async (re
   return ok(res, { message: 'Leave request submitted' });
 }));
 
-employeeRoutes.get('/payslips', employeeAuth, asyncHandler(async (req, res) => {
-  const pool = await getDbPool();
+gridEmployeeRoutes.get('/payslips', employeeAuth, asyncHandler(async (req, res) => {
+  const pool = await getGridDbPool();
   const result = await pool.request()
     .input('empId', sql.Int, req.auth.userId)
     .query(`
@@ -181,4 +181,4 @@ employeeRoutes.get('/payslips', employeeAuth, asyncHandler(async (req, res) => {
   return ok(res, { payslips: result.recordset });
 }));
 
-module.exports = { employeeRoutes };
+module.exports = { gridEmployeeRoutes };

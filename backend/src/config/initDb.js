@@ -715,22 +715,23 @@ async function ensureIndexes(pool, table) {
   }
 }
 
-async function seedAdmin(pool) {
+async function seedAdmin(pool, email, password, role) {
   const existingAdmin = await pool.request()
+    .input('email', sql.NVarChar(254), email)
     .query(`
       SELECT TOP 1 id
       FROM dbo.Users
-      WHERE role IN (N'super-admin', N'admin', N'super_admin');
+      WHERE email = @email;
     `);
 
   if (existingAdmin.recordset[0]) return;
 
-  const passwordHash = await hashPassword(ADMIN_PASSWORD);
+  const passwordHash = await hashPassword(password);
 
   await pool.request()
-    .input('email', sql.NVarChar(254), ADMIN_EMAIL)
+    .input('email', sql.NVarChar(254), email)
     .input('passwordHash', sql.NVarChar(sql.MAX), passwordHash)
-    .input('role', sql.NVarChar(32), ADMIN_ROLE)
+    .input('role', sql.NVarChar(32), role)
     .query(`
       IF EXISTS (SELECT 1 FROM dbo.Users WHERE email = @email)
       BEGIN
@@ -763,7 +764,7 @@ async function seedAdmin(pool) {
       END;
     `);
 
-  logger.info('admin_seeded', { email: ADMIN_EMAIL, role: ADMIN_ROLE });
+  logger.info('admin_seeded', { email, role });
 }
 
 async function foreignKeyExists(pool, constraintName) {
@@ -815,7 +816,8 @@ async function initDb() {
   await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_PayrollRuns', 'FOREIGN KEY (payroll_run_id) REFERENCES dbo.PayrollRuns(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
 
-  await seedAdmin(pool);
+  await seedAdmin(pool, 'admin@grid.local', ADMIN_PASSWORD, 'admin');
+  await seedAdmin(pool, 'superadmin@grid.local', 'superadmin123', 'super_admin');
 
   logger.info('db_init_complete');
 }

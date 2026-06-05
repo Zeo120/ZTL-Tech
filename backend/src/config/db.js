@@ -4,8 +4,6 @@ const { logger } = require('../utils/logger');
 
 let pool;
 let connectingDb;
-let paradigmPool;
-let paradigmConnectingDb;
 
 async function getDbPool() {
   if (pool) return pool;
@@ -32,34 +30,17 @@ async function getDbPool() {
   return connectingDb;
 }
 
+async function getGridDbPool() {
+  return getDbPool();
+}
+
 async function getParadigmDbPool() {
-  if (paradigmPool) return paradigmPool;
-  if (paradigmConnectingDb) return paradigmConnectingDb;
-
-  const options = env.paradigmSql.options;
-
-  paradigmConnectingDb = sql.connect({
-    server: env.paradigmSql.server,
-    port: env.paradigmSql.port,
-    database: env.paradigmSql.database,
-    ...(env.paradigmSql.user ? { user: env.paradigmSql.user } : {}),
-    ...(env.paradigmSql.password ? { password: env.paradigmSql.password } : {}),
-    options,
-    pool: { max: 20, min: 0, idleTimeoutMillis: 30000 }
-  })
-  .then((connectedPool) => { paradigmPool = connectedPool; return paradigmPool; })
-  .catch((error) => { paradigmPool = undefined; throw error; })
-  .finally(() => { paradigmConnectingDb = undefined; });
-
-  return paradigmConnectingDb;
+  return getGridDbPool();
 }
 
 async function closeDbPool() {
   if (pool) {
     try { await pool.close(); } catch(e){} finally { pool = undefined; }
-  }
-  if (paradigmPool) {
-    try { await paradigmPool.close(); } catch(e){} finally { paradigmPool = undefined; }
   }
 }
 
@@ -67,5 +48,6 @@ module.exports = {
   sql,
   getDbPool,
   getParadigmDbPool,
+  getGridDbPool,
   closeDbPool
 };

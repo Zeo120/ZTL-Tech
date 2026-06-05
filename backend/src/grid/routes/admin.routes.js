@@ -2,25 +2,25 @@ const express = require('express');
 const http = require('http');
 const https = require('https');
 const { URL } = require('url');
-const { authenticateCookie } = require('../middleware/auth');
-const { ipRateLimit } = require('../middleware/rateLimit');
-const { requireAtLeastRole, requireRole, revalidateRoleAtLeast } = require('../middleware/requireRole');
-const { requireCsrf } = require('../middleware/csrf');
-const { asyncHandler } = require('../utils/asyncHandler');
-const { ok } = require('../utils/responses');
-const { env } = require('../config/env');
-const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
-const { writeAuditEvent } = require('../services/audit.service');
-const { rotateSession } = require('../services/session.service');
-const { signSessionToken } = require('../services/auth.service');
-const { sql, getDbPool } = require('../config/db');
-const { tbaisEvents } = require('../services/event.service');
-const { encryptPII, decryptPII } = require('../utils/cryptoVault');
+const { authenticateCookie } = require('../../middleware/auth');
+const { ipRateLimit } = require('../../middleware/rateLimit');
+const { requireAtLeastRole, requireRole, revalidateRoleAtLeast } = require('../../middleware/requireRole');
+const { requireCsrf } = require('../../middleware/csrf');
+const { asyncHandler } = require('../../utils/asyncHandler');
+const { ok } = require('../../utils/responses');
+const { env } = require('../../config/env');
+const { sessionCookieOptions, csrfCookieOptions } = require('../../utils/cookies');
+const { writeAuditEvent } = require('../../services/audit.service');
+const { rotateSession } = require('../../services/session.service');
+const { signSessionToken } = require('../../services/auth.service');
+const { sql, getGridDbPool } = require('../../config/db');
+const { tbaisEvents } = require('../../services/event.service');
+const { encryptPII, decryptPII } = require('../../utils/cryptoVault');
 
-const adminRoutes = express.Router();
+const gridAdminRoutes = express.Router();
 
-adminRoutes.use(authenticateCookie);
-adminRoutes.use(requireCsrf);
+gridAdminRoutes.use(authenticateCookie);
+gridAdminRoutes.use(requireCsrf);
 
 const adminLimiter = ipRateLimit({
   windowMs: 60 * 1000,
@@ -34,8 +34,8 @@ const superAdminLimiter = ipRateLimit({
   keyPrefix: 'super-admin'
 });
 
-adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
-  const corePool = await getDbPool();
+gridAdminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const corePool = await getGridDbPool();
   const pool = corePool;
 
   const [userRes, empRes, leavesRes, expensesRes] = await Promise.all([
@@ -65,7 +65,7 @@ adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), a
   });
 }));
 
-adminRoutes.post('/super-admin/actions', superAdminLimiter, requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/super-admin/actions', superAdminLimiter, requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
   await writeAuditEvent({
     actorUserId: Number(req.auth.userId),
     action: 'super_admin.action',
@@ -98,14 +98,14 @@ adminRoutes.post('/super-admin/actions', superAdminLimiter, requireRole('super-a
 }));
 
 // POST /api/admin/phasr/free-audit
-adminRoutes.post('/phasr/free-audit', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/phasr/free-audit', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const { domainName, proofDetails, agreementFilename } = req.body;
   if (!domainName || !proofDetails) {
     return res.status(400).json({ success: false, error: 'Domain name and proof details are required.' });
   }
 
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
+  const corePool = await getGridDbPool();
   const pool = corePool;
 
   // Create Audit record
@@ -319,7 +319,7 @@ adminRoutes.post('/phasr/free-audit', adminLimiter, requireAtLeastRole('admin'),
   // Start background real-time auditing and sequential signal updates
   setTimeout(async () => {
     try {
-      const bgPool = await getDbPool();
+      const bgPool = await getGridDbPool();
       
       // Update status to active
       await bgPool.request()
@@ -491,7 +491,7 @@ adminRoutes.post('/phasr/free-audit', adminLimiter, requireAtLeastRole('admin'),
 }));
 
 // POST /api/admin/phasr/scan-codebase
-adminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const { sourceType, targetPath, scanFocus } = req.body;
   if (!sourceType || !targetPath || !scanFocus) {
     return res.status(400).json({ success: false, error: 'sourceType, targetPath, and scanFocus are required parameters.' });
@@ -501,7 +501,7 @@ adminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin
   const ip = req.ip;
   const userAgent = req.get('user-agent') || '';
 
-  const { queueService } = require('../services/queue.service');
+  const { queueService } = require('../../services/queue.service');
 
   // Dispatch job to the native Worker Thread pool
   const jobId = queueService.dispatchCodebaseScan(targetPath, scanFocus);
@@ -513,8 +513,8 @@ adminRoutes.post('/phasr/scan-codebase', adminLimiter, requireAtLeastRole('admin
 }));
 
 // GET /api/admin/phasr/scan-status/:jobId
-adminRoutes.get('/phasr/scan-status/:jobId', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
-  const { queueService } = require('../services/queue.service');
+gridAdminRoutes.get('/phasr/scan-status/:jobId', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
+  const { queueService } = require('../../services/queue.service');
   const status = queueService.getJobStatus(req.params.jobId);
   
   if (!status) {
@@ -525,7 +525,7 @@ adminRoutes.get('/phasr/scan-status/:jobId', adminLimiter, requireAtLeastRole('a
 });
 
 // POST /api/admin/phasr/run-drill
-adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const { phase } = req.body;
   const phaseNum = parseInt(phase, 10);
   if (isNaN(phaseNum) || phaseNum < -1 || phaseNum > 5) {
@@ -683,9 +683,9 @@ adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), 
 }));
 
 // GET /api/admin/security-alerts
-adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+gridAdminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   const result = await suitePool.request()
     .query(`
@@ -709,7 +709,7 @@ adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), a
 }));
 
 // GET /api/admin/events (Server-Sent Events)
-adminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
+gridAdminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res) => {
   // Setup SSE headers
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -735,10 +735,10 @@ adminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res)
 });
 
 // GET /api/admin/phasr/logs
-adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const logsResult = await pool.request()
@@ -764,10 +764,10 @@ adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncH
 }));
 
 // GET /api/admin/phasr/scans — list all historical codebase scans for this operator
-adminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const scansResult = await pool.request()
@@ -806,7 +806,7 @@ adminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), async
 }));
 
 // GET /api/admin/phasr/scans/:id — full detail: scan metadata + dependencies + findings from audit log
-adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const scanId = Number(req.params.id);
 
@@ -814,8 +814,8 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
     return res.status(400).json({ success: false, error: 'Invalid scan ID.' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Fetch the scan metadata and verify ownership
@@ -903,9 +903,9 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
 }));
 
 // GET /api/admin/clients - List all users with role 'admin'
-adminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+gridAdminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   const result = await pool.request()
     .query(`
@@ -936,14 +936,14 @@ adminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('s
 }));
 
 // POST /api/admin/clients - Create a new admin client
-adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
   const { email, password, purchased_modules } = req.body;
   if (!email || !password) {
     return res.status(400).json({ success: false, error: 'Email and password are required' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Check if email already exists
@@ -955,7 +955,7 @@ adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('
     return res.status(400).json({ success: false, error: 'A user with this email address already exists' });
   }
 
-  const { hashPassword } = require('../services/auth.service');
+  const { hashPassword } = require('../../services/auth.service');
   const passwordHash = await hashPassword(password);
   const modulesString = JSON.stringify(Array.isArray(purchased_modules) ? purchased_modules : []);
 
@@ -983,7 +983,7 @@ adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('
 }));
 
 // PUT /api/admin/clients/:id - Update client's purchased modules
-adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
+gridAdminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
   const clientId = Number(req.params.id);
   const { purchased_modules } = req.body;
 
@@ -991,8 +991,8 @@ adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeas
     return res.status(400).json({ success: false, error: 'purchased_modules must be an array' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   const modulesString = JSON.stringify(purchased_modules);
 
@@ -1068,10 +1068,10 @@ function validateEmployeePayload(data) {
 }
 
 // GET /api/admin/employees - Fetch employee records for the current tenant user with pagination/search support
-adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const searchStr = req.query.search ? req.query.search.trim() : '';
@@ -1178,10 +1178,10 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
 }));
 
 // GET /api/admin/employees/summary - Fetch server-side aggregate salary/tax metrics for reports
-adminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1216,7 +1216,7 @@ adminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res
 }));
 
 // POST /api/admin/employees - Create a new employee record for the current tenant user
-adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const validationErrors = validateEmployeePayload(req.body);
 
@@ -1234,8 +1234,8 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     state, professional_tax, tds
   } = req.body;
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const parseInputDate = (dStr) => {
@@ -1296,7 +1296,7 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
 }));
 
 // PUT /api/admin/employees/:id/salary - Update salary details for an employee
-adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const employeeId = Number(req.params.id);
   const { base_salary, hra, allowances, deductions, state, professional_tax, tds, tax_regime, tax_declarations_json } = req.body;
@@ -1321,8 +1321,8 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
     });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1360,11 +1360,11 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
 }));
 
 // DELETE /api/admin/employees/:id - Remove an employee record for the current tenant user
-adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const employeeId = Number(req.params.id);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const deleteResult = await suitePool.request()
@@ -1383,15 +1383,15 @@ adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res)
 }));
 
 // GET /api/admin/employees/attendance - Fetch attendance records for a specific date
-adminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const dateStr = req.query.date; // YYYY-MM-DD
   if (!dateStr) {
     return res.status(400).json({ success: false, error: 'Date is required' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -1408,7 +1408,7 @@ adminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, 
 }));
 
 // POST /api/admin/employees/attendance - Update or record attendance for a specific date
-adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const { employee_id, attendance_date, status } = req.body;
 
@@ -1416,8 +1416,8 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
     return res.status(400).json({ success: false, error: 'employee_id, attendance_date, and status are required' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // First verify employee belongs to user
@@ -1454,10 +1454,10 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
 // =============================================
 
 // GET /api/admin/payroll/runs - Fetch all payroll runs for the current user
-adminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1495,7 +1495,7 @@ adminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => 
 }));
 
 // POST /api/admin/payroll/runs - Create a new payroll run
-adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const { month, year } = req.body;
 
@@ -1509,8 +1509,8 @@ adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) =>
     return res.status(400).json({ success: false, error: 'Year must be 2020 or later.' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Check for duplicate
@@ -1546,7 +1546,7 @@ adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) =>
 }));
 
 // POST /api/admin/payroll/runs/:id/process - Process a payroll run
-adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
 
@@ -1554,8 +1554,8 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Verify run belongs to user and is in Draft status
@@ -1843,7 +1843,7 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
 }));
 
 // GET /api/admin/payroll/runs/:id/transactions - Fetch all transactions for a payroll run
-adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
 
@@ -1851,8 +1851,8 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID.' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Verify run belongs to user
@@ -1909,16 +1909,16 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
   });
 }));
 
-const { sendNativeEmail } = require('../utils/nativeMailer');
+const { sendNativeEmail } = require('../../utils/nativeMailer');
 const crypto = require('crypto');
 
 
 // POST /api/admin/payroll/runs/:id/dispatch - Dispatch payslips via raw SMTP magic links
-adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   const runCheck = await pool.request()
@@ -1944,7 +1944,7 @@ adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async 
   const monthYear = monthNames[runInfo.month - 1] + ' ' + runInfo.year;
   const basePath = req.headers.origin || 'http://localhost:3000';
 
-  const { mailDaemon } = require('../utils/mailDaemon');
+  const { mailDaemon } = require('../../utils/mailDaemon');
   let queuedCount = 0;
   for (const row of result.recordset) {
     const magicStr = `${runId}:${row.employee_id}`;
@@ -1972,7 +1972,7 @@ adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async 
 }));
 
 // GET /api/admin/payroll/runs/:id/payslip/:employeeId - Fetch single transaction for payslip
-adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
   const employeeId = Number(req.params.employeeId);
@@ -1981,8 +1981,8 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
     return res.status(400).json({ success: false, error: 'Invalid payroll run ID or employee ID.' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
 
   // Verify run belongs to user
@@ -2066,7 +2066,7 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
 
 
 // POST /api/admin/employees/:id/credentials - Set employee credentials
-adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const empId = Number(req.params.id);
   const { email, password } = req.body;
@@ -2075,8 +2075,8 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
     return res.status(400).json({ success: false, error: 'Email and password required' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   
   // Verify employee belongs to admin
@@ -2089,7 +2089,7 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
     return res.status(404).json({ success: false, error: 'Employee not found' });
   }
 
-  const { hashPassword } = require('../services/auth.service');
+  const { hashPassword } = require('../../services/auth.service');
   const passwordHash = await hashPassword(password);
 
   await pool.request()
@@ -2102,10 +2102,10 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
 }));
 
 // GET /api/admin/leaves - Fetch all leaves
-adminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   
   const result = await pool.request()
@@ -2122,7 +2122,7 @@ adminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
 }));
 
 // POST /api/admin/leaves - Admin creates a leave for employee
-adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const { employee_id, type, start_date, end_date, reason } = req.body;
   
@@ -2130,8 +2130,8 @@ adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   
   // Verify ownership
@@ -2157,7 +2157,7 @@ adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
 }));
 
 // PUT /api/admin/leaves/:id/status - Approve or reject leave
-adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res) => {
+gridAdminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const leaveId = Number(req.params.id);
   const { status } = req.body;
@@ -2166,8 +2166,8 @@ adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res
     return res.status(400).json({ success: false, error: 'Status must be Approved or Rejected' });
   }
 
-  const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const corePool = await getGridDbPool();
+  const suitePool = await getGridDbPool();
   const pool = corePool;
   
   // Update if owned
@@ -2186,4 +2186,4 @@ adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res
   return ok(res, { message: 'Leave status updated' });
 }));
 
-module.exports = { adminRoutes };
+module.exports = { gridAdminRoutes };

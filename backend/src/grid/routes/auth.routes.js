@@ -1,17 +1,19 @@
 const express = require('express');
-const { authenticateCookie } = require('../middleware/auth');
-const { requireCsrf } = require('../middleware/csrf');
-const { loginRateLimit } = require('../middleware/rateLimit');
-const { env } = require('../config/env');
-const { sql, getDbPool } = require('../config/db');
-const { sessionCookieOptions, csrfCookieOptions } = require('../utils/cookies');
-const { asyncHandler } = require('../utils/asyncHandler');
-const { ok } = require('../utils/responses');
-const { httpError } = require('../utils/httpError');
-const { login, findUserById } = require('../services/auth.service');
-const { revokeSession, revokeAllSessions } = require('../services/session.service');
+const crypto = require('crypto');
+const { authenticateCookie } = require('../../middleware/auth');
+const { requireCsrf } = require('../../middleware/csrf');
+const { loginRateLimit } = require('../../middleware/rateLimit');
+const { env } = require('../../config/env');
+const { sql, getGridDbPool } = require('../../config/db');
+const { sessionCookieOptions, csrfCookieOptions } = require('../../utils/cookies');
+const { asyncHandler } = require('../../utils/asyncHandler');
+const { ok } = require('../../utils/responses');
+const { httpError } = require('../../utils/httpError');
+const { login, findUserById } = require('../../services/auth.service');
+const { revokeSession, revokeAllSessions } = require('../../services/session.service');
+const { decryptPII } = require('../../utils/cryptoVault');
 
-const authRoutes = express.Router();
+const gridAuthRoutes = express.Router();
 
 const loginLimiter = loginRateLimit({
   windowMs: 15 * 60 * 1000,
@@ -19,7 +21,7 @@ const loginLimiter = loginRateLimit({
   keyPrefix: 'login'
 });
 
-authRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
+gridAuthRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const result = await login(req.body, {
     ip: req.body.simulateNoIp ? '' : req.ip,
     userAgent: req.get('user-agent') || ''
@@ -30,21 +32,21 @@ authRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   return ok(res, { user: result.user });
 }));
 
-authRoutes.post('/logout', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
+gridAuthRoutes.post('/logout', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
   await revokeSession(req.auth.sessionId);
   res.clearCookie(env.sessionCookieName, sessionCookieOptions());
   res.clearCookie(env.csrfCookieName, csrfCookieOptions());
   return ok(res, {});
 }));
 
-authRoutes.post('/logout-all', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
+gridAuthRoutes.post('/logout-all', authenticateCookie, requireCsrf, asyncHandler(async (req, res) => {
   await revokeAllSessions(req.auth.userId);
   res.clearCookie(env.sessionCookieName, sessionCookieOptions());
   res.clearCookie(env.csrfCookieName, csrfCookieOptions());
   return ok(res, {});
 }));
 
-authRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
+gridAuthRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
   const user = await findUserById(req.auth.userId);
   if (!user) {
     return res.status(404).json({ success: false, error: 'User not found' });
@@ -67,10 +69,7 @@ authRoutes.get('/me', authenticateCookie, asyncHandler(async (req, res) => {
   });
 }));
 
-const crypto = require('crypto');
-const { decryptPII } = require('../utils/cryptoVault');
-
-authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
+gridAuthRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
   const { runId, empId, token } = req.query;
   if (!runId || !empId || !token) throw httpError(400, 'Missing parameters.');
 
@@ -78,7 +77,7 @@ authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
   const expectedToken = crypto.createHmac('sha256', env.jwtSecret).update(magicStr).digest('hex');
   if (token !== expectedToken) throw httpError(403, 'Invalid or expired magic link.');
 
-  const pool = await getDbPool();
+  const pool = await getGridDbPool();
   const runCheck = await pool.request()
     .input('runId', sql.Int, Number(runId))
     .query("SELECT TOP 1 id, month, year FROM dbo.PayrollRuns WHERE id = @runId AND status = 'Completed';");
@@ -127,7 +126,7 @@ authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
       professional_tax: row.professional_tax ? Number(row.professional_tax) : 0,
       tds: row.tds ? Number(row.tds) : 0,
       lwp_deduction: row.lwp_deduction ? Number(row.lwp_deduction) : 0,
-      net_salary: row.net_salary ? Number(row.net_salary) : 0,
+      net_salary: row.net_salary ? Number(row.net_salary) : 0
     },
     run: payrollRun
   };
@@ -135,5 +134,4 @@ authRoutes.get('/magic-payslip', asyncHandler(async (req, res) => {
   return ok(res, { payslip_payload: payload });
 }));
 
-module.exports = { authRoutes };
-;
+module.exports = { gridAuthRoutes };

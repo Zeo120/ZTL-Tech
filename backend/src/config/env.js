@@ -81,11 +81,11 @@ const env = {
     }
   },
   paradigmSql: {
-    server: required('PARADIGM_SQL_SERVER'),
-    port: parsePositiveInt('PARADIGM_SQL_PORT', 1433),
-    database: required('PARADIGM_SQL_DATABASE'),
-    user: optional('PARADIGM_SQL_USER'),
-    password: optional('PARADIGM_SQL_PASSWORD'),
+    server: optional('PARADIGM_SQL_SERVER', required('SQL_SERVER')),
+    port: parsePositiveInt('PARADIGM_SQL_PORT', parsePositiveInt('SQL_PORT', 1433)),
+    database: optional('PARADIGM_SQL_DATABASE', required('SQL_DATABASE')),
+    user: optional('PARADIGM_SQL_USER', optional('SQL_USER')),
+    password: optional('PARADIGM_SQL_PASSWORD', optional('SQL_PASSWORD')),
     options: {
       encrypt: process.env.SQL_ENCRYPT !== 'false',
       trustServerCertificate: process.env.SQL_TRUST_SERVER_CERTIFICATE === 'true'

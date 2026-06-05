@@ -1,6 +1,6 @@
-# ZTL Tech Backend
+# GRID Backend
 
-Minimal Express backend scaffold for ZTL Tech.
+Minimal Express backend scaffold for GRID on SQL Server.
 
 ## Layout
 
@@ -72,10 +72,10 @@ backend/
 
 ## Expected Tables
 
-The application expects the following tables in MS SQL Server:
+The application expects the following tables in `GRID_DB` on the same SQL Server instance:
 
 ```sql
-Users(
+grid.Users(
   id INT PRIMARY KEY,
   email NVARCHAR(254) UNIQUE NOT NULL,
   password_hash NVARCHAR(MAX) NOT NULL,
@@ -85,21 +85,21 @@ Users(
   updated_at DATETIME2 NULL
 )
 
-Pages(
+grid.Pages(
   id INT PRIMARY KEY,
   user_id INT NOT NULL,
   title NVARCHAR(200) NOT NULL,
   created_at DATETIME2 NOT NULL
 )
 
-Widgets(
+grid.Widgets(
   id INT PRIMARY KEY,
   page_id INT NOT NULL,
   type NVARCHAR(100) NOT NULL,
   config_json NVARCHAR(MAX) NULL
 )
 
-AuditLog(
+grid.AuditLog(
   id INT IDENTITY PRIMARY KEY,
   actor_user_id INT NULL,
   action NVARCHAR(100) NOT NULL,
@@ -112,7 +112,7 @@ AuditLog(
   created_at DATETIME2 NOT NULL
 )
 
-PhasrAudits(
+grid.PhasrAudits(
   id INT IDENTITY PRIMARY KEY,
   user_id INT NOT NULL,
   domain_name NVARCHAR(255) NOT NULL,
@@ -122,7 +122,7 @@ PhasrAudits(
   created_at DATETIME2 NOT NULL
 )
 
-CodebaseScans(
+grid.CodebaseScans(
   id INT IDENTITY PRIMARY KEY,
   user_id INT NOT NULL,
   target_path NVARCHAR(MAX) NOT NULL,
@@ -135,7 +135,7 @@ CodebaseScans(
   created_at DATETIME2 NOT NULL
 )
 
-CodebaseDependencies(
+grid.CodebaseDependencies(
   id INT IDENTITY PRIMARY KEY,
   scan_id INT NOT NULL,
   name NVARCHAR(255) NOT NULL,
@@ -145,7 +145,7 @@ CodebaseDependencies(
   created_at DATETIME2 NOT NULL
 )
 
-CodebaseScanFindings(
+grid.CodebaseScanFindings(
   id INT IDENTITY PRIMARY KEY,
   scan_id INT NOT NULL,
   file_path NVARCHAR(MAX) NOT NULL,
@@ -172,3 +172,24 @@ Use a long random `JWT_SECRET` before running outside local development.
 For cookie-authenticated unsafe requests, send the authenticated session's `ztl_csrf` cookie value in the `x-csrf-token` header.
 
 In production, login rate limiting fails closed when Redis is unavailable. In development, the limiter uses a bounded in-memory fallback to avoid blocking local work during Redis restarts.
+
+## Grid Login Seed
+
+The database bootstrap seeds these test accounts:
+
+- `admin@grid.local` / `admin123`
+- `superadmin@grid.local` / `superadmin123`
+
+## Database Layout
+
+- SQL Server instance: shared host
+- Application database: `GRID_DB`
+- Schema: `grid`
+- Session store: Redis
+- Legacy `Paradigm` database access has been collapsed into the `GRID_DB` pool
+
+## API Namespaces
+
+- Legacy routes remain available under `/api/auth`, `/api/admin`, and `/api/employee`
+- GRID-specific routes are mounted through separate route modules under `/api/grid/auth`, `/api/grid/admin`, and `/api/grid/employee`
+- Both namespaces currently point to the same live handlers and database pool
