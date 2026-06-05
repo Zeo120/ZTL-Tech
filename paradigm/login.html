@@ -1,102 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paradigm | Admin Portal Login</title>
-    <meta name="description" content="Secure credential verification gateway for Paradigm enterprise business suites.">
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+    <meta
+      name="description"
+      content="Secure credential verification gateway for Paradigm enterprise business suites."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
     <script src="js/routes.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
-            });
-        }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
     </script>
-    
-</head>
-<body>
+  </head>
+  <body>
     <div class="bg-glow">
-        <div class="glow-1"></div>
-        <div class="glow-2"></div>
+      <div class="glow-1"></div>
+      <div class="glow-2"></div>
     </div>
 
     <nav>
-        <a href="../ztl_tech/index.html#home" class="logo-group" aria-label="ZTL Tech Home">
-            <div class="logo-diamond"></div>
-            <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
-        </a>
+      <a
+        href="../ztl_tech/index.html#home"
+        class="logo-group"
+        aria-label="ZTL Tech Home"
+      >
+        <div class="logo-diamond"></div>
+        <span class="logo-text"
+          ><span class="logo-separator">|</span> TECH</span
+        >
+      </a>
     </nav>
 
     <main class="login-container">
-        <div class="login-card">
-            <a href="index.html" class="back-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Return to Paradigm
-            </a>
+      <div class="login-card">
+        <a href="index.html" class="back-link">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Return to Paradigm
+        </a>
 
-            <!-- Mode Tabs (Visible but Hidden form trigger) -->
-            <div class="login-tabs">
-                <button class="login-tab active" id="tab-admin" onclick="switchMode('admin')">Admin Portal</button>
-                <button class="login-tab" id="tab-super" onclick="switchMode('super')">Super Admin</button>
-                <button class="login-tab" id="tab-employee" onclick="switchMode('employee')">Employee</button>
-            </div>
- 
-            <!-- Mode Header -->
-            <div class="mode-header" id="login-header">
-                <h2 class="mode-title" id="header-title">ADMIN PORTAL</h2>
-                <p class="mode-desc" id="header-desc">Provide authorized admin credentials to access the Paradigm control workspace.</p>
-            </div>
- 
-            <!-- Out-of-band security warning banner (Hidden by default) -->
-            <div class="super-admin-banner" id="super-banner">
-                <span style="font-weight: 800; color: var(--accent-primary);">[!] ELEVATED SYSTEM OVERVIEW ACCESS:</span> Accessing multi-tenant license controller. Secure audits are permanently recorded.
-            </div>
- 
-            <!-- Login Form (Only Access ID and Password) -->
-            <form id="login-form" onsubmit="event.preventDefault(); handleAuth();" style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
-                <div class="form-group">
-                    <label for="access-id">Admin Email Address</label>
-                    <input type="email" id="access-id" required placeholder="cfo@company.com" autocomplete="username">
-                </div>
- 
-                <div class="form-group">
-                    <label for="password">Security Password</label>
-                    <div class="password-container">
-                        <input type="password" id="password" required placeholder="••••••••••••" autocomplete="current-password">
-                        <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Toggle Password Visibility">
-                            <!-- Eye Icon SVG (Shows eye by default) -->
-                            <svg id="eye-icon" viewBox="0 0 24 24">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
- 
-                <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; border: none;">Authorize Admin Session</button>
-            </form>
-
-            <!-- Epic verification overlay -->
-            <div id="auth-success-overlay" class="epic-overlay">
-                <div class="scanner-line"></div>
-                <div class="glowing-success-ring"></div>
-                <h3 style="font-size: 1.2rem; font-weight: 800; color: #ffffff; letter-spacing: 2px; margin-bottom: 0.5rem;">ACCESS GRANTED</h3>
-                <p id="auth-status-text" style="font-size: 0.8rem; color: var(--text-secondary); letter-spacing: 1px; font-family: monospace;">VERIFYING CREDENTIALS...</p>
-            </div>
+        <!-- Mode Tabs (Visible but Hidden form trigger) -->
+        <div class="login-tabs">
+          <button
+            class="login-tab active"
+            id="tab-admin"
+            onclick="switchMode('admin')"
+          >
+            Admin Portal
+          </button>
+          <button
+            class="login-tab"
+            id="tab-super"
+            onclick="switchMode('super')"
+          >
+            Super Admin
+          </button>
+          <button
+            class="login-tab"
+            id="tab-employee"
+            onclick="switchMode('employee')"
+          >
+            Employee
+          </button>
         </div>
+
+        <!-- Mode Header -->
+        <div class="mode-header" id="login-header">
+          <h2 class="mode-title" id="header-title">ADMIN PORTAL</h2>
+          <p class="mode-desc" id="header-desc">
+            Provide authorized admin credentials to access the Paradigm control
+            workspace.
+          </p>
+        </div>
+
+        <!-- Out-of-band security warning banner (Hidden by default) -->
+        <div class="super-admin-banner" id="super-banner">
+          <span style="font-weight: 800; color: var(--accent-primary)"
+            >[!] ELEVATED SYSTEM OVERVIEW ACCESS:</span
+          >
+          Accessing multi-tenant license controller. Secure audits are
+          permanently recorded.
+        </div>
+
+        <!-- Login Form (Only Access ID and Password) -->
+        <form
+          id="login-form"
+          onsubmit="
+            event.preventDefault();
+            handleAuth();
+          "
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: left;
+          "
+        >
+          <div class="form-group">
+            <label for="access-id">Admin Email Address</label>
+            <input
+              type="email"
+              id="access-id"
+              required
+              placeholder="cfo@company.com"
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Security Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="password"
+                required
+                placeholder="••••••••••••"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                id="password-toggle"
+                onclick="togglePasswordVisibility()"
+                aria-label="Toggle Password Visibility"
+              >
+                <!-- Eye Icon SVG (Shows eye by default) -->
+                <svg id="eye-icon" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn-primary"
+            style="margin-top: 1rem; width: 100%; border: none"
+          >
+            Authorize Admin Session
+          </button>
+        </form>
+
+        <!-- Epic verification overlay -->
+        <div id="auth-success-overlay" class="epic-overlay">
+          <div class="scanner-line"></div>
+          <div class="glowing-success-ring"></div>
+          <h3
+            style="
+              font-size: 1.2rem;
+              font-weight: 800;
+              color: #ffffff;
+              letter-spacing: 2px;
+              margin-bottom: 0.5rem;
+            "
+          >
+            ACCESS GRANTED
+          </h3>
+          <p
+            id="auth-status-text"
+            style="
+              font-size: 0.8rem;
+              color: var(--text-secondary);
+              letter-spacing: 1px;
+              font-family: monospace;
+            "
+          >
+            VERIFYING CREDENTIALS...
+          </p>
+        </div>
+      </div>
     </main>
- 
-    <footer style="margin-top: auto; padding: 4rem 10% 2rem; text-align: center; color: var(--text-secondary);">
-        <p>© 2026 Zeo Thinking Labs. Paradigm Admin Business Suite Management Console.</p>
+
+    <footer
+      style="
+        margin-top: auto;
+        padding: 4rem 10% 2rem;
+        text-align: center;
+        color: var(--text-secondary);
+      "
+    >
+      <p>
+        © 2026 Zeo Thinking Labs. Paradigm Admin Business Suite Management
+        Console.
+      </p>
     </footer>
 
     <script src="js/login.js"></script>
-</body>
+  </body>
 </html>

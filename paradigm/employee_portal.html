@@ -1,273 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Employee Portal - Paradigm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
-            });
-        }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
     </script>
     <style>
-        :root {
-            --bg-color: #050505;
-            --glass-bg: rgba(10, 10, 10, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --accent: #ffffff;
-            --accent-hover: #dddddd;
-            --input-bg: rgba(20, 20, 20, 0.6);
-            --card-bg: rgba(15, 15, 15, 0.7);
-        }
+      :root {
+        --bg-color: #050505;
+        --glass-bg: rgba(10, 10, 10, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-primary: #ffffff;
+        --text-secondary: #aaaaaa;
+        --accent: #ffffff;
+        --accent-hover: #dddddd;
+        --input-bg: rgba(20, 20, 20, 0.6);
+        --card-bg: rgba(15, 15, 15, 0.7);
+      }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.03), transparent 30%),
-                              radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.03), transparent 30%);
-            color: var(--text-primary);
-            min-height: 100vh;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-color);
+        background-image:
+          radial-gradient(
+            circle at 10% 10%,
+            rgba(255, 255, 255, 0.03),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 90% 90%,
+            rgba(255, 255, 255, 0.03),
+            transparent 30%
+          );
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
 
-        .navbar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+      .navbar {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+        padding: 16px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .navbar h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-        }
+      .navbar h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+      }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
 
-        .user-name {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
+      .user-name {
+        font-weight: 500;
+        color: var(--text-primary);
+      }
 
-        .logout-btn {
-            background: transparent;
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
+      .logout-btn {
+        background: transparent;
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
 
+      .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+          grid-template-columns: 1fr;
         }
+      }
 
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
+      .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 24px;
+      }
 
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 24px;
-        }
+      .card h2 {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        font-weight: 500;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--glass-border);
+      }
 
-        .card h2 {
-            margin: 0 0 20px 0;
-            font-size: 18px;
-            font-weight: 500;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--glass-border);
-        }
+      .form-group {
+        margin-bottom: 16px;
+      }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        color-scheme: dark;
+      }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            color-scheme: dark;
-        }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+      }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+      button.submit-btn {
+        width: 100%;
+        padding: 10px;
+        background: var(--accent);
+        color: #000000;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        margin-top: 8px;
+      }
 
-        button.submit-btn {
-            width: 100%;
-            padding: 10px;
-            background: var(--accent);
-            color: #000000;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            margin-top: 8px;
-        }
+      button.submit-btn:hover {
+        background: var(--accent-hover);
+      }
 
-        button.submit-btn:hover {
-            background: var(--accent-hover);
-        }
+      .message {
+        margin-top: 12px;
+        font-size: 13px;
+        text-align: center;
+        min-height: 18px;
+      }
 
-        .message {
-            margin-top: 12px;
-            font-size: 13px;
-            text-align: center;
-            min-height: 18px;
-        }
-        
-        .error { color: #ef4444; }
-        .success { color: #10b981; }
+      .error {
+        color: #ef4444;
+      }
+      .success {
+        color: #10b981;
+      }
 
-        .profile-details p {
-            margin: 8px 0;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        .profile-details span {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
+      .profile-details p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+      .profile-details span {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
 
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
+      .full-width {
+        grid-column: 1 / -1;
+      }
     </style>
-</head>
-<body>
-
-<nav class="navbar">
-    <h1>Paradigm Portal</h1>
-    <div class="user-info">
+  </head>
+  <body>
+    <nav class="navbar">
+      <h1>Paradigm Portal</h1>
+      <div class="user-info">
         <span class="user-name" id="displayUsername">Loading...</span>
         <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-</nav>
+      </div>
+    </nav>
 
-<div class="container">
-    <div class="card full-width">
+    <div class="container">
+      <div class="card full-width">
         <h2>Employee Profile</h2>
         <div class="profile-details" id="profileDetails">
-            Loading profile information...
+          Loading profile information...
         </div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <h2>Live Attendance</h2>
-        <div style="text-align: center; margin: 16px 0;">
-            <div id="liveClock" style="font-size: 24px; font-weight: 600; font-family: monospace; letter-spacing: 2px; color: var(--accent);">--:--:--</div>
-            <div id="liveDate" style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">---</div>
+        <div style="text-align: center; margin: 16px 0">
+          <div
+            id="liveClock"
+            style="
+              font-size: 24px;
+              font-weight: 600;
+              font-family: monospace;
+              letter-spacing: 2px;
+              color: var(--accent);
+            "
+          >
+            --:--:--
+          </div>
+          <div
+            id="liveDate"
+            style="
+              font-size: 13px;
+              color: var(--text-secondary);
+              margin-top: 4px;
+            "
+          >
+            ---
+          </div>
         </div>
         <form id="attendanceForm">
-            <button type="submit" class="submit-btn" style="padding: 14px; font-weight: 600; font-size: 15px;">MARK PRESENT NOW</button>
+          <button
+            type="submit"
+            class="submit-btn"
+            style="padding: 14px; font-weight: 600; font-size: 15px"
+          >
+            MARK PRESENT NOW
+          </button>
         </form>
         <div id="attMessage" class="message"></div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <h2>Request Leave</h2>
         <form id="leaveForm">
-            <div class="form-group">
-                <label for="leaveType">Leave Type</label>
-                <select id="leaveType" required>
-                    <option value="">Select type...</option>
-                    <option value="Annual">Annual Leave</option>
-                    <option value="Sick">Sick Leave</option>
-                    <option value="Personal">Personal Leave</option>
-                    <option value="Unpaid">Unpaid Leave</option>
-                </select>
+          <div class="form-group">
+            <label for="leaveType">Leave Type</label>
+            <select id="leaveType" required>
+              <option value="">Select type...</option>
+              <option value="Annual">Annual Leave</option>
+              <option value="Sick">Sick Leave</option>
+              <option value="Personal">Personal Leave</option>
+              <option value="Unpaid">Unpaid Leave</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 12px">
+            <div class="form-group" style="flex: 1">
+              <label for="leaveStart">Start Date</label>
+              <input type="date" id="leaveStart" required />
             </div>
-            <div style="display: flex; gap: 12px;">
-                <div class="form-group" style="flex: 1;">
-                    <label for="leaveStart">Start Date</label>
-                    <input type="date" id="leaveStart" required>
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label for="leaveEnd">End Date</label>
-                    <input type="date" id="leaveEnd" required>
-                </div>
+            <div class="form-group" style="flex: 1">
+              <label for="leaveEnd">End Date</label>
+              <input type="date" id="leaveEnd" required />
             </div>
-            <div class="form-group">
-                <label for="leaveReason">Reason</label>
-                <textarea id="leaveReason" required placeholder="Briefly describe the reason for your leave..."></textarea>
-            </div>
-            <button type="submit" class="submit-btn">Submit Request</button>
+          </div>
+          <div class="form-group">
+            <label for="leaveReason">Reason</label>
+            <textarea
+              id="leaveReason"
+              required
+              placeholder="Briefly describe the reason for your leave..."
+            ></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Submit Request</button>
         </form>
         <div id="leaveMessage" class="message"></div>
-    </div>
+      </div>
 
-    <div class="card full-width">
+      <div class="card full-width">
         <h2>My Payslips</h2>
-        <div id="payslipsContainer" style="margin-top: 16px;">
-            Loading payslips...
+        <div id="payslipsContainer" style="margin-top: 16px">
+          Loading payslips...
         </div>
+      </div>
     </div>
-</div> <!-- Closing container div was here -->
+    <!-- Closing container div was here -->
 
-
-<script src="js/employee_portal.js"></script>
-
-</body>
+    <script src="js/employee_portal.js"></script>
+  </body>
 </html>

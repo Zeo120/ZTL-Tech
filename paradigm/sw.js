@@ -1,18 +1,18 @@
-const CACHE_NAME = 'paradigm-cache-v1';
+const CACHE_NAME = "paradigm-cache-v1";
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
   // HTML files: network-first or stale-while-revalidate (implementing network-first with cache fallback here for simplicity and to match request)
-  if (event.request.headers.get('accept').includes('text/html')) {
+  if (event.request.headers.get("accept").includes("text/html")) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -24,13 +24,16 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           return caches.match(event.request);
-        })
+        }),
     );
     return;
   }
 
   // CSS/JS: cache-first
-  if (event.request.destination === 'style' || event.request.destination === 'script') {
+  if (
+    event.request.destination === "style" ||
+    event.request.destination === "script"
+  ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) {
@@ -43,7 +46,7 @@ self.addEventListener('fetch', (event) => {
           });
           return response;
         });
-      })
+      }),
     );
     return;
   }

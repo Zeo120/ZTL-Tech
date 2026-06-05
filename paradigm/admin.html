@@ -1,958 +1,2365 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paradigm | Welcome</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="manifest" href="manifest.json" />
     <script src="js/routes.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
-            });
-        }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
     </script>
-    
-</head>
-<body>
+  </head>
+  <body>
     <!-- Epic Portal Welcome Reveal Screen -->
-    
 
     <!-- Fixed Header -->
     <header class="top-header">
-        <div style="display: flex; align-items: center; gap: 0.8rem;">
-            <div class="logo-group" onclick="toggleTerminateBtn()" style="cursor: pointer; display: flex; align-items: center; gap: 0.6rem;">
-                <div class="logo-diamond"></div>
-                <span class="logo-text" id="logo-text-val"><span class="logo-separator">|</span> PARADIGM</span>
-            </div>
-            <button id="terminate-btn" onclick="handleLogout()">Terminate Session</button>
+      <div style="display: flex; align-items: center; gap: 0.8rem">
+        <div
+          class="logo-group"
+          onclick="toggleTerminateBtn()"
+          style="
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+          "
+        >
+          <div class="logo-diamond"></div>
+          <span class="logo-text" id="logo-text-val"
+            ><span class="logo-separator">|</span> PARADIGM</span
+          >
         </div>
-        <button class="hamburger-btn" id="hamburger-toggle" onclick="toggleDrawer(true)" aria-label="Open Menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+        <button id="terminate-btn" onclick="handleLogout()">
+          Terminate Session
         </button>
+      </div>
+      <button
+        class="hamburger-btn"
+        id="hamburger-toggle"
+        onclick="toggleDrawer(true)"
+        aria-label="Open Menu"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </header>
 
     <!-- Right Drawer menu -->
-    <div class="drawer-backdrop" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+    <div
+      class="drawer-backdrop"
+      id="drawer-backdrop"
+      onclick="toggleDrawer(false)"
+    ></div>
     <aside class="sidebar-drawer" id="sidebar-drawer">
-        <div class="drawer-header">
-            <h3>Navigate</h3>
-            <button class="drawer-close-btn" onclick="toggleDrawer(false)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <nav class="drawer-nav">
-            <button class="drawer-item" id="nav-crm" onclick="switchView('crm')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                Custom CRM Module
-            </button>
-            <button class="drawer-item" id="nav-ops" onclick="switchView('ops')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                Custom Operations
-            </button>
-            <button class="drawer-item" class="drawer-item active" id="nav-payroll" onclick="switchView('payroll')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                Custom Payroll Module
-            </button>
-            <div class="drawer-separator"></div>
-            <button class="drawer-item btn-logout" onclick="handleLogout()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
-                Logout Session
-            </button>
-        </nav>
+      <div class="drawer-header">
+        <h3>Navigate</h3>
+        <button class="drawer-close-btn" onclick="toggleDrawer(false)">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="drawer-nav">
+        <button class="drawer-item" id="nav-crm" onclick="switchView('crm')">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+          </svg>
+          Custom CRM Module
+        </button>
+        <button class="drawer-item" id="nav-ops" onclick="switchView('ops')">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Custom Operations
+        </button>
+        <button
+          class="drawer-item"
+          class="drawer-item active"
+          id="nav-payroll"
+          onclick="switchView('payroll')"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          Custom Payroll Module
+        </button>
+        <div class="drawer-separator"></div>
+        <button class="drawer-item btn-logout" onclick="handleLogout()">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+          </svg>
+          Logout Session
+        </button>
+      </nav>
     </aside>
 
     <!-- Main Workspace Area -->
     <main class="workspace-container">
-        
-        <!-- CRM View -->
-        <section class="view-panel" id="view-crm">
-            <div class="view-header">
-                <h1>Custom CRM</h1>
-                <button class="btn-action" onclick="openCRMModal()">Add Lead</button>
+      <!-- CRM View -->
+      <section class="view-panel" id="view-crm">
+        <div class="view-header">
+          <h1>Custom CRM</h1>
+          <button class="btn-action" onclick="openCRMModal()">Add Lead</button>
+        </div>
+
+        <!-- Stats Label -->
+        <div class="summary-label">
+          <span>Pipeline: <strong id="crm-total-pipeline">$0</strong></span>
+          <span>Active Leads: <strong id="crm-active-leads">0</strong></span>
+        </div>
+
+        <!-- Client leads grid -->
+        <div class="control-panel">
+          <div class="search-wrapper">
+            <svg
+              class="search-icon-svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              id="crm-search-box"
+              placeholder="Search client name..."
+              oninput="filterCRMLeads()"
+            />
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Deal Stage</th>
+                  <th>Contract Value</th>
+                  <th style="text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crm-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Operations View -->
+      <section class="view-panel" id="view-ops">
+        <div class="view-header">
+          <h1>Custom Operations</h1>
+        </div>
+
+        <div class="ops-split">
+          <!-- Dispatch Form -->
+          <div class="panel-card">
+            <form
+              id="ops-dispatch-form"
+              onsubmit="
+                event.preventDefault();
+                triggerOpsDispatch();
+              "
+              style="display: flex; flex-direction: column; gap: 1rem"
+            >
+              <div class="form-group">
+                <label for="ops-carrier">Fleet Carrier</label>
+                <select id="ops-carrier" class="form-control" required>
+                  <option value="Carrier drone v4">Hyper-V Drone Unit</option>
+                  <option value="Heavy persistence loader">
+                    Heavy Cargo Loader
+                  </option>
+                  <option value="Reflex breaker core">
+                    Reflex Breaker Cruiser
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ops-destination">Destination Hub</label>
+                <select id="ops-destination" class="form-control" required>
+                  <option value="Beta persistent database cluster">
+                    Beta DB Cluster Nodes
+                  </option>
+                  <option value="East shard server gateway">
+                    East Shard Server Gateway
+                  </option>
+                  <option value="Zero-trust perimeter control nodes">
+                    Zero-Trust Perimeter A
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ops-payload">Cargo Load (kg)</label>
+                <input
+                  type="number"
+                  id="ops-payload"
+                  class="form-control"
+                  placeholder="e.g. 500"
+                  required
+                  min="1"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn-action"
+                style="justify-content: center"
+              >
+                Launch
+              </button>
+            </form>
+          </div>
+
+          <!-- Single Line terminal console status -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 0.8rem;
+              justify-content: center;
+            "
+          >
+            <div
+              style="
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+              "
+            >
+              Status Telemetry
+            </div>
+            <div class="status-box" id="ops-status-box">
+              [STATUS] Telemetry Offline. Launch unit to sync.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payroll View (Roster with Sub-tabs) -->
+      <section class="view-panel active" id="view-payroll">
+        <div class="view-header">
+          <h1>Custom Payroll</h1>
+        </div>
+
+        <div class="payroll-split-container">
+          <!-- Sub-tab Selector Navigation Sidebar -->
+          <aside class="payroll-sidebar">
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-employees"
+              onclick="switchPayrollTab('employees')"
+            >
+              Employee Center
+            </button>
+            <!-- Dropdown Options under Employee Center -->
+            <div
+              id="employees-dropdown"
+              style="
+                display: none;
+                flex-direction: column;
+                gap: 0.4rem;
+                padding-left: 1rem;
+                margin-top: 0.2rem;
+                margin-bottom: 0.6rem;
+              "
+            >
+              <button
+                class="sub-tab-btn"
+                id="btn-sub-tab-emp-manage"
+                onclick="switchEmployeeSubTab('view')"
+                style="font-size: 0.76rem; opacity: 0.85"
+              >
+                Employee Management
+              </button>
+              <button
+                class="sub-tab-btn"
+                id="btn-sub-tab-emp-salary"
+                onclick="switchEmployeeSubTab('salary')"
+                style="font-size: 0.76rem; opacity: 0.85"
+              >
+                Salary Details
+              </button>
+              <button
+                class="sub-tab-btn"
+                id="btn-sub-tab-emp-attendance"
+                onclick="switchEmployeeSubTab('attendance')"
+                style="font-size: 0.76rem; opacity: 0.85"
+              >
+                Attendance
+              </button>
+            </div>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-rates"
+              onclick="switchPayrollTab('rates')"
+            >
+              Deductions & Rates
+            </button>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-ctc"
+              onclick="switchPayrollTab('ctc')"
+            >
+              CTC Calculation
+            </button>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-processing"
+              onclick="switchPayrollTab('processing')"
+            >
+              Payroll Processing
+            </button>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-leaves"
+              onclick="switchPayrollTab('leaves')"
+            >
+              Leave Approvals
+            </button>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-expenses"
+              onclick="switchPayrollTab('expenses')"
+            >
+              Expense Claims
+            </button>
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-documents"
+              onclick="switchPayrollTab('documents')"
+            >
+              Document Vault
+            </button>
+
+            <button
+              class="sub-tab-btn"
+              id="btn-tab-reports"
+              onclick="switchPayrollTab('reports')"
+            >
+              Reports
+            </button>
+            <!-- Dropdown Options under Reports -->
+            <div
+              id="reports-dropdown"
+              style="
+                display: none;
+                flex-direction: column;
+                gap: 0.4rem;
+                padding-left: 1rem;
+                margin-top: 0.2rem;
+                margin-bottom: 0.6rem;
+              "
+            >
+              <button
+                class="sub-tab-btn"
+                id="btn-sub-tab-rep-summary"
+                onclick="switchReportsSubTab('summary')"
+                style="font-size: 0.76rem; opacity: 0.85"
+              >
+                Payroll Summary
+              </button>
+              <button
+                class="sub-tab-btn"
+                id="btn-sub-tab-rep-audit"
+                onclick="switchReportsSubTab('audit')"
+                style="font-size: 0.76rem; opacity: 0.85"
+              >
+                Tax Audit Trail
+              </button>
+            </div>
+          </aside>
+
+          <!-- Active tab content area -->
+          <div class="payroll-content">
+            <!-- Tab 0: Welcome / Neutral Overview -->
+            <div class="tab-panel active" id="payroll-tab-welcome">
+              <div
+                class="panel-card"
+                style="
+                  text-align: center;
+                  padding: 4rem 2rem;
+                  border: 1px dashed var(--surface-border);
+                  border-radius: 16px;
+                  background: rgba(162, 89, 255, 0.01);
+                "
+              >
+                <div
+                  style="
+                    background: rgba(162, 89, 255, 0.08);
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 1.5rem;
+                    border: 1px solid var(--surface-border);
+                  "
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-primary)"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path
+                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                    ></path>
+                  </svg>
+                </div>
+                <h2
+                  style="
+                    font-size: 1.5rem;
+                    font-weight: 800;
+                    margin-bottom: 0.5rem;
+                    letter-spacing: 0.5px;
+                  "
+                >
+                  Custom Payroll System
+                </h2>
+                <p
+                  style="
+                    color: var(--text-secondary);
+                    max-width: 480px;
+                    margin: 0 auto;
+                    font-size: 0.9rem;
+                    line-height: 1.6;
+                  "
+                >
+                  Select an operation from the sidebar navigation menu to manage
+                  the employee registry, view salary structures, configure
+                  statutory rates, or execute CTC calculations.
+                </p>
+              </div>
             </div>
 
-            <!-- Stats Label -->
-            <div class="summary-label">
-                <span>Pipeline: <strong id="crm-total-pipeline">$0</strong></span>
-                <span>Active Leads: <strong id="crm-active-leads">0</strong></span>
-            </div>
-
-            <!-- Client leads grid -->
-            <div class="control-panel">
-                <div class="search-wrapper">
-                    <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <!-- Tab 1: Employee Center -->
+            <div class="tab-panel" id="payroll-tab-employees">
+              <!-- Sub-panel A: Employee Management -->
+              <div id="payroll-sub-panel-view" style="display: block">
+                <div class="control-panel">
+                  <div class="search-wrapper">
+                    <svg
+                      class="search-icon-svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" class="search-input" id="crm-search-box" placeholder="Search client name..." oninput="filterCRMLeads()">
+                    <input
+                      type="text"
+                      class="search-input"
+                      id="payroll-search-box"
+                      placeholder="Search name..."
+                      oninput="filterPayrollRoster()"
+                    />
+                  </div>
+                  <button class="btn-action" onclick="openPayrollModal()">
+                    Add Employee
+                  </button>
                 </div>
-            </div>
 
-            <div class="panel-card">
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Client Name</th>
-                                <th>Deal Stage</th>
-                                <th>Contract Value</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="crm-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Operations View -->
-        <section class="view-panel" id="view-ops">
-            <div class="view-header">
-                <h1>Custom Operations</h1>
-            </div>
-
-            <div class="ops-split">
-                <!-- Dispatch Form -->
                 <div class="panel-card">
-                    <form id="ops-dispatch-form" onsubmit="event.preventDefault(); triggerOpsDispatch();" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div class="form-group">
-                            <label for="ops-carrier">Fleet Carrier</label>
-                            <select id="ops-carrier" class="form-control" required>
-                                <option value="Carrier drone v4">Hyper-V Drone Unit</option>
-                                <option value="Heavy persistence loader">Heavy Cargo Loader</option>
-                                <option value="Reflex breaker core">Reflex Breaker Cruiser</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="ops-destination">Destination Hub</label>
-                            <select id="ops-destination" class="form-control" required>
-                                <option value="Beta persistent database cluster">Beta DB Cluster Nodes</option>
-                                <option value="East shard server gateway">East Shard Server Gateway</option>
-                                <option value="Zero-trust perimeter control nodes">Zero-Trust Perimeter A</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="ops-payload">Cargo Load (kg)</label>
-                            <input type="number" id="ops-payload" class="form-control" placeholder="e.g. 500" required min="1">
-                        </div>
-                        <button type="submit" class="btn-action" style="justify-content: center;">Launch</button>
-                    </form>
+                  <div class="table-responsive">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Employee Name</th>
+                          <th>Status</th>
+                          <th>Financial Detail</th>
+                          <th style="text-align: center">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="payroll-table-body">
+                        <tr>
+                          <td
+                            colspan="4"
+                            style="
+                              text-align: center;
+                              padding: 2rem;
+                              color: var(--text-secondary);
+                            "
+                          >
+                            Syncing database...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    class="pagination-controls"
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-top: 1rem;
+                      padding: 0.5rem 0;
+                    "
+                  >
+                    <div
+                      style="font-size: 0.85rem; color: var(--text-secondary)"
+                    >
+                      Showing <span id="pag-start">0</span> to
+                      <span id="pag-end">0</span> of
+                      <span id="pag-total">0</span> employees
+                    </div>
+                    <div style="display: flex; gap: 0.5rem">
+                      <button
+                        id="btn-pag-prev"
+                        class="btn-sub-tab"
+                        style="
+                          padding: 0.35rem 0.8rem;
+                          font-size: 0.8rem;
+                          background: rgba(255, 255, 255, 0.05);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 4px;
+                          color: var(--text-primary);
+                          cursor: pointer;
+                        "
+                        onclick="changePage(-1)"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        id="btn-pag-next"
+                        class="btn-sub-tab"
+                        style="
+                          padding: 0.35rem 0.8rem;
+                          font-size: 0.8rem;
+                          background: rgba(255, 255, 255, 0.05);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 4px;
+                          color: var(--text-primary);
+                          cursor: pointer;
+                        "
+                        onclick="changePage(1)"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-panel B: Salary Details -->
+              <div id="payroll-sub-panel-salary" style="display: none">
+                <div class="panel-card" style="max-width: 600px; margin: 0">
+                  <div
+                    class="form-grid"
+                    style="
+                      display: grid;
+                      grid-template-columns: 1fr;
+                      gap: 1.2rem;
+                    "
+                  >
+                    <div class="form-group">
+                      <label for="admin-salary-employee-select"
+                        >Select Employee<span class="required-star"
+                          >*</span
+                        ></label
+                      >
+                      <select
+                        id="admin-salary-employee-select"
+                        class="form-control"
+                        onchange="loadAdminEmployeeSalary()"
+                        required
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      >
+                        <option value="">-- Choose Employee --</option>
+                      </select>
+                    </div>
+
+                    <div
+                      class="form-banner-error"
+                      id="admin-salary-error-banner"
+                      style="color: #ff5470; display: none; font-size: 0.85rem"
+                    ></div>
+                    <div
+                      class="form-banner-error"
+                      id="admin-salary-success-banner"
+                      style="color: #00ffaa; display: none; font-size: 0.85rem"
+                    ></div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-base">Base Salary</label>
+                      <input
+                        type="number"
+                        id="admin-sal-base"
+                        class="form-control"
+                        placeholder="Base Salary"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-hra"
+                        >House Rent Allowance (HRA)</label
+                      >
+                      <input
+                        type="number"
+                        id="admin-sal-hra"
+                        class="form-control"
+                        placeholder="HRA"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-allowances">Allowances</label>
+                      <input
+                        type="number"
+                        id="admin-sal-allowances"
+                        class="form-control"
+                        placeholder="Allowances"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-deductions">Deductions</label>
+                      <input
+                        type="number"
+                        id="admin-sal-deductions"
+                        class="form-control"
+                        placeholder="Deductions"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-state"
+                        >Work State (For Professional Tax)</label
+                      >
+                      <select
+                        id="admin-sal-state"
+                        class="form-control"
+                        onchange="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      >
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Exempt">Exempt / Other (No PT)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-pt">Professional Tax (PT)</label>
+                      <input
+                        type="number"
+                        id="admin-sal-pt"
+                        class="form-control"
+                        placeholder="PT"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-tax-regime">Tax Regime</label>
+                      <select
+                        id="admin-sal-tax-regime"
+                        class="form-control"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      >
+                        <option value="New">New Tax Regime</option>
+                        <option value="Old">Old Tax Regime</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="admin-sal-tds"
+                        >Tax Deducted at Source (TDS)</label
+                      >
+                      <input
+                        type="number"
+                        id="admin-sal-tds"
+                        class="form-control"
+                        placeholder="TDS"
+                        min="0"
+                        oninput="calculateAdminTakeHome()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.75rem 1rem;
+                          color: #fff;
+                          width: 100%;
+                        "
+                      />
+                    </div>
+
+                    <div
+                      style="
+                        background: rgba(162, 89, 255, 0.04);
+                        border: 1px solid var(--surface-border);
+                        border-radius: 12px;
+                        padding: 1rem;
+                        display: flex;
+                        justify-content: space-around;
+                        font-size: 0.85rem;
+                        font-weight: 700;
+                      "
+                    >
+                      <div>
+                        Gross:
+                        <span id="admin-sal-display-gross" style="color: #fff"
+                          >$0.00</span
+                        >
+                      </div>
+                      <div>
+                        Deductions:
+                        <span
+                          id="admin-sal-display-deductions"
+                          style="color: #ff5470"
+                          >$0.00</span
+                        >
+                      </div>
+                      <div>
+                        Net:
+                        <span id="admin-sal-display-net" style="color: #00ffaa"
+                          >$0.00</span
+                        >
+                      </div>
+                    </div>
+
+                    <button
+                      class="btn-action"
+                      onclick="submitAdminSalaryDetails()"
+                      style="
+                        justify-content: center;
+                        background: var(--accent-primary);
+                        color: #000;
+                        font-weight: 700;
+                      "
+                    >
+                      Save Salary Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-panel C: Attendance -->
+              <div id="payroll-sub-panel-attendance" style="display: none">
+                <div class="panel-card" style="margin: 0">
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-bottom: 1.5rem;
+                      flex-wrap: wrap;
+                      gap: 1rem;
+                    "
+                  >
+                    <div>
+                      <h3
+                        style="
+                          font-size: 1.1rem;
+                          font-weight: 700;
+                          margin-bottom: 0.25rem;
+                        "
+                      >
+                        Daily Attendance Register
+                      </h3>
+                      <p
+                        style="color: var(--text-secondary); font-size: 0.8rem"
+                      >
+                        Mark daily attendance status for employees
+                      </p>
+                    </div>
+                    <div
+                      class="form-group"
+                      style="
+                        margin-bottom: 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                      "
+                    >
+                      <label
+                        for="admin-attendance-date"
+                        style="
+                          margin-bottom: 0;
+                          font-size: 0.85rem;
+                          font-weight: 600;
+                        "
+                        >Select Date:</label
+                      >
+                      <input
+                        type="date"
+                        id="admin-attendance-date"
+                        class="form-control"
+                        onchange="loadDailyAttendance()"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.5rem 0.75rem;
+                          color: #fff;
+                          width: auto;
+                          font-size: 0.85rem;
+                        "
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    class="form-banner-error"
+                    id="admin-attendance-error-banner"
+                    style="
+                      color: #ff5470;
+                      display: none;
+                      font-size: 0.85rem;
+                      margin-bottom: 1rem;
+                    "
+                  ></div>
+                  <div
+                    class="form-banner-error"
+                    id="admin-attendance-success-banner"
+                    style="
+                      color: #00ffaa;
+                      display: none;
+                      font-size: 0.85rem;
+                      margin-bottom: 1rem;
+                    "
+                  ></div>
+
+                  <div class="table-responsive">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Employee Name</th>
+                          <th style="text-align: right; padding-right: 2rem">
+                            Mark Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="attendance-table-body">
+                        <tr>
+                          <td
+                            colspan="2"
+                            style="
+                              text-align: center;
+                              padding: 2rem;
+                              color: var(--text-secondary);
+                            "
+                          >
+                            Loading employees registry...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Deductions & Rates -->
+            <div class="tab-panel" id="payroll-tab-rates">
+              <div class="panel-card" style="max-width: 500px; margin: 0">
+                <form
+                  id="payroll-rates-form"
+                  onsubmit="
+                    event.preventDefault();
+                    savePayrollRates();
+                  "
+                  style="display: flex; flex-direction: column; gap: 1.2rem"
+                >
+                  <div class="form-group">
+                    <label for="rate-pf"
+                      >Provident Fund (PF) Contribution Rate (%)</label
+                    >
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="rate-pf"
+                      class="form-control"
+                      value="12.0"
+                      required
+                      min="0"
+                      max="30"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="rate-tds"
+                      >TDS Income Tax Slab Estimate (%)</label
+                    >
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="rate-tds"
+                      class="form-control"
+                      value="15.0"
+                      required
+                      min="0"
+                      max="50"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn-action"
+                    style="justify-content: center; width: 100%"
+                  >
+                    Save Rates
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Tab 3: CTC Calculator -->
+            <div class="tab-panel" id="payroll-tab-ctc">
+              <div class="panel-card" style="max-width: 500px; margin: 0">
+                <form
+                  style="display: flex; flex-direction: column; gap: 1.2rem"
+                >
+                  <div class="form-group">
+                    <label for="ctc-employee-select">Select Employee</label>
+                    <select
+                      id="ctc-employee-select"
+                      class="form-control"
+                      onchange="runCTCCalculations()"
+                    >
+                      <option value="">-- Choose Employee --</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ctc-monthly-salary"
+                      >Monthly Salary Gross (USD)</label
+                    >
+                    <input
+                      type="number"
+                      id="ctc-monthly-salary"
+                      class="form-control"
+                      placeholder="e.g. 5000"
+                      min="0"
+                      oninput="runCTCCalculations()"
+                    />
+                  </div>
+                </form>
+
+                <!-- Ultra Minimalist Output results -->
+                <div
+                  class="ctc-result-box"
+                  id="ctc-result-box"
+                  style="display: none"
+                >
+                  <div class="ctc-result-row">
+                    <span>Monthly Take-Home:</span>
+                    <span id="ctc-net-pay">$0.00</span>
+                  </div>
+                  <div class="ctc-result-row">
+                    <span>Annual CTC:</span>
+                    <span id="ctc-annual-ctc">$0.00</span>
+                  </div>
+                  <div class="ctc-result-row">
+                    <span>Monthly PF Contribution:</span>
+                    <span id="ctc-monthly-pf">$0.00</span>
+                  </div>
+                  <div class="ctc-result-row">
+                    <span>Professional Tax (PT):</span>
+                    <span id="ctc-monthly-pt">$0.00</span>
+                  </div>
+                  <div class="ctc-result-row">
+                    <span>TDS Income Tax:</span>
+                    <span id="ctc-monthly-tds">$0.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Payroll Processing -->
+            <div class="tab-panel" id="payroll-tab-processing">
+              <div class="panel-card">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                  "
+                >
+                  <div>
+                    <h2 class="roster-title" style="margin-bottom: 0.25rem">
+                      Monthly Payroll Runs
+                    </h2>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem">
+                      Create, process, and manage monthly payroll cycles with
+                      auto-calculated PF, ESI, LWP deductions, and TDS.
+                    </p>
+                  </div>
+                  <button
+                    class="btn-action"
+                    onclick="openCreatePayrollRunModal()"
+                  >
+                    + New Payroll Run
+                  </button>
                 </div>
 
-                <!-- Single Line terminal console status -->
-                <div style="display: flex; flex-direction: column; gap: 0.8rem; justify-content: center;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Status Telemetry</div>
-                    <div class="status-box" id="ops-status-box">
-                        [STATUS] Telemetry Offline. Launch unit to sync.
+                <div
+                  class="form-banner-error"
+                  id="payroll-run-error-banner"
+                  style="
+                    color: #ff5470;
+                    display: none;
+                    font-size: 0.85rem;
+                    margin-bottom: 1rem;
+                  "
+                ></div>
+                <div
+                  class="form-banner-error"
+                  id="payroll-run-success-banner"
+                  style="
+                    color: #00ffaa;
+                    display: none;
+                    font-size: 0.85rem;
+                    margin-bottom: 1rem;
+                  "
+                ></div>
+
+                <!-- Inline Create Form (Hidden by default) -->
+                <div
+                  id="create-payroll-run-form"
+                  style="
+                    display: none;
+                    margin-bottom: 1.5rem;
+                    padding: 1.2rem;
+                    border: 1px solid var(--surface-border);
+                    border-radius: 12px;
+                    background: rgba(162, 89, 255, 0.02);
+                  "
+                >
+                  <h3
+                    style="
+                      font-size: 0.95rem;
+                      font-weight: 700;
+                      margin-bottom: 1rem;
+                    "
+                  >
+                    Create New Payroll Run
+                  </h3>
+                  <div
+                    style="
+                      display: flex;
+                      gap: 1rem;
+                      align-items: flex-end;
+                      flex-wrap: wrap;
+                    "
+                  >
+                    <div class="form-group" style="margin-bottom: 0">
+                      <label for="payroll-run-month" style="font-size: 0.8rem"
+                        >Month</label
+                      >
+                      <select
+                        id="payroll-run-month"
+                        class="form-control"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.5rem 0.75rem;
+                          color: #fff;
+                          width: auto;
+                        "
+                      >
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
                     </div>
+                    <div class="form-group" style="margin-bottom: 0">
+                      <label for="payroll-run-year" style="font-size: 0.8rem"
+                        >Year</label
+                      >
+                      <input
+                        type="number"
+                        id="payroll-run-year"
+                        class="form-control"
+                        min="2020"
+                        max="2099"
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid rgba(255, 255, 255, 0.1);
+                          border-radius: 8px;
+                          padding: 0.5rem 0.75rem;
+                          color: #fff;
+                          width: 100px;
+                        "
+                      />
+                    </div>
+                    <button
+                      class="btn-action"
+                      onclick="createPayrollRun()"
+                      style="padding: 0.5rem 1.2rem; font-size: 0.85rem"
+                    >
+                      Create Draft
+                    </button>
+                    <button
+                      class="btn-action btn-secondary"
+                      onclick="closeCreatePayrollRunModal()"
+                      style="padding: 0.5rem 1.2rem; font-size: 0.85rem"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Payroll View (Roster with Sub-tabs) -->
-        <section class="view-panel active" id="view-payroll">
-            <div class="view-header">
-                <h1>Custom Payroll</h1>
-            </div>
-
-            <div class="payroll-split-container">
-                <!-- Sub-tab Selector Navigation Sidebar -->
-                <aside class="payroll-sidebar">
-                    <button class="sub-tab-btn" id="btn-tab-employees" onclick="switchPayrollTab('employees')">Employee Center</button>
-                    <!-- Dropdown Options under Employee Center -->
-                    <div id="employees-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
-                        <button class="sub-tab-btn" id="btn-sub-tab-emp-manage" onclick="switchEmployeeSubTab('view')" style="font-size: 0.76rem; opacity: 0.85;">Employee Management</button>
-                        <button class="sub-tab-btn" id="btn-sub-tab-emp-salary" onclick="switchEmployeeSubTab('salary')" style="font-size: 0.76rem; opacity: 0.85;">Salary Details</button>
-                        <button class="sub-tab-btn" id="btn-sub-tab-emp-attendance" onclick="switchEmployeeSubTab('attendance')" style="font-size: 0.76rem; opacity: 0.85;">Attendance</button>
-                    </div>
-                    <button class="sub-tab-btn" id="btn-tab-rates" onclick="switchPayrollTab('rates')">Deductions & Rates</button>
-                    <button class="sub-tab-btn" id="btn-tab-ctc" onclick="switchPayrollTab('ctc')">CTC Calculation</button>
-                    <button class="sub-tab-btn" id="btn-tab-processing" onclick="switchPayrollTab('processing')">Payroll Processing</button>
-                    <button class="sub-tab-btn" id="btn-tab-leaves" onclick="switchPayrollTab('leaves')">Leave Approvals</button>
-                    <button class="sub-tab-btn" id="btn-tab-expenses" onclick="switchPayrollTab('expenses')">Expense Claims</button>
-                    <button class="sub-tab-btn" id="btn-tab-documents" onclick="switchPayrollTab('documents')">Document Vault</button>
-
-                    <button class="sub-tab-btn" id="btn-tab-reports" onclick="switchPayrollTab('reports')">Reports</button>
-                    <!-- Dropdown Options under Reports -->
-                    <div id="reports-dropdown" style="display: none; flex-direction: column; gap: 0.4rem; padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.6rem;">
-                        <button class="sub-tab-btn" id="btn-sub-tab-rep-summary" onclick="switchReportsSubTab('summary')" style="font-size: 0.76rem; opacity: 0.85;">Payroll Summary</button>
-                        <button class="sub-tab-btn" id="btn-sub-tab-rep-audit" onclick="switchReportsSubTab('audit')" style="font-size: 0.76rem; opacity: 0.85;">Tax Audit Trail</button>
-                    </div>
-                </aside>
-
-                <!-- Active tab content area -->
-                <div class="payroll-content">
-                    <!-- Tab 0: Welcome / Neutral Overview -->
-                    <div class="tab-panel active" id="payroll-tab-welcome">
-                        <div class="panel-card" style="text-align: center; padding: 4rem 2rem; border: 1px dashed var(--surface-border); border-radius: 16px; background: rgba(162, 89, 255, 0.01);">
-                            <div style="background: rgba(162, 89, 255, 0.08); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid var(--surface-border);">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
-                                    <line x1="12" y1="1" x2="12" y2="23"></line>
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                </svg>
-                            </div>
-                            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Custom Payroll System</h2>
-                            <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto; font-size: 0.9rem; line-height: 1.6;">Select an operation from the sidebar navigation menu to manage the employee registry, view salary structures, configure statutory rates, or execute CTC calculations.</p>
-                        </div>
-                    </div>
-
-                    <!-- Tab 1: Employee Center -->
-                    <div class="tab-panel" id="payroll-tab-employees">
-
-                        <!-- Sub-panel A: Employee Management -->
-                        <div id="payroll-sub-panel-view" style="display: block;">
-                            <div class="control-panel">
-                                <div class="search-wrapper">
-                                    <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                    <input type="text" class="search-input" id="payroll-search-box" placeholder="Search name..." oninput="filterPayrollRoster()">
-                                </div>
-                                <button class="btn-action" onclick="openPayrollModal()">Add Employee</button>
-                            </div>
-
-                            <div class="panel-card">
-                                <div class="table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Employee Name</th>
-                                                <th>Status</th>
-                                                <th>Financial Detail</th>
-                                                <th style="text-align: center;">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="payroll-table-body">
-                                            <tr>
-                                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                    Syncing database...
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding: 0.5rem 0;">
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                                        Showing <span id="pag-start">0</span> to <span id="pag-end">0</span> of <span id="pag-total">0</span> employees
-                                    </div>
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <button id="btn-pag-prev" class="btn-sub-tab" style="padding: 0.35rem 0.8rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-primary); cursor: pointer;" onclick="changePage(-1)">Prev</button>
-                                        <button id="btn-pag-next" class="btn-sub-tab" style="padding: 0.35rem 0.8rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-primary); cursor: pointer;" onclick="changePage(1)">Next</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sub-panel B: Salary Details -->
-                        <div id="payroll-sub-panel-salary" style="display: none;">
-                            <div class="panel-card" style="max-width: 600px; margin: 0;">
-                                <div class="form-grid" style="display: grid; grid-template-columns: 1fr; gap: 1.2rem;">
-                                    <div class="form-group">
-                                        <label for="admin-salary-employee-select">Select Employee<span class="required-star">*</span></label>
-                                        <select id="admin-salary-employee-select" class="form-control" onchange="loadAdminEmployeeSalary()" required style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                            <option value="">-- Choose Employee --</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-banner-error" id="admin-salary-error-banner" style="color: #ff5470; display: none; font-size: 0.85rem;"></div>
-                                    <div class="form-banner-error" id="admin-salary-success-banner" style="color: #00ffaa; display: none; font-size: 0.85rem;"></div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-base">Base Salary</label>
-                                        <input type="number" id="admin-sal-base" class="form-control" placeholder="Base Salary" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-hra">House Rent Allowance (HRA)</label>
-                                        <input type="number" id="admin-sal-hra" class="form-control" placeholder="HRA" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-allowances">Allowances</label>
-                                        <input type="number" id="admin-sal-allowances" class="form-control" placeholder="Allowances" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-deductions">Deductions</label>
-                                        <input type="number" id="admin-sal-deductions" class="form-control" placeholder="Deductions" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-state">Work State (For Professional Tax)</label>
-                                        <select id="admin-sal-state" class="form-control" onchange="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                            <option value="Karnataka">Karnataka</option>
-                                            <option value="Maharashtra">Maharashtra</option>
-                                            <option value="West Bengal">West Bengal</option>
-                                            <option value="Tamil Nadu">Tamil Nadu</option>
-                                            <option value="Telangana">Telangana</option>
-                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                            <option value="Gujarat">Gujarat</option>
-                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                            <option value="Exempt">Exempt / Other (No PT)</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-pt">Professional Tax (PT)</label>
-                                        <input type="number" id="admin-sal-pt" class="form-control" placeholder="PT" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-tax-regime">Tax Regime</label>
-                                        <select id="admin-sal-tax-regime" class="form-control" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                            <option value="New">New Tax Regime</option>
-                                            <option value="Old">Old Tax Regime</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="admin-sal-tds">Tax Deducted at Source (TDS)</label>
-                                        <input type="number" id="admin-sal-tds" class="form-control" placeholder="TDS" min="0" oninput="calculateAdminTakeHome()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; width: 100%;">
-                                    </div>
-
-                                    <div style="background: rgba(162, 89, 255, 0.04); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 700;">
-                                        <div>Gross: <span id="admin-sal-display-gross" style="color: #fff;">$0.00</span></div>
-                                        <div>Deductions: <span id="admin-sal-display-deductions" style="color: #ff5470;">$0.00</span></div>
-                                        <div>Net: <span id="admin-sal-display-net" style="color: #00ffaa;">$0.00</span></div>
-                                    </div>
-
-                                    <button class="btn-action" onclick="submitAdminSalaryDetails()" style="justify-content: center; background: var(--accent-primary); color: #000; font-weight: 700;">Save Salary Details</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sub-panel C: Attendance -->
-                        <div id="payroll-sub-panel-attendance" style="display: none;">
-                            <div class="panel-card" style="margin: 0;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                                    <div>
-                                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">Daily Attendance Register</h3>
-                                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Mark daily attendance status for employees</p>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem;">
-                                        <label for="admin-attendance-date" style="margin-bottom: 0; font-size: 0.85rem; font-weight: 600;">Select Date:</label>
-                                        <input type="date" id="admin-attendance-date" class="form-control" onchange="loadDailyAttendance()" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: auto; font-size: 0.85rem;">
-                                    </div>
-                                </div>
-
-                                <div class="form-banner-error" id="admin-attendance-error-banner" style="color: #ff5470; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
-                                <div class="form-banner-error" id="admin-attendance-success-banner" style="color: #00ffaa; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
-
-                                <div class="table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Employee Name</th>
-                                                <th style="text-align: right; padding-right: 2rem;">Mark Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="attendance-table-body">
-                                            <tr>
-                                                <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                    Loading employees registry...
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 2: Deductions & Rates -->
-                    <div class="tab-panel" id="payroll-tab-rates">
-                        <div class="panel-card" style="max-width: 500px; margin: 0;">
-                            <form id="payroll-rates-form" onsubmit="event.preventDefault(); savePayrollRates();" style="display: flex; flex-direction: column; gap: 1.2rem;">
-                                <div class="form-group">
-                                    <label for="rate-pf">Provident Fund (PF) Contribution Rate (%)</label>
-                                    <input type="number" step="0.1" id="rate-pf" class="form-control" value="12.0" required min="0" max="30">
-                                </div>
-                                <div class="form-group">
-                                    <label for="rate-tds">TDS Income Tax Slab Estimate (%)</label>
-                                    <input type="number" step="0.1" id="rate-tds" class="form-control" value="15.0" required min="0" max="50">
-                                </div>
-                                <button type="submit" class="btn-action" style="justify-content: center; width: 100%;">Save Rates</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Tab 3: CTC Calculator -->
-                    <div class="tab-panel" id="payroll-tab-ctc">
-                        <div class="panel-card" style="max-width: 500px; margin: 0;">
-                            <form style="display: flex; flex-direction: column; gap: 1.2rem;">
-                                <div class="form-group">
-                                    <label for="ctc-employee-select">Select Employee</label>
-                                    <select id="ctc-employee-select" class="form-control" onchange="runCTCCalculations()">
-                                        <option value="">-- Choose Employee --</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ctc-monthly-salary">Monthly Salary Gross (USD)</label>
-                                    <input type="number" id="ctc-monthly-salary" class="form-control" placeholder="e.g. 5000" min="0" oninput="runCTCCalculations()">
-                                </div>
-                            </form>
-
-                            <!-- Ultra Minimalist Output results -->
-                            <div class="ctc-result-box" id="ctc-result-box" style="display: none;">
-                                <div class="ctc-result-row">
-                                    <span>Monthly Take-Home:</span>
-                                    <span id="ctc-net-pay">$0.00</span>
-                                </div>
-                                <div class="ctc-result-row">
-                                    <span>Annual CTC:</span>
-                                    <span id="ctc-annual-ctc">$0.00</span>
-                                </div>
-                                <div class="ctc-result-row">
-                                    <span>Monthly PF Contribution:</span>
-                                    <span id="ctc-monthly-pf">$0.00</span>
-                                </div>
-                                <div class="ctc-result-row">
-                                    <span>Professional Tax (PT):</span>
-                                    <span id="ctc-monthly-pt">$0.00</span>
-                                </div>
-                                <div class="ctc-result-row">
-                                    <span>TDS Income Tax:</span>
-                                    <span id="ctc-monthly-tds">$0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 4: Payroll Processing -->
-                    <div class="tab-panel" id="payroll-tab-processing">
-                        <div class="panel-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                                <div>
-                                    <h2 class="roster-title" style="margin-bottom: 0.25rem;">Monthly Payroll Runs</h2>
-                                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Create, process, and manage monthly payroll cycles with auto-calculated PF, ESI, LWP deductions, and TDS.</p>
-                                </div>
-                                <button class="btn-action" onclick="openCreatePayrollRunModal()">+ New Payroll Run</button>
-                            </div>
-
-                            <div class="form-banner-error" id="payroll-run-error-banner" style="color: #ff5470; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
-                            <div class="form-banner-error" id="payroll-run-success-banner" style="color: #00ffaa; display: none; font-size: 0.85rem; margin-bottom: 1rem;"></div>
-
-                            <!-- Inline Create Form (Hidden by default) -->
-                            <div id="create-payroll-run-form" style="display: none; margin-bottom: 1.5rem; padding: 1.2rem; border: 1px solid var(--surface-border); border-radius: 12px; background: rgba(162, 89, 255, 0.02);">
-                                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem;">Create New Payroll Run</h3>
-                                <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label for="payroll-run-month" style="font-size: 0.8rem;">Month</label>
-                                        <select id="payroll-run-month" class="form-control" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: auto;">
-                                            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
-                                            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
-                                            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
-                                            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label for="payroll-run-year" style="font-size: 0.8rem;">Year</label>
-                                        <input type="number" id="payroll-run-year" class="form-control" min="2020" max="2099" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; width: 100px;">
-                                    </div>
-                                    <button class="btn-action" onclick="createPayrollRun()" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Create Draft</button>
-                                    <button class="btn-action btn-secondary" onclick="closeCreatePayrollRunModal()" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Cancel</button>
-                                </div>
-                            </div>
-
-                            <!-- Payroll Runs Table -->
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Period</th>
-                                            <th>Status</th>
-                                            <th>Gross Payout</th>
-                                            <th>Net Payout</th>
-                                            <th style="text-align: center;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="payroll-runs-table-body">
-                                        <tr>
-                                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                Loading payroll runs...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Transactions Detail Panel (Hidden by default) -->
-                        <div id="payroll-transactions-panel" style="display: none; margin-top: 1.5rem;">
-                            <div class="panel-card">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                                    <h3 id="transactions-panel-title" style="font-size: 1rem; font-weight: 700;">Payroll Transactions</h3>
-                                    <button class="btn-action btn-secondary" onclick="closeTransactionsPanel()" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">Close</button>
-                                </div>
-                                <!-- Summary Cards -->
-                                <div id="transactions-summary-cards" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 0.8rem 1rem; border-radius: 10px; min-width: 120px;">
-                                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total PF</div>
-                                        <div id="txn-total-pf" style="font-size: 1.1rem; font-weight: 800; color: #ffaa00; margin-top: 0.2rem;">₹0</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 0.8rem 1rem; border-radius: 10px; min-width: 120px;">
-                                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total ESI</div>
-                                        <div id="txn-total-esi" style="font-size: 1.1rem; font-weight: 800; color: #7b61ff; margin-top: 0.2rem;">₹0</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 0.8rem 1rem; border-radius: 10px; min-width: 120px;">
-                                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total LWP</div>
-                                        <div id="txn-total-lwp" style="font-size: 1.1rem; font-weight: 800; color: #ff5470; margin-top: 0.2rem;">₹0</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 0.8rem 1rem; border-radius: 10px; min-width: 120px;">
-                                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Total Net</div>
-                                        <div id="txn-total-net" style="font-size: 1.1rem; font-weight: 800; color: #00ffaa; margin-top: 0.2rem;">₹0</div>
-                                    </div>
-                                </div>
-                                <div class="table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Employee</th>
-                                                <th>Gross</th>
-                                                <th>PF</th>
-                                                <th>ESI</th>
-                                                <th>PT</th>
-                                                <th>TDS</th>
-                                                <th>LWP</th>
-                                                <th>Net</th>
-                                                <th style="text-align: center;">Payslip</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="payroll-transactions-table-body">
-                                            <tr>
-                                                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                    Loading transactions...
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab: Leaves -->
-                    <div class="tab-panel" id="payroll-tab-leaves">
-                        <div class="view-header">
-                            <h2>Leave Approvals</h2>
-                        </div>
-                        
-                        <div class="panel-card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
-                            <form id="leave-request-form" onsubmit="event.preventDefault(); submitLeave();" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 150px;">
-                                    <label>Employee</label>
-                                    <select id="leave-emp-select" class="form-control" required></select>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 120px;">
-                                    <label>Leave Type</label>
-                                    <select id="leave-type-select" class="form-control" required>
-                                        <option value="Sick">Sick Leave</option>
-                                        <option value="Casual">Casual Leave</option>
-                                        <option value="Earned">Earned Leave</option>
-                                        <option value="Unpaid">Unpaid / LWP</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 140px;">
-                                    <label>Start Date</label>
-                                    <input type="date" id="leave-start" class="form-control" required>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 140px;">
-                                    <label>End Date</label>
-                                    <input type="date" id="leave-end" class="form-control" required>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 2; min-width: 200px;">
-                                    <label>Reason</label>
-                                    <input type="text" id="leave-reason" class="form-control" placeholder="Optional reason">
-                                </div>
-                                <button type="submit" class="btn-action">Submit Request</button>
-                            </form>
-                        </div>
-<div class="panel-card" style="margin-top: 1.5rem;">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Leave Type</th>
-                                            <th>Duration</th>
-                                            <th>Reason</th>
-                                            <th>Status</th>
-                                            <th style="text-align: right;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="leaves-table-body">
-                                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Loading leaves...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab: Expenses -->
-                    <div class="tab-panel" id="payroll-tab-expenses">
-                        <div class="view-header">
-                            <h2>Expense Claims</h2>
-                        </div>
-                        
-                        <div class="panel-card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
-                            <form id="expense-claim-form" onsubmit="event.preventDefault(); submitExpense();" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 150px;">
-                                    <label>Employee</label>
-                                    <select id="expense-emp-select" class="form-control" required></select>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 150px;">
-                                    <label>Category</label>
-                                    <select id="expense-cat-select" class="form-control" required>
-                                        <option value="Travel">Travel & Transport</option>
-                                        <option value="Meals">Meals & Entertainment</option>
-                                        <option value="Office Supplies">Office Supplies</option>
-                                        <option value="Internet/Phone">Internet/Phone</option>
-                                        <option value="Other">Other Allowance</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1; min-width: 120px;">
-                                    <label>Amount (₹)</label>
-                                    <input type="number" step="0.01" id="expense-amount" class="form-control" required>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 2; min-width: 200px;">
-                                    <label>Description</label>
-                                    <input type="text" id="expense-desc" class="form-control" placeholder="Context">
-                                </div>
-                                <button type="submit" class="btn-action">Claim Expense</button>
-                            </form>
-                        </div>
-<div class="panel-card" style="margin-top: 1.5rem;">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Category</th>
-                                            <th>Amount</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th style="text-align: right;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expenses-table-body">
-                                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Loading expenses...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab: Documents -->
-                    <div class="tab-panel" id="payroll-tab-documents">
-                        <div class="view-header">
-                            <h2>Document Vault</h2>
-                        </div>
-                        <div class="panel-card" style="margin-top: 1.5rem;">
-                            <form id="generate-doc-form" onsubmit="event.preventDefault(); generateDocument();" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 2rem;">
-                                <div class="form-group" style="margin:0; flex: 1;">
-                                    <label>Employee</label>
-                                    <select id="doc-emp-select" class="form-control" required></select>
-                                </div>
-                                <div class="form-group" style="margin:0; flex: 1;">
-                                    <label>Document Type</label>
-                                    <select id="doc-type-select" class="form-control" required>
-                                        <option value="Offer Letter">Offer Letter</option>
-                                        <option value="Relieving Letter">Relieving Letter</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn-action">Generate PDF</button>
-                            </form>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Document Type</th>
-                                            <th>Generated On</th>
-                                            <th style="text-align: right;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="documents-table-body">
-                                        <tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Loading documents...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    
-                    <!-- Tab 5: Reports Panel -->
-                    <div class="tab-panel" id="payroll-tab-reports">
-                        <!-- Sub-panel A: Payroll Summary -->
-                        <div id="reports-sub-panel-summary" style="display: block;">
-                            <div class="panel-card">
-                                <h2 class="roster-title" style="margin-bottom: 1rem;">Payroll Summary Report</h2>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Overview of total corporate payout, HRA, allowances, and statutory tax deductions for the current cycle.</p>
-                                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem;">
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
-                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Total Net Payout</div>
-                                        <div id="rep-total-net" style="font-size: 1.6rem; font-weight: 800; color: #00ffaa; margin-top: 0.3rem;">$0.00</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
-                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Gross Disbursements</div>
-                                        <div id="rep-total-gross" style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin-top: 0.3rem;">$0.00</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.2rem; border-radius: 10px; min-width: 180px;">
-                                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Total Tax Deducted</div>
-                                        <div id="rep-total-deductions" style="font-size: 1.6rem; font-weight: 800; color: #ff5470; margin-top: 0.3rem;">$0.00</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sub-panel B: Tax Audit Trail -->
-                        <div id="reports-sub-panel-audit" style="display: none;">
-                            <div class="panel-card">
-                                <h2 class="roster-title" style="margin-bottom: 1rem;">Tax Audit Trail</h2>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Corporate PF status verification, Permanent Account Numbers (PAN), and Aadhar IDs register log.</p>
-                                <div class="table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Employee</th>
-                                                <th>PAN Status</th>
-                                                <th>Aadhar Status</th>
-                                                <th>PF Registration</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="reports-audit-table-body">
-                                            <tr>
-                                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                                    No audit data available.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Payroll Runs Table -->
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Gross Payout</th>
+                        <th>Net Payout</th>
+                        <th style="text-align: center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="payroll-runs-table-body">
+                      <tr>
+                        <td
+                          colspan="5"
+                          style="
+                            text-align: center;
+                            padding: 2rem;
+                            color: var(--text-secondary);
+                          "
+                        >
+                          Loading payroll runs...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-            </div>
-        </section>
+              </div>
 
+              <!-- Transactions Detail Panel (Hidden by default) -->
+              <div
+                id="payroll-transactions-panel"
+                style="display: none; margin-top: 1.5rem"
+              >
+                <div class="panel-card">
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-bottom: 1rem;
+                      flex-wrap: wrap;
+                      gap: 0.5rem;
+                    "
+                  >
+                    <h3
+                      id="transactions-panel-title"
+                      style="font-size: 1rem; font-weight: 700"
+                    >
+                      Payroll Transactions
+                    </h3>
+                    <button
+                      class="btn-action btn-secondary"
+                      onclick="closeTransactionsPanel()"
+                      style="padding: 0.4rem 0.9rem; font-size: 0.8rem"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <!-- Summary Cards -->
+                  <div
+                    id="transactions-summary-cards"
+                    style="
+                      display: flex;
+                      gap: 1rem;
+                      flex-wrap: wrap;
+                      margin-bottom: 1.5rem;
+                    "
+                  >
+                    <div
+                      style="
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 1px solid var(--surface-border);
+                        padding: 0.8rem 1rem;
+                        border-radius: 10px;
+                        min-width: 120px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.7rem;
+                          color: var(--text-secondary);
+                          text-transform: uppercase;
+                        "
+                      >
+                        Total PF
+                      </div>
+                      <div
+                        id="txn-total-pf"
+                        style="
+                          font-size: 1.1rem;
+                          font-weight: 800;
+                          color: #ffaa00;
+                          margin-top: 0.2rem;
+                        "
+                      >
+                        ₹0
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 1px solid var(--surface-border);
+                        padding: 0.8rem 1rem;
+                        border-radius: 10px;
+                        min-width: 120px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.7rem;
+                          color: var(--text-secondary);
+                          text-transform: uppercase;
+                        "
+                      >
+                        Total ESI
+                      </div>
+                      <div
+                        id="txn-total-esi"
+                        style="
+                          font-size: 1.1rem;
+                          font-weight: 800;
+                          color: #7b61ff;
+                          margin-top: 0.2rem;
+                        "
+                      >
+                        ₹0
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 1px solid var(--surface-border);
+                        padding: 0.8rem 1rem;
+                        border-radius: 10px;
+                        min-width: 120px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.7rem;
+                          color: var(--text-secondary);
+                          text-transform: uppercase;
+                        "
+                      >
+                        Total LWP
+                      </div>
+                      <div
+                        id="txn-total-lwp"
+                        style="
+                          font-size: 1.1rem;
+                          font-weight: 800;
+                          color: #ff5470;
+                          margin-top: 0.2rem;
+                        "
+                      >
+                        ₹0
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 1px solid var(--surface-border);
+                        padding: 0.8rem 1rem;
+                        border-radius: 10px;
+                        min-width: 120px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.7rem;
+                          color: var(--text-secondary);
+                          text-transform: uppercase;
+                        "
+                      >
+                        Total Net
+                      </div>
+                      <div
+                        id="txn-total-net"
+                        style="
+                          font-size: 1.1rem;
+                          font-weight: 800;
+                          color: #00ffaa;
+                          margin-top: 0.2rem;
+                        "
+                      >
+                        ₹0
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Employee</th>
+                          <th>Gross</th>
+                          <th>PF</th>
+                          <th>ESI</th>
+                          <th>PT</th>
+                          <th>TDS</th>
+                          <th>LWP</th>
+                          <th>Net</th>
+                          <th style="text-align: center">Payslip</th>
+                        </tr>
+                      </thead>
+                      <tbody id="payroll-transactions-table-body">
+                        <tr>
+                          <td
+                            colspan="9"
+                            style="
+                              text-align: center;
+                              padding: 2rem;
+                              color: var(--text-secondary);
+                            "
+                          >
+                            Loading transactions...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Leaves -->
+            <div class="tab-panel" id="payroll-tab-leaves">
+              <div class="view-header">
+                <h2>Leave Approvals</h2>
+              </div>
+
+              <div
+                class="panel-card"
+                style="margin-top: 1.5rem; margin-bottom: 1.5rem"
+              >
+                <form
+                  id="leave-request-form"
+                  onsubmit="
+                    event.preventDefault();
+                    submitLeave();
+                  "
+                  style="
+                    display: flex;
+                    gap: 1rem;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 150px"
+                  >
+                    <label>Employee</label>
+                    <select
+                      id="leave-emp-select"
+                      class="form-control"
+                      required
+                    ></select>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 120px"
+                  >
+                    <label>Leave Type</label>
+                    <select
+                      id="leave-type-select"
+                      class="form-control"
+                      required
+                    >
+                      <option value="Sick">Sick Leave</option>
+                      <option value="Casual">Casual Leave</option>
+                      <option value="Earned">Earned Leave</option>
+                      <option value="Unpaid">Unpaid / LWP</option>
+                    </select>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 140px"
+                  >
+                    <label>Start Date</label>
+                    <input
+                      type="date"
+                      id="leave-start"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 140px"
+                  >
+                    <label>End Date</label>
+                    <input
+                      type="date"
+                      id="leave-end"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 2; min-width: 200px"
+                  >
+                    <label>Reason</label>
+                    <input
+                      type="text"
+                      id="leave-reason"
+                      class="form-control"
+                      placeholder="Optional reason"
+                    />
+                  </div>
+                  <button type="submit" class="btn-action">
+                    Submit Request
+                  </button>
+                </form>
+              </div>
+              <div class="panel-card" style="margin-top: 1.5rem">
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Leave Type</th>
+                        <th>Duration</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th style="text-align: right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="leaves-table-body">
+                      <tr>
+                        <td
+                          colspan="6"
+                          style="
+                            text-align: center;
+                            color: var(--text-secondary);
+                          "
+                        >
+                          Loading leaves...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Expenses -->
+            <div class="tab-panel" id="payroll-tab-expenses">
+              <div class="view-header">
+                <h2>Expense Claims</h2>
+              </div>
+
+              <div
+                class="panel-card"
+                style="margin-top: 1.5rem; margin-bottom: 1.5rem"
+              >
+                <form
+                  id="expense-claim-form"
+                  onsubmit="
+                    event.preventDefault();
+                    submitExpense();
+                  "
+                  style="
+                    display: flex;
+                    gap: 1rem;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 150px"
+                  >
+                    <label>Employee</label>
+                    <select
+                      id="expense-emp-select"
+                      class="form-control"
+                      required
+                    ></select>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 150px"
+                  >
+                    <label>Category</label>
+                    <select
+                      id="expense-cat-select"
+                      class="form-control"
+                      required
+                    >
+                      <option value="Travel">Travel & Transport</option>
+                      <option value="Meals">Meals & Entertainment</option>
+                      <option value="Office Supplies">Office Supplies</option>
+                      <option value="Internet/Phone">Internet/Phone</option>
+                      <option value="Other">Other Allowance</option>
+                    </select>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 1; min-width: 120px"
+                  >
+                    <label>Amount (₹)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      id="expense-amount"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin: 0; flex: 2; min-width: 200px"
+                  >
+                    <label>Description</label>
+                    <input
+                      type="text"
+                      id="expense-desc"
+                      class="form-control"
+                      placeholder="Context"
+                    />
+                  </div>
+                  <button type="submit" class="btn-action">
+                    Claim Expense
+                  </button>
+                </form>
+              </div>
+              <div class="panel-card" style="margin-top: 1.5rem">
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th style="text-align: right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="expenses-table-body">
+                      <tr>
+                        <td
+                          colspan="6"
+                          style="
+                            text-align: center;
+                            color: var(--text-secondary);
+                          "
+                        >
+                          Loading expenses...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Documents -->
+            <div class="tab-panel" id="payroll-tab-documents">
+              <div class="view-header">
+                <h2>Document Vault</h2>
+              </div>
+              <div class="panel-card" style="margin-top: 1.5rem">
+                <form
+                  id="generate-doc-form"
+                  onsubmit="
+                    event.preventDefault();
+                    generateDocument();
+                  "
+                  style="
+                    display: flex;
+                    gap: 1rem;
+                    align-items: flex-end;
+                    margin-bottom: 2rem;
+                  "
+                >
+                  <div class="form-group" style="margin: 0; flex: 1">
+                    <label>Employee</label>
+                    <select
+                      id="doc-emp-select"
+                      class="form-control"
+                      required
+                    ></select>
+                  </div>
+                  <div class="form-group" style="margin: 0; flex: 1">
+                    <label>Document Type</label>
+                    <select id="doc-type-select" class="form-control" required>
+                      <option value="Offer Letter">Offer Letter</option>
+                      <option value="Relieving Letter">Relieving Letter</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn-action">Generate PDF</button>
+                </form>
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Document Type</th>
+                        <th>Generated On</th>
+                        <th style="text-align: right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="documents-table-body">
+                      <tr>
+                        <td
+                          colspan="4"
+                          style="
+                            text-align: center;
+                            color: var(--text-secondary);
+                          "
+                        >
+                          Loading documents...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tab 5: Reports Panel -->
+              <div class="tab-panel" id="payroll-tab-reports">
+                <!-- Sub-panel A: Payroll Summary -->
+                <div id="reports-sub-panel-summary" style="display: block">
+                  <div class="panel-card">
+                    <h2 class="roster-title" style="margin-bottom: 1rem">
+                      Payroll Summary Report
+                    </h2>
+                    <p
+                      style="
+                        color: var(--text-secondary);
+                        font-size: 0.9rem;
+                        margin-bottom: 1.5rem;
+                      "
+                    >
+                      Overview of total corporate payout, HRA, allowances, and
+                      statutory tax deductions for the current cycle.
+                    </p>
+                    <div
+                      style="
+                        display: flex;
+                        gap: 1.5rem;
+                        flex-wrap: wrap;
+                        margin-bottom: 2rem;
+                      "
+                    >
+                      <div
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid var(--surface-border);
+                          padding: 1.2rem;
+                          border-radius: 10px;
+                          min-width: 180px;
+                        "
+                      >
+                        <div
+                          style="
+                            font-size: 0.75rem;
+                            color: var(--text-secondary);
+                            text-transform: uppercase;
+                          "
+                        >
+                          Total Net Payout
+                        </div>
+                        <div
+                          id="rep-total-net"
+                          style="
+                            font-size: 1.6rem;
+                            font-weight: 800;
+                            color: #00ffaa;
+                            margin-top: 0.3rem;
+                          "
+                        >
+                          $0.00
+                        </div>
+                      </div>
+                      <div
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid var(--surface-border);
+                          padding: 1.2rem;
+                          border-radius: 10px;
+                          min-width: 180px;
+                        "
+                      >
+                        <div
+                          style="
+                            font-size: 0.75rem;
+                            color: var(--text-secondary);
+                            text-transform: uppercase;
+                          "
+                        >
+                          Gross Disbursements
+                        </div>
+                        <div
+                          id="rep-total-gross"
+                          style="
+                            font-size: 1.6rem;
+                            font-weight: 800;
+                            color: #ffffff;
+                            margin-top: 0.3rem;
+                          "
+                        >
+                          $0.00
+                        </div>
+                      </div>
+                      <div
+                        style="
+                          background: rgba(255, 255, 255, 0.02);
+                          border: 1px solid var(--surface-border);
+                          padding: 1.2rem;
+                          border-radius: 10px;
+                          min-width: 180px;
+                        "
+                      >
+                        <div
+                          style="
+                            font-size: 0.75rem;
+                            color: var(--text-secondary);
+                            text-transform: uppercase;
+                          "
+                        >
+                          Total Tax Deducted
+                        </div>
+                        <div
+                          id="rep-total-deductions"
+                          style="
+                            font-size: 1.6rem;
+                            font-weight: 800;
+                            color: #ff5470;
+                            margin-top: 0.3rem;
+                          "
+                        >
+                          $0.00
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sub-panel B: Tax Audit Trail -->
+                <div id="reports-sub-panel-audit" style="display: none">
+                  <div class="panel-card">
+                    <h2 class="roster-title" style="margin-bottom: 1rem">
+                      Tax Audit Trail
+                    </h2>
+                    <p
+                      style="
+                        color: var(--text-secondary);
+                        font-size: 0.9rem;
+                        margin-bottom: 1.5rem;
+                      "
+                    >
+                      Corporate PF status verification, Permanent Account
+                      Numbers (PAN), and Aadhar IDs register log.
+                    </p>
+                    <div class="table-responsive">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Employee</th>
+                            <th>PAN Status</th>
+                            <th>Aadhar Status</th>
+                            <th>PF Registration</th>
+                          </tr>
+                        </thead>
+                        <tbody id="reports-audit-table-body">
+                          <tr>
+                            <td
+                              colspan="4"
+                              style="
+                                text-align: center;
+                                padding: 2rem;
+                                color: var(--text-secondary);
+                              "
+                            >
+                              No audit data available.
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    
     <!-- Modal Employee Credentials -->
-    <div class="modal" id="credentials-modal" onclick="closeCredentialsModalOnBackdrop(event)">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="font-size: 1.1rem; font-weight: 800;">Set Employee Portal Credentials</h2>
-                <button class="modal-close" onclick="closeCredentialsModal()">✕</button>
-            </div>
-            <form id="credentials-form" onsubmit="event.preventDefault(); submitCredentialsForm();">
-                <input type="hidden" id="cred-emp-id">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="cred-email" class="form-control" required placeholder="employee@company.com">
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="cred-password" class="form-control" required minlength="6" placeholder="******">
-                    </div>
-                </div>
-                <div id="cred-error-banner" class="error-banner" style="display: none; margin-bottom: 1rem;"></div>
-                <div id="cred-success-banner" class="success-banner" style="display: none; margin-bottom: 1rem;"></div>
-                <div class="modal-footer" style="margin-top: 1.5rem;">
-                    <button type="submit" class="btn-action">Save Credentials</button>
-                </div>
-            </form>
+    <div
+      class="modal"
+      id="credentials-modal"
+      onclick="closeCredentialsModalOnBackdrop(event)"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 style="font-size: 1.1rem; font-weight: 800">
+            Set Employee Portal Credentials
+          </h2>
+          <button class="modal-close" onclick="closeCredentialsModal()">
+            ✕
+          </button>
         </div>
+        <form
+          id="credentials-form"
+          onsubmit="
+            event.preventDefault();
+            submitCredentialsForm();
+          "
+        >
+          <input type="hidden" id="cred-emp-id" />
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                id="cred-email"
+                class="form-control"
+                required
+                placeholder="employee@company.com"
+              />
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input
+                type="password"
+                id="cred-password"
+                class="form-control"
+                required
+                minlength="6"
+                placeholder="******"
+              />
+            </div>
+          </div>
+          <div
+            id="cred-error-banner"
+            class="error-banner"
+            style="display: none; margin-bottom: 1rem"
+          ></div>
+          <div
+            id="cred-success-banner"
+            class="success-banner"
+            style="display: none; margin-bottom: 1rem"
+          ></div>
+          <div class="modal-footer" style="margin-top: 1.5rem">
+            <button type="submit" class="btn-action">Save Credentials</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Modal CRM Add Lead -->
     <div class="modal" id="crm-modal" onclick="closeCRMModalOnBackdrop(event)">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="font-size: 1.1rem; font-weight: 800;">Register New Account Lead</h2>
-                <button class="modal-close" onclick="closeCRMModal()">✕</button>
-            </div>
-            <form id="crm-lead-form" onsubmit="event.preventDefault(); submitCRMForm();">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="crm-name">Client Name<span class="required-star">*</span></label>
-                        <input type="text" id="crm-name" class="form-control" placeholder="Acme Corp" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="crm-contact">Contact Person<span class="required-star">*</span></label>
-                        <input type="text" id="crm-contact" class="form-control" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="crm-industry">Industry<span class="required-star">*</span></label>
-                        <select id="crm-industry" class="form-control" required>
-                            <option value="SaaS / Software">SaaS / Software</option>
-                            <option value="Finance & Banking">Finance & Banking</option>
-                            <option value="Aerospace / Logistics">Aerospace / Logistics</option>
-                            <option value="Medical Technology">Medical Technology</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="crm-stage">Stage</label>
-                        <select id="crm-stage" class="form-control">
-                            <option value="Lead Qualification">Lead Qualification</option>
-                            <option value="Active Proposal">Active Proposal</option>
-                            <option value="Contract Negotiation">Contract Negotiation</option>
-                            <option value="Closed-Won">Closed-Won</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="crm-value">Contract Value ($)<span class="required-star">*</span></label>
-                        <input type="number" id="crm-value" class="form-control" placeholder="50000" min="0" required>
-                    </div>
-                    <div class="form-actions" style="grid-column: 1/-1; display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
-                        <button type="button" class="btn-action btn-secondary" onclick="closeCRMModal()">Cancel</button>
-                        <button type="submit" class="btn-action">Save Lead</button>
-                    </div>
-                </div>
-            </form>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 style="font-size: 1.1rem; font-weight: 800">
+            Register New Account Lead
+          </h2>
+          <button class="modal-close" onclick="closeCRMModal()">✕</button>
         </div>
+        <form
+          id="crm-lead-form"
+          onsubmit="
+            event.preventDefault();
+            submitCRMForm();
+          "
+        >
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="crm-name"
+                >Client Name<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="crm-name"
+                class="form-control"
+                placeholder="Acme Corp"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="crm-contact"
+                >Contact Person<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="crm-contact"
+                class="form-control"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="crm-industry"
+                >Industry<span class="required-star">*</span></label
+              >
+              <select id="crm-industry" class="form-control" required>
+                <option value="SaaS / Software">SaaS / Software</option>
+                <option value="Finance & Banking">Finance & Banking</option>
+                <option value="Aerospace / Logistics">
+                  Aerospace / Logistics
+                </option>
+                <option value="Medical Technology">Medical Technology</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="crm-stage">Stage</label>
+              <select id="crm-stage" class="form-control">
+                <option value="Lead Qualification">Lead Qualification</option>
+                <option value="Active Proposal">Active Proposal</option>
+                <option value="Contract Negotiation">
+                  Contract Negotiation
+                </option>
+                <option value="Closed-Won">Closed-Won</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="crm-value"
+                >Contract Value ($)<span class="required-star">*</span></label
+              >
+              <input
+                type="number"
+                id="crm-value"
+                class="form-control"
+                placeholder="50000"
+                min="0"
+                required
+              />
+            </div>
+            <div
+              class="form-actions"
+              style="
+                grid-column: 1/-1;
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.8rem;
+                margin-top: 1rem;
+              "
+            >
+              <button
+                type="button"
+                class="btn-action btn-secondary"
+                onclick="closeCRMModal()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn-action">Save Lead</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Modal Payroll Add Employee -->
-    <div class="modal" id="payroll-modal" onclick="closePayrollModalOnBackdrop(event)">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="font-size: 1.1rem; font-weight: 800;">Add Corporate Employee</h2>
-                <button class="modal-close" onclick="closePayrollModal()">✕</button>
-            </div>
-            <form id="payroll-employee-form" onsubmit="event.preventDefault(); submitPayrollForm();">
-                <div class="form-grid">
-                    <div class="form-banner-error" id="payroll-form-error"></div>
-
-                    <!-- Personal -->
-                    <div class="form-section-title">Personal Details</div>
-                    <div class="form-group">
-                        <label for="emp-name">Full Name<span class="required-star">*</span></label>
-                        <input type="text" id="emp-name" class="form-control" placeholder="Rahul Sharma" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-age">Age<span class="required-star">*</span></label>
-                        <input type="number" id="emp-age" class="form-control" placeholder="30" min="18" max="100" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-gender">Gender<span class="required-star">*</span></label>
-                        <select id="emp-gender" class="form-control" required>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-dob">Date of Birth</label>
-                        <input type="date" id="emp-dob" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-marital">Marital Status</label>
-                        <select id="emp-marital" class="form-control" onchange="toggleSpouseField()">
-                            <option value="Unmarried">Unmarried</option>
-                            <option value="Married">Married</option>
-                        </select>
-                    </div>
-                    <!-- Spouse Name (Conditional) -->
-                    <div class="form-group conditional-field" id="spouse-field-wrapper">
-                        <label for="emp-spouse">Spouse Name<span class="required-star">*</span></label>
-                        <input type="text" id="emp-spouse" class="form-control" placeholder="Spouse Full Name">
-                    </div>
-
-                    <!-- Gov Details -->
-                    <div class="form-section-title">Identity Parameters</div>
-                    <div class="form-group">
-                        <label for="emp-pan">PAN Number<span class="required-star">*</span></label>
-                        <input type="text" id="emp-pan" class="form-control" placeholder="ABCDE1234F" style="text-transform: uppercase;" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-aadhar">Aadhar Number (12 Digits)<span class="required-star">*</span></label>
-                        <input type="text" id="emp-aadhar" class="form-control" placeholder="123456789012" required>
-                    </div>
-
-                    <!-- Employment -->
-                    <div class="form-section-title">Employment Profile</div>
-                    <div class="form-group">
-                        <label for="emp-status">Status</label>
-                        <select id="emp-status" class="form-control" onchange="toggleExitDateField()">
-                            <option value="Active">Active</option>
-                            <option value="Terminated">Terminated</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-doj">Date of Joining<span class="required-star">*</span></label>
-                        <input type="date" id="emp-doj" class="form-control" required>
-                    </div>
-                    <!-- Date of Exit (Conditional) -->
-                    <div class="form-group conditional-field" id="exit-date-field-wrapper">
-                        <label for="emp-doe">Date of Exit<span class="required-star">*</span></label>
-                        <input type="date" id="emp-doe" class="form-control">
-                    </div>
-
-                    <!-- Finance -->
-                    <div class="form-section-title">Financial Profile</div>
-                    <div class="form-group">
-                        <label for="emp-bank">Bank Account</label>
-                        <input type="text" id="emp-bank" class="form-control" placeholder="Account Number">
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-ifsc">IFSC (Optional)</label>
-                        <input type="text" id="emp-ifsc" class="form-control" placeholder="SBIN0001234" style="text-transform: uppercase;">
-                    </div>
-                    <div class="form-group">
-                        <label for="emp-pf">PF Status</label>
-                        <select id="emp-pf" class="form-control" onchange="toggleUanField()">
-                            <option value="Not Applicable">Not Applicable</option>
-                            <option value="Applicable">Applicable</option>
-                        </select>
-                    </div>
-                    <!-- UAN Number (Conditional) -->
-                    <div class="form-group conditional-field" id="uan-field-wrapper">
-                        <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
-                        <input type="text" id="emp-uan" class="form-control" placeholder="100998877665">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="emp-state">Work State (For Professional Tax)</label>
-                        <select id="emp-state" class="form-control">
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Exempt">Exempt / Other (No PT)</option>
-                        </select>
-                    </div>
-
-                    <!-- Submission -->
-                    <div class="form-actions" style="grid-column: 1/-1; display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
-                        <button type="button" class="btn-action btn-secondary" onclick="closePayrollModal()">Cancel</button>
-                        <button type="submit" class="btn-action">Save Employee</button>
-                    </div>
-                </div>
-            </form>
+    <div
+      class="modal"
+      id="payroll-modal"
+      onclick="closePayrollModalOnBackdrop(event)"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 style="font-size: 1.1rem; font-weight: 800">
+            Add Corporate Employee
+          </h2>
+          <button class="modal-close" onclick="closePayrollModal()">✕</button>
         </div>
+        <form
+          id="payroll-employee-form"
+          onsubmit="
+            event.preventDefault();
+            submitPayrollForm();
+          "
+        >
+          <div class="form-grid">
+            <div class="form-banner-error" id="payroll-form-error"></div>
+
+            <!-- Personal -->
+            <div class="form-section-title">Personal Details</div>
+            <div class="form-group">
+              <label for="emp-name"
+                >Full Name<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="emp-name"
+                class="form-control"
+                placeholder="Rahul Sharma"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="emp-age"
+                >Age<span class="required-star">*</span></label
+              >
+              <input
+                type="number"
+                id="emp-age"
+                class="form-control"
+                placeholder="30"
+                min="18"
+                max="100"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="emp-gender"
+                >Gender<span class="required-star">*</span></label
+              >
+              <select id="emp-gender" class="form-control" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="emp-dob">Date of Birth</label>
+              <input type="date" id="emp-dob" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="emp-marital">Marital Status</label>
+              <select
+                id="emp-marital"
+                class="form-control"
+                onchange="toggleSpouseField()"
+              >
+                <option value="Unmarried">Unmarried</option>
+                <option value="Married">Married</option>
+              </select>
+            </div>
+            <!-- Spouse Name (Conditional) -->
+            <div class="form-group conditional-field" id="spouse-field-wrapper">
+              <label for="emp-spouse"
+                >Spouse Name<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="emp-spouse"
+                class="form-control"
+                placeholder="Spouse Full Name"
+              />
+            </div>
+
+            <!-- Gov Details -->
+            <div class="form-section-title">Identity Parameters</div>
+            <div class="form-group">
+              <label for="emp-pan"
+                >PAN Number<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="emp-pan"
+                class="form-control"
+                placeholder="ABCDE1234F"
+                style="text-transform: uppercase"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="emp-aadhar"
+                >Aadhar Number (12 Digits)<span class="required-star"
+                  >*</span
+                ></label
+              >
+              <input
+                type="text"
+                id="emp-aadhar"
+                class="form-control"
+                placeholder="123456789012"
+                required
+              />
+            </div>
+
+            <!-- Employment -->
+            <div class="form-section-title">Employment Profile</div>
+            <div class="form-group">
+              <label for="emp-status">Status</label>
+              <select
+                id="emp-status"
+                class="form-control"
+                onchange="toggleExitDateField()"
+              >
+                <option value="Active">Active</option>
+                <option value="Terminated">Terminated</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="emp-doj"
+                >Date of Joining<span class="required-star">*</span></label
+              >
+              <input type="date" id="emp-doj" class="form-control" required />
+            </div>
+            <!-- Date of Exit (Conditional) -->
+            <div
+              class="form-group conditional-field"
+              id="exit-date-field-wrapper"
+            >
+              <label for="emp-doe"
+                >Date of Exit<span class="required-star">*</span></label
+              >
+              <input type="date" id="emp-doe" class="form-control" />
+            </div>
+
+            <!-- Finance -->
+            <div class="form-section-title">Financial Profile</div>
+            <div class="form-group">
+              <label for="emp-bank">Bank Account</label>
+              <input
+                type="text"
+                id="emp-bank"
+                class="form-control"
+                placeholder="Account Number"
+              />
+            </div>
+            <div class="form-group">
+              <label for="emp-ifsc">IFSC (Optional)</label>
+              <input
+                type="text"
+                id="emp-ifsc"
+                class="form-control"
+                placeholder="SBIN0001234"
+                style="text-transform: uppercase"
+              />
+            </div>
+            <div class="form-group">
+              <label for="emp-pf">PF Status</label>
+              <select
+                id="emp-pf"
+                class="form-control"
+                onchange="toggleUanField()"
+              >
+                <option value="Not Applicable">Not Applicable</option>
+                <option value="Applicable">Applicable</option>
+              </select>
+            </div>
+            <!-- UAN Number (Conditional) -->
+            <div class="form-group conditional-field" id="uan-field-wrapper">
+              <label for="emp-uan"
+                >UAN Number<span class="required-star">*</span></label
+              >
+              <input
+                type="text"
+                id="emp-uan"
+                class="form-control"
+                placeholder="100998877665"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="emp-state">Work State (For Professional Tax)</label>
+              <select id="emp-state" class="form-control">
+                <option value="Karnataka">Karnataka</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Exempt">Exempt / Other (No PT)</option>
+              </select>
+            </div>
+
+            <!-- Submission -->
+            <div
+              class="form-actions"
+              style="
+                grid-column: 1/-1;
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.8rem;
+                margin-top: 1rem;
+              "
+            >
+              <button
+                type="button"
+                class="btn-action btn-secondary"
+                onclick="closePayrollModal()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn-action">Save Employee</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- JavaScript Module Logic -->
     <script src="js/admin.js"></script>
-</body>
+  </body>
 </html>

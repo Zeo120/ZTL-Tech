@@ -1,305 +1,357 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paradigm | Mathematical Payslip</title>
     <style>
+      :root {
+        --bg-color: #fff;
+        --text-color: #000;
+        --accent: #000;
+        --border-color: #000;
+      }
+
+      @media (prefers-color-scheme: dark) {
         :root {
-            --bg-color: #fff;
-            --text-color: #000;
-            --accent: #000;
-            --border-color: #000;
+          --bg-color: #050505;
+          --text-color: #f4f4f4;
+          --accent: #fff;
+          --border-color: #333;
         }
+      }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #050505;
-                --text-color: #f4f4f4;
-                --accent: #fff;
-                --border-color: #333;
-            }
-        }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
+      .payslip-container {
+        width: 100%;
+        max-width: 800px;
+        border: 2px solid var(--border-color);
+        padding: 2rem;
+        box-sizing: border-box;
+        background: var(--bg-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 2px solid var(--text-color);
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        text-transform: uppercase;
+      }
+
+      .header p {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        font-family: monospace;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .info-box {
+        border: 1px solid var(--border-color);
+        padding: 1rem;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-label {
+        font-weight: 600;
+        opacity: 0.7;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+      }
+
+      .info-value {
+        font-family: monospace;
+      }
+
+      .salary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+      }
+
+      .salary-table th,
+      .salary-table td {
+        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+        text-align: left;
+      }
+
+      .salary-table th {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        opacity: 0.7;
+      }
+
+      .salary-table td.amount {
+        text-align: right;
+        font-family: monospace;
+      }
+
+      .net-pay-box {
+        border: 2px solid var(--text-color);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      .net-pay-box h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: -0.5px;
+      }
+
+      .net-pay-box .net-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        font-family: monospace;
+      }
+
+      .controls {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      button {
+        background: var(--text-color);
+        color: var(--bg-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-family: inherit;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      button:hover {
+        opacity: 0.8;
+      }
+
+      /* ----------------- PRINT STYLES ----------------- */
+      @media print {
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+          background: white;
+          color: black;
+          padding: 0;
         }
-
         .payslip-container {
-            width: 100%;
-            max-width: 800px;
-            border: 2px solid var(--border-color);
-            padding: 2rem;
-            box-sizing: border-box;
-            background: var(--bg-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
+          border: 2px solid black;
+          box-shadow: none;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          page-break-inside: avoid;
         }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 2px solid var(--text-color);
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-        }
-
-        .header p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-family: monospace;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-box {
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            font-weight: 600;
-            opacity: 0.7;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-        }
-
-        .info-value {
-            font-family: monospace;
-        }
-
-        .salary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-        }
-
-        .salary-table th, .salary-table td {
-            border: 1px solid var(--border-color);
-            padding: 0.75rem;
-            text-align: left;
-        }
-
-        .salary-table th {
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            opacity: 0.7;
-        }
-
-        .salary-table td.amount {
-            text-align: right;
-            font-family: monospace;
-        }
-
-        .net-pay-box {
-            border: 2px solid var(--text-color);
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.02);
-        }
-
-        .net-pay-box h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: -0.5px;
-        }
-
-        .net-pay-box .net-amount {
-            font-size: 2rem;
-            font-weight: 800;
-            font-family: monospace;
-        }
-
         .controls {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
+          display: none !important;
         }
-
-        button {
-            background: var(--text-color);
-            color: var(--bg-color);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-family: inherit;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: opacity 0.2s;
+        .net-pay-box {
+          border: 2px solid black;
+          background: white;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
-
-        button:hover {
-            opacity: 0.8;
-        }
-
-        /* ----------------- PRINT STYLES ----------------- */
-        @media print {
-            body {
-                background: white;
-                color: black;
-                padding: 0;
-            }
-            .payslip-container {
-                border: 2px solid black;
-                box-shadow: none;
-                width: 100%;
-                max-width: none;
-                margin: 0;
-                page-break-inside: avoid;
-            }
-            .controls {
-                display: none !important;
-            }
-            .net-pay-box {
-                border: 2px solid black;
-                background: white;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="payslip-container" id="payslip-content">
-        <div class="header">
-            <div>
-                <h1>ZTL Tech</h1>
-                <p>Paradigm Payroll Engine</p>
-            </div>
-            <div style="text-align: right;">
-                <h2 style="margin:0; font-size: 1.5rem;" id="month-year"></h2>
-                <p>PAYSLIP</p>
-            </div>
+      <div class="header">
+        <div>
+          <h1>ZTL Tech</h1>
+          <p>Paradigm Payroll Engine</p>
         </div>
-
-        <div class="grid-2">
-            <div class="info-box">
-                <div class="info-row"><span class="info-label">Name</span><span class="info-value" id="emp-name"></span></div>
-                <div class="info-row"><span class="info-label">ID</span><span class="info-value" id="emp-id"></span></div>
-                <div class="info-row"><span class="info-label">Joining Date</span><span class="info-value" id="emp-doj"></span></div>
-                <div class="info-row"><span class="info-label">LWP Days</span><span class="info-value" id="emp-lwp"></span></div>
-            </div>
-            <div class="info-box">
-                <div class="info-row"><span class="info-label">PAN</span><span class="info-value" id="emp-pan"></span></div>
-                <div class="info-row"><span class="info-label">UAN</span><span class="info-value" id="emp-uan"></span></div>
-                <div class="info-row"><span class="info-label">Bank AC</span><span class="info-value" id="emp-bank"></span></div>
-                <div class="info-row"><span class="info-label">IFSC</span><span class="info-value" id="emp-ifsc"></span></div>
-            </div>
+        <div style="text-align: right">
+          <h2 style="margin: 0; font-size: 1.5rem" id="month-year"></h2>
+          <p>PAYSLIP</p>
         </div>
+      </div>
 
-        <table class="salary-table">
-            <thead>
-                <tr>
-                    <th>Earnings</th>
-                    <th style="text-align: right;">Amount (₹)</th>
-                    <th>Deductions</th>
-                    <th style="text-align: right;">Amount (₹)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Basic Salary</td>
-                    <td class="amount" id="earn-basic">0.00</td>
-                    <td>Provident Fund (Employee)</td>
-                    <td class="amount" id="ded-pf">0.00</td>
-                </tr>
-                <tr>
-                    <td>House Rent Allowance</td>
-                    <td class="amount" id="earn-hra">0.00</td>
-                    <td>ESI (Employee)</td>
-                    <td class="amount" id="ded-esi">0.00</td>
-                </tr>
-                <tr>
-                    <td>Special Allowances</td>
-                    <td class="amount" id="earn-allowances">0.00</td>
-                    <td>Professional Tax</td>
-                    <td class="amount" id="ded-pt">0.00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>TDS</td>
-                    <td class="amount" id="ded-tds">0.00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>LWP Deduction</td>
-                    <td class="amount" id="ded-lwp">0.00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Other Deductions</td>
-                    <td class="amount" id="ded-other">0.00</td>
-                </tr>
-                <tr style="font-weight: bold; background: rgba(0,0,0,0.02);">
-                    <td>Total Gross</td>
-                    <td class="amount" id="total-gross">0.00</td>
-                    <td>Total Deductions</td>
-                    <td class="amount" id="total-deductions">0.00</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="net-pay-box">
-            <div>
-                <h2>Net Payable</h2>
-                <p style="margin: 0; font-size: 0.8rem; font-family: monospace; opacity: 0.7;">(Gross - Deductions)</p>
-            </div>
-            <div class="net-amount" id="net-pay">₹0.00</div>
+      <div class="grid-2">
+        <div class="info-box">
+          <div class="info-row">
+            <span class="info-label">Name</span
+            ><span class="info-value" id="emp-name"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">ID</span
+            ><span class="info-value" id="emp-id"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Joining Date</span
+            ><span class="info-value" id="emp-doj"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">LWP Days</span
+            ><span class="info-value" id="emp-lwp"></span>
+          </div>
         </div>
-        
-        <p style="text-align: center; font-size: 0.7rem; font-family: monospace; opacity: 0.5; margin-top: 2rem;">
-            Generated natively via mathematical proof on device. This is a system-generated document.
-        </p>
+        <div class="info-box">
+          <div class="info-row">
+            <span class="info-label">PAN</span
+            ><span class="info-value" id="emp-pan"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">UAN</span
+            ><span class="info-value" id="emp-uan"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Bank AC</span
+            ><span class="info-value" id="emp-bank"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">IFSC</span
+            ><span class="info-value" id="emp-ifsc"></span>
+          </div>
+        </div>
+      </div>
+
+      <table class="salary-table">
+        <thead>
+          <tr>
+            <th>Earnings</th>
+            <th style="text-align: right">Amount (₹)</th>
+            <th>Deductions</th>
+            <th style="text-align: right">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic Salary</td>
+            <td class="amount" id="earn-basic">0.00</td>
+            <td>Provident Fund (Employee)</td>
+            <td class="amount" id="ded-pf">0.00</td>
+          </tr>
+          <tr>
+            <td>House Rent Allowance</td>
+            <td class="amount" id="earn-hra">0.00</td>
+            <td>ESI (Employee)</td>
+            <td class="amount" id="ded-esi">0.00</td>
+          </tr>
+          <tr>
+            <td>Special Allowances</td>
+            <td class="amount" id="earn-allowances">0.00</td>
+            <td>Professional Tax</td>
+            <td class="amount" id="ded-pt">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>TDS</td>
+            <td class="amount" id="ded-tds">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>LWP Deduction</td>
+            <td class="amount" id="ded-lwp">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>Other Deductions</td>
+            <td class="amount" id="ded-other">0.00</td>
+          </tr>
+          <tr style="font-weight: bold; background: rgba(0, 0, 0, 0.02)">
+            <td>Total Gross</td>
+            <td class="amount" id="total-gross">0.00</td>
+            <td>Total Deductions</td>
+            <td class="amount" id="total-deductions">0.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="net-pay-box">
+        <div>
+          <h2>Net Payable</h2>
+          <p
+            style="
+              margin: 0;
+              font-size: 0.8rem;
+              font-family: monospace;
+              opacity: 0.7;
+            "
+          >
+            (Gross - Deductions)
+          </p>
+        </div>
+        <div class="net-amount" id="net-pay">₹0.00</div>
+      </div>
+
+      <p
+        style="
+          text-align: center;
+          font-size: 0.7rem;
+          font-family: monospace;
+          opacity: 0.5;
+          margin-top: 2rem;
+        "
+      >
+        Generated natively via mathematical proof on device. This is a
+        system-generated document.
+      </p>
     </div>
 
     <div class="controls">
-        <button onclick="window.close()">Close</button>
-        <button onclick="window.print()" style="background: #00ffaa; color: #000;">Download PDF Natively</button>
+      <button onclick="window.close()">Close</button>
+      <button onclick="window.print()" style="background: #00ffaa; color: #000">
+        Download PDF Natively
+      </button>
     </div>
 
     <script src="js/payslip.js"></script>
-</body>
+  </body>
 </html>
