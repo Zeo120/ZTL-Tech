@@ -77,6 +77,9 @@ try {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add("visible");
+      } else {
+        // Remove class when off-screen so the animation replays EVERY time you scroll
+        entry.target.classList.remove("visible");
       }
     });
   }, observerOptions);
