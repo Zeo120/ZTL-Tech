@@ -2956,3 +2956,476 @@ select {
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
 }
+
+/* --- CSS from employee_portal.html --- */
+
+:root {
+  --bg-color: #050505;
+  --glass-bg: rgba(10, 10, 10, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --accent: #ffffff;
+  --accent-hover: #dddddd;
+  --input-bg: rgba(20, 20, 20, 0.6);
+  --card-bg: rgba(15, 15, 15, 0.7);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg-color);
+  background-image:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(255, 255, 255, 0.03),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(255, 255, 255, 0.03),
+      transparent 30%
+    );
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.navbar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.card h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 500;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  color-scheme: dark;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+button.submit-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: #000000;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 8px;
+}
+
+button.submit-btn:hover {
+  background: var(--accent-hover);
+}
+
+.message {
+  margin-top: 12px;
+  font-size: 13px;
+  text-align: center;
+  min-height: 18px;
+}
+
+.error {
+  color: #ef4444;
+}
+.success {
+  color: #10b981;
+}
+
+.profile-details p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.profile-details span {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* --- CSS from index.html --- */
+
+@keyframes flow-code {
+  to {
+    stroke-dashoffset: -80;
+  }
+}
+@keyframes rotate-blueprint {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes code-stream {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+@keyframes frame-grow {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(0.98);
+    opacity: 0.25;
+  }
+}
+.code-channel {
+  stroke-dasharray: 6, 14;
+  animation: flow-code 2.5s linear infinite;
+}
+.code-channel-reverse {
+  stroke-dasharray: 10, 10;
+  animation: flow-code 1.8s linear infinite reverse;
+}
+.rotator-bp {
+  animation: rotate-blueprint 28s linear infinite;
+  transform-origin: 300px 200px;
+}
+.rotator-bp-fast {
+  animation: rotate-blueprint 12s linear infinite reverse;
+  transform-origin: 300px 200px;
+}
+.grid-frame {
+  animation: frame-grow 6s ease-in-out infinite;
+  transform-origin: 300px 200px;
+}
+.code-fragment-1 {
+  animation: code-stream 4s linear infinite;
+}
+.code-fragment-2 {
+  animation: code-stream 4s linear infinite -2s;
+}
+
+/* --- CSS from payslip.html --- */
+
+:root {
+  --bg-color: #fff;
+  --text-color: #000;
+  --accent: #000;
+  --border-color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #050505;
+    --text-color: #f4f4f4;
+    --accent: #fff;
+    --border-color: #333;
+  }
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.payslip-container {
+  width: 100%;
+  max-width: 800px;
+  border: 2px solid var(--border-color);
+  padding: 2rem;
+  box-sizing: border-box;
+  background: var(--bg-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--text-color);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+}
+
+.header p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-family: monospace;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.info-box {
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-weight: 600;
+  opacity: 0.7;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.info-value {
+  font-family: monospace;
+}
+
+.salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.salary-table th,
+.salary-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.salary-table th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+.salary-table td.amount {
+  text-align: right;
+  font-family: monospace;
+}
+
+.net-pay-box {
+  border: 2px solid var(--text-color);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.net-pay-box h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.net-pay-box .net-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: monospace;
+}
+
+.controls {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  background: var(--text-color);
+  color: var(--bg-color);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-family: inherit;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+/* ----------------- PRINT STYLES ----------------- */
+@media print {
+  body {
+    background: white;
+    color: black;
+    padding: 0;
+  }
+  .payslip-container {
+    border: 2px solid black;
+    box-shadow: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    page-break-inside: avoid;
+  }
+  .controls {
+    display: none !important;
+  }
+  .net-pay-box {
+    border: 2px solid black;
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

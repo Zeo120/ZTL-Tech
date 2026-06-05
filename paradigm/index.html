@@ -8,7 +8,7 @@
       name="description"
       content="Paradigm by ZTL Tech offers advanced custom software architecture design: translating natural requirements, auditing architectural debt, auto-generating boilerplates, and simulating delivery sprints."
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=3" />
   </head>
   <body>
     <div class="bg-glow">
@@ -222,77 +222,6 @@
                 />
                 <circle cx="40" cy="0" r="1" fill="rgba(255, 255, 255, 0.1)" />
               </pattern>
-              <style>
-                @keyframes flow-code {
-                  to {
-                    stroke-dashoffset: -80;
-                  }
-                }
-                @keyframes rotate-blueprint {
-                  from {
-                    transform: rotate(0deg);
-                  }
-                  to {
-                    transform: rotate(360deg);
-                  }
-                }
-                @keyframes code-stream {
-                  0% {
-                    transform: translateY(10px);
-                    opacity: 0;
-                  }
-                  20% {
-                    opacity: 0.8;
-                  }
-                  80% {
-                    opacity: 0.8;
-                  }
-                  100% {
-                    transform: translateY(-30px);
-                    opacity: 0;
-                  }
-                }
-                @keyframes frame-grow {
-                  0% {
-                    transform: scale(0.98);
-                    opacity: 0.25;
-                  }
-                  50% {
-                    transform: scale(1.02);
-                    opacity: 0.45;
-                  }
-                  100% {
-                    transform: scale(0.98);
-                    opacity: 0.25;
-                  }
-                }
-                .code-channel {
-                  stroke-dasharray: 6, 14;
-                  animation: flow-code 2.5s linear infinite;
-                }
-                .code-channel-reverse {
-                  stroke-dasharray: 10, 10;
-                  animation: flow-code 1.8s linear infinite reverse;
-                }
-                .rotator-bp {
-                  animation: rotate-blueprint 28s linear infinite;
-                  transform-origin: 300px 200px;
-                }
-                .rotator-bp-fast {
-                  animation: rotate-blueprint 12s linear infinite reverse;
-                  transform-origin: 300px 200px;
-                }
-                .grid-frame {
-                  animation: frame-grow 6s ease-in-out infinite;
-                  transform-origin: 300px 200px;
-                }
-                .code-fragment-1 {
-                  animation: code-stream 4s linear infinite;
-                }
-                .code-fragment-2 {
-                  animation: code-stream 4s linear infinite -2s;
-                }
-              </style>
             </defs>
 
             <!-- Technical Grid Blueprint -->
