@@ -66,18 +66,6 @@ if (mobileTrigger && mobileDropdown) {
   });
 }
 
-// Force all hero section elements to be visible immediately on load to prevent viewport blackouts
-const forceHeroVisible = () => {
-  document.querySelectorAll(".hero .animate").forEach((el) => {
-    el.classList.add("visible");
-  });
-};
-if (document.readyState === "loading") {
-  window.addEventListener("DOMContentLoaded", forceHeroVisible);
-} else {
-  forceHeroVisible();
-}
-
 // Intersection Observer for Smooth Scroll Animations (with viewport fallback)
 try {
   const observerOptions = {
