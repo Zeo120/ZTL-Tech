@@ -2062,11 +2062,10 @@ select {
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
 }
-\n    
 
 /* --- LOGIN CSS --- */
 
-        .login-container {
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
