@@ -81,9 +81,28 @@ try {
     });
   }, observerOptions);
 
-  document.querySelectorAll(".animate").forEach((element) => {
-    observer.observe(element);
-  });
+  
+  // Batch Loading and Compute Implementation to reduce Client-Side Memory (CSM)
+  const animateElements = document.querySelectorAll(".animate");
+  const BATCH_SIZE = 3;
+  let currentIndex = 0;
+
+  function processObserverBatch() {
+    const end = Math.min(currentIndex + BATCH_SIZE, animateElements.length);
+    for (let i = currentIndex; i < end; i++) {
+      observer.observe(animateElements[i]);
+    }
+    currentIndex = end;
+    if (currentIndex < animateElements.length) {
+      if (window.requestIdleCallback) {
+        requestIdleCallback(processObserverBatch);
+      } else {
+        setTimeout(processObserverBatch, 16);
+      }
+    }
+  }
+  processObserverBatch();
+
 } catch (e) {
   document.querySelectorAll(".animate").forEach((el) => {
     el.classList.add("visible");

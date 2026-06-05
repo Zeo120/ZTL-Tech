@@ -440,42 +440,11 @@ footer {
 }
 
 /* Background Glow Effects */
-.bg-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  z-index: -1;
-  pointer-events: none;
-}
 
-.glow-1 {
-  position: absolute;
-  top: -20%;
-  left: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(147, 51, 234, 0.03) 0%,
-    transparent 70%
-  );
-}
 
-.glow-2 {
-  position: absolute;
-  bottom: -20%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(107, 33, 168, 0.02) 0%,
-    transparent 70%
-  );
-}
+
+
+
 
 /* Animations */
 
@@ -1015,18 +984,7 @@ footer {
 
 body {
   background: var(--bg-color);
-  background-image:
-    radial-gradient(
-      circle at 15% 50%,
-      rgba(79, 70, 229, 0.15) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 85% 30%,
-      rgba(236, 72, 153, 0.15) 0%,
-      transparent 40%
-    );
-  background-attachment: fixed;
+  
   color: var(--text-primary);
   font-family: var(--font-display);
   line-height: 1.6;
@@ -2286,18 +2244,7 @@ select {
 
 body {
   background: var(--bg-color);
-  background-image:
-    radial-gradient(
-      circle at 15% 50%,
-      rgba(79, 70, 229, 0.15) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 85% 30%,
-      rgba(236, 72, 153, 0.15) 0%,
-      transparent 40%
-    );
-  background-attachment: fixed;
+  
   color: var(--text-primary);
   font-family: var(--font-main);
   line-height: 1.6;
@@ -2308,42 +2255,11 @@ body {
 }
 
 /* Ambient background glow */
-.bg-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  z-index: -1;
-  pointer-events: none;
-}
 
-.glow-1 {
-  position: absolute;
-  top: -20%;
-  left: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(147, 51, 234, 0.03) 0%,
-    transparent 70%
-  );
-}
 
-.glow-2 {
-  position: absolute;
-  bottom: -20%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(107, 33, 168, 0.02) 0%,
-    transparent 70%
-  );
-}
+
+
+
 
 nav {
   position: fixed;
@@ -2937,4 +2853,14 @@ select {
 }
 .code-fragment-2 {
   animation: code-stream 4s linear infinite -2s;
+}
+
+
+/* Batch Loading & Compute Optimization */
+section:not(.hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+.hero-svg {
+  will-change: transform;
 }
