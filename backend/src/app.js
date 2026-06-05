@@ -55,6 +55,7 @@ function createApp() {
   mountStaticRoute('/phasr', 'phasr');
   mountStaticRoute('/scalpel', 'scalpel');
   mountStaticRoute('/ztl_tech', 'ztl_tech');
+  mountStaticRoute('/grid', 'grid');
 
   // Main pages
   app.get('/', (_req, res) => {
