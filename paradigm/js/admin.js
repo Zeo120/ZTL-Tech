@@ -1918,7 +1918,8 @@ function applyMinimalistUI() {
 applyMinimalistUI();
 // Start validation on page load
 loadUserData();
-\n
+
+
 /* ------------------ DEEP HR CONTROLLER ------------------ */
 async function loadHRData() {
     try {

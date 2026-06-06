@@ -41,7 +41,9 @@ function switchView(viewId) {
       .querySelectorAll(".tab-panel")
       .forEach((panel) => panel.classList.remove("active"));
     document.getElementById("payroll-tab-welcome").classList.add("active");
-  } else if (viewId === "hr") {\n    if (typeof loadHRData === "function") loadHRData();\n  } else if (viewId === "crm") {
+  } else if (viewId === "hr") {
+    if (typeof loadHRData === "function") loadHRData();
+  } else if (viewId === "crm") {
     renderCRMTable();
   }
   toggleDrawer(false);
