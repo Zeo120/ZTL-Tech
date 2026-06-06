@@ -312,8 +312,8 @@ nav {
     top: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(12px);
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid var(--surface-border);
+    background: #000000;
+    border: 1px solid #1a1a1a;
     border-radius: 12px;
     padding: 0.8rem;
     width: 290px;
