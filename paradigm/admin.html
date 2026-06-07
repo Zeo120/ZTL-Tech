@@ -21,7 +21,22 @@
       }
     </script>
     <link rel="stylesheet" href="style.css?v=4" />
-  </head>
+  
+    <!-- Isolated Hamburger Logic -->
+    <script>
+      function toggleDrawer(isOpen) {
+        const drawer = document.getElementById("sidebar-drawer");
+        const backdrop = document.getElementById("drawer-backdrop");
+        if (isOpen) {
+          drawer.classList.add("active");
+          backdrop.classList.add("active");
+        } else {
+          drawer.classList.remove("active");
+          backdrop.classList.remove("active");
+        }
+      }
+    </script>
+\n  </head>
   <body>
     <!-- Epic Portal Welcome Reveal Screen -->
 
