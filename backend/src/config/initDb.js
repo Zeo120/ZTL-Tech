@@ -687,6 +687,24 @@ const tables = [
       { name: 'IX_Documents_user_id', sql: 'CREATE INDEX IX_Documents_user_id ON dbo.Documents(user_id);' }
     ]
   }
+  ,
+  {
+    name: 'OAuthIntegrations',
+    createSql: "CREATE TABLE dbo.OAuthIntegrations (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_OAuthIntegrations PRIMARY KEY, user_id INT NOT NULL, platform NVARCHAR(50) NOT NULL, auth_token NVARCHAR(MAX) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_OAuthIntegrations_status DEFAULT 'Linked', created_at DATETIME2 NOT NULL CONSTRAINT DF_OAuthIntegrations_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL' },
+      { name: 'platform', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'auth_token', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_OAuthIntegrations_status DEFAULT N'Linked'" },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_OAuthIntegrations_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_OAuthIntegrations',
+    indexes: [
+      { name: 'IX_OAuthIntegrations_user_id', sql: 'CREATE INDEX IX_OAuthIntegrations_user_id ON dbo.OAuthIntegrations(user_id);' }
+    ]
+  }
 ];
 
 
@@ -902,6 +920,8 @@ async function initDb() {
   await ensureForeignKey(pool, 'PerformanceReviews', 'FK_PerformanceReviews_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Documents', 'FK_Documents_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Documents', 'FK_Documents_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
+  await ensureForeignKey(pool, 'OAuthIntegrations', 'FK_OAuthIntegrations_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+
 
 
   await seedAdmin(pool, 'admin@grid.local', ADMIN_PASSWORD, 'admin');
