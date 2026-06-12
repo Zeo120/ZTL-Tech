@@ -8,7 +8,7 @@ function escapeHTML(str) {
     .replace(/'/g, "&#039;");
 }
 
-let currentView = "payroll";
+let currentView = "landing";
 let currentPayrollTab = "employees";
 let allEmployees = [];
 let allEmployeesFull = [];
@@ -1921,7 +1921,8 @@ loadUserData();
 
 
 /* ------------------ DEEP HR CONTROLLER ------------------ */
-async function loadHRData() {\n    checkIntegrations();
+async function loadHRData() {
+    checkIntegrations();
     try {
         const token = localStorage.getItem('paradigm_token');
         if (!token) return;
@@ -1995,7 +1996,12 @@ async function loadHRData() {\n    checkIntegrations();
                 <td>${row.module}</td>
                 <td>${row.status}</td>
                 <td>${row.date}</td>
-                <td><button class="btn-icon">View</button></td>
+                <td>
+                    <button style="background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; padding: 0.4rem 0.8rem; color: #fff; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; backdrop-filter: blur(4px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.4)';" onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(255, 255, 255, 0.2)';">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        View
+                    </button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -2004,7 +2010,7 @@ async function loadHRData() {\n    checkIntegrations();
         console.error('HR Sync Failed:', e);
     }
 }
-\n
+
 /* ------------------ SOURCING ENGINE ------------------ */
 async function checkIntegrations() {
     const token = localStorage.getItem('paradigm_token');

@@ -704,6 +704,70 @@ const tables = [
     indexes: [
       { name: 'IX_OAuthIntegrations_user_id', sql: 'CREATE INDEX IX_OAuthIntegrations_user_id ON dbo.OAuthIntegrations(user_id);' }
     ]
+  },
+  {
+    name: 'CRM_Leads',
+    createSql: "CREATE TABLE dbo.CRM_Leads (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Leads PRIMARY KEY, user_id INT NOT NULL, company_name NVARCHAR(255) NOT NULL, contact_name NVARCHAR(255) NOT NULL, email NVARCHAR(255) NOT NULL, phone NVARCHAR(50) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Leads_status DEFAULT 'New', value DECIMAL(18,2) NULL, notes NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Leads_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL' },
+      { name: 'company_name', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'contact_name', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'email', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'phone', sql: 'NVARCHAR(50) NULL' },
+      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Leads_status DEFAULT N'New'" },
+      { name: 'value', sql: 'DECIMAL(18,2) NULL' },
+      { name: 'notes', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Leads_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_CRM_Leads',
+    indexes: [
+      { name: 'IX_CRM_Leads_user_id', sql: 'CREATE INDEX IX_CRM_Leads_user_id ON dbo.CRM_Leads(user_id);' }
+    ]
+  },
+  {
+    name: 'CRM_Clients',
+    createSql: "CREATE TABLE dbo.CRM_Clients (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Clients PRIMARY KEY, user_id INT NOT NULL, company_name NVARCHAR(255) NOT NULL, contact_name NVARCHAR(255) NOT NULL, email NVARCHAR(255) NOT NULL, phone NVARCHAR(50) NULL, address NVARCHAR(MAX) NULL, gst_number NVARCHAR(50) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Clients_status DEFAULT 'Active', created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Clients_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL' },
+      { name: 'company_name', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'contact_name', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'email', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'phone', sql: 'NVARCHAR(50) NULL' },
+      { name: 'address', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'gst_number', sql: 'NVARCHAR(50) NULL' },
+      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Clients_status DEFAULT N'Active'" },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Clients_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_CRM_Clients',
+    indexes: [
+      { name: 'IX_CRM_Clients_user_id', sql: 'CREATE INDEX IX_CRM_Clients_user_id ON dbo.CRM_Clients(user_id);' }
+    ]
+  },
+  {
+    name: 'CRM_Invoices',
+    createSql: "CREATE TABLE dbo.CRM_Invoices (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Invoices PRIMARY KEY, user_id INT NOT NULL, client_id INT NOT NULL, invoice_number NVARCHAR(50) NOT NULL, amount DECIMAL(18,2) NOT NULL, issue_date DATE NOT NULL, due_date DATE NOT NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Invoices_status DEFAULT 'Unpaid', items_json NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Invoices_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'user_id', sql: 'INT NOT NULL' },
+      { name: 'client_id', sql: 'INT NOT NULL' },
+      { name: 'invoice_number', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL' },
+      { name: 'issue_date', sql: 'DATE NOT NULL' },
+      { name: 'due_date', sql: 'DATE NOT NULL' },
+      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Invoices_status DEFAULT N'Unpaid'" },
+      { name: 'items_json', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Invoices_created_at DEFAULT SYSUTCDATETIME()' },
+      { name: 'updated_at', sql: 'DATETIME2 NULL' }
+    ],
+    primaryKey: 'PK_CRM_Invoices',
+    indexes: [
+      { name: 'IX_CRM_Invoices_client_id', sql: 'CREATE INDEX IX_CRM_Invoices_client_id ON dbo.CRM_Invoices(client_id);' },
+      { name: 'UQ_CRM_Invoices_number', sql: 'CREATE UNIQUE INDEX UQ_CRM_Invoices_number ON dbo.CRM_Invoices(invoice_number);' }
+    ]
   }
 ];
 
@@ -921,6 +985,10 @@ async function initDb() {
   await ensureForeignKey(pool, 'Documents', 'FK_Documents_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'Documents', 'FK_Documents_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
   await ensureForeignKey(pool, 'OAuthIntegrations', 'FK_OAuthIntegrations_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CRM_Leads', 'FK_CRM_Leads_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CRM_Clients', 'FK_CRM_Clients_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CRM_Invoices', 'FK_CRM_Invoices_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
+  await ensureForeignKey(pool, 'CRM_Invoices', 'FK_CRM_Invoices_Clients', 'FOREIGN KEY (client_id) REFERENCES dbo.CRM_Clients(id)');
 
 
 

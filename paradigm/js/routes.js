@@ -10,12 +10,7 @@ function toggleDrawer(isOpen) {
   }
 }
 
-function toggleTerminateBtn() {
-  const btn = document.getElementById("terminate-btn");
-  if (btn) {
-    btn.classList.toggle("visible");
-  }
-}
+
 
 function switchView(viewId) {
   currentView = viewId;
@@ -24,6 +19,8 @@ function switchView(viewId) {
     .forEach((item) => item.classList.remove("active"));
   const activeNav = document.getElementById(`nav-${viewId}`);
   if (activeNav) activeNav.classList.add("active");
+  const heroLogo = document.getElementById("hero-logo");
+  if (heroLogo) heroLogo.style.opacity = (viewId === "landing") ? "1" : "0";
 
   document
     .querySelectorAll(".view-panel")

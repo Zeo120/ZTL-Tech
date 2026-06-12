@@ -246,8 +246,14 @@ async function runCodebaseScan({ userId, sourceType, targetPath, scanFocus, ip, 
         metadata: { details: `Cloning public GitHub repository: ${targetPath} ...` }
       });
 
-      // Run shallow clone
-      await runCommand(`git clone --depth 1 "${targetPath}" "${tempClonePath}"`);
+      // Run shallow clone using execFile to prevent RCE / command injection
+      const { execFile } = require('child_process');
+      await new Promise((resolve, reject) => {
+        execFile('git', ['clone', '--depth', '1', targetPath, tempClonePath], (error, stdout, stderr) => {
+          if (error) reject(error);
+          else resolve({ stdout, stderr });
+        });
+      });
       scanDir = tempClonePath;
 
       await writeAuditEvent({

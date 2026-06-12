@@ -1012,8 +1012,6 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--surface-border);
   z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
   transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1031,28 +1029,7 @@ body {
   }
 }
 
-#terminate-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 84, 112, 0.15);
-  color: #ff5470;
-  cursor: pointer;
-  padding: 0.35rem 0.7rem;
-  border-radius: 5px;
-  font-size: 0.72rem;
-  font-weight: 900;
-  transition: var(--transition);
-  display: none;
-}
 
-#terminate-btn:hover {
-  background: rgba(255, 84, 112, 0.06);
-  border-color: #ff5470;
-}
-
-#terminate-btn.visible {
-  display: inline-block;
-  animation: slideInFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
 
 @keyframes slideInFade {
   from {

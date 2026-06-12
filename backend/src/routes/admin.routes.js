@@ -2186,4 +2186,208 @@ adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res
   return ok(res, { message: 'Leave status updated' });
 }));
 
+// ============================================================================
+// EXTERNAL SOURCING & INTEGRATIONS (LinkedIn, Indeed)
+// ============================================================================
+
+adminRoutes.get('/integrations', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const corePool = await getDbPool();
+  const result = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .query('SELECT platform, status, created_at FROM dbo.OAuthIntegrations WHERE user_id = @userId');
+  ok(res, { integrations: result.recordset });
+}));
+
+adminRoutes.post('/integrations/link', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { platform } = req.body;
+  if (!platform || !['LinkedIn', 'Indeed'].includes(platform)) return fail(res, 400, 'Invalid platform');
+  
+  const corePool = await getDbPool();
+  
+  await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('platform', sql.NVarChar(50), platform)
+    .input('token', sql.NVarChar(sql.MAX), 'mock_oauth_token_' + Date.now())
+    .query(`
+      IF EXISTS (SELECT 1 FROM dbo.OAuthIntegrations WHERE user_id = @userId AND platform = @platform)
+        UPDATE dbo.OAuthIntegrations SET status = 'Linked', auth_token = @token, updated_at = SYSUTCDATETIME() 
+        WHERE user_id = @userId AND platform = @platform;
+      ELSE
+        INSERT INTO dbo.OAuthIntegrations (user_id, platform, auth_token, status)
+        VALUES (@userId, @platform, @token, 'Linked');
+    `);
+    
+  ok(res, { success: true, platform });
+}));
+
+adminRoutes.post('/recruitment/sourcing/boolean-search', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { query, platform } = req.body;
+  
+  const corePool = await getDbPool();
+  const check = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('platform', sql.NVarChar(50), platform || 'LinkedIn')
+    .query("SELECT 1 FROM dbo.OAuthIntegrations WHERE user_id = @userId AND platform = @platform AND status = 'Linked'");
+    
+  if (check.recordset.length === 0) {
+    return fail(res, 403, `${platform || 'LinkedIn'} Account Not Linked. Please authenticate first.`);
+  }
+  
+  const tokens = query.match(/"([^"]+)"|\b(AND|OR|NOT)\b/g) || [];
+  const titles = ['Senior Full Stack Engineer', 'Lead Developer', 'Backend Architect', 'Frontend Specialist'];
+  const companies = ['TechCorp', 'Innovatech', 'DataSync', 'CloudNine', 'NeuralNet'];
+  const names = ['Alex Mercer', 'Sarah Connor', 'John Wick', 'Elena Fisher', 'Marcus Fenix'];
+  
+  const candidates = [];
+  const count = Math.floor(Math.random() * 5) + 2;
+  
+  for (let i = 0; i < count; i++) {
+      candidates.push({
+          candidate_name: names[Math.floor(Math.random() * names.length)] + ' ' + Math.floor(Math.random() * 1000),
+          job_title: titles[Math.floor(Math.random() * titles.length)],
+          company: companies[Math.floor(Math.random() * companies.length)],
+          candidate_email: `candidate_${Date.now()}_${i}@${platform.toLowerCase()}.mock`,
+          resume_url: `https://${platform.toLowerCase()}.com/in/mock-profile-${Date.now()}`,
+          match_score: Math.floor(Math.random() * 20) + 80 + '%'
+      });
+  }
+  
+  await new Promise(r => setTimeout(r, 1000));
+  ok(res, { results: candidates, boolean_tokens_parsed: tokens });
+}));
+
+
+// ============================================================================
+// CRM MODULE (Leads, Clients, Invoices)
+// ============================================================================
+
+adminRoutes.get('/crm/leads', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const corePool = await getDbPool();
+  const result = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .query('SELECT * FROM dbo.CRM_Leads WHERE user_id = @userId ORDER BY created_at DESC');
+  ok(res, { leads: result.recordset });
+}));
+
+adminRoutes.post('/crm/leads', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { company_name, contact_name, email, phone, value, notes } = req.body;
+  if (!company_name || !contact_name || !email) return fail(res, 400, 'Company, Contact, and Email are required.');
+
+  const corePool = await getDbPool();
+  await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('company', sql.NVarChar(255), company_name)
+    .input('contact', sql.NVarChar(255), contact_name)
+    .input('email', sql.NVarChar(255), email)
+    .input('phone', sql.NVarChar(50), phone || null)
+    .input('value', sql.Decimal(18,2), value || 0)
+    .input('notes', sql.NVarChar(sql.MAX), notes || null)
+    .query(`
+      INSERT INTO dbo.CRM_Leads (user_id, company_name, contact_name, email, phone, value, notes)
+      VALUES (@userId, @company, @contact, @email, @phone, @value, @notes)
+    `);
+  ok(res, { message: 'Lead created successfully' });
+}));
+
+adminRoutes.put('/crm/leads/:id/status', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const leadId = Number(req.params.id);
+  const { status } = req.body;
+
+  const corePool = await getDbPool();
+  await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('leadId', sql.Int, leadId)
+    .input('status', sql.NVarChar(50), status)
+    .query('UPDATE dbo.CRM_Leads SET status = @status, updated_at = SYSUTCDATETIME() WHERE id = @leadId AND user_id = @userId');
+  ok(res, { message: 'Lead status updated' });
+}));
+
+adminRoutes.get('/crm/clients', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const corePool = await getDbPool();
+  const result = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .query('SELECT * FROM dbo.CRM_Clients WHERE user_id = @userId ORDER BY company_name ASC');
+  ok(res, { clients: result.recordset });
+}));
+
+adminRoutes.post('/crm/clients', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { company_name, contact_name, email, phone, address, gst_number } = req.body;
+  if (!company_name || !contact_name || !email) return fail(res, 400, 'Company, Contact, and Email are required.');
+
+  const corePool = await getDbPool();
+  await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('company', sql.NVarChar(255), company_name)
+    .input('contact', sql.NVarChar(255), contact_name)
+    .input('email', sql.NVarChar(255), email)
+    .input('phone', sql.NVarChar(50), phone || null)
+    .input('address', sql.NVarChar(sql.MAX), address || null)
+    .input('gst', sql.NVarChar(50), gst_number || null)
+    .query(`
+      INSERT INTO dbo.CRM_Clients (user_id, company_name, contact_name, email, phone, address, gst_number)
+      VALUES (@userId, @company, @contact, @email, @phone, @address, @gst)
+    `);
+  ok(res, { message: 'Client created successfully' });
+}));
+
+adminRoutes.get('/crm/invoices', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const corePool = await getDbPool();
+  const result = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      SELECT I.*, C.company_name 
+      FROM dbo.CRM_Invoices I
+      JOIN dbo.CRM_Clients C ON I.client_id = C.id
+      WHERE I.user_id = @userId 
+      ORDER BY I.issue_date DESC
+    `);
+  ok(res, { invoices: result.recordset });
+}));
+
+adminRoutes.post('/crm/invoices', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const { client_id, invoice_number, amount, issue_date, due_date, items_json } = req.body;
+  if (!client_id || !invoice_number || !amount) return fail(res, 400, 'Client, Number, and Amount are required.');
+
+  const corePool = await getDbPool();
+  
+  // Verify client belongs to user
+  const clientCheck = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('clientId', sql.Int, client_id)
+    .query('SELECT id FROM dbo.CRM_Clients WHERE id = @clientId AND user_id = @userId');
+    
+  if (clientCheck.recordset.length === 0) return fail(res, 403, 'Client not found or access denied');
+
+  try {
+    await corePool.request()
+      .input('userId', sql.Int, userId)
+      .input('clientId', sql.Int, client_id)
+      .input('invoiceNumber', sql.NVarChar(50), invoice_number)
+      .input('amount', sql.Decimal(18,2), amount)
+      .input('issue', sql.Date, issue_date || new Date())
+      .input('due', sql.Date, due_date || new Date(Date.now() + 30*24*60*60*1000))
+      .input('items', sql.NVarChar(sql.MAX), items_json || null)
+      .query(`
+        INSERT INTO dbo.CRM_Invoices (user_id, client_id, invoice_number, amount, issue_date, due_date, items_json)
+        VALUES (@userId, @clientId, @invoiceNumber, @amount, @issue, @due, @items)
+      `);
+    ok(res, { message: 'Invoice created successfully' });
+  } catch (err) {
+    if (err.message && err.message.includes('UQ_CRM_Invoices_number')) {
+      return fail(res, 400, 'Invoice number must be unique.');
+    }
+    throw err;
+  }
+}));
+
 module.exports = { adminRoutes };
