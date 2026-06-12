@@ -10,6 +10,9 @@ This document establishes the long-term design parameters, core philosophy, and 
 
 Because eventual compromise is an architectural certainty, PHASR does not measure security as **Trust**. Instead, it continuously measures security as **State Integrity**—the mathematical alignment between the expected configuration blueprint and the live runtime system.
 
+### Zero Supply Chain Attack Surface
+As a true **Deterministic Evaluation Mathematical Model (DEVM)**, PHASR operates as an impenetrable monolith. It entirely rejects external dependencies, third-party libraries, and bloated runtime frameworks. By implementing all cryptographic and physics operations directly in native Assembly and C++, it completely eliminates the supply chain attack surface. Hackers cannot exploit vulnerabilities in black-box dependencies because there are no dependencies.
+
 ---
 
 ## 2. The 5 Pillars of PHASR

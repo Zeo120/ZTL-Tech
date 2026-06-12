@@ -93,9 +93,11 @@ flowchart TD
 
 ---
 
-## 4. Statically Generated Verification Flow
+## 4. The Infra-Agnostic Spacetime Matrix (Statically Generated Verification)
 
-To run the audits, 10,000 helper functions are statically compiled. The driver executes 1,000 test cases, verifying the invariants against expected mathematical outcomes.
+In a physical DEVM, physical execution time ($t_{phys}$) is not an optimization; it is the fundamental dimension of the wave simulation. To maintain absolute cycle-exact determinism across fundamentally different hardware paradigms, PHASR must be **Infrastructure Agnostic**.
+
+It achieves this not through runtime interpretation, but by pre-calculating the entire spacetime geodesic matrix. The simulation equations are structurally unrolled into **100,000 discrete, hardcoded Assembly subroutines** specifically mapped to the instruction sets and NUMA topologies of both ARM64 and x86_64 architectures. The driver executes these pre-computed physical wave matrices, verifying the invariants natively on the silicon.
 
 ```mermaid
 flowchart LR

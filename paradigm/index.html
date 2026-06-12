@@ -106,6 +106,20 @@
       <a href="../ztl_tech/index.html#contact" class="mobile-main-link"
         >Contact</a
       >
+      <a href="javascript:void(0)" class="mobile-main-link" onclick="toggleTheme()" style="display: flex; align-items: center; justify-content: space-between;">
+        Toggle Theme
+        <svg id="theme-icon-index" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </a>
     </div>
 
     <main>
@@ -584,7 +598,19 @@
         >
       </div>
     </footer>
-
+    <script>
+      function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('paradigm_theme', newTheme);
+      }
+      
+      const savedTheme = localStorage.getItem('paradigm_theme');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    </script>
     <script src="js/index.js"></script>
   </body>
 </html>

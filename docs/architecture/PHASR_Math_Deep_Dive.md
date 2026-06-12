@@ -8,9 +8,9 @@ This document is designed to take you from zero to fully understanding how this 
 
 ## 1. What is PHASR?
 
-At its core, PHASR is an automated, high-assurance security auditor. Instead of relying on simple regular expressions or known signature databases (like an antivirus), PHASR uses **pure mathematics, physics simulations, and Turing State Machines** to prove whether a codebase is secure or vulnerable.
+At its core, PHASR is not a traditional software application—it is a **Deterministic Evaluation Mathematical Model (DEVM)**. Instead of relying on simple regular expressions or known signature databases (like an antivirus), PHASR acts as a physics engine. It uses **pure mathematics, FDTD wave simulations, and Turing State Machines** to calculate the physical constraints of an exploit.
 
-Our philosophy is: *Security is a mathematical proof. If a vulnerability exists, it can be modeled, simulated, and blocked.*
+Our philosophy is: *Security is not a probabilistic heuristic; it is a rigid mathematical proof. If a vulnerability exists, its execution path can be modeled, simulated, and destructively annihilated via its exact mathematical inverse.*
 
 ---
 
@@ -65,6 +65,7 @@ Our stack is designed around **Zero-Copy Memory Execution** and **V8 Isolate Con
     $$ \Delta t \le \frac{1}{c \sqrt{\frac{1}{\Delta x^2} + \frac{1}{\Delta y^2}}} $$
     If the time step $\Delta t$ is too large, the simulation explodes (numerical dispersion). The wave cannot propagate faster than one grid cell per tick.
 *   **Boundary Conditions (PML):** We apply Perfectly Matched Layers (PML) to the edges of the simulation grid to absorb the waves, preventing exploits from "bouncing" off the edge of the software graph and creating infinite feedback loops.
+*   **Active Defense (Destructive Wave Interference):** When an anomaly or exploit payload is detected, the engine does not simply "block" it. It calculates the exact angular frequency and spatial topology of the rogue wave and generates an exact inverse twin wave ($\Psi_{defense}$). The two waves collide and annihilate each other via perfect destructive interference in real-time, evaporating the payload without a trace.
 
 ### Phase 5: Legions Consensus (The Assembly DFA)
 *   **The Mechanism:** The exploit path is blocked by a Deterministic Finite Automaton (DFA) deployed in Assembly.
