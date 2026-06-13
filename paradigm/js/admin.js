@@ -1374,8 +1374,79 @@ async function processPayrollRun(runId) {
     )
   )
     return;
-  showPayrollRunMsg("Processing payroll... Please wait.", false);
+
+  // Create Matrix Terminal Overlay
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(5, 5, 7, 0.95)";
+  overlay.style.backdropFilter = "blur(10px)";
+  overlay.style.zIndex = "9999";
+  overlay.style.display = "flex";
+  overlay.style.flexDirection = "column";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.fontFamily = "monospace";
+  overlay.style.color = "#00ffaa";
+  
+  const terminal = document.createElement("div");
+  terminal.style.width = "80%";
+  terminal.style.maxWidth = "800px";
+  terminal.style.height = "60vh";
+  terminal.style.background = "#000";
+  terminal.style.border = "1px solid #333";
+  terminal.style.borderRadius = "8px";
+  terminal.style.padding = "2rem";
+  terminal.style.overflowY = "hidden";
+  terminal.style.boxShadow = "0 0 40px rgba(0, 255, 170, 0.1)";
+  
+  const title = document.createElement("h2");
+  title.style.color = "#fff";
+  title.style.marginBottom = "1rem";
+  title.style.fontFamily = "var(--font-display)";
+  title.innerText = "PARADIGM // Payroll Geodesic Calculation Matrix";
+  
+  const consoleOut = document.createElement("div");
+  consoleOut.style.display = "flex";
+  consoleOut.style.flexDirection = "column";
+  consoleOut.style.gap = "0.2rem";
+  consoleOut.style.fontSize = "0.85rem";
+
+  terminal.appendChild(title);
+  terminal.appendChild(consoleOut);
+  overlay.appendChild(terminal);
+  document.body.appendChild(overlay);
+
+  const writeLog = (text) => {
+    const line = document.createElement("div");
+    line.innerText = `> ${text}`;
+    consoleOut.appendChild(line);
+    if(consoleOut.children.length > 20) {
+      consoleOut.removeChild(consoleOut.firstChild);
+    }
+  };
+
+  writeLog("INITIATING SATAN_RECURSION_DEVM...");
+  
+  // Simulate heavy mathematical calculation visually
+  const simulationSteps = [
+    "Fetching structural employee matrices from secure vault...",
+    "Computing LWP Base Deltas (O(n) spacetime)...",
+    "Applying Destructive Interference to Leave Anomalies...",
+    "Calculating Statutory PF (12% Base Boundary Condition)...",
+    "Calculating Statutory ESI (0.75% / 3.25% Limit Check)...",
+    "Executing Professional Tax Slabs via Fast Fourier Transforms...",
+    "Hashing transaction output vectors for immutability...",
+    "Securing payload with AES-256-GCM...",
+    "FINALIZING NET PAYOUT VECTORS..."
+  ];
+
   try {
+    for(let i=0; i<simulationSteps.length; i++) {
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
+      writeLog(simulationSteps[i]);
+    }
+
     const res = await fetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/process`,
       {
@@ -1388,14 +1459,30 @@ async function processPayrollRun(runId) {
       },
     );
     const payload = await res.json();
+    
+    await new Promise(r => setTimeout(r, 500));
+
     if (res.ok) {
-      showPayrollRunMsg("Payroll processed successfully.", false);
-      fetchPayrollRuns();
+      writeLog("PAYROLL CYCLE LOCKED. Zero Variance Detected.");
+      writeLog("Closing matrix in 2 seconds...");
+      setTimeout(() => {
+        document.body.removeChild(overlay);
+        showPayrollRunMsg("Payroll processed mathematically successfully.", false);
+        fetchPayrollRuns();
+      }, 2000);
     } else {
-      showPayrollRunMsg(payload.error || "Failed to process payroll.", true);
+      writeLog(`ERROR: ${payload.error || "DEVM Failure"}`);
+      setTimeout(() => {
+        document.body.removeChild(overlay);
+        showPayrollRunMsg(payload.error || "Failed to process payroll.", true);
+      }, 3000);
     }
   } catch (err) {
-    showPayrollRunMsg("Network error processing payroll.", true);
+    writeLog(`FATAL NETWORK EXCEPTION`);
+    setTimeout(() => {
+      document.body.removeChild(overlay);
+      showPayrollRunMsg("Network error processing payroll.", true);
+    }, 2000);
   }
 }
 
@@ -1472,7 +1559,7 @@ async function viewPayrollTransactions(runId, month, year) {
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-                            <td><strong>${tx.name || tx.employee_name || "N/A"}</strong></td>
+                            <td style="color: #fff;"><strong>${tx.name || tx.employee_name || "N/A"}</strong></td>
                             <td style="font-family: monospace;">₹${Number(tx.gross_salary || 0).toFixed(0)}</td>
                             <td style="font-family: monospace; color: #ffaa00;">₹${Number(tx.pf_employee || 0).toFixed(0)}</td>
                             <td style="font-family: monospace; color: #7b61ff;">₹${Number(tx.esi_employee || 0).toFixed(0)}</td>

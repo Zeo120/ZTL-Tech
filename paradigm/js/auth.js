@@ -25,20 +25,13 @@ async function handleLogout() {
 
 async function loadUserData() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/dashboard/batch`, {
+    const res = await fetch(`${apiBase}/api/admin/me`, {
       credentials: "include",
     });
     if (res.ok) {
       const payload = await res.json();
       if (payload.success && payload.data && payload.data.user) {
         const user = payload.data.user;
-
-        // Populate Global Caches from Batch payload
-        allEmployeesFull = payload.data.employees || [];
-        allEmployees = payload.data.employees || [];
-        dropdownCached = true;
-        populateAdminEmployeeSelect();
-        renderPayrollTable(allEmployees);
 
         const welcomeName = user.email
           ? user.email.split("@")[0].toUpperCase()

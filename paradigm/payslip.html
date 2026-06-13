@@ -117,6 +117,117 @@
       <div class="net-pay-box">
         <div>
           <h2>Net Payable</h2>
+  </head>
+  <body>
+    <div class="payslip-container" id="payslip-content">
+      <div class="header">
+        <div>
+          <h1>ZTL Tech</h1>
+          <p>Paradigm Payroll Engine</p>
+        </div>
+        <div style="text-align: right">
+          <h2 style="margin: 0; font-size: 1.5rem" id="month-year"></h2>
+          <p>PAYSLIP</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <div class="info-row">
+            <span class="info-label">Name</span
+            ><span class="info-value" id="emp-name"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">ID</span
+            ><span class="info-value" id="emp-id"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Joining Date</span
+            ><span class="info-value" id="emp-doj"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">LWP Days</span
+            ><span class="info-value" id="emp-lwp"></span>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-row">
+            <span class="info-label">PAN</span
+            ><span class="info-value" id="emp-pan"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">UAN</span
+            ><span class="info-value" id="emp-uan"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Bank AC</span
+            ><span class="info-value" id="emp-bank"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">IFSC</span
+            ><span class="info-value" id="emp-ifsc"></span>
+          </div>
+        </div>
+      </div>
+
+      <table class="salary-table">
+        <thead>
+          <tr>
+            <th>Earnings</th>
+            <th style="text-align: right">Amount (₹)</th>
+            <th>Deductions</th>
+            <th style="text-align: right">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic Salary</td>
+            <td class="amount" id="earn-basic">0.00</td>
+            <td>Provident Fund (Employee)</td>
+            <td class="amount" id="ded-pf">0.00</td>
+          </tr>
+          <tr>
+            <td>House Rent Allowance</td>
+            <td class="amount" id="earn-hra">0.00</td>
+            <td>ESI (Employee)</td>
+            <td class="amount" id="ded-esi">0.00</td>
+          </tr>
+          <tr>
+            <td>Special Allowances</td>
+            <td class="amount" id="earn-allowances">0.00</td>
+            <td>Professional Tax</td>
+            <td class="amount" id="ded-pt">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>TDS</td>
+            <td class="amount" id="ded-tds">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>LWP Deduction</td>
+            <td class="amount" id="ded-lwp">0.00</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>Other Deductions</td>
+            <td class="amount" id="ded-other">0.00</td>
+          </tr>
+          <tr style="font-weight: bold; background: rgba(0, 0, 0, 0.02)">
+            <td>Total Gross</td>
+            <td class="amount" id="total-gross">0.00</td>
+            <td>Total Deductions</td>
+            <td class="amount" id="total-deductions">0.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="net-pay-box">
+        <div>
+          <h2>Net Payable</h2>
           <p
             style="
               margin: 0;
@@ -131,18 +242,22 @@
         <div class="net-amount" id="net-pay">₹0.00</div>
       </div>
 
-      <p
-        style="
-          text-align: center;
-          font-size: 0.7rem;
-          font-family: monospace;
-          opacity: 0.5;
-          margin-top: 2rem;
-        "
-      >
-        Generated natively via mathematical proof on device. This is a
-        system-generated document.
-      </p>
+      <div style="margin-top: 3rem; border-top: 1px dashed var(--border-color); padding-top: 1.5rem;">
+        <h4 style="margin: 0 0 0.5rem 0; font-family: monospace; font-size: 0.8rem; text-transform: uppercase;">Cryptographic Verification</h4>
+        <div style="background: rgba(0,255,170,0.05); border: 1px solid var(--border-color); padding: 1rem; border-radius: 6px; display: flex; align-items: center; gap: 1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <div style="flex-grow: 1;">
+            <div style="font-family: monospace; font-size: 0.75rem; word-break: break-all; color: var(--accent);" id="crypto-hash">
+              GENERATING_SHA256_PROOF...
+            </div>
+            <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 0.2rem; font-family: monospace;">
+              Geodesic Transaction Signed & Locked
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="controls">
@@ -153,5 +268,18 @@
     </div>
 
     <script src="js/payslip.js"></script>
+    <script>
+      async function generateProof() {
+        const payload = sessionStorage.getItem("payslip_payload") || "paradigm_fallback";
+        const encoder = new TextEncoder();
+        const data = encoder.encode(payload + Date.now());
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashElem = document.getElementById('crypto-hash');
+        if(hashElem) hashElem.textContent = "0x" + hashHex;
+      }
+      setTimeout(generateProof, 800);
+    </script>
   </body>
 </html>

@@ -34,6 +34,15 @@ const superAdminLimiter = ipRateLimit({
   keyPrefix: 'super-admin'
 });
 
+adminRoutes.get('/me', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
+  const corePool = await getDbPool();
+  const userRes = await corePool.request()
+    .input('id', sql.Int, req.auth.userId)
+    .query(`SELECT id, email, role, is_active FROM dbo.Users WHERE id = @id`);
+  if (!userRes.recordset.length) return fail(res, 404, 'User not found');
+  return ok(res, { user: userRes.recordset[0] });
+}));
+
 adminRoutes.get('/dashboard/batch', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const corePool = await getDbPool();
   const pool = corePool;
@@ -685,7 +694,7 @@ adminRoutes.post('/phasr/run-drill', adminLimiter, requireAtLeastRole('admin'), 
 // GET /api/admin/security-alerts
 adminRoutes.get('/security-alerts', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   const result = await suitePool.request()
     .query(`
@@ -738,7 +747,7 @@ adminRoutes.get('/events', adminLimiter, requireAtLeastRole('admin'), (req, res)
 adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const logsResult = await pool.request()
@@ -767,7 +776,7 @@ adminRoutes.get('/phasr/logs', adminLimiter, requireAtLeastRole('admin'), asyncH
 adminRoutes.get('/phasr/scans', adminLimiter, requireAtLeastRole('admin'), asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const scansResult = await pool.request()
@@ -815,7 +824,7 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Fetch the scan metadata and verify ownership
@@ -905,7 +914,7 @@ adminRoutes.get('/phasr/scans/:id', adminLimiter, requireAtLeastRole('admin'), a
 // GET /api/admin/clients - List all users with role 'admin'
 adminRoutes.get('/clients', requireRole('super-admin'), revalidateRoleAtLeast('super-admin'), asyncHandler(async (req, res) => {
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   const result = await pool.request()
     .query(`
@@ -943,7 +952,7 @@ adminRoutes.post('/clients', requireRole('super-admin'), revalidateRoleAtLeast('
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Check if email already exists
@@ -992,7 +1001,7 @@ adminRoutes.put('/clients/:id', requireRole('super-admin'), revalidateRoleAtLeas
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   const modulesString = JSON.stringify(purchased_modules);
 
@@ -1071,7 +1080,7 @@ function validateEmployeePayload(data) {
 adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const searchStr = req.query.search ? req.query.search.trim() : '';
@@ -1181,7 +1190,7 @@ adminRoutes.get('/employees', adminLimiter, asyncHandler(async (req, res) => {
 adminRoutes.get('/employees/summary', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1235,7 +1244,7 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
   } = req.body;
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const parseInputDate = (dStr) => {
@@ -1322,7 +1331,7 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1364,7 +1373,7 @@ adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res)
   const userId = Number(req.auth.userId);
   const employeeId = Number(req.params.id);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const deleteResult = await suitePool.request()
@@ -1391,7 +1400,7 @@ adminRoutes.get('/employees/attendance', adminLimiter, asyncHandler(async (req, 
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   const result = await pool.request()
     .input('userId', sql.Int, userId)
@@ -1417,7 +1426,7 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // First verify employee belongs to user
@@ -1457,7 +1466,7 @@ adminRoutes.post('/employees/attendance', adminLimiter, asyncHandler(async (req,
 adminRoutes.get('/payroll/runs', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const result = await pool.request()
@@ -1510,7 +1519,7 @@ adminRoutes.post('/payroll/runs', adminLimiter, asyncHandler(async (req, res) =>
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Check for duplicate
@@ -1555,7 +1564,7 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Verify run belongs to user and is in Draft status
@@ -1852,7 +1861,7 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Verify run belongs to user
@@ -1918,7 +1927,7 @@ adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async 
   const userId = Number(req.auth.userId);
   const runId = Number(req.params.id);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   const runCheck = await pool.request()
@@ -1982,7 +1991,7 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
 
   // Verify run belongs to user
@@ -2076,7 +2085,7 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   
   // Verify employee belongs to admin
@@ -2105,7 +2114,7 @@ adminRoutes.post('/employees/:id/credentials', adminLimiter, asyncHandler(async 
 adminRoutes.get('/leaves', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   
   const result = await pool.request()
@@ -2131,7 +2140,7 @@ adminRoutes.post('/leaves', adminLimiter, asyncHandler(async (req, res) => {
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   
   // Verify ownership
@@ -2167,7 +2176,7 @@ adminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req, res
   }
 
   const corePool = await getDbPool();
-  const suitePool = await getParadigmDbPool();
+  const suitePool = await getDbPool();
   const pool = corePool;
   
   // Update if owned

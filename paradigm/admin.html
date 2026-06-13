@@ -20,7 +20,7 @@
         });
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=4" />
+    <link rel="stylesheet" href="style.css?v=6" />
   
     <!-- Isolated Hamburger Logic -->
     <script>
@@ -41,15 +41,138 @@
         }
       }
     </script>
+    <script src="js/animations.js"></script>
   </head>
   <body>
+    <!-- Cinematic Sequence Start -->
+    <style>
+      .top-nav, .workspace-container, .sidebar-drawer, .hamburger-btn {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
+      .ui-revealed {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+      #intro-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-color);
+        transition: background 1s ease, opacity 1.5s ease;
+      }
+      #intro-screen.bg-faded {
+        background: transparent;
+      }
+      #intro-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Luxury VC Style Mask Reveal */
+      .intro-logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        height: 70px;
+        padding-bottom: 5px;
+      }
+
+      .intro-logo-text {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        transform: translateY(100%);
+        opacity: 0;
+        transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.2s ease;
+      }
+
+      .intro-logo-text.revealed {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      
+      .intro-logo-text span {
+        color: #00ffaa;
+      }
+      
+      .intro-line {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--text-primary);
+        transition: width 1s cubic-bezier(0.25, 1, 0.5, 1), left 1s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      
+      .intro-line.expanded {
+        width: 100%;
+        left: 0;
+      }
+    </style>
+
+    <div id="intro-screen">
+      <div class="intro-logo-container">
+        <div class="intro-logo-text" id="intro-logo-text">PARADIGM<span>.</span></div>
+        <div class="intro-line" id="intro-line"></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Fade the solid background to transparent to reveal the particle matrix underneath
+        setTimeout(() => {
+          document.getElementById('intro-screen').classList.add('bg-faded');
+        }, 50);
+
+        // Step 1: Expand the line from the center outward
+        setTimeout(() => {
+          document.getElementById('intro-line').classList.add('expanded');
+        }, 500);
+
+        // Step 2: Slide the typography up from behind the invisible mask
+        setTimeout(() => {
+          document.getElementById('intro-logo-text').classList.add('revealed');
+        }, 1300);
+
+        // Step 3: Shatter the matrix and fade the screen
+        setTimeout(() => {
+          document.getElementById('intro-line').style.opacity = '0';
+          window.isParticleMatrixShattered = true; // TRIGGER SHATTER!
+          
+          setTimeout(() => {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.querySelectorAll('.top-nav, .workspace-container, .sidebar-drawer, .hamburger-btn').forEach(el => el.classList.add('ui-revealed'));
+            
+            // Garbage collect the overlay
+            setTimeout(() => {
+              const s = document.getElementById('intro-screen');
+              if (s) s.remove();
+            }, 2000);
+          }, 800);
+        }, 3000);
+      });
+    </script>
+    <!-- Cinematic Sequence End -->
+    
     <!-- ZTL Omnipresent Background -->
     <div id="ag-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; pointer-events: none; background: var(--bg-color);">
        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
              <linearGradient id="ag-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="var(--particle-1, rgba(255,255,255,0.7))" />
-                <stop offset="100%" stop-color="var(--particle-2, rgba(255,255,255,0.2))" />
+                <stop offset="0%" stop-color="var(--text-primary)" stop-opacity="0.7" />
+                <stop offset="100%" stop-color="var(--text-primary)" stop-opacity="0.2" />
              </linearGradient>
           </defs>
           <rect width="100%" height="100%" fill="var(--bg-color)"></rect>
@@ -57,8 +180,6 @@
           <g id="ag-particles"></g>
        </svg>
     </div>
-    
-    <div id="hero-logo" style="position: fixed; top: calc(50% - 25px); left: calc(50% - 25px); width: 50px; height: 50px; background: var(--text-primary); clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); z-index: -5; pointer-events: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-color: var(--text-primary);"></div>
 
     <script>
        // Global Antigravity Vanilla JS Animation
@@ -67,43 +188,60 @@
           const lineGroup = document.getElementById('ag-lines');
           if(!svgGroup) return;
           
-          const numParticles = 80;
+          const numParticles = 250;
           const particles = [];
+          
+          const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          pathEl.setAttribute("fill", "none");
+          pathEl.setAttribute("stroke", "var(--text-primary)"); 
+          pathEl.setAttribute("stroke-opacity", "0.2"); // Bright connected matrix
+          pathEl.style.transition = "stroke-opacity 1s ease";
+          lineGroup.appendChild(pathEl);
           
           for(let i=0; i<numParticles; i++) {
              const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-             const x = Math.random() * 100;
-             const y = Math.random() * 100;
-             const r = Math.random() * 2 + 0.5;
              
-             circle.setAttribute('cx', x + '%');
-             circle.setAttribute('cy', y + '%');
-             circle.setAttribute('r', r);
+             const baseX = Math.random() * 100;
+             const baseY = Math.random() * 100;
+             
+             // Massive Sphere/Orb Matrix Formation
+             const angle = Math.random() * Math.PI * 2;
+             const R = 25; // Sphere radius
+             const targetX = 50 + Math.cos(angle) * R;
+             const targetY = 50 + Math.sin(angle) * R;
+             
+             circle.setAttribute('cx', targetX + '%');
+             circle.setAttribute('cy', targetY + '%');
+             circle.setAttribute('r', Math.random() * 1.5 + 0.5);
              circle.setAttribute('fill', 'url(#ag-grad)');
              
              svgGroup.appendChild(circle);
              
              particles.push({
                 el: circle,
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 0.06,
-                vy: (Math.random() - 0.5) * 0.06,
-                baseX: x,
-                baseY: y
+                x: targetX,
+                y: targetY,
+                vx: (Math.random() - 0.5) * 0.08,
+                vy: (Math.random() - 0.5) * 0.08,
+                baseX: baseX,
+                baseY: baseY,
+                diamondX: targetX,
+                diamondY: targetY,
+                shattered: false
              });
           }
           
           let mouseX = 50;
           let mouseY = 50;
           let isClicked = false;
+          window.isParticleMatrixShattered = false;
           
           window.addEventListener('mousemove', (e) => {
              mouseX = (e.clientX / window.innerWidth) * 100;
              mouseY = (e.clientY / window.innerHeight) * 100;
              
              const heroLogo = document.getElementById('hero-logo');
-             if (heroLogo && !isClicked) {
+             if (heroLogo && !isClicked && window.isParticleMatrixShattered) {
                  const rect = heroLogo.getBoundingClientRect();
                  const centerX = rect.left + rect.width/2;
                  const centerY = rect.top + rect.height/2;
@@ -111,7 +249,6 @@
                  const dy = e.clientY - centerY;
                  const dist = Math.sqrt(dx*dx + dy*dy);
                  
-                 // Distance-based hover effect ignores z-index/DOM overlaps
                  if (dist < 150) {
                      heroLogo.style.transform = `scale(1.5) rotate(90deg) translate(${dx * 0.15}px, ${dy * 0.15}px)`;
                  } else {
@@ -122,7 +259,7 @@
 
           window.addEventListener('click', (e) => {
              const heroLogo = document.getElementById('hero-logo');
-             if (heroLogo) {
+             if (heroLogo && window.isParticleMatrixShattered) {
                  const rect = heroLogo.getBoundingClientRect();
                  const centerX = rect.left + rect.width/2;
                  const centerY = rect.top + rect.height/2;
@@ -139,23 +276,40 @@
           });
           
           function animate() {
-             lineGroup.innerHTML = '';
+             let pathData = "";
              
              particles.forEach((p, i) => {
+                if (window.isParticleMatrixShattered && !p.shattered) {
+                   p.vx = (p.baseX - 50) * Math.random() * 0.08; // Gentle, majestic shatter
+                   p.vy = (p.baseY - 50) * Math.random() * 0.08;
+                   p.shattered = true;
+                   
+                   // Keep the web glowing for 3 seconds before slowly fading it down
+                   if (i === 0) { // Only call this once
+                       setTimeout(() => {
+                           pathEl.setAttribute("stroke-opacity", "0.04");
+                       }, 3000);
+                   }
+                }
+
                 p.x += p.vx;
                 p.y += p.vy;
                 
-                const dx = p.x - mouseX;
-                const dy = p.y - mouseY;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                
-                if(dist < 15) {
-                   p.x += dx * 0.015;
-                   p.y += dy * 0.015;
+                if (p.shattered) {
+                   p.x += (p.baseX - p.x) * 0.02; // Eventually drift to base
+                   p.y += (p.baseY - p.y) * 0.02;
+                   
+                   const dx = p.x - mouseX;
+                   const dy = p.y - mouseY;
+                   if(Math.sqrt(dx*dx + dy*dy) < 15) {
+                      p.x += dx * 0.02;
+                      p.y += dy * 0.02;
+                   }
+                } else {
+                   // Lock to diamond matrix initially
+                   p.x += (p.diamondX - p.x) * 0.1;
+                   p.y += (p.diamondY - p.y) * 0.1;
                 }
-                
-                p.x += (p.baseX - p.x) * 0.002;
-                p.y += (p.baseY - p.y) * 0.002;
                 
                 p.el.setAttribute('cx', p.x + '%');
                 p.el.setAttribute('cy', p.y + '%');
@@ -165,16 +319,18 @@
                     const ddx = p.x - p2.x;
                     const ddy = p.y - p2.y;
                     const ddist = Math.sqrt(ddx*ddx + ddy*ddy);
-                    if (ddist < 10) {
-                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                        line.setAttribute('x1', p.x + '%');
-                        line.setAttribute('y1', p.y + '%');
-                        line.setAttribute('x2', p2.x + '%');
-                        line.setAttribute('y2', p2.y + '%');
-                        lineGroup.appendChild(line);
+                    const threshold = p.shattered ? 12 : 5; // Allow web to stretch out visibly
+                    if (ddist < threshold) {
+                        const px1 = (p.x * window.innerWidth) / 100;
+                        const py1 = (p.y * window.innerHeight) / 100;
+                        const px2 = (p2.x * window.innerWidth) / 100;
+                        const py2 = (p2.y * window.innerHeight) / 100;
+                        pathData += `M${px1} ${py1} L${px2} ${py2} `;
                     }
                 }
              });
+             
+             pathEl.setAttribute('d', pathData);
              requestAnimationFrame(animate);
           }
           animate();
@@ -327,8 +483,10 @@
           </svg>
           Custom HR Module
         </button>
+      </nav>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 0.6rem;">
         <div class="drawer-separator"></div>
-        <button class="drawer-item btn-logout" onclick="handleLogout()">
+        <button class="drawer-item btn-logout stagger-item" onclick="handleLogout()" style="animation-delay: 0.6s">
           <svg
             width="16"
             height="16"
@@ -342,7 +500,7 @@
           </svg>
           Logout Session
         </button>
-      </nav>
+      </div>
     </aside>
 
     <!-- Main Workspace Area -->
