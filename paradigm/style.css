@@ -1011,9 +1011,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(11, 12, 16, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom: 1px solid var(--surface-border);
   z-index: 1000;
   transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2978,13 +2978,10 @@ html[data-theme="light"], body[data-theme="light"], [data-theme="light"] {
 [data-theme="light"] .top-header,
 [data-theme="light"] nav,
 [data-theme="light"] .nav-menu {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.03),
-    inset 0 -1px 0 rgba(255, 255, 255, 1);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
 }
 
 [data-theme="light"] .logo-text, 

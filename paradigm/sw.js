@@ -1,4 +1,4 @@
-const CACHE_NAME = "paradigm-cache-v4";
+const CACHE_NAME = "paradigm-cache-v6";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
