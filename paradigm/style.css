@@ -2969,10 +2969,10 @@ html[data-theme="light"], body[data-theme="light"], [data-theme="light"] {
 }
 
 [data-theme="light"] .sidebar-drawer {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-left: none;
 }
 
 [data-theme="light"] .top-header,
