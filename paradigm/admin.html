@@ -27,10 +27,11 @@
   <body>
     <!-- Cinematic Sequence Start -->
     <style>
-      .top-nav, .workspace-container, .sidebar-drawer, .hamburger-btn {
+      .top-header, .workspace-container, .sidebar-drawer {
         opacity: 0;
         pointer-events: none;
         transition: opacity 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
       .ui-revealed {
         opacity: 1 !important;
         pointer-events: auto !important;
@@ -133,7 +134,7 @@
           
           setTimeout(() => {
             document.getElementById('intro-screen').classList.add('hidden');
-            document.querySelectorAll('.top-nav, .workspace-container, .sidebar-drawer, .hamburger-btn').forEach(el => el.classList.add('ui-revealed'));
+            document.querySelectorAll('.top-header, .workspace-container, .sidebar-drawer').forEach(el => el.classList.add('ui-revealed'));
             
             // Garbage collect the overlay
             setTimeout(() => {
