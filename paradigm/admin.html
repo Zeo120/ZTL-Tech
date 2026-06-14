@@ -11,7 +11,7 @@
       rel="stylesheet"
     />
     <link rel="manifest" href="manifest.json" />
-    <script src="js/routes.js"></script>
+    <script src="js/routes.js?v=9"></script>
     <script src="js/auth.js"></script>
     <script>
       if ("serviceWorker" in navigator) {
@@ -20,28 +20,8 @@
         });
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=6" />
+    <link rel="stylesheet" href="style.css?v=7" />
     <link rel="stylesheet" href="payroll_theme.css?v=1781416150715" />
-  
-    <!-- Isolated Hamburger Logic -->
-    <script>
-      function toggleDrawer(isOpen) {
-        const drawer = document.getElementById("sidebar-drawer");
-        const backdrop = document.getElementById("drawer-backdrop");
-        const logo = document.getElementById("hero-logo");
-        if (isOpen) {
-          drawer.classList.add("active");
-          backdrop.classList.add("active");
-          if (logo) logo.style.opacity = "0";
-        } else {
-          drawer.classList.remove("active");
-          backdrop.classList.remove("active");
-          if (logo && (typeof currentView === "undefined" || currentView === "landing")) {
-             logo.style.opacity = "1";
-          }
-        }
-      }
-    </script>
     <script src="js/animations.js"></script>
   </head>
   <body>
@@ -51,7 +31,6 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-      }
       .ui-revealed {
         opacity: 1 !important;
         pointer-events: auto !important;
@@ -390,8 +369,7 @@
       onclick="toggleDrawer(false)"
     ></div>
     <aside class="sidebar-drawer" id="sidebar-drawer">
-      <div class="drawer-header">
-        <h3>Navigate</h3>
+      <div class="drawer-header" style="justify-content: flex-end;">
         <button class="drawer-close-btn" onclick="toggleDrawer(false)">
           <svg
             width="20"
