@@ -1,12 +1,24 @@
 function toggleDrawer(isOpen) {
   const drawer = document.getElementById("sidebar-drawer");
   const backdrop = document.getElementById("drawer-backdrop");
+  const logo = document.getElementById("hero-logo");
+  const hamburger = document.getElementById("hamburger-toggle");
+  const navHeader = document.querySelector(".drawer-header h3");
+  
   if (isOpen) {
     drawer.classList.add("active");
     backdrop.classList.add("active");
+    if (logo) logo.style.opacity = "0";
+    if (hamburger) hamburger.style.opacity = "0";
+    if (navHeader) navHeader.style.opacity = "0";
   } else {
     drawer.classList.remove("active");
     backdrop.classList.remove("active");
+    if (logo && (typeof currentView === "undefined" || currentView === "landing")) {
+       logo.style.opacity = "1";
+    }
+    if (hamburger) hamburger.style.opacity = "1";
+    if (navHeader) navHeader.style.opacity = "1";
   }
 }
 
