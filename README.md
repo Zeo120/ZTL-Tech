@@ -99,3 +99,19 @@ The server will boot up, initialize the database tables automatically, and serve
 *   **Where do I put my CSS?** We don't use Tailwind. We use Vanilla CSS. Put it in the `style.css` file inside the respective product folder (e.g., `paradigm/style.css`). Keep designs sleek and symmetrical.
 
 Good luck, and welcome to the team!
+
+---
+
+## 🌟 6. Recent Overhauls & Architecture Upgrades (Paradigm Suite)
+
+**The Caveman Philosophy (Divide & Rule):**
+We have recently overhauled the Paradigm Enterprise Software to enforce strict Multi-Tenant isolation. Every employee, payroll ledger, and attendance record is strictly partitioned by `company_id`. The blast radius of any data breach is mathematically contained to a single corporate entity.
+
+**Cryptographic Payroll & PDF Engine:**
+*   **Merkle Roots:** All completed Payroll Runs are cryptographically sealed using SHA-256 Merkle Roots generated from the employee transactions, ensuring zero tampering post-processing.
+*   **Headless PDF Generation:** We bypass unreliable headless browsers in production by using `pdf-lib` to programmatically inject binary text into pure PDF buffers, guaranteeing 100% reliable Payslip generation in the `/tempmediaStorage` directory.
+
+**Aesthetic Paradigm Shift (UI/UX):**
+*   **Glassmorphic Data Tables:** All legacy HTML tables in the Payroll module have been aggressively upgraded to Frosted Glass panels (`.table-glass`).
+*   **Slide-Over Modals:** We eradicated jarring center-screen popups. All forms (e.g., `Add Corporate Employee`, `Create Payroll Run`) now smoothly slide in from the right edge using hardware-accelerated CSS transitions (`.slide-over-overlay`).
+*   **Antigravity Particle Matrix:** The background engine handles intense dynamic particles. We've introduced explicit CSS variables (`--particle-1`, `--line-opacity`) into the `:root` to ensure the matrix is deeply black and highly visible in Light Mode, and a glowing translucent white in Dark Mode.

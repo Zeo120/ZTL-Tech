@@ -14,6 +14,10 @@
     "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif;
   --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  --particle-1: rgba(255, 255, 255, 0.7);
+  --particle-2: rgba(255, 255, 255, 0.2);
+  --particle-line: #ffffff;
+  --line-opacity: 0.06;
 }
 
 /* Custom Scrollbar Styles (Everywhere) */
@@ -1065,9 +1069,9 @@ body {
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 1999;
   opacity: 0;
   pointer-events: none;
@@ -2940,9 +2944,10 @@ html[data-theme="light"], body[data-theme="light"], [data-theme="light"] {
   --text-primary: #020617;
   --text-secondary: #334155;
   --surface-border: rgba(0, 0, 0, 0.1);
-  --particle-1: rgba(0, 0, 0, 0.9);
-  --particle-2: rgba(0, 0, 0, 0.75);
-  --particle-line: rgba(0, 0, 0, 0.4);
+  --particle-1: #000000;
+  --particle-2: rgba(0, 0, 0, 0.85);
+  --particle-line: #000000;
+  --line-opacity: 0.35;
 }
 
 [data-theme="light"] body {

@@ -28,3 +28,6 @@ backend/.env
 *.exe
 *.bin
 backend/.env.*
+
+*.pdf
+sample_payslip.html

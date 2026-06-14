@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Paradigm | Executive Payslip</title>
+    <title>Paradigm | Executive Payslip (PREVIEW)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="payslip.css?v=5" />
   </head>
@@ -171,6 +171,53 @@
       </button>
     </div>
 
+    <script>
+      // INJECT MOCK DATA INTO SESSION STORAGE BEFORE SCRIPT LOADS
+      const mockPayload = {
+        payslip: {
+          id: 999,
+          payroll_run_id: 1,
+          month: 5,
+          year: 2026,
+          employee_id: 33,
+          employee_name: "NEELAGIRI V SUBBA RAO",
+          employee_code: "AA/B-033",
+          department: "NON TECH TEAM",
+          pan: "ABCDE1234F",
+          bank_account_number: "XXXX-XXXX-1234",
+          ifsc_code: "SBIN0001234",
+          uan_no: "100023456789",
+          date_of_joining: "2026-03-31T00:00:00.000Z",
+          base_salary: 50000,
+          hra: 20000,
+          allowances: 30000,
+          gross_salary: 100000,
+          deductions: 0,
+          pf_employee: 0,
+          pf_employer: 0,
+          esi_employee: 0,
+          esi_employer: 0,
+          professional_tax: 200,
+          tds: 0,
+          lwp_days: 0,
+          lwp_deduction: 0,
+          working_days: 26,
+          net_salary: 99800,
+          net_salary_words: "Rs. Ninety Nine Thousand Eight Hundred Only",
+          ctc_breakdown: {
+            eps_amount: 0,
+            epf_amount: 0
+          },
+          merkle_proof: "0x8f2a9b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
+          company_metadata: {
+            company_name: "AKIN ANALYTICS SOLUTIONS PRIVATE LIMITED",
+            registered_address: "202, 2ND FLOOR, RAJ BHAVAN ROAD, LAKE MELODY APARTMENT, SOMAJIGUDA-500082",
+            contact_email: "*****i.pn21@gmail.com"
+          }
+        }
+      };
+      sessionStorage.setItem("payslip_payload", JSON.stringify(mockPayload));
+    </script>
     <script src="js/payslip.js"></script>
   </body>
 </html>

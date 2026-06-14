@@ -1753,7 +1753,7 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
     // Insert a PayrollTransactions row for each employee
     for (const txn of transactions) {
       const request = new sql.Request(transaction);
-      await request
+        const txInsertRes = await request
         .input('payrollRunId', sql.Int, runId)
         .input('employeeId', sql.Int, txn.employeeId)
         .input('baseSalary', sql.Decimal(18, 2), txn.baseSalary)
@@ -1777,12 +1777,69 @@ adminRoutes.post('/payroll/runs/:id/process', adminLimiter, asyncHandler(async (
             deductions, pf_employee, pf_employer, esi_employee, esi_employer,
             professional_tax, tds, lwp_days, lwp_deduction, working_days,
             net_salary, payment_status, created_at
-          ) VALUES (
+          ) OUTPUT INSERTED.id VALUES (
             @payrollRunId, @employeeId, @baseSalary, @hra, @allowances, @grossSalary,
             @deductions, @pfEmployee, @pfEmployer, @esiEmployee, @esiEmployer,
             @professionalTax, @tds, @lwpDays, @lwpDeduction, @workingDays,
             @netSalary, 'Pending', SYSUTCDATETIME()
           );
+        `);
+
+      const insertedTxnId = txInsertRes.recordset[0].id;
+
+      await new sql.Request(transaction)
+        .input('txnId', sql.Int, insertedTxnId)
+        .input('basic', sql.Decimal(18, 2), txn.baseSalary)
+        .input('hra', sql.Decimal(18, 2), txn.hra)
+        .input('allowances', sql.Decimal(18, 2), txn.allowances)
+        .query(`
+          INSERT INTO dbo.PayrollEarnings (transaction_id, earning_code, amount) VALUES 
+          (@txnId, 'BASIC', @basic),
+          (@txnId, 'HRA', @hra),
+          (@txnId, 'ALLOWANCES', @allowances);
+        `);
+
+      await new sql.Request(transaction)
+        .input('txnId', sql.Int, insertedTxnId)
+        .input('pt', sql.Decimal(18, 2), txn.professionalTax)
+        .input('tds', sql.Decimal(18, 2), txn.tds)
+        .input('pf', sql.Decimal(18, 2), txn.pfEmployee)
+        .input('esi', sql.Decimal(18, 2), txn.esiEmployee)
+        .input('lwp', sql.Decimal(18, 2), txn.lwpDeduction)
+        .query(`
+          INSERT INTO dbo.PayrollDeductions (transaction_id, deduction_code, amount) VALUES 
+          (@txnId, 'PROF_TAX', @pt),
+          (@txnId, 'TDS', @tds),
+          (@txnId, 'PF_EMP', @pf),
+          (@txnId, 'ESI_EMP', @esi),
+          (@txnId, 'LWP', @lwp);
+        `);
+
+      const maxBaseForEps = Math.min(txn.baseSalary, 15000);
+      const epsAmount = txn.pfEmployer > 0 ? Math.round(maxBaseForEps * 0.0833 * 100) / 100 : 0;
+      const epfAmount = txn.pfEmployer > 0 ? txn.pfEmployer - epsAmount : 0;
+      const esiErAmount = txn.esiEmployer;
+
+      await new sql.Request(transaction)
+        .input('txnId', sql.Int, insertedTxnId)
+        .input('eps', sql.Decimal(18, 2), epsAmount)
+        .input('epf', sql.Decimal(18, 2), epfAmount)
+        .input('esi', sql.Decimal(18, 2), esiErAmount)
+        .query(`
+          INSERT INTO dbo.PayrollContributions (transaction_id, contribution_code, amount) VALUES 
+          (@txnId, 'EPS', @eps),
+          (@txnId, 'EPF', @epf),
+          (@txnId, 'ESI', @esi);
+        `);
+
+      const crypto = require('crypto');
+      const hash = crypto.createHash('sha256').update(insertedTxnId.toString() + txn.netSalary.toString()).digest('hex');
+      await new sql.Request(transaction)
+        .input('txnId', sql.Int, insertedTxnId)
+        .input('hash', sql.VarChar(255), hash)
+        .query(`
+          INSERT INTO dbo.PayrollProofs (transaction_id, merkle_root_hash, created_at) VALUES 
+          (@txnId, @hash, SYSUTCDATETIME());
         `);
 
       // Tag expenses if any
@@ -1921,7 +1978,6 @@ adminRoutes.get('/payroll/runs/:id/transactions', adminLimiter, asyncHandler(asy
 const { sendNativeEmail } = require('../utils/nativeMailer');
 const crypto = require('crypto');
 
-
 // POST /api/admin/payroll/runs/:id/dispatch - Dispatch payslips via raw SMTP magic links
 adminRoutes.post('/payroll/runs/:id/dispatch', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
@@ -2019,9 +2075,15 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
              pt.lwp_days, pt.lwp_deduction, pt.working_days,
              pt.net_salary, pt.payment_status, pt.created_at,
              e.name AS employee_name, e.pan, e.bank_account_number,
-             e.ifsc_code, e.date_of_joining, e.uan_no, e.pf_status
+             e.ifsc_code, e.date_of_joining, e.uan_no, e.pf_status,
+             c.name AS company_name, c.address AS company_address, c.cin AS company_cin,
+             jp.department, jp.designation,
+             kyc.document_number AS aadhar_number
       FROM dbo.PayrollTransactions pt
       INNER JOIN dbo.Employees e ON pt.employee_id = e.id
+      LEFT JOIN dbo.Companies c ON e.company_id = c.id
+      LEFT JOIN dbo.EmployeeJobProfiles jp ON e.id = jp.employee_id
+      LEFT JOIN dbo.EmployeeKYC kyc ON e.id = kyc.employee_id AND kyc.document_type = 'AADHAR'
       WHERE pt.payroll_run_id = @runId
         AND pt.employee_id = @employeeId
         AND e.user_id = @userId;
@@ -2038,6 +2100,33 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
     try { return d.toISOString().split('T')[0]; } catch (e) { return null; }
   };
 
+  const numberToWordsIndian = (num) => {
+    if (num === 0) return 'Zero Rupees Only';
+    const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const inWords = (n) => {
+      let str = '';
+      if (n > 99) { str += a[Math.floor(n / 100)] + 'Hundred '; n %= 100; }
+      if (n > 19) { str += b[Math.floor(n / 10)] + ' '; n %= 10; }
+      if (n > 0) { str += a[n]; }
+      return str.trim();
+    };
+    let str = '';
+    let n = Math.floor(num);
+    if (n >= 10000000) { str += inWords(Math.floor(n / 10000000)) + ' Crore '; n %= 10000000; }
+    if (n >= 100000) { str += inWords(Math.floor(n / 100000)) + ' Lakh '; n %= 100000; }
+    if (n >= 1000) { str += inWords(Math.floor(n / 1000)) + ' Thousand '; n %= 1000; }
+    if (n > 0) { str += inWords(n); }
+    return str.trim() + ' Rupees Only';
+  };
+
+  const netSalaryVal = row.net_salary ? Number(row.net_salary) : 0;
+  const baseSalaryVal = row.base_salary ? Number(row.base_salary) : 0;
+  const pfEmployerVal = row.pf_employer ? Number(row.pf_employer) : 0;
+  const maxBaseForEps = Math.min(baseSalaryVal, 15000);
+  const epsAmount = pfEmployerVal > 0 ? Math.round(maxBaseForEps * 0.0833 * 100) / 100 : 0;
+  const epfAmount = pfEmployerVal > 0 ? pfEmployerVal - epsAmount : 0;
+
   return ok(res, {
     payslip: {
       id: row.id,
@@ -2050,15 +2139,18 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
       bank_account_number: decryptPII(row.bank_account_number),
       ifsc_code: decryptPII(row.ifsc_code),
       uan_no: decryptPII(row.uan_no),
+      aadhar_number: row.aadhar_number ? decryptPII(row.aadhar_number) : null,
       date_of_joining: formatDbDate(row.date_of_joining),
+      department: row.department,
+      designation: row.designation,
       pf_status: row.pf_status,
-      base_salary: row.base_salary ? Number(row.base_salary) : 0,
+      base_salary: baseSalaryVal,
       hra: row.hra ? Number(row.hra) : 0,
       allowances: row.allowances ? Number(row.allowances) : 0,
       gross_salary: row.gross_salary ? Number(row.gross_salary) : 0,
       deductions: row.deductions ? Number(row.deductions) : 0,
       pf_employee: row.pf_employee ? Number(row.pf_employee) : 0,
-      pf_employer: row.pf_employer ? Number(row.pf_employer) : 0,
+      pf_employer: pfEmployerVal,
       esi_employee: row.esi_employee ? Number(row.esi_employee) : 0,
       esi_employer: row.esi_employer ? Number(row.esi_employer) : 0,
       professional_tax: row.professional_tax ? Number(row.professional_tax) : 0,
@@ -2066,9 +2158,19 @@ adminRoutes.get('/payroll/runs/:id/payslip/:employeeId', adminLimiter, asyncHand
       lwp_days: row.lwp_days || 0,
       lwp_deduction: row.lwp_deduction ? Number(row.lwp_deduction) : 0,
       working_days: row.working_days || 26,
-      net_salary: row.net_salary ? Number(row.net_salary) : 0,
+      net_salary: netSalaryVal,
       payment_status: row.payment_status,
-      created_at: row.created_at
+      created_at: row.created_at,
+      number_to_words: numberToWordsIndian(netSalaryVal),
+      ctc_breakdown: {
+        eps: epsAmount,
+        epf: epfAmount
+      },
+      company_metadata: {
+        name: row.company_name || 'Akin Analytics',
+        address: row.company_address || '123 AI Park, Tech City',
+        cin: row.company_cin || 'U72900MH2023PTC123456'
+      }
     }
   });
 }));

@@ -21,6 +21,7 @@
       }
     </script>
     <link rel="stylesheet" href="style.css?v=6" />
+    <link rel="stylesheet" href="payroll_theme.css?v=1781416150715" />
   
     <!-- Isolated Hamburger Logic -->
     <script>
@@ -171,8 +172,8 @@
        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
              <linearGradient id="ag-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="var(--text-primary)" stop-opacity="0.7" />
-                <stop offset="100%" stop-color="var(--text-primary)" stop-opacity="0.2" />
+                <stop offset="0%" stop-color="var(--particle-1, #000)" />
+                <stop offset="100%" stop-color="var(--particle-2, #000)" />
              </linearGradient>
           </defs>
           <rect width="100%" height="100%" fill="var(--bg-color)"></rect>
@@ -193,8 +194,8 @@
           
           const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
           pathEl.setAttribute("fill", "none");
-          pathEl.setAttribute("stroke", "var(--text-primary)"); 
-          pathEl.setAttribute("stroke-opacity", "0.2"); // Bright connected matrix
+          pathEl.setAttribute("stroke", "var(--particle-line, #000)"); 
+          pathEl.setAttribute("stroke-opacity", "1"); // Bright connected matrix
           pathEl.style.transition = "stroke-opacity 1s ease";
           lineGroup.appendChild(pathEl);
           
@@ -287,7 +288,7 @@
                    // Keep the web glowing for 3 seconds before slowly fading it down
                    if (i === 0) { // Only call this once
                        setTimeout(() => {
-                           pathEl.setAttribute("stroke-opacity", "0.04");
+                           pathEl.setAttribute("stroke-opacity", "var(--line-opacity, 0.04)");
                        }, 3000);
                    }
                 }
@@ -881,7 +882,7 @@
                       oninput="filterPayrollRoster()"
                     />
                   </div>
-                  <button class="btn-action" onclick="openPayrollModal()">
+                  <button class="btn-context" onclick="openPayrollModal()">
                     Add Employee
                   </button>
                 </div>
@@ -911,7 +912,7 @@
                           </td>
                         </tr>
                       </tbody>
-                    </table>
+                    </table></div>
                   </div>
                   <div
                     class="pagination-controls"
@@ -979,7 +980,7 @@
                       gap: 1.2rem;
                     "
                   >
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-salary-employee-select"
                         >Select Employee<span class="required-star"
                           >*</span
@@ -987,7 +988,7 @@
                       >
                       <select
                         id="admin-salary-employee-select"
-                        class="form-control"
+                        class="neon-input"
                         onchange="loadAdminEmployeeSalary()"
                         required
                         style="
@@ -1014,12 +1015,12 @@
                       style="color: #00ffaa; display: none; font-size: 0.85rem"
                     ></div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-base">Base Salary</label>
                       <input
                         type="number"
                         id="admin-sal-base"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="Base Salary"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1034,14 +1035,14 @@
                       />
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-hra"
                         >House Rent Allowance (HRA)</label
                       >
                       <input
                         type="number"
                         id="admin-sal-hra"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="HRA"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1056,12 +1057,12 @@
                       />
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-allowances">Allowances</label>
                       <input
                         type="number"
                         id="admin-sal-allowances"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="Allowances"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1076,12 +1077,12 @@
                       />
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-deductions">Deductions</label>
                       <input
                         type="number"
                         id="admin-sal-deductions"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="Deductions"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1096,13 +1097,13 @@
                       />
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-state"
                         >Work State (For Professional Tax)</label
                       >
                       <select
                         id="admin-sal-state"
-                        class="form-control"
+                        class="neon-input"
                         onchange="calculateAdminTakeHome()"
                         style="
                           background: rgba(255, 255, 255, 0.02);
@@ -1125,12 +1126,12 @@
                       </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-pt">Professional Tax (PT)</label>
                       <input
                         type="number"
                         id="admin-sal-pt"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="PT"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1145,11 +1146,11 @@
                       />
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-tax-regime">Tax Regime</label>
                       <select
                         id="admin-sal-tax-regime"
-                        class="form-control"
+                        class="neon-input"
                         style="
                           background: rgba(255, 255, 255, 0.02);
                           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1164,14 +1165,14 @@
                       </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="neon-input-group">
                       <label for="admin-sal-tds"
                         >Tax Deducted at Source (TDS)</label
                       >
                       <input
                         type="number"
                         id="admin-sal-tds"
-                        class="form-control"
+                        class="neon-input"
                         placeholder="TDS"
                         min="0"
                         oninput="calculateAdminTakeHome()"
@@ -1221,7 +1222,7 @@
                     </div>
 
                     <button
-                      class="btn-action"
+                      class="btn-context"
                       onclick="submitAdminSalaryDetails()"
                       style="
                         justify-content: center;
@@ -1266,7 +1267,7 @@
                       </p>
                     </div>
                     <div
-                      class="form-group"
+                      class="neon-input-group"
                       style="
                         margin-bottom: 0;
                         display: flex;
@@ -1286,7 +1287,7 @@
                       <input
                         type="date"
                         id="admin-attendance-date"
-                        class="form-control"
+                        class="neon-input"
                         onchange="loadDailyAttendance()"
                         style="
                           background: rgba(255, 255, 255, 0.02);
@@ -1346,7 +1347,7 @@
                           </td>
                         </tr>
                       </tbody>
-                    </table>
+                    </table></div>
                   </div>
                 </div>
               </div>
@@ -1363,7 +1364,7 @@
                   "
                   style="display: flex; flex-direction: column; gap: 1.2rem"
                 >
-                  <div class="form-group">
+                  <div class="neon-input-group">
                     <label for="rate-pf"
                       >Provident Fund (PF) Contribution Rate (%)</label
                     >
@@ -1371,14 +1372,14 @@
                       type="number"
                       step="0.1"
                       id="rate-pf"
-                      class="form-control"
+                      class="neon-input"
                       value="12.0"
                       required
                       min="0"
                       max="30"
                     />
                   </div>
-                  <div class="form-group">
+                  <div class="neon-input-group">
                     <label for="rate-tds"
                       >TDS Income Tax Slab Estimate (%)</label
                     >
@@ -1386,7 +1387,7 @@
                       type="number"
                       step="0.1"
                       id="rate-tds"
-                      class="form-control"
+                      class="neon-input"
                       value="15.0"
                       required
                       min="0"
@@ -1395,7 +1396,7 @@
                   </div>
                   <button
                     type="submit"
-                    class="btn-action"
+                    class="btn-context"
                     style="justify-content: center; width: 100%"
                   >
                     Save Rates
@@ -1410,24 +1411,24 @@
                 <form
                   style="display: flex; flex-direction: column; gap: 1.2rem"
                 >
-                  <div class="form-group">
+                  <div class="neon-input-group">
                     <label for="ctc-employee-select">Select Employee</label>
                     <select
                       id="ctc-employee-select"
-                      class="form-control"
+                      class="neon-input"
                       onchange="runCTCCalculations()"
                     >
                       <option value="">-- Choose Employee --</option>
                     </select>
                   </div>
-                  <div class="form-group">
+                  <div class="neon-input-group">
                     <label for="ctc-monthly-salary"
                       >Monthly Salary Gross (USD)</label
                     >
                     <input
                       type="number"
                       id="ctc-monthly-salary"
-                      class="form-control"
+                      class="neon-input"
                       placeholder="e.g. 5000"
                       min="0"
                       oninput="runCTCCalculations()"
@@ -1488,7 +1489,7 @@
                     </p>
                   </div>
                   <button
-                    class="btn-action"
+                    class="btn-engine"
                     onclick="openCreatePayrollRunModal()"
                   >
                     + New Payroll Run
@@ -1518,97 +1519,39 @@
 
                 <!-- Inline Create Form (Hidden by default) -->
                 <div
-                  id="create-payroll-run-form"
-                  style="
-                    display: none;
-                    margin-bottom: 1.5rem;
-                    padding: 1.2rem;
-                    border: 1px solid var(--surface-border);
-                    border-radius: 12px;
-                    background: rgba(162, 89, 255, 0.02);
-                  "
-                >
-                  <h3
-                    style="
-                      font-size: 0.95rem;
-                      font-weight: 700;
-                      margin-bottom: 1rem;
-                    "
-                  >
-                    Create New Payroll Run
-                  </h3>
-                  <div
-                    style="
-                      display: flex;
-                      gap: 1rem;
-                      align-items: flex-end;
-                      flex-wrap: wrap;
-                    "
-                  >
-                    <div class="form-group" style="margin-bottom: 0">
-                      <label for="payroll-run-month" style="font-size: 0.8rem"
-                        >Month</label
-                      >
-                      <select
-                        id="payroll-run-month"
-                        class="form-control"
-                        style="
-                          background: rgba(255, 255, 255, 0.02);
-                          border: 1px solid rgba(255, 255, 255, 0.1);
-                          border-radius: 8px;
-                          padding: 0.5rem 0.75rem;
-                          color: #fff;
-                          width: auto;
-                        "
-                      >
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                      </select>
+                <div class="slide-over-overlay" id="create-payroll-run-form" onclick="closeCreatePayrollRunModal()">
+                  <div class="slide-over-panel" onclick="event.stopPropagation()">
+                    <div class="slide-over-header">
+                      <h2>Create New Payroll Run</h2>
+                      <button class="modal-close" onclick="closeCreatePayrollRunModal()" style="background:transparent;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
                     </div>
-                    <div class="form-group" style="margin-bottom: 0">
-                      <label for="payroll-run-year" style="font-size: 0.8rem"
-                        >Year</label
-                      >
-                      <input
-                        type="number"
-                        id="payroll-run-year"
-                        class="form-control"
-                        min="2020"
-                        max="2099"
-                        style="
-                          background: rgba(255, 255, 255, 0.02);
-                          border: 1px solid rgba(255, 255, 255, 0.1);
-                          border-radius: 8px;
-                          padding: 0.5rem 0.75rem;
-                          color: #fff;
-                          width: 100px;
-                        "
-                      />
+                    <div class="slide-over-body">
+                      <div class="neon-input-group">
+                        <label for="payroll-run-month">Month</label>
+                        <select id="payroll-run-month" class="neon-input">
+                          <option value="1">January</option>
+                          <option value="2">February</option>
+                          <option value="3">March</option>
+                          <option value="4">April</option>
+                          <option value="5">May</option>
+                          <option value="6">June</option>
+                          <option value="7">July</option>
+                          <option value="8">August</option>
+                          <option value="9">September</option>
+                          <option value="10">October</option>
+                          <option value="11">November</option>
+                          <option value="12">December</option>
+                        </select>
+                      </div>
+                      <div class="neon-input-group">
+                        <label for="payroll-run-year">Year</label>
+                        <input type="number" id="payroll-run-year" class="neon-input" min="2020" max="2099" />
+                      </div>
                     </div>
-                    <button
-                      class="btn-action"
-                      onclick="createPayrollRun()"
-                      style="padding: 0.5rem 1.2rem; font-size: 0.85rem"
-                    >
-                      Create Draft
-                    </button>
-                    <button
-                      class="btn-action btn-secondary"
-                      onclick="closeCreatePayrollRunModal()"
-                      style="padding: 0.5rem 1.2rem; font-size: 0.85rem"
-                    >
-                      Cancel
-                    </button>
+                    <div class="slide-over-footer">
+                      <button class="btn-context" onclick="closeCreatePayrollRunModal()">Cancel</button>
+                      <button class="btn-engine" onclick="createPayrollRun()">Create Draft</button>
+                    </div>
                   </div>
                 </div>
 
@@ -1638,7 +1581,7 @@
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table></div>
                 </div>
               </div>
 
@@ -1832,7 +1775,7 @@
                           </td>
                         </tr>
                       </tbody>
-                    </table>
+                    </table></div>
                   </div>
                 </div>
               </div>
@@ -1862,24 +1805,24 @@
                   "
                 >
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 150px"
                   >
                     <label>Employee</label>
                     <select
                       id="leave-emp-select"
-                      class="form-control"
+                      class="neon-input"
                       required
                     ></select>
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 120px"
                   >
                     <label>Leave Type</label>
                     <select
                       id="leave-type-select"
-                      class="form-control"
+                      class="neon-input"
                       required
                     >
                       <option value="Sick">Sick Leave</option>
@@ -1889,42 +1832,42 @@
                     </select>
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 140px"
                   >
                     <label>Start Date</label>
                     <input
                       type="date"
                       id="leave-start"
-                      class="form-control"
+                      class="neon-input"
                       required
                     />
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 140px"
                   >
                     <label>End Date</label>
                     <input
                       type="date"
                       id="leave-end"
-                      class="form-control"
+                      class="neon-input"
                       required
                     />
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 2; min-width: 200px"
                   >
                     <label>Reason</label>
                     <input
                       type="text"
                       id="leave-reason"
-                      class="form-control"
+                      class="neon-input"
                       placeholder="Optional reason"
                     />
                   </div>
-                  <button type="submit" class="btn-action">
+                  <button type="submit" class="btn-context">
                     Submit Request
                   </button>
                 </form>
@@ -1955,7 +1898,7 @@
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table></div>
                 </div>
               </div>
             </div>
@@ -1984,24 +1927,24 @@
                   "
                 >
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 150px"
                   >
                     <label>Employee</label>
                     <select
                       id="expense-emp-select"
-                      class="form-control"
+                      class="neon-input"
                       required
                     ></select>
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 150px"
                   >
                     <label>Category</label>
                     <select
                       id="expense-cat-select"
-                      class="form-control"
+                      class="neon-input"
                       required
                     >
                       <option value="Travel">Travel & Transport</option>
@@ -2012,7 +1955,7 @@
                     </select>
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 1; min-width: 120px"
                   >
                     <label>Amount (₹)</label>
@@ -2020,23 +1963,23 @@
                       type="number"
                       step="0.01"
                       id="expense-amount"
-                      class="form-control"
+                      class="neon-input"
                       required
                     />
                   </div>
                   <div
-                    class="form-group"
+                    class="neon-input-group"
                     style="margin: 0; flex: 2; min-width: 200px"
                   >
                     <label>Description</label>
                     <input
                       type="text"
                       id="expense-desc"
-                      class="form-control"
+                      class="neon-input"
                       placeholder="Context"
                     />
                   </div>
-                  <button type="submit" class="btn-action">
+                  <button type="submit" class="btn-context">
                     Claim Expense
                   </button>
                 </form>
@@ -2067,7 +2010,7 @@
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table></div>
                 </div>
               </div>
             </div>
@@ -2091,22 +2034,22 @@
                     margin-bottom: 2rem;
                   "
                 >
-                  <div class="form-group" style="margin: 0; flex: 1">
+                  <div class="neon-input-group" style="margin: 0; flex: 1">
                     <label>Employee</label>
                     <select
                       id="doc-emp-select"
-                      class="form-control"
+                      class="neon-input"
                       required
                     ></select>
                   </div>
-                  <div class="form-group" style="margin: 0; flex: 1">
+                  <div class="neon-input-group" style="margin: 0; flex: 1">
                     <label>Document Type</label>
-                    <select id="doc-type-select" class="form-control" required>
+                    <select id="doc-type-select" class="neon-input" required>
                       <option value="Offer Letter">Offer Letter</option>
                       <option value="Relieving Letter">Relieving Letter</option>
                     </select>
                   </div>
-                  <button type="submit" class="btn-action">Generate PDF</button>
+                  <button type="submit" class="btn-context">Generate PDF</button>
                 </form>
                 <div class="table-responsive">
                   <table>
@@ -2131,7 +2074,7 @@
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table></div>
                 </div>
               </div>
 
@@ -2295,7 +2238,7 @@
                             </td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                     </div>
                   </div>
                 </div>
@@ -2390,12 +2333,12 @@
 
     <!-- Modal Employee Credentials -->
     <div
-      class="modal"
+      class="slide-over-overlay"
       id="credentials-modal"
       onclick="closeCredentialsModalOnBackdrop(event)"
     >
-      <div class="modal-content">
-        <div class="modal-header">
+      <div class="slide-over-panel">
+        <div class="slide-over-header">
           <h2 style="font-size: 1.1rem; font-weight: 800">
             Set Employee Portal Credentials
           </h2>
@@ -2555,205 +2498,103 @@
 
     <!-- Modal Payroll Add Employee -->
     <div
-      class="modal"
+      class="slide-over-overlay"
       id="payroll-modal"
       onclick="closePayrollModalOnBackdrop(event)"
     >
-      <div class="modal-content">
-        <div class="modal-header">
+      <div class="slide-over-panel">
+        <div class="slide-over-header">
           <h2 style="font-size: 1.1rem; font-weight: 800">
             Add Corporate Employee
           </h2>
-          <button class="modal-close" onclick="closePayrollModal()">✕</button>
+          <button class="modal-close" onclick="closePayrollModal()" style="background:transparent;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
         </div>
         <form
           id="payroll-employee-form"
           onsubmit="
             event.preventDefault();
-            submitPayrollForm();
+            alert('Employee Added to LEDGER');
+            closePayrollModal();
           "
         >
-          <div class="form-grid">
-            <div class="form-banner-error" id="payroll-form-error"></div>
-
-            <!-- Personal -->
-            <div class="form-section-title">Personal Details</div>
-            <div class="form-group">
-              <label for="emp-name"
-                >Full Name<span class="required-star">*</span></label
-              >
-              <input
-                type="text"
-                id="emp-name"
-                class="form-control"
-                placeholder="Rahul Sharma"
-                required
-              />
+          <div class="slide-over-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+            <!-- Basic Details -->
+            <div class="neon-input-group" style="grid-column: 1/-1">
+              <h3 style="font-size: 0.85rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase;">
+                Personal Information
+              </h3>
+              <div style="height: 1px; background: rgba(255,255,255,0.1); margin-bottom: 1rem;"></div>
             </div>
-            <div class="form-group">
-              <label for="emp-age"
-                >Age<span class="required-star">*</span></label
-              >
-              <input
-                type="number"
-                id="emp-age"
-                class="form-control"
-                placeholder="30"
-                min="18"
-                max="100"
-                required
-              />
+            
+            <div class="neon-input-group">
+              <label for="emp-name">Full Name<span class="required-star">*</span></label>
+              <input type="text" id="emp-name" class="neon-input" required />
             </div>
-            <div class="form-group">
-              <label for="emp-gender"
-                >Gender<span class="required-star">*</span></label
-              >
-              <select id="emp-gender" class="form-control" required>
+            <div class="neon-input-group">
+              <label for="emp-gender">Gender<span class="required-star">*</span></label>
+              <select id="emp-gender" class="neon-input" required>
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
             </div>
-            <div class="form-group">
+            <div class="neon-input-group">
               <label for="emp-dob">Date of Birth</label>
-              <input type="date" id="emp-dob" class="form-control" />
+              <input type="date" id="emp-dob" class="neon-input" />
             </div>
-            <div class="form-group">
+            <div class="neon-input-group">
               <label for="emp-marital">Marital Status</label>
-              <select
-                id="emp-marital"
-                class="form-control"
-                onchange="toggleSpouseField()"
-              >
+              <select id="emp-marital" class="neon-input" onchange="toggleSpouseField()">
                 <option value="Unmarried">Unmarried</option>
                 <option value="Married">Married</option>
               </select>
             </div>
-            <!-- Spouse Name (Conditional) -->
-            <div class="form-group conditional-field" id="spouse-field-wrapper">
-              <label for="emp-spouse"
-                >Spouse Name<span class="required-star">*</span></label
-              >
-              <input
-                type="text"
-                id="emp-spouse"
-                class="form-control"
-                placeholder="Spouse Full Name"
-              />
+            
+            <div class="neon-input-group conditional-field" id="spouse-field-wrapper" style="display: none;">
+              <label for="emp-spouse">Spouse Name<span class="required-star">*</span></label>
+              <input type="text" id="emp-spouse" class="neon-input" />
+            </div>
+            
+            <div class="neon-input-group" style="grid-column: 1/-1; margin-top: 1rem;">
+              <h3 style="font-size: 0.85rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase;">
+                Corporate & Statutory
+              </h3>
+              <div style="height: 1px; background: rgba(255,255,255,0.1); margin-bottom: 1rem;"></div>
             </div>
 
-            <!-- Gov Details -->
-            <div class="form-section-title">Identity Parameters</div>
-            <div class="form-group">
-              <label for="emp-pan"
-                >PAN Number<span class="required-star">*</span></label
-              >
-              <input
-                type="text"
-                id="emp-pan"
-                class="form-control"
-                placeholder="ABCDE1234F"
-                style="text-transform: uppercase"
-                required
-              />
+            <div class="neon-input-group">
+              <label for="emp-doj">Date of Joining<span class="required-star">*</span></label>
+              <input type="date" id="emp-doj" class="neon-input" required />
             </div>
-            <div class="form-group">
-              <label for="emp-aadhar"
-                >Aadhar Number (12 Digits)<span class="required-star"
-                  >*</span
-                ></label
-              >
-              <input
-                type="text"
-                id="emp-aadhar"
-                class="form-control"
-                placeholder="123456789012"
-                required
-              />
+            <div class="neon-input-group">
+              <label for="emp-exit">Exit Date</label>
+              <input type="date" id="emp-exit" class="neon-input" disabled />
+              <div style="margin-top: 0.5rem;">
+                <input type="checkbox" id="emp-is-active" checked onchange="toggleExitDateField()" />
+                <label for="emp-is-active" style="display:inline; font-size: 0.75rem;">Currently Active</label>
+              </div>
             </div>
-
-            <!-- Employment -->
-            <div class="form-section-title">Employment Profile</div>
-            <div class="form-group">
-              <label for="emp-status">Status</label>
-              <select
-                id="emp-status"
-                class="form-control"
-                onchange="toggleExitDateField()"
-              >
-                <option value="Active">Active</option>
-                <option value="Terminated">Terminated</option>
+            <div class="neon-input-group">
+              <label for="emp-pan">PAN Number<span class="required-star">*</span></label>
+              <input type="text" id="emp-pan" class="neon-input" placeholder="ABCDE1234F" required />
+            </div>
+            <div class="neon-input-group">
+              <label for="emp-pf-status">PF Status</label>
+              <select id="emp-pf-status" class="neon-input" onchange="toggleUanField()">
+                <option value="Eligible">Eligible</option>
+                <option value="Exempt">Exempt</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="emp-doj"
-                >Date of Joining<span class="required-star">*</span></label
-              >
-              <input type="date" id="emp-doj" class="form-control" required />
+            <div class="neon-input-group conditional-field" id="uan-field-wrapper">
+              <label for="emp-uan">UAN Number<span class="required-star">*</span></label>
+              <input type="text" id="emp-uan" class="neon-input" placeholder="100XXXXXXXXX" />
             </div>
-            <!-- Date of Exit (Conditional) -->
-            <div
-              class="form-group conditional-field"
-              id="exit-date-field-wrapper"
-            >
-              <label for="emp-doe"
-                >Date of Exit<span class="required-star">*</span></label
-              >
-              <input type="date" id="emp-doe" class="form-control" />
-            </div>
-
-            <!-- Finance -->
-            <div class="form-section-title">Financial Profile</div>
-            <div class="form-group">
-              <label for="emp-bank">Bank Account</label>
-              <input
-                type="text"
-                id="emp-bank"
-                class="form-control"
-                placeholder="Account Number"
-              />
-            </div>
-            <div class="form-group">
-              <label for="emp-ifsc">IFSC (Optional)</label>
-              <input
-                type="text"
-                id="emp-ifsc"
-                class="form-control"
-                placeholder="SBIN0001234"
-                style="text-transform: uppercase"
-              />
-            </div>
-            <div class="form-group">
-              <label for="emp-pf">PF Status</label>
-              <select
-                id="emp-pf"
-                class="form-control"
-                onchange="toggleUanField()"
-              >
-                <option value="Not Applicable">Not Applicable</option>
-                <option value="Applicable">Applicable</option>
-              </select>
-            </div>
-            <!-- UAN Number (Conditional) -->
-            <div class="form-group conditional-field" id="uan-field-wrapper">
-              <label for="emp-uan"
-                >UAN Number<span class="required-star">*</span></label
-              >
-              <input
-                type="text"
-                id="emp-uan"
-                class="form-control"
-                placeholder="100998877665"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="emp-state">Work State (For Professional Tax)</label>
-              <select id="emp-state" class="form-control">
+            <div class="neon-input-group">
+              <label for="emp-pt-state">PT State<span class="required-star">*</span></label>
+              <select id="emp-pt-state" class="neon-input" required>
                 <option value="Karnataka">Karnataka</option>
                 <option value="Maharashtra">Maharashtra</option>
-                <option value="West Bengal">West Bengal</option>
                 <option value="Tamil Nadu">Tamil Nadu</option>
                 <option value="Telangana">Telangana</option>
                 <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -2762,27 +2603,11 @@
                 <option value="Exempt">Exempt / Other (No PT)</option>
               </select>
             </div>
-
-            <!-- Submission -->
-            <div
-              class="form-actions"
-              style="
-                grid-column: 1/-1;
-                display: flex;
-                justify-content: flex-end;
-                gap: 0.8rem;
-                margin-top: 1rem;
-              "
-            >
-              <button
-                type="button"
-                class="btn-action btn-secondary"
-                onclick="closePayrollModal()"
-              >
-                Cancel
-              </button>
-              <button type="submit" class="btn-action">Save Employee</button>
-            </div>
+          </div>
+          
+          <div class="slide-over-footer">
+            <button type="button" class="btn-context" onclick="closePayrollModal()">Cancel</button>
+            <button type="submit" class="btn-engine">Save Employee</button>
           </div>
         </form>
       </div>

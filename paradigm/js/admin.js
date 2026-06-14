@@ -1234,13 +1234,16 @@ let currentPayrollRuns = [];
 function openCreatePayrollRunModal() {
   const form = document.getElementById("create-payroll-run-form");
   form.style.display = "block";
+  form.classList.add("active");
   const now = new Date();
   document.getElementById("payroll-run-month").value = now.getMonth() + 1;
   document.getElementById("payroll-run-year").value = now.getFullYear();
 }
 
 function closeCreatePayrollRunModal() {
-  document.getElementById("create-payroll-run-form").style.display = "none";
+  const form = document.getElementById("create-payroll-run-form");
+  form.classList.remove("active");
+  setTimeout(() => { form.style.display = "none"; }, 400);
 }
 
 function showPayrollRunMsg(msg, isError) {

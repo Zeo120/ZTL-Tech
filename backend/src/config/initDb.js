@@ -269,6 +269,7 @@ const tables = [
       CREATE TABLE dbo.Employees (
         id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Employees PRIMARY KEY,
         user_id INT NOT NULL,
+        company_id INT NULL,
         name NVARCHAR(255) NOT NULL,
         age INT NOT NULL,
         status NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_status DEFAULT 'Active',
@@ -301,6 +302,7 @@ const tables = [
     columns: [
       { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
       { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_Employees_user_id DEFAULT 0' },
+      { name: 'company_id', sql: 'INT NULL' },
       { name: 'name', sql: 'NVARCHAR(255) NOT NULL CONSTRAINT DF_Employees_name DEFAULT N\'\'' },
       { name: 'age', sql: 'INT NOT NULL CONSTRAINT DF_Employees_age DEFAULT 0' },
       { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_Employees_status DEFAULT N\'Active\'' },
@@ -377,6 +379,7 @@ const tables = [
       CREATE TABLE dbo.PayrollRuns (
         id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollRuns PRIMARY KEY,
         user_id INT NOT NULL,
+        company_id INT NULL,
         month INT NOT NULL,
         year INT NOT NULL,
         status NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollRuns_status DEFAULT 'Draft',
@@ -398,6 +401,7 @@ const tables = [
     columns: [
       { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
       { name: 'user_id', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_user_id DEFAULT 0' },
+      { name: 'company_id', sql: 'INT NULL' },
       { name: 'month', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_month DEFAULT 1' },
       { name: 'year', sql: 'INT NOT NULL CONSTRAINT DF_PayrollRuns_year DEFAULT 2024' },
       { name: 'status', sql: 'NVARCHAR(50) NOT NULL CONSTRAINT DF_PayrollRuns_status DEFAULT N\'Draft\'' },
@@ -767,6 +771,197 @@ const tables = [
     indexes: [
       { name: 'IX_CRM_Invoices_client_id', sql: 'CREATE INDEX IX_CRM_Invoices_client_id ON dbo.CRM_Invoices(client_id);' },
       { name: 'UQ_CRM_Invoices_number', sql: 'CREATE UNIQUE INDEX UQ_CRM_Invoices_number ON dbo.CRM_Invoices(invoice_number);' }
+    ]
+  },
+  {
+    name: 'Companies',
+    createSql: `
+      CREATE TABLE dbo.Companies (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Companies PRIMARY KEY,
+        client_user_id INT NOT NULL,
+        company_name NVARCHAR(255) NOT NULL,
+        registered_address NVARCHAR(MAX) NULL,
+        contact_email NVARCHAR(255) NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_Companies_created_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_Companies_Users FOREIGN KEY (client_user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'client_user_id', sql: 'INT NOT NULL' },
+      { name: 'company_name', sql: 'NVARCHAR(255) NOT NULL' },
+      { name: 'registered_address', sql: 'NVARCHAR(MAX) NULL' },
+      { name: 'contact_email', sql: 'NVARCHAR(255) NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Companies_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_Companies',
+    indexes: [
+      { name: 'IX_Companies_client_user_id', sql: 'CREATE INDEX IX_Companies_client_user_id ON dbo.Companies(client_user_id);' }
+    ]
+  },
+  {
+    name: 'EmployeeJobProfiles',
+    createSql: `
+      CREATE TABLE dbo.EmployeeJobProfiles (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_EmployeeJobProfiles PRIMARY KEY,
+        employee_id INT NOT NULL,
+        employee_code NVARCHAR(50) NULL,
+        department NVARCHAR(100) NULL,
+        created_at DATETIME2 NOT NULL CONSTRAINT DF_EmployeeJobProfiles_created_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_EmployeeJobProfiles_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'employee_id', sql: 'INT NOT NULL' },
+      { name: 'employee_code', sql: 'NVARCHAR(50) NULL' },
+      { name: 'department', sql: 'NVARCHAR(100) NULL' },
+      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_EmployeeJobProfiles_created_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_EmployeeJobProfiles',
+    indexes: [
+      { name: 'IX_EmployeeJobProfiles_employee_id', sql: 'CREATE INDEX IX_EmployeeJobProfiles_employee_id ON dbo.EmployeeJobProfiles(employee_id);' }
+    ]
+  },
+  {
+    name: 'EmployeeKYC',
+    createSql: `
+      CREATE TABLE dbo.EmployeeKYC (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_EmployeeKYC PRIMARY KEY,
+        employee_id INT NOT NULL,
+        fathers_name NVARCHAR(255) NULL,
+        date_of_birth DATE NULL,
+        bank_account_number NVARCHAR(255) NULL,
+        ifsc_code NVARCHAR(100) NULL,
+        pan NVARCHAR(255) NULL,
+        uan_no NVARCHAR(255) NULL,
+        aadhar NVARCHAR(255) NULL,
+        CONSTRAINT FK_EmployeeKYC_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'employee_id', sql: 'INT NOT NULL' },
+      { name: 'fathers_name', sql: 'NVARCHAR(255) NULL' },
+      { name: 'date_of_birth', sql: 'DATE NULL' },
+      { name: 'bank_account_number', sql: 'NVARCHAR(255) NULL' },
+      { name: 'ifsc_code', sql: 'NVARCHAR(100) NULL' },
+      { name: 'pan', sql: 'NVARCHAR(255) NULL' },
+      { name: 'uan_no', sql: 'NVARCHAR(255) NULL' },
+      { name: 'aadhar', sql: 'NVARCHAR(255) NULL' }
+    ],
+    primaryKey: 'PK_EmployeeKYC',
+    indexes: [
+      { name: 'IX_EmployeeKYC_employee_id', sql: 'CREATE INDEX IX_EmployeeKYC_employee_id ON dbo.EmployeeKYC(employee_id);' }
+    ]
+  },
+  {
+    name: 'PayrollEarnings',
+    createSql: `
+      CREATE TABLE dbo.PayrollEarnings (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollEarnings PRIMARY KEY,
+        transaction_id INT NOT NULL,
+        code NVARCHAR(50) NOT NULL,
+        amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollEarnings_amount DEFAULT 0,
+        CONSTRAINT FK_PayrollEarnings_PayrollTransactions FOREIGN KEY (transaction_id) REFERENCES dbo.PayrollTransactions(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'transaction_id', sql: 'INT NOT NULL' },
+      { name: 'code', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollEarnings_amount DEFAULT 0' }
+    ],
+    primaryKey: 'PK_PayrollEarnings',
+    indexes: [
+      { name: 'IX_PayrollEarnings_transaction_id', sql: 'CREATE INDEX IX_PayrollEarnings_transaction_id ON dbo.PayrollEarnings(transaction_id);' }
+    ]
+  },
+  {
+    name: 'PayrollDeductions',
+    createSql: `
+      CREATE TABLE dbo.PayrollDeductions (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollDeductions PRIMARY KEY,
+        transaction_id INT NOT NULL,
+        code NVARCHAR(50) NOT NULL,
+        amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollDeductions_amount DEFAULT 0,
+        CONSTRAINT FK_PayrollDeductions_PayrollTransactions FOREIGN KEY (transaction_id) REFERENCES dbo.PayrollTransactions(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'transaction_id', sql: 'INT NOT NULL' },
+      { name: 'code', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollDeductions_amount DEFAULT 0' }
+    ],
+    primaryKey: 'PK_PayrollDeductions',
+    indexes: [
+      { name: 'IX_PayrollDeductions_transaction_id', sql: 'CREATE INDEX IX_PayrollDeductions_transaction_id ON dbo.PayrollDeductions(transaction_id);' }
+    ]
+  },
+  {
+    name: 'PayrollContributions',
+    createSql: `
+      CREATE TABLE dbo.PayrollContributions (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollContributions PRIMARY KEY,
+        transaction_id INT NOT NULL,
+        code NVARCHAR(50) NOT NULL,
+        amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollContributions_amount DEFAULT 0,
+        CONSTRAINT FK_PayrollContributions_PayrollTransactions FOREIGN KEY (transaction_id) REFERENCES dbo.PayrollTransactions(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'transaction_id', sql: 'INT NOT NULL' },
+      { name: 'code', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL CONSTRAINT DF_PayrollContributions_amount DEFAULT 0' }
+    ],
+    primaryKey: 'PK_PayrollContributions',
+    indexes: [
+      { name: 'IX_PayrollContributions_transaction_id', sql: 'CREATE INDEX IX_PayrollContributions_transaction_id ON dbo.PayrollContributions(transaction_id);' }
+    ]
+  },
+  {
+    name: 'PayrollProofs',
+    createSql: `
+      CREATE TABLE dbo.PayrollProofs (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollProofs PRIMARY KEY,
+        transaction_id INT NOT NULL,
+        merkle_root_hash NVARCHAR(64) NOT NULL,
+        signed_at DATETIME2 NOT NULL CONSTRAINT DF_PayrollProofs_signed_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_PayrollProofs_PayrollTransactions FOREIGN KEY (transaction_id) REFERENCES dbo.PayrollTransactions(id) ON DELETE CASCADE
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'transaction_id', sql: 'INT NOT NULL' },
+      { name: 'merkle_root_hash', sql: 'NVARCHAR(64) NOT NULL' },
+      { name: 'signed_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PayrollProofs_signed_at DEFAULT SYSUTCDATETIME()' }
+    ],
+    primaryKey: 'PK_PayrollProofs',
+    indexes: [
+      { name: 'IX_PayrollProofs_transaction_id', sql: 'CREATE INDEX IX_PayrollProofs_transaction_id ON dbo.PayrollProofs(transaction_id);' }
+    ]
+  },
+  {
+    name: 'StatutoryRates',
+    createSql: `
+      CREATE TABLE dbo.StatutoryRates (
+        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_StatutoryRates PRIMARY KEY,
+        tax_code NVARCHAR(50) NOT NULL,
+        percentage DECIMAL(5,2) NOT NULL,
+        effective_date DATE NOT NULL
+      );
+    `,
+    columns: [
+      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
+      { name: 'tax_code', sql: 'NVARCHAR(50) NOT NULL' },
+      { name: 'percentage', sql: 'DECIMAL(5,2) NOT NULL' },
+      { name: 'effective_date', sql: 'DATE NOT NULL' }
+    ],
+    primaryKey: 'PK_StatutoryRates',
+    indexes: [
+      { name: 'IX_StatutoryRates_tax_code', sql: 'CREATE INDEX IX_StatutoryRates_tax_code ON dbo.StatutoryRates(tax_code);' }
     ]
   }
 ];
