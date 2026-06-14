@@ -1383,20 +1383,12 @@ body {
 
 @media (max-width: 768px) {
   .payroll-split-container {
-    flex-direction: column;
-    gap: 1.5rem;
+    flex-direction: row;
   }
 
   .payroll-sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--surface-border);
-    padding-right: 0;
-    padding-bottom: 1rem;
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 1.5rem;
-    min-width: auto;
+    width: 200px;
+    min-width: 200px;
   }
 
   .sub-tab-btn {
