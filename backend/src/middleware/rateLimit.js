@@ -4,15 +4,20 @@ const { env } = require('../config/env');
 const { normalizeEmail } = require('../utils/validators');
 const { logger } = require('../utils/logger');
 
+const crypto = require('crypto');
+
 function fallbackMemoryRateLimit({ windowMs, max }) {
   const buckets = new Map();
 
   // Periodically prune expired rate limit entries to prevent memory leaks
   const interval = setInterval(() => {
     const now = Date.now();
-    for (const [key, current] of buckets.entries()) {
-      if (current.resetAt <= now) {
+    for (const [key, timestamps] of buckets.entries()) {
+      const valid = timestamps.filter(t => t > now - windowMs);
+      if (valid.length === 0) {
         buckets.delete(key);
+      } else {
+        buckets.set(key, valid);
       }
     }
   }, 60000);
@@ -23,32 +28,39 @@ function fallbackMemoryRateLimit({ windowMs, max }) {
 
   return function check(key) {
     const now = Date.now();
-    const current = buckets.get(key);
-
-    if (!current || current.resetAt <= now) {
-      buckets.set(key, { count: 1, resetAt: now + windowMs });
-      return true;
-    }
-
-    current.count += 1;
-    return current.count <= max;
+    const windowStart = now - windowMs;
+    
+    let timestamps = buckets.get(key) || [];
+    timestamps = timestamps.filter(t => t > windowStart);
+    timestamps.push(now);
+    buckets.set(key, timestamps);
+    
+    return {
+      count: timestamps.length,
+      allowed: timestamps.length <= max
+    };
   };
 }
 
-async function incrementRedisLimit(key, windowSeconds) {
+async function incrementRedisLimit(key, windowMs) {
+  const now = Date.now();
+  const windowStart = now - windowMs;
+  const windowSeconds = Math.ceil(windowMs / 1000);
+
   return withRedis(async (redis) => {
-    const count = await redis.incr(key);
-    if (count === 1) {
-      await redis.expire(key, windowSeconds);
-    } else {
-      // Self-healing check: if the key somehow has no expiration (e.g. process crashed
-      // between INCR and EXPIRE), set it now so the user is not permanently locked out.
-      const ttl = await redis.ttl(key);
-      if (ttl === -1) {
-        await redis.expire(key, windowSeconds);
-      }
-    }
-    return count;
+    const multi = redis.multi();
+    // Remove timestamps older than the sliding window
+    multi.zRemRangeByScore(key, 0, windowStart);
+    // Add the current request timestamp with a unique value to prevent collision
+    multi.zAdd(key, { score: now, value: `${now}-${crypto.randomUUID()}` });
+    // Count the number of requests in the current window
+    multi.zCard(key);
+    // Set an expiration on the sorted set to prevent memory leaks
+    multi.expire(key, windowSeconds);
+    
+    const results = await multi.exec();
+    // results[2] is the output of zCard
+    return results[2];
   });
 }
 
@@ -66,8 +78,16 @@ function redisRateLimit({ windowMs, max, keyPrefix, keyParts, failClosedOnRedisE
 
     try {
       for (const key of keys) {
-        const count = await incrementRedisLimit(key, windowSeconds);
-        if (count > max) return fail(res, 429, 'Too many requests');
+        const count = await incrementRedisLimit(key, windowMs);
+        
+        // Inject modern rate limiting headers
+        res.setHeader('X-RateLimit-Limit', max);
+        res.setHeader('X-RateLimit-Remaining', Math.max(0, max - count));
+
+        if (count > max) {
+          res.setHeader('Retry-After', windowSeconds);
+          return fail(res, 429, 'Too many requests. Please try again later.');
+        }
       }
       return next();
     } catch (error) {
@@ -80,7 +100,14 @@ function redisRateLimit({ windowMs, max, keyPrefix, keyParts, failClosedOnRedisE
       }
 
       for (const key of keys) {
-        if (!fallback(key)) return fail(res, 429, 'Too many requests');
+        const fallbackCheck = fallback(key);
+        res.setHeader('X-RateLimit-Limit', max);
+        res.setHeader('X-RateLimit-Remaining', Math.max(0, max - fallbackCheck.count));
+        
+        if (!fallbackCheck.allowed) {
+          res.setHeader('Retry-After', windowSeconds);
+          return fail(res, 429, 'Too many requests. Please try again later.');
+        }
       }
       return next();
     }

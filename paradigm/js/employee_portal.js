@@ -144,9 +144,10 @@ document
         }
       },
       (error) => {
-        msg.textContent = "Location access is required to punch in.";
+        msg.textContent = "Failed to get location (Timeout or Denied).";
         msg.className = "message error";
       },
+      { timeout: 10000 }
     );
   });
 

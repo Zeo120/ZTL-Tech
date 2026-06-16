@@ -55,7 +55,10 @@ function authenticate(options = {}) {
     const currentUserAgent = req.get('user-agent') || '';
     const currentDeviceHash = crypto.createHash('sha256').update(`${currentIp}-${currentUserAgent}`).digest('hex');
 
-    if (currentDeviceHash !== session.deviceHash) {
+    const currentBuf = Buffer.from(currentDeviceHash, 'hex');
+    const sessionBuf = Buffer.from(session.deviceHash, 'hex');
+
+    if (currentBuf.length !== sessionBuf.length || !crypto.timingSafeEqual(currentBuf, sessionBuf)) {
       await revokeSession(session.sid);
       return fail(res, 401, 'Device fingerprint mismatch. Session hijacked.');
     }

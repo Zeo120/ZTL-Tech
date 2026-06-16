@@ -1,4 +1,4 @@
-const CACHE_NAME = "paradigm-cache-v14";
+const CACHE_NAME = "paradigm-cache-v23";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -22,7 +22,13 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Always fetch from network to ensure fresh CSS/JS for now
+  const url = new URL(event.request.url);
+
+  // Do not intercept API requests or non-GET requests
+  if (url.pathname.startsWith('/api/') || event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {

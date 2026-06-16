@@ -139,54 +139,73 @@ function triggerOpsDispatch() {
 
 /* ------------------ PAYROLL MODULE CONTROLLER ------------------ */
 // Sub-tab toggling
+
 function switchPayrollTab(tabId) {
   currentPayrollTab = tabId;
+
+  // 1. Update active state on sidebar buttons
   document
     .querySelectorAll(".sub-tab-btn")
     .forEach((btn) => btn.classList.remove("active"));
-  document.getElementById(`btn-tab-${tabId}`).classList.add("active");
+  
+  const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+  if (activeBtn) activeBtn.classList.add("active");
 
+  // 2. Hide all tab-panels and show the active one
   document
     .querySelectorAll(".tab-panel")
     .forEach((panel) => panel.classList.remove("active"));
-  document.getElementById(`payroll-tab-${tabId}`).classList.add("active");
+  
+  const activePanel = document.getElementById(`payroll-tab-${tabId}`);
+  if (activePanel) activePanel.classList.add("active");
 
+  // 3. Trigger data fetching logic based on the active tab
   if (tabId === "employees") {
-    document.getElementById("employees-dropdown").style.display = "flex";
-    document.getElementById("reports-dropdown").style.display = "none";
-    switchEmployeeSubTab("view");
-  } else if (tabId === "reports") {
-    document.getElementById("reports-dropdown").style.display = "flex";
-    document.getElementById("employees-dropdown").style.display = "none";
-    switchReportsSubTab("summary");
-  } else {
-    document.getElementById("employees-dropdown").style.display = "none";
-    document.getElementById("reports-dropdown").style.display = "none";
-    if (tabId === "rates") {
-      // Populate forms with loaded rates
-      document.getElementById("rate-pf").value = pfRateConfig;
-      document.getElementById("rate-tds").value = tdsRateConfig;
-    } else if (tabId === "ctc") {
-      populateEmployeeDropdown();
-      runCTCCalculations();
-    } else if (tabId === "processing") {
-      fetchPayrollRuns();
-    } else if (tabId === "leaves") {
-      fetchLeaves();
-      fetchDropdownEmployees();
-      populateAllEnterpriseDropdowns();
-      fetchLeaves();
-    } else if (tabId === "expenses") {
-      fetchDropdownEmployees();
-      populateAllEnterpriseDropdowns();
-      fetchExpenses();
-    } else if (tabId === "documents") {
-      populateDocEmployees();
-      fetchDocuments();
-    }
+    fetchPayrollRoster();
+  } else if (tabId === "salary") {
+    fetchDropdownEmployees();
+  } else if (tabId === "attendance") {
+    // Attendance tab relies on the month picker trigger
+  } else if (tabId === "rates") {
+    // Populate forms with loaded rates
+    document.getElementById("rate-pf").value = pfRateConfig;
+    document.getElementById("rate-tds").value = tdsRateConfig;
+  } else if (tabId === "ctc") {
+    populateEmployeeDropdown();
+    runCTCCalculations();
+  } else if (tabId === "processing") {
+    fetchPayrollRuns();
+  } else if (tabId === "leaves") {
+    fetchLeaves();
+    fetchDropdownEmployees();
+    populateAllEnterpriseDropdowns();
+  } else if (tabId === "expenses") {
+    fetchDropdownEmployees();
+    populateAllEnterpriseDropdowns();
+    fetchExpenses();
+  } else if (tabId === "documents") {
+    populateDocEmployees();
+    fetchDocuments();
+  } else if (tabId === "summary") {
+    // Rely on generatePayrollSummary()
+  } else if (tabId === "audit") {
+    // Rely on generateTaxAuditTrail()
   }
 }
 
+function toggleSidebarGroup(groupId) {
+  const group = document.getElementById(groupId);
+  const chevron = document.getElementById(`chevron-${groupId}`);
+  if (!group || !chevron) return;
+  
+  if (group.style.display === "none") {
+    group.style.display = "flex";
+    chevron.style.transform = "rotate(180deg)";
+  } else {
+    group.style.display = "none";
+    chevron.style.transform = "rotate(0deg)";
+  }
+}
 // Conditional forms toggles
 function toggleSpouseField() {
   const marital = document.getElementById("emp-marital").value;
@@ -1963,6 +1982,7 @@ function applyMinimalistUI() {
       btn.style.justifyContent = "center";
       btn.style.gap = "10px";
       btn.style.borderRadius = "8px";
+      btn.style.boxSizing = "border-box";
       btn.style.margin = "0 auto";
 
       let title = "Reveal Information";
