@@ -1766,6 +1766,8 @@ label {
   padding: 1.5rem;
   opacity: 0;
   transition: opacity 0.3s ease;
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .modal.active {
@@ -2507,6 +2509,8 @@ tr:hover td {
   padding: 2rem;
   opacity: 0;
   transition: opacity 0.3s ease;
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .modal.active {
