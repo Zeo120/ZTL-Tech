@@ -102,7 +102,7 @@ Analyzes the developer's assumptions against live architectural constraints. It 
 Verifies cluster replication, health, and failover capabilities. It guarantees that the mathematical engines calculating the vulnerability vectors have absolute quorum synchronization before moving to topological mapping.
 
 ### Phase 5: Nine Circles (Reachability Mapping)
-Computes a dense $O(V^3)$ Warshall Reachability matrix on the execution paths. It calculates all horizontal and vertical access boundaries, pinpointing exact vectors where an untrusted session could connect to a highly secure internal object.
+Computes a dense $`O(V^3)`$ Warshall Reachability matrix on the execution paths. It calculates all horizontal and vertical access boundaries, pinpointing exact vectors where an untrusted session could connect to a highly secure internal object.
 
 ### Phase 6: Abaddon's Chasm (Chaos Physics)
 The core physical simulation. It injects a "Chaos Wave" using Finite-Difference Time-Domain (FDTD) mechanics, modeling how a theoretical exploit propagates physically across the mapped topology until it hits a defensive barrier or triggers a fatal vulnerability.
@@ -111,7 +111,7 @@ The core physical simulation. It injects a "Chaos Wave" using Finite-Difference 
 The Turing-Based Attacker Invalidation System builds a deterministic finite automaton (DFA) based on the expected execution flow. Any anomaly or deviation in the execution path instantly triggers a Turing Halt, locking down the node.
 
 ### Phase 8: FDTD Stability (Wave Attenuation)
-Calculates the spatial and temporal damping factors (using the Courant number $r = \frac{v \Delta t}{\Delta x} \leq 1.0$) to ensure the exploit waves injected in Phase 6 stabilize and do not infinitely resonate in memory.
+Calculates the spatial and temporal damping factors (using the Courant number $`r = \frac{v \Delta t}{\Delta x} \leq 1.0`$) to ensure the exploit waves injected in Phase 6 stabilize and do not infinitely resonate in memory.
 
 ### Phase 9: Satan's Recursion (The Final Core)
-The ultimate execution boundary. It maps the final state matrix onto a Kerr Spacetime Solver, evaluating the effective potential ($V_{eff}$) of the system state. If the simulated attacker bypasses all previous phases, they cross the event horizon. At this point, the node severs its own logical connection, ensuring the attacker is infinitely trapped in a black-hole recursive loop.
+The ultimate execution boundary. It maps the final state matrix onto a Kerr Spacetime Solver, evaluating the effective potential ($`V_{eff}`$) of the system state. If the simulated attacker bypasses all previous phases, they cross the event horizon. At this point, the node severs its own logical connection, ensuring the attacker is infinitely trapped in a black-hole recursive loop.
