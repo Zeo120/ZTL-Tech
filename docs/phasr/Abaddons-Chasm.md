@@ -1,4 +1,4 @@
-# PHASR Phase 4 | Solutions Mitigation & Chaos Verification
+# Phase 6: Abaddon's Chasm | Chaos Physics & Exploit Verification
 
 ## 1. Target Workflow: Chaos Injector & Control Verifier
 The **Chaos Injector & Control Verifier** is the security control validation engine in Workflow 4 of the PHASR platform. It injects simulated exploits (bypass challenges) into the system and audits active security mitigations (e.g., firewall states, privilege boundaries) using low-level assembly checks.

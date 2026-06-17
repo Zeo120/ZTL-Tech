@@ -1,4 +1,4 @@
-# PHASR Phase 1 | Lifecycle Sequence Verification
+# Phase 2: Acheron's Gate | Execution Sequencing & Temporal Verification
 
 ## 1. Target Workflow: Phase FSM Validator
 The **Phase FSM Validator** is the core hot-path temporal execution sequencing check in Workflow 1 of the PHASR engine. It validates execution sequencing and prevents unauthorized state jumps or privilege escalation.

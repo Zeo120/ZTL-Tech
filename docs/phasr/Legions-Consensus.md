@@ -1,4 +1,4 @@
-# PHASR Phase 5 | Redundancy Failover Attestation
+# Phase 4: Legion's Consensus | Redundancy & Quorum Check
 
 ## 1. Target Workflow: Redundancy Consensus Auditor
 The **Redundancy Consensus Auditor** is the resilience verification engine in Workflow 5 of the PHASR engine. It audits cluster health, network replication lag, quorum consistency, and standby promotion readiness.

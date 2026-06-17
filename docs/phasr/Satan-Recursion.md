@@ -1,4 +1,4 @@
-# Satan's Recursion Architecture & Flow
+# Phase 9: Satan's Recursion | Kerr Spacetime Solvers & Event Horizon
 
 This document details the architectural design, mathematical model, and execution flow of the **Satan's Recursion** curved spacetime wave solver module.
 

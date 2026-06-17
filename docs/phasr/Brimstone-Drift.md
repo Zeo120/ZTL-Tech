@@ -1,4 +1,4 @@
-# PHASR Phase 3 | Invariant Drift & Telemetry Monitoring
+# Phase 3: Brimstone Drift | Invariant Drift & Assumption Decay
 
 ## 1. Target Workflow: Telemetry Collector & Assumption Graph
 The **Telemetry Collector & Assumption Graph** is the core hot-path invariant drift checker in Workflow 3 of the PHASR engine. It monitors system calls and network telemetry via mock eBPF ring buffers, auditing invariants in real-time to detect architectural and performance drift.

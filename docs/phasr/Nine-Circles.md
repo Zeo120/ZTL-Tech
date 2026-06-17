@@ -1,4 +1,4 @@
-# PHASR Phase 2 | Hierarchy Access Boundary Verification
+# Phase 5: Nine Circles | Reachability Matrix & Privilege Paths
 
 ## 1. Target Workflow: Hierarchy Reachability Engine
 The **Hierarchy Reachability Engine** is the core hot-path privilege path reachability checker in Workflow 2 of the PHASR engine. It audits horizontal and vertical access boundaries, verifying that untrusted interfaces cannot connect directly to privileged objects.
