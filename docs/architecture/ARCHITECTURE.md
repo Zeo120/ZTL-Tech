@@ -17,121 +17,101 @@ graph TD
     classDef p3 fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#fff
     classDef p4 fill:#450a0a,stroke:#ff3366,stroke-width:2px,color:#fff
     classDef p5 fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff
+    classDef p6 fill:#4c1d95,stroke:#a855f7,stroke-width:2px,color:#fff
+    classDef p7 fill:#831843,stroke:#f43f5e,stroke-width:2px,color:#fff
+    classDef p8 fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#fff
+    classDef p9 fill:#000000,stroke:#ef4444,stroke-width:3px,color:#fff
     classDef monitor fill:#000000,stroke:#00ffaa,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
 
     %% Data Entry / Target
     subgraph Input ["Data Entry / Target Selection"]
         T1[Target Domain/URL]:::target
         T2[Local Codebase Directory]:::target
-        T3[GitHub Repository]:::target
-        UI[Admin Dashboard UI]:::monitor
     end
 
     %% Phase 1
-    subgraph Phase1 ["Phase 1: Acherons Gate (Static Analysis)"]
-        W1[V8 Worker Thread: AST Parser]:::p1
-        V[Vulnerability Extraction]:::p1
-        S1[Node.js Queue Manager]:::p1
+    subgraph Phase1 ["Phase 1: Primordial Sin"]
+        PS[State Initialization & Entropy Setup]:::p1
     end
 
     %% Phase 2
-    subgraph Phase2 ["Phase 2: Nine Circles (Reachability Matrix)"]
-        W2[V8 Worker Thread: Graph Compute]:::p2
-        WM[Warshall Matrix Computation]:::p2
-        PE[Privilege Escalation Paths]:::p2
+    subgraph Phase2 ["Phase 2: Acherons Gate"]
+        AG[Execution Sequencing & Temporal Verification]:::p2
     end
 
     %% Phase 3
-    subgraph Phase3 ["Phase 3: Brimstone Drift (Axiomatic Assumptions)"]
-        AX[Axiom Extraction Engine]:::p3
-        TV[Trust Boundary Validation]:::p3
-        RR[Risk & Assumption Report]:::p3
+    subgraph Phase3 ["Phase 3: Brimstone Drift"]
+        BD[Invariant Monitoring & Assumption Decay]:::p3
     end
 
     %% Phase 4
-    subgraph Phase4 ["Phase 4: Abaddons Chasm (Chaos Physics)"]
-        FDTD[FDTD Wave Solvers C++]:::p4
-        CH[Chaos Engine Simulation]:::p4
-        EXP[Exploit Path Generation]:::p4
+    subgraph Phase4 ["Phase 4: Legions Consensus"]
+        LC[Redundancy & Quorum Check]:::p4
     end
 
     %% Phase 5
-    subgraph Phase5 ["Phase 5: Legions Consensus (Mitigation & Assembly)"]
-        FSM[DFA State Machine Builder]:::p5
-        ASM[Native x86/ARM64 Kernels]:::p5
-        NAPI[node-addon-api Bridge]:::p5
+    subgraph Phase5 ["Phase 5: Nine Circles"]
+        NC[Warshall Reachability Matrix Computation]:::p5
     end
 
-    %% Telemetry & Monitoring
-    subgraph Telemetry ["Monitoring & Telemetry"]
-        SSE[Server-Sent Events /api/admin/events]:::monitor
-        DB[(SQL Audit & Persistence)]
-        TBAIS[TBAIS Sentinel Node]:::monitor
+    %% Phase 6
+    subgraph Phase6 ["Phase 6: Abaddons Chasm"]
+        AC[Chaos Physics & Exploit Generation]:::p6
     end
 
-    %% Connections: Input to Routing
-    UI -->|Dispatches Jobs| S1
-    T1 --> S1
-    T2 --> S1
-    T3 --> S1
+    %% Phase 7
+    subgraph Phase7 ["Phase 7: TBAIS Turing Machine"]
+        TM[DFA Stateful Anomaly Interception]:::p7
+    end
 
-    %% Phase 1 Flow
-    S1 -->|Isolate Thread| W1
-    W1 --> V
-    V -->|Discovered Surfaces| W2
+    %% Phase 8
+    subgraph Phase8 ["Phase 8: FDTD Stability"]
+        FD[Wave Propagation Damping & Attenuation]:::p8
+    end
 
-    %% Phase 2 Flow
-    W2 --> WM
-    WM --> PE
-    PE -->|Target Topology| AX
+    %% Phase 9
+    subgraph Phase9 ["Phase 9: Satans Recursion"]
+        SR[Kerr Spacetime Solvers / Core Singularity]:::p9
+    end
 
-    %% Phase 3 Flow
-    AX --> TV
-    TV --> RR
-    RR -->|Assumptions vs Reality| CH
-
-    %% Phase 4 Flow
-    CH --> FDTD
-    FDTD --> EXP
-    EXP -->|Exploit Payload| FSM
-
-    %% Phase 5 Flow
-    FSM --> ASM
-    ASM <-->|Zero-Copy Memory| NAPI
-    NAPI <-->|Node Validation| TBAIS
-
-    %% Telemetry & Monitoring Flow
-    TBAIS -->|turing_halt| SSE
-    W1 -.->|Progress Updates| SSE
-    W2 -.->|Progress Updates| SSE
-    CH -.->|Wave Propagation Data| SSE
-    SSE -->|Real-Time Dashboard| UI
-    
-    TBAIS --> DB
-    V --> DB
-    PE --> DB
-    EXP --> DB
+    %% Flow Execution
+    T1 --> PS
+    T2 --> PS
+    PS -->|Entropy Seed Valid| AG
+    AG -->|AST Parsed & Sequence Valid| BD
+    BD -->|Axioms Verified| LC
+    LC -->|Cluster Synced| NC
+    NC -->|Privilege Boundaries Mapped| AC
+    AC -->|Chaos Injected| TM
+    TM -->|DFA State Analyzed| FD
+    FD -->|Energy Stabilized| SR
 ```
 
-## Architectural Stages Breakdown
+## The 9 Circles of PHASR Execution
 
-### Data Entry & Target Selection
-The system accepts multiple forms of input via the **Admin Dashboard UI**: external domains, local directory paths, or Git repositories. The Node.js Express API routes these inputs into the asynchronous Queue Manager.
+### Phase 1: Primordial Sin (Initialization)
+Before any logic runs, the system calculates cryptographic entropy and initializes base random seeds. If the initial state hash lacks the minimum required entropy threshold, the run aborts immediately to prevent predictable state paths.
 
-### Phase 1: Acherons Gate
-Instead of blocking the main server, Node spins up isolated **V8 Worker Threads**. These threads parse millions of lines of code into Abstract Syntax Trees (AST), identifying CSRF surfaces, broken auth logic, and resource leaks.
+### Phase 2: Acheron's Gate (Temporal Verification)
+The system parses the codebase into an Abstract Syntax Tree (AST) using V8 Worker Threads. It maps the temporal execution logic, ensuring that processes cannot leapfrog prerequisites or bypass initialization validation gates.
 
-### Phase 2: Nine Circles
-The vulnerability nodes discovered in Phase 1 are fed into a separate Worker Thread running the **Warshall Algorithm**. It computes an $O(V^3)$ reachability matrix to map exactly how an attacker could chain a guest vulnerability into a Super Admin privilege escalation.
+### Phase 3: Brimstone Drift (Assumption Decay)
+Analyzes the developer's assumptions against live architectural constraints. It continuously verifies massive arrays of invariants, calculating a Boolean product to ensure no silent assumption failures occur (e.g., verifying an internal IP is actually still internal).
 
-### Phase 3: Brimstone Drift
-The system analyzes the developer's assumptions (e.g., "Internal traffic is trusted") against the reality of the reachability graph. Trust boundaries are mathematically validated.
+### Phase 4: Legion's Consensus (Redundancy)
+Verifies cluster replication, health, and failover capabilities. It guarantees that the mathematical engines calculating the vulnerability vectors have absolute quorum synchronization before moving to topological mapping.
 
-### Phase 4: Abaddons Chasm
-High-performance C++ binaries run **Finite-Difference Time-Domain (FDTD)** wave simulations. The system models exploit execution as a physical wave crashing through the software's topological map, dynamically generating the optimal exploit payloads.
+### Phase 5: Nine Circles (Reachability Mapping)
+Computes a dense $O(V^3)$ Warshall Reachability matrix on the execution paths. It calculates all horizontal and vertical access boundaries, pinpointing exact vectors where an untrusted session could connect to a highly secure internal object.
 
-### Phase 5: Legions Consensus
-To mitigate the exploit paths, the system generates a Deterministic Finite Automaton (DFA). The **node-addon-api** acts as a bridge, loading optimized **x86/ARM64 Assembly Kernels** directly into memory. 
+### Phase 6: Abaddon's Chasm (Chaos Physics)
+The core physical simulation. It injects a "Chaos Wave" using Finite-Difference Time-Domain (FDTD) mechanics, modeling how a theoretical exploit propagates physically across the mapped topology until it hits a defensive barrier or triggers a fatal vulnerability.
 
-### Telemetry & Monitoring (TBAIS)
-The Turing-Based Anomaly Interception System (TBAIS) monitors the DFA state. If an anomaly is detected (e.g., reaching state $q_9$), TBAIS triggers a Turing Halt. This halt is broadcast instantly across the network via **Server-Sent Events (SSE)**, alerting the Admin Dashboard in real-time with zero polling delay.
+### Phase 7: TBAIS Turing Machine (DFA Stateful Monitoring)
+The Turing-Based Attacker Invalidation System builds a deterministic finite automaton (DFA) based on the expected execution flow. Any anomaly or deviation in the execution path instantly triggers a Turing Halt, locking down the node.
+
+### Phase 8: FDTD Stability (Wave Attenuation)
+Calculates the spatial and temporal damping factors (using the Courant number $r = \frac{v \Delta t}{\Delta x} \leq 1.0$) to ensure the exploit waves injected in Phase 6 stabilize and do not infinitely resonate in memory.
+
+### Phase 9: Satan's Recursion (The Final Core)
+The ultimate execution boundary. It maps the final state matrix onto a Kerr Spacetime Solver, evaluating the effective potential ($V_{eff}$) of the system state. If the simulated attacker bypasses all previous phases, they cross the event horizon. At this point, the node severs its own logical connection, ensuring the attacker is infinitely trapped in a black-hole recursive loop.
