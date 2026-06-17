@@ -1,0 +1,345 @@
+﻿/* Contact Section & Form Styling */
+.contact {
+  padding: 6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-form {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--surface-border);
+  padding: 3.5rem;
+  border-radius: 24px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.contact-form:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Form Configuration elements */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 580px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section-title {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent-palladium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.2rem;
+  margin-top: 0.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.required-star {
+  color: #ff5470;
+  margin-left: 0.2rem;
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--surface-border);
+  border-radius: 5px;
+  padding: 0.5rem 0.7rem;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-palladium);
+}
+
+.conditional-field {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.conditional-field.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.form-banner-error {
+  grid-column: 1 / -1;
+  background: rgba(255, 84, 112, 0.05);
+  border: 1px solid rgba(255, 84, 112, 0.15);
+  color: #ff8b9e;
+  padding: 0.5rem 0.8rem;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  display: none;
+  text-align: left;
+}
+
+/* CTC Output text styling */
+.ctc-result-box {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px dashed var(--surface-border);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.ctc-result-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ctc-result-row span:first-child {
+  color: var(--text-secondary);
+}
+
+.ctc-result-row span:last-child {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* Attendance Segmented Toggle */
+.attendance-toggle-group {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.attendance-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.attendance-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.attendance-btn.active.present {
+  background: #00ffaa;
+  color: #0b0c10;
+}
+
+.attendance-btn.active.absent {
+  background: #ff5470;
+  color: #ffffff;
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(0.9);
+    box-shadow:
+      0 0 20px rgba(255, 255, 255, 0.2),
+      0 0 40px rgba(162, 89, 255, 0.1);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 0 40px rgba(255, 255, 255, 0.6),
+      0 0 80px rgba(162, 89, 255, 0.4);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow:
+      0 0 20px rgba(255, 255, 255, 0.2),
+      0 0 40px rgba(162, 89, 255, 0.1);
+  }
+}
+
+/* Complex Grid Form Layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 680px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section-title {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid rgba(162, 89, 255, 0.1);
+  padding-bottom: 0.3rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.required-star {
+  color: #ff5470;
+  margin-left: 0.2rem;
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 10px rgba(162, 89, 255, 0.1);
+}
+
+.form-control:disabled {
+  background: rgba(255, 255, 255, 0.01);
+  border-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+}
+
+select.form-control option {
+  background: #080808;
+  color: #ffffff;
+}
+
+/* Conditional Visibility Wrapper */
+.conditional-field {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.conditional-field.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+.form-banner-error {
+  grid-column: 1 / -1;
+  background: rgba(255, 84, 112, 0.08);
+  border: 1px solid rgba(255, 84, 112, 0.25);
+  color: #ff9bad;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: none;
+  text-align: left;
+}
+

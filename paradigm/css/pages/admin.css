@@ -1,0 +1,309 @@
+﻿/* Workspace Core Container */
+.workspace-container {
+  flex: 1;
+  margin-top: 60px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.view-panel {
+  display: none;
+  width: 100%;
+}
+
+.view-panel.active {
+  display: block;
+  animation: slideInView 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInView {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+/* Welcome view landing */
+#view-welcome {
+  display: none;
+  text-align: left;
+  width: 100%;
+}
+
+#view-welcome.active {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: auto;
+  margin-top: 12vh;
+}
+
+.welcome-message {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: left;
+  background: linear-gradient(135deg, #ffffff 0%, #afafb7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transform: translateY(15px) scale(0.98);
+  filter: blur(12px);
+}
+
+.welcome-message.reveal-luxurious {
+  animation: slowReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.welcome-message.fade-out {
+  animation: slowFadeOut 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slowReveal {
+  0% {
+    opacity: 0;
+    filter: blur(15px);
+    letter-spacing: 0.12em;
+    transform: translateY(15px) scale(0.98);
+  }
+  30% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    letter-spacing: -0.02em;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slowFadeOut {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(-15px) scale(0.98);
+  }
+}
+
+/* Minimal Header block */
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.view-header h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+/* Payroll Split Layout */
+.payroll-split-container {
+  display: flex;
+  width: 100%;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.payroll-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  min-width: 200px;
+  border-right: 1px solid var(--surface-border);
+  padding-right: 2rem;
+}
+
+.payroll-content {
+  flex: 1;
+  width: 100%;
+}
+
+.sub-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: var(--transition);
+  width: 100%;
+  text-align: left;
+}
+
+.sub-tab-btn:hover {
+  color: #ffffff;
+}
+
+.sub-tab-btn.active {
+  color: #ffffff;
+}
+
+.sub-tab-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--text-primary);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top;
+}
+
+.sub-tab-btn.active::after {
+  transform: scaleY(1);
+}
+
+@media (max-width: 768px) {
+  .payroll-split-container {
+    flex-direction: row;
+  }
+
+  .payroll-sidebar {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  .sub-tab-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 1rem;
+    justify-content: flex-start;
+  }
+
+  .sub-tab-btn::after {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  .sub-tab-btn.active::after {
+    transform: scaleY(1);
+  }
+}
+
+.tab-panel {
+  display: none;
+  width: 100%;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: slideInTab 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInTab {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Control Panel Header */
+.control-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  width: 100%;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 260px;
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  padding: 0.45rem 0.8rem 0.45rem 2rem;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-palladium);
+}
+
+.search-icon-svg {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+/* Minimal Statistics Panel */
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.summary-label span strong {
+  color: #ffffff;
+}
+
+/* Minimal Cards */
+.panel-card {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  padding: 1.2rem;
+  width: 100%;
+}
+
