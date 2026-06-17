@@ -1,0 +1,86 @@
+<div class="view-header">
+          <h1>Custom Operations</h1>
+        </div>
+
+        <div class="ops-split">
+          <!-- Dispatch Form -->
+          <div class="panel-card">
+            <form
+              id="ops-dispatch-form"
+              onsubmit="
+                event.preventDefault();
+                triggerOpsDispatch();
+              "
+              style="display: flex; flex-direction: column; gap: 1rem"
+            >
+              <div class="form-group">
+                <label for="ops-carrier">Fleet Carrier</label>
+                <select id="ops-carrier" class="form-control" required>
+                  <option value="Carrier drone v4">Hyper-V Drone Unit</option>
+                  <option value="Heavy persistence loader">
+                    Heavy Cargo Loader
+                  </option>
+                  <option value="Reflex breaker core">
+                    Reflex Breaker Cruiser
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ops-destination">Destination Hub</label>
+                <select id="ops-destination" class="form-control" required>
+                  <option value="Beta persistent database cluster">
+                    Beta DB Cluster Nodes
+                  </option>
+                  <option value="East shard server gateway">
+                    East Shard Server Gateway
+                  </option>
+                  <option value="Zero-trust perimeter control nodes">
+                    Zero-Trust Perimeter A
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ops-payload">Cargo Load (kg)</label>
+                <input
+                  type="number"
+                  id="ops-payload"
+                  class="form-control"
+                  placeholder="e.g. 500"
+                  required
+                  min="1"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn-action"
+                style="justify-content: center"
+              >
+                Launch
+              </button>
+            </form>
+          </div>
+
+          <!-- Single Line terminal console status -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 0.8rem;
+              justify-content: center;
+            "
+          >
+            <div
+              style="
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+              "
+            >
+              Status Telemetry
+            </div>
+            <div class="status-box" id="ops-status-box">
+              [STATUS] Telemetry Offline. Launch unit to sync.
+            </div>
+          </div>
+        </div>
