@@ -37,6 +37,47 @@ function createApp() {
 
   app.use(cookieParser());
 
+  const fs = require('fs');
+  const logFile = path.join(__dirname, '../server.log');
+  
+  app.use((req, res, next) => {
+    const start = Date.now();
+    const sanitizeObj = (obj) => {
+      if (!obj) return {};
+      const sanitized = { ...obj };
+      ['password', 'token', 'authorization', 'cookie'].forEach(k => {
+        if (sanitized[k]) sanitized[k] = '[REDACTED]';
+      });
+      return sanitized;
+    };
+
+    console.log(`\n[\x1b[36mINCOMING\x1b[0m] ${req.method} ${req.originalUrl}`);
+    console.log(`\x1b[90mHEADERS:\x1b[0m`, JSON.stringify(sanitizeObj(req.headers)));
+    if (Object.keys(req.query).length) console.log(`\x1b[90mQUERY:\x1b[0m`, JSON.stringify(sanitizeObj(req.query)));
+    if (Object.keys(req.body).length) console.log(`\x1b[90mBODY:\x1b[0m`, JSON.stringify(sanitizeObj(req.body)));
+
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      const statusColor = res.statusCode >= 500 ? '\x1b[31m' : res.statusCode >= 400 ? '\x1b[33m' : '\x1b[32m';
+      console.log(`[\x1b[35mOUTGOING\x1b[0m] ${req.method} ${req.originalUrl} ${statusColor}${res.statusCode}\x1b[0m - ${duration}ms\n`);
+
+      // Write structured JSON to server.log for parsing
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        ip: req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+        method: req.method,
+        path: req.originalUrl,
+        status: res.statusCode,
+        duration,
+        error: res.statusCode >= 400 ? res.statusMessage : null
+      };
+      fs.appendFile(logFile, JSON.stringify(logEntry) + '\\n', (err) => {
+        if (err) console.error('Failed to write log', err);
+      });
+    });
+    next();
+  });
+
   const frontendPath = path.join(__dirname, '../../');
 
   function mountStaticRoute(route, folderName) {
