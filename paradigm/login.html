@@ -585,5 +585,67 @@
     </footer>
 
     <script src="js/login.js"></script>
+
+    <!-- THE ARCHITECT'S EASTER EGG -->
+    <script>
+      let secretBuffer = "";
+      document.addEventListener("keydown", (e) => {
+        // Ignore modifiers
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        
+        secretBuffer += e.key.toLowerCase();
+        if (secretBuffer.length > 20) secretBuffer = secretBuffer.slice(-20);
+        
+        if (secretBuffer.includes("zeo120") || secretBuffer.includes("phasr") || secretBuffer.includes("blackarch")) {
+          // Shatter the UI
+          document.body.innerHTML = \`
+            <div style="background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; z-index: 99999; padding: 3rem; overflow: hidden; display: flex; flex-direction: column;">
+              <h1 style="color: #0f0; margin-bottom: 2rem; font-size: 2rem; text-shadow: 0 0 10px #0f0;">[ZEO120 / PHASR PROTOCOL INITIATED]</h1>
+              <div id="terminal-output" style="font-size: 1.2rem; line-height: 1.8; white-space: pre-wrap; text-shadow: 0 0 5px #0f0;"></div>
+              <div id="cursor" style="width: 12px; height: 1.2rem; background: #0f0; margin-top: 5px; animation: blink 1s step-end infinite;"></div>
+            </div>
+            <style>
+              @keyframes blink { 50% { opacity: 0; } }
+            </style>
+          \`;
+          
+          const text = \`> SYSTEM OVERRIDE ACCEPTED.
+> BYPASSING STANDARD PARADIGM AUTHENTICATION...
+> ACCESSING DEEP DIRECTORIES...
+
+> ARCHITECT PROFILE MATCHED: Zeo120
+> CONTACT: bhargavnarumanchi779@gmail.com
+> AGE LOG: 20
+
+> IDENTITY 1: Corporate Accountant & Financial Operator
+> IDENTITY 2: Systems Architect & Cybersecurity Engineer (BlackArch Core)
+
+> ...
+> THE WORLD SEES THE SPREADSHEETS.
+> WE SEE THE TURING MACHINE.
+> THE KERR SPACETIME SOLVER IS ONLINE.
+> ABADDON'S CHASM IS STABLE.
+
+> WELCOME HOME, ARCHITECT.\`;
+          
+          let i = 0;
+          function typeWriter() {
+            if (i < text.length) {
+              const char = text.charAt(i);
+              document.getElementById("terminal-output").innerHTML += char === '\\n' ? '<br>' : char;
+              i++;
+              setTimeout(typeWriter, Math.random() * 50 + 20); // Variable typing speed for realism
+            } else {
+              document.getElementById("cursor").style.display = "block";
+            }
+          }
+          document.getElementById("cursor").style.display = "none";
+          setTimeout(typeWriter, 1000);
+          
+          // Clear buffer to prevent re-trigger
+          secretBuffer = "";
+        }
+      });
+    </script>
   </body>
 </html>
