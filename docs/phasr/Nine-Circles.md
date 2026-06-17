@@ -28,12 +28,12 @@ graph TD
 ```
 
 ### Data Flow Steps
-1. **Flat Graph Representation:** Adjacency relationships on the privilege graph $G = (V, E)$ are flattened in memory as a contiguous bit-packed matrix of size $16 \times 16$: `uint16_t adjacency[16]`. Row $i$ represents outgoing edges from node $i$.
+1. **Flat Graph Representation:** Adjacency relationships on the privilege graph $`G = (V, E)`$ are flattened in memory as a contiguous bit-packed matrix of size $`16 \times 16`$: `uint16_t adjacency[16]`. Row $`i`$ represents outgoing edges from node $`i`$.
 2. **Reachability Computation:** The master transitive closure sweep dispatches to `compute_reachability` (ARM64 assembly, x64 assembly, or C++ fallback), executing Warshall's algorithm in-place to calculate all reachable node pairs.
 3. **Exhaustive Path Audit:** An array of **4,500 static helper procedures** (`audit_boundary_0000` to `audit_boundary_4499`) check specific source-to-destination reachability bits in constant time.
 4. **Boundary Attestation Check:** The engine evaluates the deterministic equation:
    $$D_H = 1 - \text{Reachability}(S_{\text{untrusted}}, O_{\text{secure}}, G)$$
-   If any untrusted subject ($S \in \{0..7\}$) can reach any secure object ($O \in \{12..15\}$), $D_H = 0$ and the connection is blocked.
+   If any untrusted subject ($`S \in \{0..7\}`$) can reach any secure object ($`O \in \{12..15\}`$), $`D_H = 0`$ and the connection is blocked.
 
 ---
 
@@ -58,9 +58,9 @@ Continuous privilege sweeps are modeled using a discrete FDTD solver simulating 
 $$\frac{\partial^2 \phi_H}{\partial t^2} + \gamma_H \frac{\partial \phi_H}{\partial t} - v_H^2 \nabla^2 \phi_H = 0$$
 
 Where:
-- $\phi_H$ is the query heartbeat wave.
-- $\gamma_H = 0.4$ represents the access-path attenuation factor created by boundary checks.
-- $v_H = 0.5$ is the wave propagation velocity.
+- $`\phi_H`$ is the query heartbeat wave.
+- $`\gamma_H = 0.4`$ represents the access-path attenuation factor created by boundary checks.
+- $`v_H = 0.5`$ is the wave propagation velocity.
 
 Discrete solver update equation:
 $$\phi_{\text{next}}[i] = \frac{1}{1 + \frac{\gamma_H \Delta t}{2}} \left[ 2\phi[i] - \phi_{\text{prev}}[i] \left( 1 - \frac{\gamma_H \Delta t}{2} \right) + r^2 (\phi[i+1] - 2\phi[i] + \phi[i-1]) \right]$$

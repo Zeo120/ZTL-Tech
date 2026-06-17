@@ -16,15 +16,15 @@ The **Phase FSM Validator** is the core hot-path temporal execution sequencing c
 ## 2. Global Execution Workflow
 
 The FSM validation process operates as follows:
-1. **Telemetry Capture:** Ingress static scanners or eBPF execution sensors capture transition events (e.g., transition from `STATE_PHASE_1_CODEBASE_DISCOVERY` to `STATE_PHASE_2_TECH_STACK_DOCUMENT`) and construct the telemetry data vector $\mathbf{T}_{a \to b}$.
+1. **Telemetry Capture:** Ingress static scanners or eBPF execution sensors capture transition events (e.g., transition from `STATE_PHASE_1_CODEBASE_DISCOVERY` to `STATE_PHASE_2_TECH_STACK_DOCUMENT`) and construct the telemetry data vector $`\mathbf{T}_{a \to b}`$.
 2. **Transition Query:** The system intercepts the transition request and passes the parameters: `current_state`, `next_state`, `prerequisites` bitmask, and the telemetry vector.
 3. **Low-Level Check & Multivariate Drift Verification:**
-   - The FSM sequence is evaluated via `validate_transition` in the active platform-specific assembly backend (or C fallback) to produce the score $D_P$.
-   - Simultaneously, the telemetry drift monitor calculates the Mahalanobis distance $D_M$ of the collected vector against the source state baseline profile and verifies the transition time delta.
-   - The composite score $D_P'$ is computed.
+   - The FSM sequence is evaluated via `validate_transition` in the active platform-specific assembly backend (or C fallback) to produce the score $`D_P`$.
+   - Simultaneously, the telemetry drift monitor calculates the Mahalanobis distance $`D_M`$ of the collected vector against the source state baseline profile and verifies the transition time delta.
+   - The composite score $`D_P'`$ is computed.
 4. **Attestation & Ledger Ingestion:**
-   - If allowed ($D_P' = 1$): The transition is authorized, and the validation results (metadata + dependencies + findings + telemetry vector) are written to the database under `dbo.CodebaseScans` and `dbo.CodebaseDependencies`, and appended as a cryptographically chained block to the state-transition ledger.
-   - If blocked ($D_P' = 0$): The transition is denied, and the system raises a security violation in `dbo.AuditLog` and triggers a shock pulse in the wave simulation.
+   - If allowed ($`D_P' = 1`$): The transition is authorized, and the validation results (metadata + dependencies + findings + telemetry vector) are written to the database under `dbo.CodebaseScans` and `dbo.CodebaseDependencies`, and appended as a cryptographically chained block to the state-transition ledger.
+   - If blocked ($`D_P' = 0`$): The transition is denied, and the system raises a security violation in `dbo.AuditLog` and triggers a shock pulse in the wave simulation.
 5. **Dashboard Retrieval:** The Acherons-Gate Operator console dynamically queries the database via `GET /api/admin/phasr/scans` (or specific `?scanId=X` details in `nerd-stats.html`) to display the audit trail.
 
 ---
@@ -72,7 +72,7 @@ These procedures provide an exhaustive, deterministic, constant-time reference l
 
 ### 1. Verification Edge Cases
 * **Out-of-Bounds Values:** Any `current_state` or `next_state` argument value outside the valid range of `[0, 7]` is immediately intercepted and blocked.
-* **Non-Sequential State Jumps:** The validator prevents bypassing verification stages (leapfrogging). The only permitted forward transition is $next = current + 1$.
+* **Non-Sequential State Jumps:** The validator prevents bypassing verification stages (leapfrogging). The only permitted forward transition is $`next = current + 1`$.
 * **Missing Prerequisites:** Every state progression requires specific prerequisite bits in the 64-bit validator bitmask. If a single dependent bit is missing, the validator blocks the execution path.
 * **Fail-Closed State Reset:** Transition to state `0` (Reset / Disconnect) is allowed from any state to handle session timeouts, panic conditions, or cluster node failover resets safely.
 * **Constant-Time Execution:** No conditional branch instructions depend on the values of the state variables during validation. This guarantees constant execution time and mitigates timing side-channel attacks.

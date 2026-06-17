@@ -13,7 +13,7 @@ $$\Box_g \Psi \equiv \frac{1}{\sqrt{-g}}\, \partial_\mu\!\left(\sqrt{-g}\, g^{\m
 $$\Psi_i^{n+1} = 2\Psi_i^n - \Psi_i^{n-1} + \mathcal{F}_i\!\left[\sqrt{-g}_{i+1}\,g^{11}_{i+1}\!\left(\Psi_{i+1}^n - \Psi_i^n\right) - \sqrt{-g}_{i-1}\,g^{11}_{i-1}\!\left(\Psi_i^n - \Psi_{i-1}^n\right)\right]$$
 
 Where:
-*   $\mathcal{F}_i = \frac{r^2}{\sqrt{-g}_i\, g^{00}_i}$ represents the local coordinate geometry scaling.
+*   $`\mathcal{F}_i = \frac{r^2}{\sqrt{-g}_i\, g^{00}_i}`$ represents the local coordinate geometry scaling.
 
 ### Security Intent
 Tests the numerical solver under complex general relativistic conditions. Telemetry amplitudes warp the spacetime manifold, verifying that FDTD stability holds even under dynamic metric scaling.
@@ -41,7 +41,7 @@ Couples structural validation states directly to the geometric curvature of the 
 $$Q = p_\theta^2 + \cos^2\theta\!\left[a^2(m^2 - E^2) + \frac{L_z^2}{\sin^2\theta}\right]$$
 
 ### Security Intent
-Serves as a high-precision calibration check. Any numerical path through the curved metric must conserve $Q$. If $dQ/d\tau > 0$, it flags drift in the FDTD solver before it pollutes attestation logs.
+Serves as a high-precision calibration check. Any numerical path through the curved metric must conserve $`Q`$. If $`dQ/d\tau > 0`$, it flags drift in the FDTD solver before it pollutes attestation logs.
 
 ---
 
@@ -50,10 +50,10 @@ Serves as a high-precision calibration check. Any numerical path through the cur
 ### Line Element
 $$ds^2 = g_{00}\,dt^2 + 2g_{03}\,dt\,d\phi + g_{11}\,dr^2 + g_{22}\,d\theta^2 + g_{33}\,d\phi^2$$
 Where:
-*   $g_{00} = -\left(1 - \frac{2Mr}{\rho^2}\right)$
-*   $g_{11} = \frac{\rho^2}{\Delta}$
-*   $g_{22} = \rho^2$
-*   $g_{33} = \left(r^2 + a^2 + \frac{2Mra^2\sin^2\theta}{\rho^2}\right)\sin^2\theta$
+*   $`g_{00} = -\left(1 - \frac{2Mr}{\rho^2}\right)`$
+*   $`g_{11} = \frac{\rho^2}{\Delta}`$
+*   $`g_{22} = \rho^2`$
+*   $`g_{33} = \left(r^2 + a^2 + \frac{2Mra^2\sin^2\theta}{\rho^2}\right)\sin^2\theta`$
 
 ---
 

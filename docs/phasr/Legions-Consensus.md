@@ -31,7 +31,7 @@ graph TD
 2. **Consensus Auditing:** The verifier dispatches metrics to **4,500 statically generated assembly checks** (`audit_consensus_0000` to `audit_consensus_4499`).
 3. **Resilience Attestation:** The engine evaluates the attestation score:
    $$D_R = \text{PrimarySynced} \cdot \left( 1 - \frac{\text{Lag}_{\text{replica}}}{\text{Threshold}} \right)$$
-   If the primary node becomes unsynced or replication lag exceeds the safety threshold, $D_R$ falls to 0, triggering the promotion of a backup standby node.
+   If the primary node becomes unsynced or replication lag exceeds the safety threshold, $`D_R`$ falls to 0, triggering the promotion of a backup standby node.
 4. **Heartbeat Sync Simulation:** Telemetry heartbeats are simulated as a continuous wave propagating through the node cluster.
 
 ---
@@ -56,9 +56,9 @@ Heartbeat synchronization between cluster node groups is simulated using the FDT
 $$\frac{\partial^2 \phi_R}{\partial t^2} - v_R^2 \nabla^2 \phi_R = 0$$
 
 Where:
-- $\phi_R$ is the sync heartbeat wave.
-- $v_R = 0.5$ represents the consensus network transmission speed.
-- The boundary node 0 is driven periodically: $\phi_R[0] = \sin(\omega_R t)$ with frequency $\omega_R = 0.2$.
+- $`\phi_R`$ is the sync heartbeat wave.
+- $`v_R = 0.5`$ represents the consensus network transmission speed.
+- The boundary node 0 is driven periodically: $`\phi_R[0] = \sin(\omega_R t)`$ with frequency $`\omega_R = 0.2`$.
 
 ---
 

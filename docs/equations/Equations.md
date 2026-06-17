@@ -21,4 +21,4 @@ Every equation implemented across the PHASR modules is split into its respective
 *   **Boot-Time Integrity**  
     Refer to [Primordial_Sin.md](file:///d:/Project%20XT/docs/equations/Primordial_Sin.md) for initial Root of Trust signatures, Knuth rolling hashes, and Bayesian trust updates.
 *   **TBAIS: Turing-Based Attacker Invalidation**  
-    Refer to [TBAIS_Turing_Machine.md](file:///d:/Project%20XT/docs/equations/TBAIS_Turing_Machine.md) for the complete DFA 6-tuple definition, transition table, trust confidence score ($T_c$), Shannon entropy behavioral analysis, Kolmogorov complexity deviation, Turing Halting Condition, and assembly↔JavaScript coherence invariants.
+    Refer to [TBAIS_Turing_Machine.md](file:///d:/Project%20XT/docs/equations/TBAIS_Turing_Machine.md) for the complete DFA 6-tuple definition, transition table, trust confidence score ($`T_c`$), Shannon entropy behavioral analysis, Kolmogorov complexity deviation, Turing Halting Condition, and assembly↔JavaScript coherence invariants.

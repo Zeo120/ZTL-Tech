@@ -31,7 +31,7 @@ graph TD
 2. **Assembly Auditing:** Each test case calls a subset of **4,500 static helper routines** (`verify_control_0000` to `verify_control_4499`) in target-specific assembly.
 3. **Attestation Evaluation:** The engine computes the safe attestation state:
    $$D_S = \text{control\_active} \times \text{coverage\_mapped}$$
-   If any required control is inactive ($D_S = 0$), the challenge bypass succeeds and a security warning is logged.
+   If any required control is inactive ($`D_S = 0`$), the challenge bypass succeeds and a security warning is logged.
 4. **Driven Wave Update:** Heartbeat telemetry is routed to a discrete FDTD solver simulating continuous spatial-temporal driving force from attacks.
 
 ---
@@ -56,16 +56,16 @@ The propagation of continuous chaotic injections is simulated using the driven w
 $$\frac{\partial^2 \phi_S}{\partial t^2} - v_S^2 \nabla^2 \phi_S = A \sin(\omega_S t - k x)$$
 
 Where:
-- $\phi_S$ is the wave propagation amplitude.
-- $v_S = 0.5$ is the propagation velocity.
-- $\omega_S = 0.2$ is the temporal driving frequency.
-- $k = 0.15$ is the spatial wave number.
-- $A$ is the dynamic heartbeat amplitude ($A = \sin(\omega_S t)$).
+- $`\phi_S`$ is the wave propagation amplitude.
+- $`v_S = 0.5`$ is the propagation velocity.
+- $`\omega_S = 0.2`$ is the temporal driving frequency.
+- $`k = 0.15`$ is the spatial wave number.
+- $`A`$ is the dynamic heartbeat amplitude ($`A = \sin(\omega_S t)`$).
 
 ---
 
 ## 5. Edge Cases Handled & Security Hardening
 
-- **Negative & Zero Time-Steps:** Guard clauses discard invalid $\Delta t$ queries to prevent simulation instability.
+- **Negative & Zero Time-Steps:** Guard clauses discard invalid $`\Delta t`$ queries to prevent simulation instability.
 - **Divergence Reset:** The simulation automatically catches invalid numbers (NaN or Inf) and auto-heals the grid states to zero.
 - **Zero-Allocation Safety:** The verifier runs with zero heap allocations in the hot loop to prevent memory fragmentation and side-channel timing leaks.

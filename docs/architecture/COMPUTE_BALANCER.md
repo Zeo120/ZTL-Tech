@@ -7,7 +7,7 @@ This document details the design, platform primitives, thread affinity configura
 ## 1. Executive Summary & Design Goals
 
 High-throughput validation of complex invariant equations involves billions of static loop cycles, creating unique hardware and software challenges:
-1. **Thermal Junction Spikes ($T_J > 90^\circ\text{C}$):** Continuous multi-threaded execution pushes silicon to its thermal limit, triggering aggressive OS/hardware thermal throttling.
+1. **Thermal Junction Spikes ($`T_J > 90^\circ\text{C}`$):** Continuous multi-threaded execution pushes silicon to its thermal limit, triggering aggressive OS/hardware thermal throttling.
 2. **Scheduler Non-Determinism:** Standard CPU schedulers dynamically migrate threads across cores, causing execution duration variance and thrashing local caches.
 3. **L1 Instruction Cache (I-Cache) Thrashing:** Running millions of lines of unrolled validation assembly exceeds the typical 32KB L1 I-Cache, creating memory bus bottlenecks.
 
@@ -140,12 +140,12 @@ By locking each worker thread onto a single physical core, we prevent the operat
 - **HugePages Allocation:** Support for direct HugePages allocation (`allocate_huge_pages`) using OS-specific large page allocation flags (`MEM_LARGE_PAGES` on Windows / `MAP_HUGETLB` on Linux) to minimize Translation Lookaside Buffer (TLB) address resolution overhead.
 
 ### B. Static Task Partitioning (No Work-Stealing)
-Traditional task schedulers use dynamic work-stealing (e.g., Intel TBB, OpenMP) which allocates work based on runtime scheduler state. The PHASR balancer uses a deterministic **static round-robin** allocation mapping chunk $C$ to thread $T$:
+Traditional task schedulers use dynamic work-stealing (e.g., Intel TBB, OpenMP) which allocates work based on runtime scheduler state. The PHASR balancer uses a deterministic **static round-robin** allocation mapping chunk $`C`$ to thread $`T`$:
 $$T = C \pmod N$$
-where $N$ is the number of active threads. This ensures identical execution steps across multiple runs.
+where $`N`$ is the number of active threads. This ensures identical execution steps across multiple runs.
 
 ### C. Thermal Duty-Cycle Pacing
-To limit junction temperatures ($T_J$) to a safe range ($65^\circ\text{C}$ to $70^\circ\text{C}$), worker threads execute paced sleep cycles:
+To limit junction temperatures ($`T_J`$) to a safe range ($`65^\circ\text{C}`$ to $`70^\circ\text{C}`$), worker threads execute paced sleep cycles:
 - Workers sleep for **1 millisecond** after completing a validation block (typically 100 assertions).
 - This introduces a deterministic cool-down duty cycle, preventing physical hardware degradation and throttling spikes.
 

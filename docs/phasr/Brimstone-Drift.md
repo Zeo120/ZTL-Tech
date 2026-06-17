@@ -31,7 +31,7 @@ graph TD
 1. **Event Capture:** Syscall frequency, network packets, CPU usage, memory, disk I/O, open file descriptors, and active TCP connections are captured into a `telemetry_event_t` structure.
 2. **Ring Buffer Queuing:** Events are pushed into a thread-safe emulated eBPF ring buffer (`ring_buffer_t`) using head/tail pointer increments with zero heap allocations.
 3. **Assembly Verification:** The collector pops events and audits them against **4,500 statically generated invariant checks** in assembly (`check_invariant_0000` to `check_invariant_4499`).
-4. **Attestation Check:** If any invariant check fails ($D_A = 0$), the collector flags architectural drift and triggers alert warnings.
+4. **Attestation Check:** If any invariant check fails ($`D_A = 0`$), the collector flags architectural drift and triggers alert warnings.
 
 ---
 
@@ -56,10 +56,10 @@ Cascading failure propagation across dependency chains is modeled using a discre
 $$\frac{\partial^2 \phi_A}{\partial t^2} + \gamma_A \frac{\partial \phi_A}{\partial t} = v_A^2 \nabla^2 \phi_A$$
 
 Where:
-- $\phi_A$ represents the failure propagation amplitude.
-- $\gamma_A = 0.3$ is the cascading decay/attenuation factor.
-- $v_A = 0.5$ is the propagation velocity.
-- The failure wave originates at node 0 and decays spatially according to $\alpha = \frac{\gamma_A v_A}{2} = 0.075$, matching the theoretical decay envelope $\phi_A(x, t) = \phi_0 e^{-\alpha x} \cos(k x - \omega t)$.
+- $`\phi_A`$ represents the failure propagation amplitude.
+- $`\gamma_A = 0.3`$ is the cascading decay/attenuation factor.
+- $`v_A = 0.5`$ is the propagation velocity.
+- The failure wave originates at node 0 and decays spatially according to $`\alpha = \frac{\gamma_A v_A}{2} = 0.075`$, matching the theoretical decay envelope $`\phi_A(x, t) = \phi_0 e^{-\alpha x} \cos(k x - \omega t)`$.
 
 ---
 
