@@ -1,6 +1,7 @@
 const { getRedisClient } = require('../config/redis');
 const { decryptPayload, encryptPayload } = require('../utils/crypto');
 const { httpError } = require('../utils/httpError');
+const crypto = require('crypto');
 
 async function decryptInterceptor(req, res, next) {
   // Check if payload is encrypted
@@ -34,6 +35,40 @@ async function decryptInterceptor(req, res, next) {
     }
 
     const aesKey = Buffer.from(aesKeyBase64, 'base64');
+    
+    // Anti-Replay HMAC Verification
+    const timestamp = req.headers['x-request-timestamp'];
+    const clientSignature = req.headers['x-request-signature'];
+    
+    if (timestamp && clientSignature && req.method !== 'GET') {
+      const now = Date.now();
+      const reqTime = parseInt(timestamp, 10);
+      
+      // Strict 5-minute replay window
+      if (Math.abs(now - reqTime) > 300000) {
+        return next(httpError(403, 'Request timestamp expired. Possible replay attack.'));
+      }
+      
+      // Reconstruct exactly what the frontend signed
+      const rawBody = JSON.stringify({
+        encryptedData: req.body.encryptedData,
+        iv: req.body.iv,
+        authTag: req.body.authTag
+      });
+      
+      const signatureBase = `${req.method}:${req.originalUrl}:${timestamp}:${rawBody}`;
+      
+      const serverSignatureBuffer = crypto.createHmac('sha256', aesKey)
+        .update(signatureBase)
+        .digest();
+        
+      const serverSignature = serverSignatureBuffer.toString('base64');
+      
+      if (serverSignature !== clientSignature) {
+        console.warn(`[ANTI-REPLAY] Signature mismatch detected from ${req.ip}`);
+        return next(httpError(403, 'Cryptographic signature verification failed.'));
+      }
+    }
 
     // Attach the AES key to the request context so downstream responses can encrypt back
     req.aesKey = aesKey;
