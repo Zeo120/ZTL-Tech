@@ -3,7 +3,7 @@ async function checkIntegrations() {
     const token = localStorage.getItem('paradigm_token');
     if (!token) return;
     try {
-        const res = await fetch(apiBase + '/api/admin/integrations', {
+        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/integrations', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
@@ -17,7 +17,7 @@ async function checkIntegrations() {
 async function linkIntegration(platform) {
     const token = localStorage.getItem('paradigm_token');
     try {
-        const res = await fetch(apiBase + '/api/admin/integrations/link', {
+        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/integrations/link', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({ platform })
@@ -40,7 +40,7 @@ async function runBooleanSearch() {
     container.innerHTML = '<div style="color:var(--text-secondary);">Executing Boolean Extraction on ' + platform + '...</div>';
     
     try {
-        const res = await fetch(apiBase + '/api/admin/recruitment/sourcing/boolean-search', {
+        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/recruitment/sourcing/boolean-search', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, platform })
@@ -71,7 +71,7 @@ async function runBooleanSearch() {
 async function importToATS(name, email, title, resume) {
     const token = localStorage.getItem('paradigm_token');
     try {
-        const res = await fetch(apiBase + '/api/admin/recruitment', {
+        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/recruitment', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -87,4 +87,5 @@ async function importToATS(name, email, title, resume) {
         }
     } catch(e) { console.error(e); }
 }
+
 

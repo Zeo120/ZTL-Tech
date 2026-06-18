@@ -434,7 +434,7 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
     name, age, status, gender, pan, marital_status, spouse_name, aadhar,
     date_of_birth, date_of_joining, date_of_exit, bank_account_number,
     ifsc_code, pf_status, uan_no, base_salary, hra, allowances, deductions,
-    state, professional_tax, tds
+    state, professional_tax, tds, tax_regime, tax_declarations_json
   } = req.body;
 
   const corePool = await getDbPool();
@@ -472,17 +472,19 @@ adminRoutes.post('/employees', adminLimiter, asyncHandler(async (req, res) => {
       .input('state', sql.NVarChar(100), state || 'Karnataka')
       .input('professionalTax', sql.Decimal(18, 2), professional_tax ? Number(professional_tax) : 0)
       .input('tds', sql.Decimal(18, 2), tds ? Number(tds) : 0)
+      .input('taxRegime', sql.NVarChar(20), tax_regime || 'New')
+      .input('taxDeclarationsJson', sql.NVarChar(sql.MAX), tax_declarations_json ? JSON.stringify(tax_declarations_json) : null)
       .query(`
         INSERT INTO dbo.Employees (
           user_id, name, age, status, gender, pan, marital_status, spouse_name, aadhar,
           date_of_birth, date_of_joining, date_of_exit, bank_account_number, ifsc_code, pf_status, uan_no,
-          base_salary, hra, allowances, deductions, state, professional_tax, tds, created_at
+          base_salary, hra, allowances, deductions, state, professional_tax, tds, tax_regime, tax_declarations_json, created_at
         )
         OUTPUT INSERTED.id
         VALUES (
           @userId, @name, @age, @status, @gender, @pan, @maritalStatus, @spouseName, @aadhar,
           @dateOfBirth, @dateOfJoining, @dateOfExit, @bankAccountNumber, @ifscCode, @pfStatus, @uanNo,
-          @baseSalary, @hra, @allowances, @deductions, @state, @professionalTax, @tds, SYSUTCDATETIME()
+          @baseSalary, @hra, @allowances, @deductions, @state, @professionalTax, @tds, @taxRegime, @taxDeclarationsJson, SYSUTCDATETIME()
         );
       `);
 

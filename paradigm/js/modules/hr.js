@@ -9,10 +9,10 @@ async function loadHRData() {
         
         // Fetch from all 4 deep HR modules concurrently
         const [recRes, onbRes, prfRes, docRes] = await Promise.all([
-            fetch(apiBase + '/api/admin/recruitment', { headers }).then(r => r.ok ? r.json() : { candidates: [] }),
-            fetch(apiBase + '/api/admin/onboarding', { headers }).then(r => r.ok ? r.json() : { onboarding_pipelines: [] }),
-            fetch(apiBase + '/api/admin/performance-reviews', { headers }).then(r => r.ok ? r.json() : { reviews: [] }),
-            fetch(apiBase + '/api/admin/documents', { headers }).then(r => r.ok ? r.json() : { documents: [] })
+            window.secureFetch(apiBase + '/api/admin/recruitment', { headers }).then(r => r.ok ? r.json() : { candidates: [] }),
+            window.secureFetch(apiBase + '/api/admin/onboarding', { headers }).then(r => r.ok ? r.json() : { onboarding_pipelines: [] }),
+            window.secureFetch(apiBase + '/api/admin/performance-reviews', { headers }).then(r => r.ok ? r.json() : { reviews: [] }),
+            window.secureFetch(apiBase + '/api/admin/documents', { headers }).then(r => r.ok ? r.json() : { documents: [] })
         ]);
 
         const candidates = recRes.candidates || [];
@@ -88,5 +88,6 @@ async function loadHRData() {
         console.error('HR Sync Failed:', e);
     }
 }
+
 
 

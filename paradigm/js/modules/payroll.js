@@ -239,7 +239,7 @@ async function submitCredentialsForm() {
   succBanner.style.display = "none";
 
   try {
-    const res = await fetch(
+    const res = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/employees/${empId}/credentials`,
       {
         method: "POST",
@@ -282,7 +282,7 @@ async function fetchDropdownEmployees() {
     return;
   }
   try {
-    const res = await fetch(`${apiBase}/api/admin/employees?limit=all`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees?limit=all`, {
       credentials: "include",
     });
     if (res.ok) {
@@ -305,7 +305,7 @@ async function fetchDropdownEmployees() {
 async function fetchRoster() {
   try {
     const url = `${apiBase}/api/admin/employees?page=${currentPage}&limit=${limitPerPage}&search=${encodeURIComponent(searchQuery)}`;
-    const res = await fetch(url, { credentials: "include" });
+    const res = await window.securewindow.secureFetch(url, { credentials: "include" });
     if (res.status === 401) {
       window.location.href = "login.html";
       return;
@@ -489,7 +489,7 @@ async function loadDailyAttendance() {
             `;
 
   try {
-    const response = await fetch(
+    const response = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/employees/attendance?date=${dateVal}`,
       {
         credentials: "include",
@@ -574,7 +574,7 @@ async function markAttendance(employeeId, status, btnElement) {
   }
 
   try {
-    const response = await fetch(`${apiBase}/api/admin/employees/attendance`, {
+    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees/attendance`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -636,7 +636,7 @@ export function switchReportsSubTab(tabId) {
     panelAudit.style.display = "none";
 
     // Fetch server-side aggregations for reports
-    fetch(`${apiBase}/api/admin/employees/summary`, { credentials: "include" })
+    window.secureFetch(`${apiBase}/api/admin/employees/summary`, { credentials: "include" })
       .then((res) => res.json())
       .then((payload) => {
         if (payload.success && payload.data) {
@@ -917,7 +917,7 @@ async function submitAdminSalaryDetails() {
   const tds = parseFloat(document.getElementById("admin-sal-tds").value) || 0;
 
   try {
-    const response = await fetch(
+    const response = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/employees/${empId}/salary`,
       {
         method: "PUT",
@@ -1037,7 +1037,7 @@ async function submitPayrollForm() {
   };
 
   try {
-    const response = await fetch(`${apiBase}/api/admin/employees`, {
+    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1075,7 +1075,7 @@ async function deletePayrollEmployee(id, name) {
     return;
 
   try {
-    const response = await fetch(`${apiBase}/api/admin/employees/${id}`, {
+    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees/${id}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -1146,7 +1146,7 @@ export function showPayrollRunMsg(msg, isError) {
 
 async function fetchPayrollRuns() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/payroll/runs`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
       credentials: "include",
     });
     if (res.status === 401) {
@@ -1224,7 +1224,7 @@ async function createPayrollRun() {
     return;
   }
   try {
-    const res = await fetch(`${apiBase}/api/admin/payroll/runs`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1330,7 +1330,7 @@ async function processPayrollRun(runId) {
       writeLog(simulationSteps[i]);
     }
 
-    const res = await fetch(
+    const res = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/process`,
       {
         method: "POST",
@@ -1381,7 +1381,7 @@ async function dispatchPayrollRun(runId) {
     false,
   );
   try {
-    const res = await fetch(
+    const res = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/dispatch`,
       {
         method: "POST",
@@ -1416,7 +1416,7 @@ async function viewPayrollTransactions(runId, month, year) {
     '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading transactions...</td></tr>';
 
   try {
-    const res = await fetch(
+    const res = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/transactions`,
       { credentials: "include" },
     );
@@ -1479,7 +1479,7 @@ export function closeTransactionsPanel() {
 
 async function generatePayslip(runId, employeeId) {
   try {
-    const res = await fetch(
+    const res = await window.securewindow.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/payslip/${employeeId}`,
       { credentials: "include" },
     );
@@ -1524,7 +1524,7 @@ async function submitLeave() {
   if (!empId) return;
 
   try {
-    await fetch(`${apiBase}/api/admin/leaves`, {
+    await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1555,7 +1555,7 @@ async function submitExpense() {
   if (!empId) return;
 
   try {
-    await fetch(`${apiBase}/api/admin/expenses`, {
+    await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1597,7 +1597,7 @@ export function populateAllEnterpriseDropdowns() {
 
 async function fetchLeaves() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/leaves`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1644,7 +1644,7 @@ async function fetchLeaves() {
 
 async function updateLeave(id, status) {
   try {
-    await fetch(`${apiBase}/api/admin/leaves/${id}/status`, {
+    await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves/${id}/status`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -1661,7 +1661,7 @@ async function updateLeave(id, status) {
 
 async function fetchExpenses() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/expenses`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1709,7 +1709,7 @@ async function fetchExpenses() {
 
 async function updateExpense(id, status) {
   try {
-    await fetch(`${apiBase}/api/admin/expenses/${id}/status`, {
+    await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses/${id}/status`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -1737,7 +1737,7 @@ export function populateDocEmployees() {
 
 async function fetchDocuments() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/documents`, {
+    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/documents`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1776,7 +1776,7 @@ async function generateDocument() {
   const type = document.getElementById("doc-type-select").value;
   if (!empId) return;
   try {
-    await fetch(`${apiBase}/api/admin/documents/generate`, {
+    await window.securewindow.secureFetch(`${apiBase}/api/admin/documents/generate`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1892,3 +1892,82 @@ export function applyMinimalistUI() {
 
 
 
+
+
+// Save Employee to DB
+export async function submitPayrollEmployee() {
+  const errBox = document.getElementById('payroll-form-error');
+  errBox.style.display = 'none';
+
+  const payload = {
+    name: document.getElementById('emp-name').value,
+    gender: document.getElementById('emp-gender').value,
+    date_of_birth: document.getElementById('emp-dob').value || null,
+    marital_status: document.getElementById('emp-marital').value,
+    spouse_name: document.getElementById('emp-spouse') ? document.getElementById('emp-spouse').value : null,
+    date_of_joining: document.getElementById('emp-doj').value,
+    status: document.getElementById('emp-is-active').checked ? 'Active' : 'Terminated',
+    date_of_exit: document.getElementById('emp-exit').value || null,
+    pan: document.getElementById('emp-pan').value,
+    pf_status: document.getElementById('emp-pf-status').value,
+    uan_no: document.getElementById('emp-uan') ? document.getElementById('emp-uan').value : null,
+    state: document.getElementById('emp-pt-state').value,
+    tax_regime: document.getElementById('emp-tax-regime') ? document.getElementById('emp-tax-regime').value : 'New',
+    base_salary: 0,
+    hra: 0,
+    allowances: 0,
+    deductions: 0,
+    professional_tax: 0,
+    tds: 0
+  };
+
+  try {
+    const res = await window.secureFetch(apiBase + '/api/admin/employees', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert('Employee Added to LEDGER successfully.');
+      closePayrollModal();
+      if(typeof fetchRoster === 'function') fetchRoster();
+      else window.location.reload();
+    } else {
+      errBox.textContent = data.error || 'Failed to save employee.';
+      errBox.style.display = 'block';
+    }
+  } catch (err) {
+    console.error(err);
+    errBox.textContent = 'Network error connecting to backend.';
+    errBox.style.display = 'block';
+  }
+}
+
+document.addEventListener('ParadigmDOMReady', () => {
+  const payrollModalForm = document.getElementById('payroll-employee-form');
+  if (payrollModalForm) {
+    payrollModalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitPayrollEmployee();
+    });
+  }
+  
+  const closeBtn = document.getElementById('btn-close-payroll-modal');
+  if (closeBtn) closeBtn.addEventListener('click', closePayrollModal);
+  
+  const cancelBtn = document.getElementById('btn-cancel-payroll-modal');
+  if (cancelBtn) cancelBtn.addEventListener('click', closePayrollModal);
+});
+document.addEventListener('ParadigmDOMReady', () => {
+  const marital = document.getElementById('emp-marital');
+  if(marital) marital.addEventListener('change', toggleSpouseField);
+
+  const isActive = document.getElementById('emp-is-active');
+  if(isActive) isActive.addEventListener('change', toggleExitDateField);
+
+  const pfStatus = document.getElementById('emp-pf-status');
+  if(pfStatus) pfStatus.addEventListener('change', toggleUanField);
+});

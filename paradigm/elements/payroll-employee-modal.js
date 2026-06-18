@@ -15,16 +15,10 @@ class PayrollEmployeeModal extends HTMLElement {
             <h2 style="font-size: 1.1rem; font-weight: 800">
               Add Corporate Employee
             </h2>
-            <button class="modal-close" onclick="closePayrollModal()" style="background:transparent;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
+            <button class="modal-close" id="btn-close-payroll-modal" style="background:transparent;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
           </div>
-          <form
-            id="payroll-employee-form"
-            onsubmit="
-              event.preventDefault();
-              alert('Employee Added to LEDGER');
-              closePayrollModal();
-            "
-          >
+          <form id="payroll-employee-form">
+            <div id="payroll-form-error" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;"></div>
             <div class="slide-over-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
               <!-- Basic Details -->
               <div class="neon-input-group" style="grid-column: 1/-1">
@@ -53,7 +47,7 @@ class PayrollEmployeeModal extends HTMLElement {
               </div>
               <div class="neon-input-group">
                 <label for="emp-marital">Marital Status</label>
-                <select id="emp-marital" class="neon-input" onchange="toggleSpouseField()">
+                <select id="emp-marital" class="neon-input">
                   <option value="Unmarried">Unmarried</option>
                   <option value="Married">Married</option>
                 </select>
@@ -79,7 +73,7 @@ class PayrollEmployeeModal extends HTMLElement {
                 <label for="emp-exit">Exit Date</label>
                 <input type="date" id="emp-exit" class="neon-input" disabled />
                 <div style="margin-top: 0.5rem;">
-                  <input type="checkbox" id="emp-is-active" checked onchange="toggleExitDateField()" />
+                  <input type="checkbox" id="emp-is-active" checked />
                   <label for="emp-is-active" style="display:inline; font-size: 0.75rem;">Currently Active</label>
                 </div>
               </div>
@@ -89,7 +83,7 @@ class PayrollEmployeeModal extends HTMLElement {
               </div>
               <div class="neon-input-group">
                 <label for="emp-pf-status">PF Status</label>
-                <select id="emp-pf-status" class="neon-input" onchange="toggleUanField()">
+                <select id="emp-pf-status" class="neon-input">
                   <option value="Eligible">Eligible</option>
                   <option value="Exempt">Exempt</option>
                 </select>
@@ -111,11 +105,18 @@ class PayrollEmployeeModal extends HTMLElement {
                   <option value="Exempt">Exempt / Other (No PT)</option>
                 </select>
               </div>
+              <div class="neon-input-group">
+                <label for="emp-tax-regime">Tax Regime<span class="required-star">*</span></label>
+                <select id="emp-tax-regime" class="neon-input" required>
+                  <option value="New">New Tax Regime</option>
+                  <option value="Old">Old Tax Regime</option>
+                </select>
+              </div>
             </div>
             
             <div class="slide-over-footer">
-              <button type="button" class="btn-context" onclick="closePayrollModal()">Cancel</button>
-              <button type="submit" class="btn-engine">Save Employee</button>
+              <button type="button" class="btn-context" id="btn-cancel-payroll-modal">Cancel</button>
+              <button type="submit" class="btn-engine" id="btn-save-payroll-modal">Save Employee</button>
             </div>
           </form>
         </div>
