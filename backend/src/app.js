@@ -13,6 +13,7 @@ const { healthRoutes } = require('./routes/health.routes');
 const { authRoutes } = require('./routes/auth.routes');
 const { adminRoutes } = require('./routes/admin.routes');
 const { employeeRoutes } = require('./routes/employee.routes');
+const superRoutes = require('./routes/super.routes');
 const { gridAdminRoutes } = require('./grid/routes/admin.routes');
 const { gridEmployeeRoutes } = require('./grid/routes/employee.routes');
 const { gridAuthRoutes } = require('./grid/routes/auth.routes');
@@ -138,6 +139,7 @@ function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/employee', employeeRoutes);
+  app.use('/api/super', superRoutes);
 
   // Grid API routes
   app.use('/api/grid/auth', gridAuthRoutes);
@@ -152,3 +154,4 @@ function createApp() {
 }
 
 module.exports = { createApp };
+

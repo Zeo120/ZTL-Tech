@@ -18,6 +18,7 @@ class PayrollEmployeeModal extends HTMLElement {
             <button class="modal-close" id="btn-close-payroll-modal" style="background:transparent;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
           </div>
           <form id="payroll-employee-form">
+            <input type="hidden" id="emp-id" value="" />
             <div id="payroll-form-error" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;"></div>
             <div class="slide-over-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
               <!-- Basic Details -->

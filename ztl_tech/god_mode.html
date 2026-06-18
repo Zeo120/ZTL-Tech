@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>God Mode Terminal</title>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 20px; }
+    h1 { color: #f00; text-transform: uppercase; border-bottom: 1px solid #f00; padding-bottom: 10px; }
+    .terminal-box { border: 1px solid #0f0; padding: 10px; margin-bottom: 20px; }
+    textarea { width: 100%; height: 200px; background: #111; color: #0f0; border: none; padding: 10px; font-family: monospace; }
+    button { background: #0f0; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    button:hover { background: #fff; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>God Mode Terminal</h1>
+  
+  <div class="terminal-box">
+    <h3>SQL Execution</h3>
+    <textarea id="sql-query" placeholder="SELECT * FROM dbo.Users;"></textarea>
+    <button id="btn-execute">Execute SQL</button>
+    <pre id="sql-result"></pre>
+  </div>
+
+  <div class="terminal-box">
+    <h3>.env Configuration</h3>
+    <button id="btn-load-env">Load .env</button>
+    <textarea id="env-content" style="height:300px; margin-top: 10px;" placeholder="Click Load .env..."></textarea>
+    <button id="btn-save-env">Save .env (Requires Restart)</button>
+    <pre id="env-result"></pre>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    
+    async function executeSQL() {
+      const query = document.getElementById('sql-query').value;
+      const res = await fetch('/api/super/sql/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      document.getElementById('sql-result').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function loadEnv() {
+      const res = await fetch('/api/super/env', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if(data.success || data.content) {
+        document.getElementById('env-content').value = data.content;
+        document.getElementById('env-result').textContent = "Loaded .env";
+      } else {
+        document.getElementById('env-result').textContent = data.error || 'Failed to load';
+      }
+    }
+
+    async function saveEnv() {
+      const content = document.getElementById('env-content').value;
+      const res = await fetch('/api/super/env', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ content })
+      });
+      const data = await res.json();
+      document.getElementById('env-result').textContent = JSON.stringify(data, null, 2);
+    }
+
+    document.getElementById('btn-execute').addEventListener('click', executeSQL);
+    document.getElementById('btn-load-env').addEventListener('click', loadEnv);
+    document.getElementById('btn-save-env').addEventListener('click', saveEnv);
+  </script>
+</body>
+</html>

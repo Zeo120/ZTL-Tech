@@ -1921,9 +1921,15 @@ export async function submitPayrollEmployee() {
     tds: 0
   };
 
+  const empIdEl = document.getElementById('emp-id');
+  const empId = empIdEl ? empIdEl.value : null;
+
   try {
-    const res = await window.secureFetch(apiBase + '/api/admin/employees', {
-      method: 'POST',
+    const method = empId ? 'PUT' : 'POST';
+    const url = empId ? `${apiBase}/api/admin/employees/${empId}` : `${apiBase}/api/admin/employees`;
+
+    const res = await window.secureFetch(url, {
+      method: method,
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -1931,7 +1937,7 @@ export async function submitPayrollEmployee() {
     
     const data = await res.json();
     if (res.ok && data.success) {
-      alert('Employee Added to LEDGER successfully.');
+      alert(`Employee ${empId ? 'Updated' : 'Added'} successfully.`);
       closePayrollModal();
       if(typeof fetchRoster === 'function') fetchRoster();
       else window.location.reload();
@@ -1971,3 +1977,49 @@ document.addEventListener('ParadigmDOMReady', () => {
   const pfStatus = document.getElementById('emp-pf-status');
   if(pfStatus) pfStatus.addEventListener('change', toggleUanField);
 });
+
+export async function deleteEmployee(empId) {
+  if (!confirm('Are you sure you want to completely delete this employee and all associated data?')) return;
+  
+  try {
+    const res = await window.secureFetch(apiBase + '/api/admin/employees/' + empId, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert('Employee deleted successfully.');
+      if(typeof fetchRoster === 'function') fetchRoster();
+      else window.location.reload();
+    } else {
+      alert(data.error || 'Failed to delete employee.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Network error while deleting employee.');
+  }
+}
+window.deleteEmployee = deleteEmployee;
+
+export async function deletePayrollRun(runId) {
+  if (!confirm('Are you sure you want to delete this Draft payroll run?')) return;
+  
+  try {
+    const res = await window.secureFetch(apiBase + '/api/admin/payroll/runs/' + runId, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert('Payroll Run deleted successfully.');
+      if(typeof fetchPayrollRuns === 'function') fetchPayrollRuns();
+      else window.location.reload();
+    } else {
+      alert(data.error || 'Failed to delete payroll run.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Network error while deleting payroll run.');
+  }
+}
+window.deletePayrollRun = deletePayrollRun;

@@ -564,6 +564,62 @@ adminRoutes.put('/employees/:id/salary', adminLimiter, asyncHandler(async (req, 
   return ok(res, { message: 'Salary and Tax details updated successfully' });
 }));
 
+// PUT /api/admin/employees/:id - Update an employee record
+adminRoutes.put('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const employeeId = Number(req.params.id);
+  const {
+    name, age, status, gender, pan, marital_status, spouse_name, aadhar,
+    date_of_birth, date_of_joining, date_of_exit, bank_account_number,
+    ifsc_code, pf_status, uan_no, state, tax_regime
+  } = req.body;
+
+  const corePool = await getDbPool();
+
+  const parseInputDate = (dStr) => {
+    if (!dStr) return null;
+    const parsed = new Date(dStr);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const updateResult = await corePool.request()
+    .input('id', sql.Int, employeeId)
+    .input('userId', sql.Int, userId)
+    .input('name', sql.NVarChar(255), name.trim())
+    .input('age', sql.Int, Number(age))
+    .input('status', sql.NVarChar(50), status || 'Active')
+    .input('gender', sql.NVarChar(50), gender.trim())
+    .input('pan', sql.NVarChar(255), encryptPII(pan ? pan.trim() : null))
+    .input('maritalStatus', sql.NVarChar(50), marital_status || 'Unmarried')
+    .input('spouseName', sql.NVarChar(255), marital_status === 'Married' ? spouse_name.trim() : null)
+    .input('aadhar', sql.NVarChar(255), encryptPII(aadhar ? aadhar.trim() : null))
+    .input('dateOfBirth', sql.Date, parseInputDate(date_of_birth))
+    .input('dateOfJoining', sql.Date, parseInputDate(date_of_joining))
+    .input('dateOfExit', sql.Date, status === 'Terminated' ? parseInputDate(date_of_exit) : null)
+    .input('bankAccountNumber', sql.NVarChar(255), encryptPII(bank_account_number ? bank_account_number.trim() : null))
+    .input('ifscCode', sql.NVarChar(255), encryptPII(ifsc_code ? ifsc_code.trim() : null))
+    .input('pfStatus', sql.NVarChar(50), pf_status || 'Not Applicable')
+    .input('uanNo', sql.NVarChar(255), encryptPII(pf_status === 'Applicable' && uan_no ? uan_no.trim() : null))
+    .input('state', sql.NVarChar(100), state || 'Karnataka')
+    .input('taxRegime', sql.NVarChar(20), tax_regime || 'New')
+    .query(`
+      UPDATE dbo.Employees
+      SET 
+        name = @name, age = @age, status = @status, gender = @gender, pan = @pan,
+        marital_status = @maritalStatus, spouse_name = @spouseName, aadhar = @aadhar,
+        date_of_birth = @dateOfBirth, date_of_joining = @dateOfJoining, date_of_exit = @dateOfExit,
+        bank_account_number = @bankAccountNumber, ifsc_code = @ifscCode, pf_status = @pfStatus, uan_no = @uanNo,
+        state = @state, tax_regime = @taxRegime, updated_at = SYSUTCDATETIME()
+      WHERE id = @id AND user_id = @userId;
+    `);
+
+  if (updateResult.rowsAffected[0] === 0) {
+    return res.status(404).json({ success: false, error: 'Employee not found or unauthorized' });
+  }
+
+  return ok(res, { message: 'Employee updated successfully' });
+}));
+
 // DELETE /api/admin/employees/:id - Remove an employee record for the current tenant user
 adminRoutes.delete('/employees/:id', adminLimiter, asyncHandler(async (req, res) => {
   const userId = Number(req.auth.userId);
@@ -1569,3 +1625,20 @@ adminRoutes.post('/recruitment/sourcing/boolean-search', adminLimiter, asyncHand
 
 // ============================================================================
 module.exports = { adminRoutes };
+
+// DELETE /api/admin/payroll/runs/:id - Delete a Draft payroll run
+adminRoutes.delete('/payroll/runs/:id', adminLimiter, asyncHandler(async (req, res) => {
+  const userId = Number(req.auth.userId);
+  const runId = Number(req.params.id);
+  
+  const corePool = await getDbPool();
+  const deleteResult = await corePool.request()
+    .input('userId', sql.Int, userId)
+    .input('id', sql.Int, runId)
+    .query('DELETE FROM dbo.PayrollRuns WHERE id = @id AND user_id = @userId AND status = ''Draft'';');
+
+  if (deleteResult.rowsAffected[0] === 0) {
+    return res.status(404).json({ success: false, error: 'Draft Payroll Run not found or cannot be deleted.' });
+  }
+  return ok(res, { message: 'Payroll Run deleted successfully' });
+}));
