@@ -393,6 +393,11 @@
     <link rel="manifest" href="manifest.json" />
     <script src="js/routes.js"></script>
     <script src="js/auth.js"></script>
+    <script type="module">
+      import * as crypto from './js/modules/crypto.js';
+      window.secureFetch = crypto.secureFetch;
+      window.initializeE2E = crypto.initializeE2E;
+    </script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -442,21 +447,18 @@
           <button
             class="login-tab active"
             id="tab-admin"
-            onclick="switchMode('admin')"
           >
             Admin Portal
           </button>
           <button
             class="login-tab"
             id="tab-super"
-            onclick="switchMode('super')"
           >
             Super Admin
           </button>
           <button
             class="login-tab"
             id="tab-employee"
-            onclick="switchMode('employee')"
           >
             Employee
           </button>
@@ -483,10 +485,6 @@
         <!-- Login Form (Only Access ID and Password) -->
         <form
           id="login-form"
-          onsubmit="
-            event.preventDefault();
-            handleAuth();
-          "
           style="
             display: flex;
             flex-direction: column;
@@ -519,7 +517,6 @@
                 type="button"
                 class="password-toggle"
                 id="password-toggle"
-                onclick="togglePasswordVisibility()"
                 aria-label="Toggle Password Visibility"
               >
                 <!-- Eye Icon SVG (Shows eye by default) -->

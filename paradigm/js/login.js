@@ -50,7 +50,7 @@ async function handleAuth() {
         : "";
     const endpoint =
       currentMode === "employee" ? "/api/employee/login" : "/api/auth/login";
-    const response = await fetch(`${apiBase}${endpoint}`, {
+    const response = await window.secureFetch(`${apiBase}${endpoint}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -119,3 +119,31 @@ async function handleAuth() {
     }
   }
 }
+
+// Bind events securely for Strict CSP compatibility
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize E2E Encryption before allowing login
+  if (window.initializeE2E) {
+    await window.initializeE2E();
+  }
+
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleAuth();
+    });
+  }
+
+  const tabAdmin = document.getElementById('tab-admin');
+  if (tabAdmin) tabAdmin.addEventListener('click', () => switchMode('admin'));
+
+  const tabSuper = document.getElementById('tab-super');
+  if (tabSuper) tabSuper.addEventListener('click', () => switchMode('super'));
+
+  const tabEmployee = document.getElementById('tab-employee');
+  if (tabEmployee) tabEmployee.addEventListener('click', () => switchMode('employee'));
+
+  const passToggle = document.getElementById('password-toggle');
+  if (passToggle) passToggle.addEventListener('click', togglePasswordVisibility);
+});
