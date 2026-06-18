@@ -10,6 +10,9 @@ const { ok } = require('../utils/responses');
 const { httpError } = require('../utils/httpError');
 const { login, findUserById } = require('../services/auth.service');
 const { revokeSession, revokeAllSessions } = require('../services/session.service');
+const { generateServerECDH, deriveAESKey } = require('../utils/crypto');
+const cryptoNode = require('crypto');
+const { getRedisClient } = require('../config/redis');
 
 const authRoutes = express.Router();
 
@@ -18,6 +21,24 @@ const loginLimiter = loginRateLimit({
   max: 10,
   keyPrefix: 'login'
 });
+
+authRoutes.post('/handshake', asyncHandler(async (req, res) => {
+  const { clientPublicKey } = req.body;
+  if (!clientPublicKey) throw httpError(400, 'Missing clientPublicKey in handshake.');
+
+  const serverEcdh = generateServerECDH();
+  const serverPublicKey = serverEcdh.getPublicKey('base64');
+  
+  const aesKey = deriveAESKey(serverEcdh, clientPublicKey);
+  
+  const handshakeId = cryptoNode.randomBytes(16).toString('hex');
+  const redis = await getRedisClient();
+  
+  // Store the derived AES key temporarily (5 mins) until the login or payload consumes it
+  await redis.set(`handshake:${handshakeId}`, aesKey.toString('base64'), { EX: 300 });
+
+  return ok(res, { serverPublicKey, handshakeId });
+}));
 
 authRoutes.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const result = await login(req.body, {

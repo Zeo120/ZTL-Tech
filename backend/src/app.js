@@ -5,6 +5,7 @@ const path = require('path');
 
 const { env } = require('./config/env');
 const { honeypotRouter } = require('./middleware/blackhole');
+const { decryptInterceptor, encryptResponse } = require('./middleware/encryption');
 const { securityHeaders } = require('./middleware/securityHeaders');
 const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -39,6 +40,10 @@ function createApp() {
   }));
 
   app.use(cookieParser());
+
+  // Mount encryption interceptors right after body parsers
+  app.use(decryptInterceptor);
+  app.use(encryptResponse);
 
   const fs = require('fs');
   const logFile = path.join(__dirname, '../server.log');
