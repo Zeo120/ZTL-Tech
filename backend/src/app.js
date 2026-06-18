@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 const { env } = require('./config/env');
+const { honeypotRouter } = require('./middleware/blackhole');
 const { securityHeaders } = require('./middleware/securityHeaders');
 const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -21,6 +22,8 @@ function createApp() {
   app.disable('x-powered-by');
   app.set('trust proxy', env.trustProxy);
 
+  // Blackhole router executes first to instantly drop malicious IPs
+  app.use(honeypotRouter);
   app.use(securityHeaders);
 
   app.use(cors({
