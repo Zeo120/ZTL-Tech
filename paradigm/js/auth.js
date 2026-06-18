@@ -12,7 +12,7 @@ function getCSRFToken() {
 
 async function handleLogout() {
   try {
-    await fetch(`${apiBase}/api/auth/logout`, {
+    await window.secureFetch(`${apiBase}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
       headers: { "x-csrf-token": getCSRFToken() },
@@ -25,7 +25,7 @@ async function handleLogout() {
 
 async function loadUserData() {
   try {
-    const res = await fetch(`${apiBase}/api/admin/me`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/me`, {
       credentials: "include",
     });
     if (res.ok) {
