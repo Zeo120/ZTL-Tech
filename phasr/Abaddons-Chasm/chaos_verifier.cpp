@@ -44,7 +44,7 @@ extern "C" {
 }
 
 // C++ Portable Fallback
-#if !defined(__aarch64__) && !(defined(__linux__) && defined(__x86_64__))
+#if 1 // PLATFORM_AGNOSTIC_C_FALLBACK_FORCED
 extern "C" {
 
     int verify_control_0000(const ControlStatus* cs) {

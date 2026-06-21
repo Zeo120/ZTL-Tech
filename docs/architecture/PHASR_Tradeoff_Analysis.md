@@ -453,3 +453,6 @@ The architect has consistently applied the following priority hierarchy across a
 $$\text{Security \& Side-Channel Mitigation} > \text{Execution Speed} > \text{System Portability \& Flexibility}$$
 
 By sacrificing dynamic routing, graph scaling, resource elasticity, and cloud portability, PHASR achieves sub-nanosecond validation speeds and constant-time execution. While this makes the tool rigid and complex to deploy in modern cloud environments, it ensures that the integrity of the security audit itself remains mathematically and forensically unassailable.
+
+## Engineering Note: Universal Unrolling & Chunking
+As of the latest architecture revision, all massive 4,500-check engines (including Brimstone Drift, Nine Circles, and Legions Consensus) have had their platform-specific Assembly routines disabled in favor of **Universal Pure C Fallbacks**. To mitigate compiler Heap Memory Exhaustion (OOM) during the parsing of these statically unrolled files, all engines have been programmatically segmented into 10 smaller chunk_XX files. These chunks are natively integrated into the host code via #include statements, preserving the deterministic branchless execution while radically improving cross-platform portability and compilation stability.

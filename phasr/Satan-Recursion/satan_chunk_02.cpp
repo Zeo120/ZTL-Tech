@@ -16,7 +16,7 @@ struct SatanStatus {
     uint32_t singularity_limit;
 };
 
-#if !defined(__aarch64__) && !(defined(__linux__) && defined(__x86_64__))
+#if 1 // PLATFORM_AGNOSTIC_C_FALLBACK_FORCED
 // Windows/MSVC Portable C++ Fallbacks
 extern "C" {
 

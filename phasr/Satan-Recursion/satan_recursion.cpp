@@ -13,7 +13,7 @@
 #include <thread>
 #include <chrono>
 
-#if defined(_WIN32)
+#if 1 // PLATFORM_AGNOSTIC_C_FALLBACK_FORCED
 #include <windows.h>
 #elif defined(__linux__)
 #include <pthread.h>
@@ -200186,7 +200186,7 @@ int main(int argc, char* argv[]) {
     for (unsigned int t = 0; t < num_threads; t++) {
         workers.emplace_back([t, num_threads, &ss, &thread_passes]() {
             // Set Thread Affinity (Core Pinning)
-#if defined(_WIN32)
+#if 1 // PLATFORM_AGNOSTIC_C_FALLBACK_FORCED
             HANDLE thread = GetCurrentThread();
             DWORD_PTR mask = 1ULL << (t % std::thread::hardware_concurrency());
             SetThreadAffinityMask(thread, mask);
