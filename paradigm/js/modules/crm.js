@@ -1,3 +1,5 @@
+import { apiBase, escapeHTML, store } from './core.js';
+let mockCRMLeads = store.state.mockCRMLeads || store.mockCRMLeads || [];
 
 export function renderCRMTable() {
   const tbody = document.getElementById("crm-table-body");

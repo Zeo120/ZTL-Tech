@@ -1,59 +1,27 @@
-
+import { apiBase, escapeHTML, store } from './core.js';
+import { calculateTDSNewRegime, numberToWords } from './math.utils.js';
 // Sub-tab toggling
 
+// Sub-tab toggling restored from deterministic state store
 export function switchPayrollTab(tabId) {
-  currentPayrollTab = tabId;
+  document.querySelectorAll(".payroll-sidebar .sub-tab-btn").forEach((btn) => btn.classList.remove("active"));
+  const btn = document.getElementById(`btn-tab-${tabId}`);
+  if (btn) btn.classList.add("active");
 
-  // 1. Update active state on sidebar buttons
-  document
-    .querySelectorAll(".sub-tab-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  
-  const activeBtn = document.getElementById(`btn-tab-${tabId}`);
-  if (activeBtn) activeBtn.classList.add("active");
+  document.querySelectorAll(".tab-panel").forEach((panel) => panel.classList.remove("active"));
+  const panel = document.getElementById(`payroll-tab-${tabId}`);
+  if (panel) panel.classList.add("active");
 
-  // 2. Hide all tab-panels and show the active one
-  document
-    .querySelectorAll(".tab-panel")
-    .forEach((panel) => panel.classList.remove("active"));
-  
-  const activePanel = document.getElementById(`payroll-tab-${tabId}`);
-  if (activePanel) activePanel.classList.add("active");
-
-  // 3. Trigger data fetching logic based on the active tab
-  if (tabId === "employees") {
-    fetchPayrollRoster();
-  } else if (tabId === "salary") {
-    fetchDropdownEmployees();
-  } else if (tabId === "attendance") {
-    // Attendance tab relies on the month picker trigger
-  } else if (tabId === "rates") {
-    // Populate forms with loaded rates
-    document.getElementById("rate-pf").value = pfRateConfig;
-    document.getElementById("rate-tds").value = tdsRateConfig;
-  } else if (tabId === "ctc") {
-    populateEmployeeDropdown();
-    runCTCCalculations();
-  } else if (tabId === "processing") {
-    fetchPayrollRuns();
-  } else if (tabId === "leaves") {
-    fetchLeaves();
-    fetchDropdownEmployees();
-    populateAllEnterpriseDropdowns();
-  } else if (tabId === "expenses") {
-    fetchDropdownEmployees();
-    populateAllEnterpriseDropdowns();
-    fetchExpenses();
-  } else if (tabId === "documents") {
-    populateDocEmployees();
-    fetchDocuments();
-  } else if (tabId === "summary") {
-    // Rely on generatePayrollSummary()
-  } else if (tabId === "audit") {
-    // Rely on generateTaxAuditTrail()
-  }
+  if (tabId === "employees") fetchRoster();
+  else if (tabId === "salary") populateAdminEmployeeSelect();
+  else if (tabId === "attendance") loadDailyAttendance();
+  else if (tabId === "processing") fetchPayrollRuns();
+  else if (tabId === "leaves") fetchLeaves();
+  else if (tabId === "expenses") fetchExpenses();
+  else if (tabId === "documents") fetchDocuments();
+  else if (tabId === "ctc") populateEmployeeDropdown();
+  else if (tabId === "summary") { /* No specific fetcher available */ }
 }
-
 export function toggleSidebarGroup(groupId) {
   const group = document.getElementById(groupId);
   const chevron = document.getElementById(`chevron-${groupId}`);
@@ -205,6 +173,10 @@ export function runCTCCalculations() {
 // Fetch DB roster
 // Search mechanism with 300ms debounce
 export let searchTimeout;
+export let currentPage = 1;
+export let limitPerPage = 5;
+export let searchQuery = '';
+export let dropdownCached = false;
 export function filterPayrollRoster() {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
@@ -228,7 +200,7 @@ export function closeCredentialsModal() {
 export function closeCredentialsModalOnBackdrop(e) {
   if (e.target.id === "credentials-modal") closeCredentialsModal();
 }
-async function submitCredentialsForm() {
+export async function submitCredentialsForm() {
   const empId = document.getElementById("cred-emp-id").value;
   const email = document.getElementById("cred-email").value.trim();
   const password = document.getElementById("cred-password").value;
@@ -239,7 +211,7 @@ async function submitCredentialsForm() {
   succBanner.style.display = "none";
 
   try {
-    const res = await window.securewindow.secureFetch(
+    const res = await window.secureFetch(
       `${apiBase}/api/admin/employees/${empId}/credentials`,
       {
         method: "POST",
@@ -276,13 +248,13 @@ export function changePage(dir) {
 }
 
 // Fetch dropdown menu list separately (bypass pagination)
-async function fetchDropdownEmployees() {
+export async function fetchDropdownEmployees() {
   if (dropdownCached) {
     populateAdminEmployeeSelect();
     return;
   }
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees?limit=all`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/employees?limit=all`, {
       credentials: "include",
     });
     if (res.ok) {
@@ -302,10 +274,10 @@ async function fetchDropdownEmployees() {
 }
 
 // Fetch DB roster with pagination
-async function fetchRoster() {
+export async function fetchRoster() {
   try {
     const url = `${apiBase}/api/admin/employees?page=${currentPage}&limit=${limitPerPage}&search=${encodeURIComponent(searchQuery)}`;
-    const res = await window.securewindow.secureFetch(url, { credentials: "include" });
+    const res = await window.secureFetch(url, { credentials: "include" });
     if (res.status === 401) {
       window.location.href = "login.html";
       return;
@@ -407,58 +379,7 @@ export function renderPayrollTable(employees) {
   });
 }
 
-// Sub-tab switching inside Employee Center via Sidebar Dropdown
-export function switchEmployeeSubTab(tabId) {
-  const btnView = document.getElementById("btn-sub-tab-emp-manage");
-  const btnSal = document.getElementById("btn-sub-tab-emp-salary");
-  const btnAtt = document.getElementById("btn-sub-tab-emp-attendance");
-  const panelView = document.getElementById("payroll-sub-panel-view");
-  const panelSal = document.getElementById("payroll-sub-panel-salary");
-  const panelAtt = document.getElementById("payroll-sub-panel-attendance");
-
-  // Highlight parent tab and keep sub-tabs active
-  document
-    .querySelectorAll(".sub-tab-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  document.getElementById("btn-tab-employees").classList.add("active");
-
-  if (tabId === "view") {
-    btnView.classList.add("active");
-    btnSal.classList.remove("active");
-    btnAtt.classList.remove("active");
-    panelView.style.display = "block";
-    panelSal.style.display = "none";
-    panelAtt.style.display = "none";
-    fetchRoster();
-  } else if (tabId === "salary") {
-    btnSal.classList.add("active");
-    btnView.classList.remove("active");
-    btnAtt.classList.remove("active");
-    panelView.style.display = "none";
-    panelSal.style.display = "block";
-    panelAtt.style.display = "none";
-
-    populateAdminEmployeeSelect();
-    loadAdminEmployeeSalary();
-  } else if (tabId === "attendance") {
-    btnAtt.classList.add("active");
-    btnView.classList.remove("active");
-    btnSal.classList.remove("active");
-    panelView.style.display = "none";
-    panelSal.style.display = "none";
-    panelAtt.style.display = "block";
-
-    // Set attendance date to today's date if empty
-    const dateInput = document.getElementById("admin-attendance-date");
-    if (!dateInput.value) {
-      const today = new Date().toISOString().split("T")[0];
-      dateInput.value = today;
-    }
-    loadDailyAttendance();
-  }
-}
-
-async function loadDailyAttendance() {
+export async function loadDailyAttendance() {
   const dateVal = document.getElementById("admin-attendance-date").value;
   const errBanner = document.getElementById("admin-attendance-error-banner");
   const successBanner = document.getElementById(
@@ -489,7 +410,7 @@ async function loadDailyAttendance() {
             `;
 
   try {
-    const response = await window.securewindow.secureFetch(
+    const response = await window.secureFetch(
       `${apiBase}/api/admin/employees/attendance?date=${dateVal}`,
       {
         credentials: "include",
@@ -558,7 +479,7 @@ async function loadDailyAttendance() {
   }
 }
 
-async function markAttendance(employeeId, status, btnElement) {
+export async function markAttendance(employeeId, status, btnElement) {
   const dateVal = document.getElementById("admin-attendance-date").value;
   const errBanner = document.getElementById("admin-attendance-error-banner");
   const successBanner = document.getElementById(
@@ -574,7 +495,7 @@ async function markAttendance(employeeId, status, btnElement) {
   }
 
   try {
-    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees/attendance`, {
+    const response = await window.secureFetch(`${apiBase}/api/admin/employees/attendance`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -613,77 +534,6 @@ async function markAttendance(employeeId, status, btnElement) {
     console.error(err);
     errBanner.textContent = "Error connecting to backend server.";
     errBanner.style.display = "block";
-  }
-}
-
-// Sub-tab switching inside Reports via Sidebar Dropdown
-export function switchReportsSubTab(tabId) {
-  const btnSummary = document.getElementById("btn-sub-tab-rep-summary");
-  const btnAudit = document.getElementById("btn-sub-tab-rep-audit");
-  const panelSummary = document.getElementById("reports-sub-panel-summary");
-  const panelAudit = document.getElementById("reports-sub-panel-audit");
-
-  // Highlight parent tab
-  document
-    .querySelectorAll(".sub-tab-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  document.getElementById("btn-tab-reports").classList.add("active");
-
-  if (tabId === "summary") {
-    btnSummary.classList.add("active");
-    btnAudit.classList.remove("active");
-    panelSummary.style.display = "block";
-    panelAudit.style.display = "none";
-
-    // Fetch server-side aggregations for reports
-    window.secureFetch(`${apiBase}/api/admin/employees/summary`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((payload) => {
-        if (payload.success && payload.data) {
-          const { totalGross, totalDeductions, totalNet } = payload.data;
-          document.getElementById("rep-total-net").textContent =
-            `₹${totalNet.toFixed(2)}`;
-          document.getElementById("rep-total-gross").textContent =
-            `₹${totalGross.toFixed(2)}`;
-          document.getElementById("rep-total-deductions").textContent =
-            `₹${totalDeductions.toFixed(2)}`;
-        }
-      })
-      .catch((err) => console.error("Error loading payroll summary", err));
-  } else if (tabId === "audit") {
-    btnAudit.classList.add("active");
-    btnSummary.classList.remove("active");
-    panelSummary.style.display = "none";
-    panelAudit.style.display = "block";
-
-    // Populate Tax Audit Trail table using the full employee roster
-    const tbody = document.getElementById("reports-audit-table-body");
-    tbody.innerHTML = "";
-    if (allEmployeesFull.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No corporate employees to audit.</td></tr>`;
-      return;
-    }
-    allEmployeesFull.forEach((emp) => {
-      const tr = document.createElement("tr");
-      const panStatus = emp.pan
-        ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">${escapeHTML(emp.pan).toUpperCase()} (VERIFIED)</span>`
-        : `<span style="color: #ff5470;">MISSING</span>`;
-      const aadharStatus = emp.aadhar
-        ? `<span style="color: #00ffaa; font-weight: 700; font-family: monospace;">UID: ${escapeHTML(emp.aadhar)} (VERIFIED)</span>`
-        : `<span style="color: #ff5470;">MISSING</span>`;
-      const pfReg =
-        emp.pf_status === "Applicable"
-          ? `<span style="color: var(--accent-primary); font-family: monospace;">UAN: ${escapeHTML(emp.uan_no)}</span>`
-          : `<span style="color: var(--text-secondary);">Exempt / Inactive</span>`;
-
-      tr.innerHTML = `
-                        <td><strong>${escapeHTML(emp.name)}</strong></td>
-                        <td>${panStatus}</td>
-                        <td>${aadharStatus}</td>
-                        <td>${pfReg}</td>
-                    `;
-      tbody.appendChild(tr);
-    });
   }
 }
 
@@ -738,48 +588,6 @@ export function loadAdminEmployeeSalary() {
     document.getElementById("admin-sal-tds").value = emp.tds || "";
     calculateAdminTakeHome();
   }
-}
-
-export function calculateTDSNewRegime(monthlyGross) {
-  const annualGross = monthlyGross * 12;
-  const standardDeduction = 75000;
-  const taxableIncome = Math.max(0, annualGross - standardDeduction);
-
-  // Rebate under 87A if taxable income <= 12,00,000 (12 Lakhs)
-  if (taxableIncome <= 1200000) {
-    return 0;
-  }
-
-  let tax = 0;
-
-  if (taxableIncome > 2400000) {
-    tax += (taxableIncome - 2400000) * 0.3;
-    tax += 400000 * 0.25;
-    tax += 400000 * 0.2;
-    tax += 400000 * 0.15;
-    tax += 400000 * 0.1;
-    tax += 400000 * 0.05;
-  } else if (taxableIncome > 2000000) {
-    tax += (taxableIncome - 2000000) * 0.25;
-    tax += 400000 * 0.2;
-    tax += 400000 * 0.15;
-    tax += 400000 * 0.1;
-    tax += 400000 * 0.05;
-  } else if (taxableIncome > 1600000) {
-    tax += (taxableIncome - 1600000) * 0.2;
-    tax += 400000 * 0.15;
-    tax += 400000 * 0.1;
-    tax += 400000 * 0.05;
-  } else if (taxableIncome > 1200000) {
-    tax += (taxableIncome - 1200000) * 0.15;
-    tax += 400000 * 0.1;
-    tax += 400000 * 0.05;
-  }
-
-  // Add 4% Cess
-  tax = tax * 1.04;
-
-  return Math.round((tax / 12) * 100) / 100;
 }
 
 // Calculate and update view take home
@@ -889,7 +697,7 @@ export function calculateAdminTakeHome() {
 }
 
 // Submit Salary Details via PUT on admin dashboard
-async function submitAdminSalaryDetails() {
+export async function submitAdminSalaryDetails() {
   const select = document.getElementById("admin-salary-employee-select");
   const empId = parseInt(select.value, 10);
   const errBanner = document.getElementById("admin-salary-error-banner");
@@ -917,7 +725,7 @@ async function submitAdminSalaryDetails() {
   const tds = parseFloat(document.getElementById("admin-sal-tds").value) || 0;
 
   try {
-    const response = await window.securewindow.secureFetch(
+    const response = await window.secureFetch(
       `${apiBase}/api/admin/employees/${empId}/salary`,
       {
         method: "PUT",
@@ -960,7 +768,7 @@ async function submitAdminSalaryDetails() {
 }
 
 // POST add employee record to DB
-async function submitPayrollForm() {
+export async function submitPayrollForm() {
   const errorBanner = document.getElementById("payroll-form-error");
   errorBanner.style.display = "none";
 
@@ -1037,7 +845,7 @@ async function submitPayrollForm() {
   };
 
   try {
-    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees`, {
+    const response = await window.secureFetch(`${apiBase}/api/admin/employees`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1066,7 +874,7 @@ async function submitPayrollForm() {
 }
 
 // DELETE remove employee record from DB
-async function deletePayrollEmployee(id, name) {
+export async function deletePayrollEmployee(id, name) {
   if (
     !confirm(
       `Are you sure you want to permanently remove employee "${name}" from the database?`,
@@ -1075,7 +883,7 @@ async function deletePayrollEmployee(id, name) {
     return;
 
   try {
-    const response = await window.securewindow.secureFetch(`${apiBase}/api/admin/employees/${id}`, {
+    const response = await window.secureFetch(`${apiBase}/api/admin/employees/${id}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -1144,9 +952,9 @@ export function showPayrollRunMsg(msg, isError) {
   }, 5000);
 }
 
-async function fetchPayrollRuns() {
+export async function fetchPayrollRuns() {
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
       credentials: "include",
     });
     if (res.status === 401) {
@@ -1216,7 +1024,7 @@ export function renderPayrollRuns(runs) {
   });
 }
 
-async function createPayrollRun() {
+export async function createPayrollRun() {
   const month = parseInt(document.getElementById("payroll-run-month").value);
   const year = parseInt(document.getElementById("payroll-run-year").value);
   if (!month || !year || year < 2020) {
@@ -1224,7 +1032,7 @@ async function createPayrollRun() {
     return;
   }
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/payroll/runs`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1250,7 +1058,7 @@ async function createPayrollRun() {
   }
 }
 
-async function processPayrollRun(runId) {
+export async function processPayrollRun(runId) {
   if (
     !confirm(
       "Process this payroll run? This will calculate PF, ESI, LWP deductions, and TDS for all employees and lock the cycle. This action cannot be undone.",
@@ -1330,7 +1138,7 @@ async function processPayrollRun(runId) {
       writeLog(simulationSteps[i]);
     }
 
-    const res = await window.securewindow.secureFetch(
+    const res = await window.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/process`,
       {
         method: "POST",
@@ -1369,7 +1177,7 @@ async function processPayrollRun(runId) {
   }
 }
 
-async function dispatchPayrollRun(runId) {
+export async function dispatchPayrollRun(runId) {
   if (
     !confirm(
       "Dispatch cryptographically signed payslips via Native Email to all employees in this run?",
@@ -1381,7 +1189,7 @@ async function dispatchPayrollRun(runId) {
     false,
   );
   try {
-    const res = await window.securewindow.secureFetch(
+    const res = await window.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/dispatch`,
       {
         method: "POST",
@@ -1407,7 +1215,7 @@ async function dispatchPayrollRun(runId) {
   }
 }
 
-async function viewPayrollTransactions(runId, month, year) {
+export async function viewPayrollTransactions(runId, month, year) {
   document.getElementById("payroll-transactions-panel").style.display = "block";
   document.getElementById("transactions-panel-title").textContent =
     `Payroll Transactions — ${monthNames[month - 1]} ${year}`;
@@ -1416,7 +1224,7 @@ async function viewPayrollTransactions(runId, month, year) {
     '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading transactions...</td></tr>';
 
   try {
-    const res = await window.securewindow.secureFetch(
+    const res = await window.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/transactions`,
       { credentials: "include" },
     );
@@ -1477,9 +1285,9 @@ export function closeTransactionsPanel() {
   document.getElementById("payroll-transactions-panel").style.display = "none";
 }
 
-async function generatePayslip(runId, employeeId) {
+export async function generatePayslip(runId, employeeId) {
   try {
-    const res = await window.securewindow.secureFetch(
+    const res = await window.secureFetch(
       `${apiBase}/api/admin/payroll/runs/${runId}/payslip/${employeeId}`,
       { credentials: "include" },
     );
@@ -1514,7 +1322,7 @@ async function generatePayslip(runId, employeeId) {
   }
 }
 
-async function submitLeave() {
+export async function submitLeave() {
   const empId = document.getElementById("leave-emp-select").value;
   const type = document.getElementById("leave-type-select").value;
   const start = document.getElementById("leave-start").value;
@@ -1524,7 +1332,7 @@ async function submitLeave() {
   if (!empId) return;
 
   try {
-    await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves`, {
+    await window.secureFetch(`${apiBase}/api/admin/leaves`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1546,7 +1354,7 @@ async function submitLeave() {
   }
 }
 
-async function submitExpense() {
+export async function submitExpense() {
   const empId = document.getElementById("expense-emp-select").value;
   const cat = document.getElementById("expense-cat-select").value;
   const amount = document.getElementById("expense-amount").value;
@@ -1555,7 +1363,7 @@ async function submitExpense() {
   if (!empId) return;
 
   try {
-    await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses`, {
+    await window.secureFetch(`${apiBase}/api/admin/expenses`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1595,9 +1403,9 @@ export function populateAllEnterpriseDropdowns() {
 // ENTERPRISE MODULES LOGIC (Leaves, Expenses, Documents)
 // ============================================================================
 
-async function fetchLeaves() {
+export async function fetchLeaves() {
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/leaves`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1642,9 +1450,9 @@ async function fetchLeaves() {
   }
 }
 
-async function updateLeave(id, status) {
+export async function updateLeave(id, status) {
   try {
-    await window.securewindow.secureFetch(`${apiBase}/api/admin/leaves/${id}/status`, {
+    await window.secureFetch(`${apiBase}/api/admin/leaves/${id}/status`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -1659,9 +1467,9 @@ async function updateLeave(id, status) {
   }
 }
 
-async function fetchExpenses() {
+export async function fetchExpenses() {
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/expenses`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1707,9 +1515,9 @@ async function fetchExpenses() {
   }
 }
 
-async function updateExpense(id, status) {
+export async function updateExpense(id, status) {
   try {
-    await window.securewindow.secureFetch(`${apiBase}/api/admin/expenses/${id}/status`, {
+    await window.secureFetch(`${apiBase}/api/admin/expenses/${id}/status`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -1735,9 +1543,9 @@ export function populateDocEmployees() {
   });
 }
 
-async function fetchDocuments() {
+export async function fetchDocuments() {
   try {
-    const res = await window.securewindow.secureFetch(`${apiBase}/api/admin/documents`, {
+    const res = await window.secureFetch(`${apiBase}/api/admin/documents`, {
       credentials: "include",
     });
     const payload = await res.json();
@@ -1771,12 +1579,12 @@ async function fetchDocuments() {
   }
 }
 
-async function generateDocument() {
+export async function generateDocument() {
   const empId = document.getElementById("doc-emp-select").value;
   const type = document.getElementById("doc-type-select").value;
   if (!empId) return;
   try {
-    await window.securewindow.secureFetch(`${apiBase}/api/admin/documents/generate`, {
+    await window.secureFetch(`${apiBase}/api/admin/documents/generate`, {
       method: "POST",
       credentials: "include",
       headers: {

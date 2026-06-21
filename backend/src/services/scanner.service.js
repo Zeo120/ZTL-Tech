@@ -18,24 +18,25 @@ const EXCLUDED_FOLDERS = new Set([
   'target', 'bin', 'obj', '.gemini', 'temp_clones'
 ]);
 
-// Helper: Run shell commands as Promises
-function runCommand(command, cwd) {
-  return new Promise((resolve, reject) => {
-    exec(command, { cwd }, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve({ stdout, stderr });
-      }
-    });
-  });
+class BufferPool {
+  constructor(size, limit) {
+    this.size = size;
+    this.pool = Array.from({ length: limit }, () => Buffer.alloc(size));
+  }
+  acquire() {
+    return this.pool.pop() || Buffer.alloc(this.size);
+  }
+  release(buffer) {
+    this.pool.push(buffer);
+  }
 }
+const binBufferPool = new BufferPool(1024, 10);
 
 // Helper: Inspect first 1KB of files for NULL bytes or non-printable controls (excluding tab, CR, LF)
 async function isBinaryFile(filePath) {
   let fd;
+  const buffer = binBufferPool.acquire();
   try {
-    const buffer = Buffer.alloc(1024);
     fd = await fs.promises.open(filePath, 'r');
     const { bytesRead } = await fd.read(buffer, 0, 1024, 0);
     for (let i = 0; i < bytesRead; i++) {
@@ -48,6 +49,7 @@ async function isBinaryFile(filePath) {
     return true; // default to skip on read errors
   } finally {
     if (fd) await fd.close();
+    binBufferPool.release(buffer);
   }
 }
 

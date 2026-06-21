@@ -25,7 +25,7 @@ async function handleLogout() {
 
 async function loadUserData() {
   try {
-    const res = await window.secureFetch(`${apiBase}/api/admin/me`, {
+    const res = await window.secureFetch(`${apiBase}/api/auth/me`, {
       credentials: "include",
     });
     if (res.ok) {

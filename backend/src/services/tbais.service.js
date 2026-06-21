@@ -61,11 +61,14 @@ const delta = {
   [STATES.Q_ANOMALOUS]: { default: STATES.Q_ANOMALOUS }
 };
 
-/**
- * Runs the Turing FSM check for a given session login attempt.
- * Implements the design equations for trust score and Turing Halts.
- */
-async function auditLoginSession(requestContext, credentialsValid) {
+const memoCache = new Map();
+
+function evaluateTuringState(credentialsValid, rawIp, userAgent) {
+  const cacheKey = `${credentialsValid}:${rawIp}:${userAgent}`;
+  if (memoCache.has(cacheKey)) {
+    return memoCache.get(cacheKey);
+  }
+  
   let state = STATES.Q_INITIATED;
   const signalsFed = [];
   
@@ -79,8 +82,6 @@ async function auditLoginSession(requestContext, credentialsValid) {
   }
 
   // 2. Process IP Signal
-  const rawIp = requestContext.ip;
-  // If IP is explicitly empty, undefined, or missing (e.g. mocked simulation)
   const hasIp = rawIp && rawIp !== '' && rawIp !== 'undefined' && rawIp !== 'unknown';
   
   if (state !== STATES.Q_ANOMALOUS) {
@@ -88,19 +89,17 @@ async function auditLoginSession(requestContext, credentialsValid) {
       state = delta[STATES.Q_CREDENTIAL_RECV][SIGNALS.SIG_IP_PRESENT] || STATES.Q_ANOMALOUS;
       signalsFed.push('SIG_IP_PRESENT');
     } else {
-      // Turing HALT trigger (Undecidable origin)
       state = STATES.Q_IP_ABSENT; 
       signalsFed.push('SIG_IP_ABSENT');
-      // Halting in rejection state q9
       state = STATES.Q_ANOMALOUS;
     }
   }
 
   // 3. Process Device Fingerprint Signal
-  const userAgent = requestContext.userAgent || '';
-  const isSuspiciousAgent = userAgent.toLowerCase().includes('curl') || 
-                            userAgent.toLowerCase().includes('wget') || 
-                            userAgent.toLowerCase().includes('headless');
+  const uaLower = userAgent ? userAgent.toLowerCase() : '';
+  const isSuspiciousAgent = uaLower.includes('curl') || 
+                            uaLower.includes('wget') || 
+                            uaLower.includes('headless');
   
   if (state !== STATES.Q_ANOMALOUS) {
     if (!isSuspiciousAgent) {
@@ -127,11 +126,27 @@ async function auditLoginSession(requestContext, credentialsValid) {
   // Calculate Trust Confidence Score T_c
   const ip_ok = hasIp ? 1 : 0;
   const fp_ok = !isSuspiciousAgent ? 1 : 0;
-  const beh_ok = 1;
-  const time_ok = 1;
-  const trustScore = 40 * ip_ok + 30 * fp_ok + 20 * beh_ok + 10 * time_ok;
-
+  const trustScore = 40 * ip_ok + 30 * fp_ok + 20 * 1 + 10 * 1;
   const isAnomalous = state === STATES.Q_ANOMALOUS || !hasIp || isSuspiciousAgent;
+
+  const result = { state, signalsFed, trustScore, isAnomalous, hasIp, isSuspiciousAgent };
+  if (memoCache.size > 1000) {
+    const firstKey = memoCache.keys().next().value;
+    memoCache.delete(firstKey);
+  }
+  memoCache.set(cacheKey, result);
+  return result;
+}
+
+/**
+ * Runs the Turing FSM check for a given session login attempt.
+ * Implements the design equations for trust score and Turing Halts.
+ */
+async function auditLoginSession(requestContext, credentialsValid) {
+  const rawIp = requestContext.ip;
+  const userAgent = requestContext.userAgent || '';
+  
+  const { state, signalsFed, trustScore, isAnomalous, hasIp, isSuspiciousAgent } = evaluateTuringState(credentialsValid, rawIp, userAgent);
 
   if (isAnomalous) {
     // Record Irregular Login event in AuditLog

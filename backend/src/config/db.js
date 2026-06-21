@@ -21,21 +21,13 @@ async function getDbPool() {
     ...(env.sql.user ? { user: env.sql.user } : {}),
     ...(env.sql.password ? { password: env.sql.password } : {}),
     options,
-    pool: { max: 10, min: 0, idleTimeoutMillis: 30000 }
+    pool: { max: 2, min: 0, idleTimeoutMillis: 15000 }
   })
   .then((connectedPool) => { pool = connectedPool; return pool; })
   .catch((error) => { pool = undefined; throw error; })
   .finally(() => { connectingDb = undefined; });
 
   return connectingDb;
-}
-
-async function getGridDbPool() {
-  return getDbPool();
-}
-
-async function getParadigmDbPool() {
-  return getGridDbPool();
 }
 
 async function closeDbPool() {
@@ -47,7 +39,5 @@ async function closeDbPool() {
 module.exports = {
   sql,
   getDbPool,
-  getParadigmDbPool,
-  getGridDbPool,
   closeDbPool
 };

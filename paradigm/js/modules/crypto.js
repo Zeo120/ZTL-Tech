@@ -1,6 +1,7 @@
 import { apiBase } from './core.js';
 
 let aesKey = null;
+let hmacKey = null;
 let currentHandshakeId = null;
 
 // Utility to convert ArrayBuffer to Base64
@@ -78,7 +79,16 @@ export async function initializeE2E() {
       ["encrypt", "decrypt"]
     );
     
-    console.log("[E2E] Cryptographic Handshake Complete. AES-256-GCM Channel Secured.");
+    // 8. Import the same key material for HMAC-SHA256 to sign requests (Anti-Replay)
+    hmacKey = await window.crypto.subtle.importKey(
+      "raw",
+      keyMaterial,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    
+    console.log("[E2E] Cryptographic Handshake Complete. AES-256-GCM Channel Secured with HMAC Anti-Replay.");
   } catch (error) {
     console.error("[E2E] Handshake error:", error);
   }
@@ -126,6 +136,26 @@ export async function secureFetch(url, options = {}) {
     
     headers.set("Content-Type", "application/json");
   }
+
+  // Anti-Replay: Sign the request cryptographically
+  const timestamp = Date.now().toString();
+  headers.set('X-Request-Timestamp', timestamp);
+
+  const method = (options.method || 'GET').toUpperCase();
+  // Build the signature base string: METHOD:URL:TIMESTAMP[:BODY]
+  let signatureBase = `${method}:${url}:${timestamp}`;
+  if (bodyData && method !== 'GET') {
+    signatureBase += `:${bodyData}`;
+  }
+
+  const encoder = new TextEncoder();
+  const signatureBuffer = await window.crypto.subtle.sign(
+    "HMAC",
+    hmacKey,
+    encoder.encode(signatureBase)
+  );
+  
+  headers.set('X-Request-Signature', bufferToBase64(signatureBuffer));
 
   const response = await fetch(url, { ...options, headers, body: bodyData });
   

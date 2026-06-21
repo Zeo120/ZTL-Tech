@@ -46,7 +46,7 @@ async function apiRequest(url, options = {}) {
 // Load Employee Details
 async function loadEmployeeProfile() {
   try {
-    const res = await apiRequest("/api/employee/me");
+    const res = await apiRequest("/api/auth/me");
     if (res.ok) {
       const data = await res.json();
       document.getElementById("displayUsername").textContent =

@@ -2,13 +2,14 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { sql, getDbPool } = require('../config/db');
-const { authenticateMiddleware } = require('../middleware/auth');
-const { asyncHandler, ok, fail } = require('../utils/response');
+const { authenticateCookie } = require('../middleware/auth');
+const { asyncHandler } = require('../utils/asyncHandler');
+const { ok, fail } = require('../utils/responses');
 
 const superRoutes = express.Router();
 
 // Strict authorization for super_admin
-superRoutes.use(authenticateMiddleware);
+superRoutes.use(authenticateCookie);
 superRoutes.use((req, res, next) => {
   if (req.auth.role !== 'super_admin') {
     return fail(res, 403, 'Access denied. God Mode reserved for super_admin.');

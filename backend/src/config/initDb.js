@@ -577,121 +577,7 @@ const tables = [
       }
     ]
   },
-  {
-    name: 'Documents',
-    createSql: `
-      CREATE TABLE dbo.Documents (
-        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Documents PRIMARY KEY,
-        user_id INT NOT NULL,
-        employee_id INT NULL,
-        type NVARCHAR(100) NOT NULL,
-        file_path NVARCHAR(MAX) NOT NULL,
-        generated_at DATETIME2 NOT NULL CONSTRAINT DF_Documents_generated_at DEFAULT SYSUTCDATETIME(),
-        CONSTRAINT FK_Documents_Users FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE,
-        CONSTRAINT FK_Documents_Employees FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)
-      );
-    `,
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'employee_id', sql: 'INT NULL' },
-      { name: 'type', sql: 'NVARCHAR(100) NOT NULL' },
-      { name: 'file_path', sql: 'NVARCHAR(MAX) NOT NULL' },
-      { name: 'generated_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Documents_generated_at DEFAULT SYSUTCDATETIME()' }
-    ],
-    primaryKey: 'PK_Documents',
-    indexes: [
-      {
-        name: 'IX_Documents_user_id',
-        sql: 'CREATE INDEX IX_Documents_user_id ON dbo.Documents(user_id);'
-      },
-      {
-        name: 'IX_Documents_employee_id',
-        sql: 'CREATE INDEX IX_Documents_employee_id ON dbo.Documents(employee_id);'
-      }
-    ]
-  }
-  ,
-  {
-    name: 'Recruitment',
-    createSql: "CREATE TABLE dbo.Recruitment (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Recruitment PRIMARY KEY, user_id INT NOT NULL, job_title NVARCHAR(255) NOT NULL, candidate_name NVARCHAR(255) NOT NULL, candidate_email NVARCHAR(255) NOT NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_Recruitment_status DEFAULT 'Applied', resume_url NVARCHAR(MAX) NULL, interview_date DATETIME2 NULL, notes NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_Recruitment_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'job_title', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'candidate_name', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'candidate_email', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_Recruitment_status DEFAULT N'Applied'" },
-      { name: 'resume_url', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'interview_date', sql: 'DATETIME2 NULL' },
-      { name: 'notes', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Recruitment_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_Recruitment',
-    indexes: [
-      { name: 'IX_Recruitment_user_id', sql: 'CREATE INDEX IX_Recruitment_user_id ON dbo.Recruitment(user_id);' }
-    ]
-  },
-  {
-    name: 'Onboarding',
-    createSql: "CREATE TABLE dbo.Onboarding (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Onboarding PRIMARY KEY, user_id INT NOT NULL, employee_id INT NOT NULL, current_stage NVARCHAR(100) NOT NULL CONSTRAINT DF_Onboarding_stage DEFAULT 'Pre-Onboarding', progress_percent INT NOT NULL CONSTRAINT DF_Onboarding_progress DEFAULT 0, checklist_json NVARCHAR(MAX) NULL, start_date DATE NOT NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_Onboarding_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'employee_id', sql: 'INT NOT NULL' },
-      { name: 'current_stage', sql: "NVARCHAR(100) NOT NULL CONSTRAINT DF_Onboarding_stage DEFAULT N'Pre-Onboarding'" },
-      { name: 'progress_percent', sql: 'INT NOT NULL CONSTRAINT DF_Onboarding_progress DEFAULT 0' },
-      { name: 'checklist_json', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'start_date', sql: 'DATE NOT NULL' },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Onboarding_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_Onboarding',
-    indexes: [
-      { name: 'IX_Onboarding_employee_id', sql: 'CREATE INDEX IX_Onboarding_employee_id ON dbo.Onboarding(employee_id);' }
-    ]
-  },
-  {
-    name: 'PerformanceReviews',
-    createSql: "CREATE TABLE dbo.PerformanceReviews (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PerformanceReviews PRIMARY KEY, user_id INT NOT NULL, employee_id INT NOT NULL, reviewer_id INT NULL, review_period NVARCHAR(100) NOT NULL, rating DECIMAL(3,1) NULL, comments NVARCHAR(MAX) NULL, goals_json NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_PerformanceReviews_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'employee_id', sql: 'INT NOT NULL' },
-      { name: 'reviewer_id', sql: 'INT NULL' },
-      { name: 'review_period', sql: 'NVARCHAR(100) NOT NULL' },
-      { name: 'rating', sql: 'DECIMAL(3,1) NULL' },
-      { name: 'comments', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'goals_json', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PerformanceReviews_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_PerformanceReviews',
-    indexes: [
-      { name: 'IX_PerformanceReviews_employee_id', sql: 'CREATE INDEX IX_PerformanceReviews_employee_id ON dbo.PerformanceReviews(employee_id);' }
-    ]
-  },
-  {
-    name: 'Documents',
-    createSql: "CREATE TABLE dbo.Documents (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Documents PRIMARY KEY, user_id INT NOT NULL, employee_id INT NULL, document_type NVARCHAR(100) NOT NULL, filename NVARCHAR(255) NOT NULL, s3_url NVARCHAR(MAX) NOT NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_Documents_status DEFAULT 'Active', created_at DATETIME2 NOT NULL CONSTRAINT DF_Documents_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'employee_id', sql: 'INT NULL' },
-      { name: 'document_type', sql: 'NVARCHAR(100) NOT NULL' },
-      { name: 'filename', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 's3_url', sql: 'NVARCHAR(MAX) NOT NULL' },
-      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_Documents_status DEFAULT N'Active'" },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_Documents_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_Documents',
-    indexes: [
-      { name: 'IX_Documents_user_id', sql: 'CREATE INDEX IX_Documents_user_id ON dbo.Documents(user_id);' }
-    ]
-  }
-  ,
+
   {
     name: 'OAuthIntegrations',
     createSql: "CREATE TABLE dbo.OAuthIntegrations (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_OAuthIntegrations PRIMARY KEY, user_id INT NOT NULL, platform NVARCHAR(50) NOT NULL, auth_token NVARCHAR(MAX) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_OAuthIntegrations_status DEFAULT 'Linked', created_at DATETIME2 NOT NULL CONSTRAINT DF_OAuthIntegrations_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
@@ -707,70 +593,6 @@ const tables = [
     primaryKey: 'PK_OAuthIntegrations',
     indexes: [
       { name: 'IX_OAuthIntegrations_user_id', sql: 'CREATE INDEX IX_OAuthIntegrations_user_id ON dbo.OAuthIntegrations(user_id);' }
-    ]
-  },
-  {
-    name: 'CRM_Leads',
-    createSql: "CREATE TABLE dbo.CRM_Leads (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Leads PRIMARY KEY, user_id INT NOT NULL, company_name NVARCHAR(255) NOT NULL, contact_name NVARCHAR(255) NOT NULL, email NVARCHAR(255) NOT NULL, phone NVARCHAR(50) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Leads_status DEFAULT 'New', value DECIMAL(18,2) NULL, notes NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Leads_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'company_name', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'contact_name', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'email', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'phone', sql: 'NVARCHAR(50) NULL' },
-      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Leads_status DEFAULT N'New'" },
-      { name: 'value', sql: 'DECIMAL(18,2) NULL' },
-      { name: 'notes', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Leads_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_CRM_Leads',
-    indexes: [
-      { name: 'IX_CRM_Leads_user_id', sql: 'CREATE INDEX IX_CRM_Leads_user_id ON dbo.CRM_Leads(user_id);' }
-    ]
-  },
-  {
-    name: 'CRM_Clients',
-    createSql: "CREATE TABLE dbo.CRM_Clients (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Clients PRIMARY KEY, user_id INT NOT NULL, company_name NVARCHAR(255) NOT NULL, contact_name NVARCHAR(255) NOT NULL, email NVARCHAR(255) NOT NULL, phone NVARCHAR(50) NULL, address NVARCHAR(MAX) NULL, gst_number NVARCHAR(50) NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Clients_status DEFAULT 'Active', created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Clients_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'company_name', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'contact_name', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'email', sql: 'NVARCHAR(255) NOT NULL' },
-      { name: 'phone', sql: 'NVARCHAR(50) NULL' },
-      { name: 'address', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'gst_number', sql: 'NVARCHAR(50) NULL' },
-      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Clients_status DEFAULT N'Active'" },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Clients_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_CRM_Clients',
-    indexes: [
-      { name: 'IX_CRM_Clients_user_id', sql: 'CREATE INDEX IX_CRM_Clients_user_id ON dbo.CRM_Clients(user_id);' }
-    ]
-  },
-  {
-    name: 'CRM_Invoices',
-    createSql: "CREATE TABLE dbo.CRM_Invoices (id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CRM_Invoices PRIMARY KEY, user_id INT NOT NULL, client_id INT NOT NULL, invoice_number NVARCHAR(50) NOT NULL, amount DECIMAL(18,2) NOT NULL, issue_date DATE NOT NULL, due_date DATE NOT NULL, status NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Invoices_status DEFAULT 'Unpaid', items_json NVARCHAR(MAX) NULL, created_at DATETIME2 NOT NULL CONSTRAINT DF_CRM_Invoices_created_at DEFAULT SYSUTCDATETIME(), updated_at DATETIME2 NULL);",
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'user_id', sql: 'INT NOT NULL' },
-      { name: 'client_id', sql: 'INT NOT NULL' },
-      { name: 'invoice_number', sql: 'NVARCHAR(50) NOT NULL' },
-      { name: 'amount', sql: 'DECIMAL(18,2) NOT NULL' },
-      { name: 'issue_date', sql: 'DATE NOT NULL' },
-      { name: 'due_date', sql: 'DATE NOT NULL' },
-      { name: 'status', sql: "NVARCHAR(50) NOT NULL CONSTRAINT DF_CRM_Invoices_status DEFAULT N'Unpaid'" },
-      { name: 'items_json', sql: 'NVARCHAR(MAX) NULL' },
-      { name: 'created_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_CRM_Invoices_created_at DEFAULT SYSUTCDATETIME()' },
-      { name: 'updated_at', sql: 'DATETIME2 NULL' }
-    ],
-    primaryKey: 'PK_CRM_Invoices',
-    indexes: [
-      { name: 'IX_CRM_Invoices_client_id', sql: 'CREATE INDEX IX_CRM_Invoices_client_id ON dbo.CRM_Invoices(client_id);' },
-      { name: 'UQ_CRM_Invoices_number', sql: 'CREATE UNIQUE INDEX UQ_CRM_Invoices_number ON dbo.CRM_Invoices(invoice_number);' }
     ]
   },
   {
@@ -921,49 +743,6 @@ const tables = [
       { name: 'IX_PayrollContributions_transaction_id', sql: 'CREATE INDEX IX_PayrollContributions_transaction_id ON dbo.PayrollContributions(transaction_id);' }
     ]
   },
-  {
-    name: 'PayrollProofs',
-    createSql: `
-      CREATE TABLE dbo.PayrollProofs (
-        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_PayrollProofs PRIMARY KEY,
-        transaction_id INT NOT NULL,
-        merkle_root_hash NVARCHAR(64) NOT NULL,
-        signed_at DATETIME2 NOT NULL CONSTRAINT DF_PayrollProofs_signed_at DEFAULT SYSUTCDATETIME(),
-        CONSTRAINT FK_PayrollProofs_PayrollTransactions FOREIGN KEY (transaction_id) REFERENCES dbo.PayrollTransactions(id) ON DELETE CASCADE
-      );
-    `,
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'transaction_id', sql: 'INT NOT NULL' },
-      { name: 'merkle_root_hash', sql: 'NVARCHAR(64) NOT NULL' },
-      { name: 'signed_at', sql: 'DATETIME2 NOT NULL CONSTRAINT DF_PayrollProofs_signed_at DEFAULT SYSUTCDATETIME()' }
-    ],
-    primaryKey: 'PK_PayrollProofs',
-    indexes: [
-      { name: 'IX_PayrollProofs_transaction_id', sql: 'CREATE INDEX IX_PayrollProofs_transaction_id ON dbo.PayrollProofs(transaction_id);' }
-    ]
-  },
-  {
-    name: 'StatutoryRates',
-    createSql: `
-      CREATE TABLE dbo.StatutoryRates (
-        id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_StatutoryRates PRIMARY KEY,
-        tax_code NVARCHAR(50) NOT NULL,
-        percentage DECIMAL(5,2) NOT NULL,
-        effective_date DATE NOT NULL
-      );
-    `,
-    columns: [
-      { name: 'id', sql: 'INT IDENTITY(1,1) NOT NULL', identity: true },
-      { name: 'tax_code', sql: 'NVARCHAR(50) NOT NULL' },
-      { name: 'percentage', sql: 'DECIMAL(5,2) NOT NULL' },
-      { name: 'effective_date', sql: 'DATE NOT NULL' }
-    ],
-    primaryKey: 'PK_StatutoryRates',
-    indexes: [
-      { name: 'IX_StatutoryRates_tax_code', sql: 'CREATE INDEX IX_StatutoryRates_tax_code ON dbo.StatutoryRates(tax_code);' }
-    ]
-  }
 ];
 
 
@@ -1172,18 +951,7 @@ async function initDb() {
   await ensureForeignKey(pool, 'PayrollRuns', 'FK_PayrollRuns_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_PayrollRuns', 'FOREIGN KEY (payroll_run_id) REFERENCES dbo.PayrollRuns(id) ON DELETE CASCADE');
   await ensureForeignKey(pool, 'PayrollTransactions', 'FK_PayrollTx_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
-  await ensureForeignKey(pool, 'Recruitment', 'FK_Recruitment_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'Onboarding', 'FK_Onboarding_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id)');
-  await ensureForeignKey(pool, 'Onboarding', 'FK_Onboarding_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'PerformanceReviews', 'FK_PerformanceReviews_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id)');
-  await ensureForeignKey(pool, 'PerformanceReviews', 'FK_PerformanceReviews_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'Documents', 'FK_Documents_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'Documents', 'FK_Documents_Employees', 'FOREIGN KEY (employee_id) REFERENCES dbo.Employees(id)');
   await ensureForeignKey(pool, 'OAuthIntegrations', 'FK_OAuthIntegrations_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'CRM_Leads', 'FK_CRM_Leads_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'CRM_Clients', 'FK_CRM_Clients_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'CRM_Invoices', 'FK_CRM_Invoices_Users', 'FOREIGN KEY (user_id) REFERENCES dbo.Users(id) ON DELETE CASCADE');
-  await ensureForeignKey(pool, 'CRM_Invoices', 'FK_CRM_Invoices_Clients', 'FOREIGN KEY (client_id) REFERENCES dbo.CRM_Clients(id)');
 
 
 

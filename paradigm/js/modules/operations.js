@@ -1,3 +1,4 @@
+import { apiBase, escapeHTML, store } from './core.js';
 
 export function triggerOpsDispatch() {
   const carrier = document.getElementById("ops-carrier").value;

@@ -2186,4 +2186,28 @@ gridAdminRoutes.put('/leaves/:id/status', adminLimiter, asyncHandler(async (req,
   return ok(res, { message: 'Leave status updated' });
 }));
 
+gridAdminRoutes.get('/recruitment', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { candidates: [] });
+}));
+
+gridAdminRoutes.get('/onboarding', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { onboarding_pipelines: [] });
+}));
+
+gridAdminRoutes.get('/performance-reviews', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { reviews: [] });
+}));
+
+gridAdminRoutes.get('/documents', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { documents: [] });
+}));
+
+gridAdminRoutes.get('/integrations', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { linkedAccounts: [] });
+}));
+
+gridAdminRoutes.get('/recruitment/sourcing/boolean-search', adminLimiter, asyncHandler(async (req, res) => {
+  return ok(res, { candidates: [] });
+}));
+
 module.exports = { gridAdminRoutes };

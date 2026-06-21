@@ -1,9 +1,10 @@
+import { apiBase, escapeHTML, store } from './core.js';
 
-async function checkIntegrations() {
+export async function checkIntegrations() {
     const token = localStorage.getItem('paradigm_token');
     if (!token) return;
     try {
-        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/integrations', {
+        const res = await window.secureFetch(apiBase + '/api/admin/integrations', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
@@ -14,10 +15,10 @@ async function checkIntegrations() {
     } catch(e) { console.error(e); }
 }
 
-async function linkIntegration(platform) {
+export async function linkIntegration(platform) {
     const token = localStorage.getItem('paradigm_token');
     try {
-        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/integrations/link', {
+        const res = await window.secureFetch(apiBase + '/api/admin/integrations/link', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({ platform })
@@ -29,7 +30,7 @@ async function linkIntegration(platform) {
     } catch(e) { console.error(e); }
 }
 
-async function runBooleanSearch() {
+export async function runBooleanSearch() {
     const token = localStorage.getItem('paradigm_token');
     const query = document.getElementById('sourcing-query').value;
     const platform = document.getElementById('sourcing-platform').value;
@@ -40,7 +41,7 @@ async function runBooleanSearch() {
     container.innerHTML = '<div style="color:var(--text-secondary);">Executing Boolean Extraction on ' + platform + '...</div>';
     
     try {
-        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/recruitment/sourcing/boolean-search', {
+        const res = await window.secureFetch(apiBase + '/api/admin/recruitment/sourcing/boolean-search', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, platform })
@@ -68,10 +69,10 @@ async function runBooleanSearch() {
     } catch(e) { console.error(e); }
 }
 
-async function importToATS(name, email, title, resume) {
+export async function importToATS(name, email, title, resume) {
     const token = localStorage.getItem('paradigm_token');
     try {
-        const res = await window.securewindow.secureFetch(apiBase + '/api/admin/recruitment', {
+        const res = await window.secureFetch(apiBase + '/api/admin/recruitment', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -87,5 +88,3 @@ async function importToATS(name, email, title, resume) {
         }
     } catch(e) { console.error(e); }
 }
-
-

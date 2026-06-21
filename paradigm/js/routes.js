@@ -44,16 +44,23 @@ function switchView(viewId) {
     document
       .querySelectorAll(".payroll-sidebar .sub-tab-btn")
       .forEach((btn) => btn.classList.remove("active"));
-    document.getElementById("employees-dropdown").style.display = "none";
-    document.getElementById("reports-dropdown").style.display = "none";
+    
+    const empDropdown = document.getElementById("employees-dropdown");
+    if (empDropdown) empDropdown.style.display = "none";
+    
+    const repDropdown = document.getElementById("reports-dropdown");
+    if (repDropdown) repDropdown.style.display = "none";
+    
     document
       .querySelectorAll(".tab-panel")
       .forEach((panel) => panel.classList.remove("active"));
-    document.getElementById("payroll-tab-welcome").classList.add("active");
+      
+    const welcomeTab = document.getElementById("payroll-tab-welcome");
+    if (welcomeTab) welcomeTab.classList.add("active");
   } else if (viewId === "hr") {
     if (typeof loadHRData === "function") loadHRData();
   } else if (viewId === "crm") {
-    renderCRMTable();
+    if (typeof renderCRMTable === "function") renderCRMTable();
   }
   toggleDrawer(false);
 }

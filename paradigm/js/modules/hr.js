@@ -1,6 +1,7 @@
+import { apiBase, escapeHTML, store } from './core.js';
 
-async function loadHRData() {
-    checkIntegrations();
+export async function loadHRData() {
+    if (typeof window.checkIntegrations === 'function') window.checkIntegrations();
     try {
         const token = localStorage.getItem('paradigm_token');
         if (!token) return;
