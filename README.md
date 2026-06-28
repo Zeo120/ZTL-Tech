@@ -1,75 +1,95 @@
-# ZTL Tech - Intern Onboarding & Codebase Guide
+# ZTL-Tech Enterprise Monorepo
 
-Welcome to ZTL Tech! If you're a new intern, this is the first document you should read. We've designed this guide to help you navigate the codebase, understand how the pieces fit together, and start shipping code without needing to guess or ask an AI what a file does.
+Welcome to the **ZTL-Tech Enterprise Monorepo**. This repository houses our suite of next-generation business, security, and infrastructure applications, all powered by a unified, high-performance Node.js backend. 
 
----
-
-## 🏗️ 1. High-Level Architecture
-
-This repository is a **Monorepo**. That means we have several different frontend applications (for different products) and a single, unified Node.js backend server that powers all of them.
-
-*   **The Backend** serves APIs (like login, employee management, security scans).
-*   **The Frontends** are simple, lightweight, static HTML/CSS/JS files (No React, No Next.js). The backend serves these frontend files directly.
+This document serves as the central hub for understanding the architecture, navigating the codebase, and setting up the development environment.
 
 ---
 
-## 📁 2. Where is Everything? (Directory Structure)
+## 1. System Architecture
 
-Don't let the number of folders intimidate you. Here is exactly what each folder does:
+ZTL-Tech utilizes a monolithic backend architecture serving multiple isolated frontend applications.
 
-### 🖥️ The Frontends
-These folders contain the UI for our different products. They all follow the same pattern (`index.html` for the landing page, `login.html`, and `admin.html` for the dashboard).
-*   `ztl_tech/` - Our main corporate website and Super Admin console.
-*   `paradigm/` - Our Enterprise Business Software & Payroll Management system.
-*   `grid/` - Network architecture and traffic simulation UI.
-*   `scalpel/` - Automated workflow approval UI.
-*   `phasr/` - Our flagship security auditing tool.
-
-### ⚙️ The Backend (`/backend`)
-This is the brains of the operation. It's an Express.js server connected to Microsoft SQL Server and Redis.
-*   `server.js` - The entry point. It starts the server and connects to the DB.
-*   `src/app.js` - Connects all the routes and middleware together.
-*   `src/routes/` - API Endpoints (e.g., `/api/admin/...`). This is where HTTP requests land.
-*   `src/services/` - The heavy lifting. If a route needs to calculate payroll, do a security scan, or query the DB, it calls a function in here.
-*   `src/middleware/` - Security checkpoints (CSRF protection, authentication checks) that run *before* a route is hit.
-*   `src/config/` - Database (`db.js`, `initDb.js`), Redis (`redis.js`), and Environment Variables (`env.js`) setup.
-
-### 📚 The Docs (`/docs`)
-Contains deep-dive architectural documents, mathematical models for PHASR, and detailed engine specs.
+*   **The Backend Core:** A robust Express.js server providing unified APIs for authentication, employee management, payroll processing, and security auditing. It connects to **Microsoft SQL Server** for persistent enterprise data and **Redis** for high-speed session management.
+*   **The Frontends:** We embrace a Zero-Dependency, Vanilla web philosophy. Our frontends are built with raw HTML, CSS, and JS—bypassing frameworks like React or Next.js to ensure maximum execution speed and absolute control over the DOM.
 
 ---
 
-## 🔒 3. Security & Data Flow (How Things Actually Work)
+## 2. Product Suite Overview (The Frontends)
 
-### Authentication & Sessions
-When a user logs in, we don't use simple JWTs in LocalStorage. We use **Secure Sessions stored in Redis**:
-1. User logs in (`auth.service.js`).
-2. Backend generates a Session ID, stores the user's data in **Redis**, and sets an `HttpOnly` cookie in the user's browser.
-3. Every subsequent request automatically sends this cookie.
+The `/` root directory contains the independent UI folders for each of our flagship products. Each product follows a standardized entry pattern (`index.html`, `login.html`, `admin.html`).
 
-### CSRF Protection (Crucial!)
-To prevent cross-site request forgery, every `POST`, `PUT`, or `DELETE` request requires a CSRF token:
-1. On login, the backend sets a `ztl_csrf` cookie (which *can* be read by frontend JavaScript).
-2. Whenever the frontend makes a request (like saving an employee), it must manually read the `ztl_csrf` cookie and attach it as the `x-csrf-token` header.
-3. The backend (`middleware/csrf.js`) checks if the Header matches the Cookie. If they don't match, you get a `403 CSRF Validation Failed` error.
-
-### Database (MS SQL Server)
-We use Microsoft SQL Server. If you need to add a new table:
-1. Open `backend/src/config/initDb.js`.
-2. Add your table definition to the `tables` array. The server will automatically create it on startup if it doesn't exist.
-3. Use parameterized queries (e.g., `request.input('id', sql.Int, myId)`) everywhere to prevent SQL injection.
+*   **`ztl_tech/`**: The primary corporate landing page and the Super Admin "God Mode" console.
+*   **`paradigm/`**: Our Enterprise Business Software. Features strict Multi-Tenant isolation and a Cryptographic Payroll engine.
+*   **`grid/`**: Network architecture mapping and real-time traffic simulation interface.
+*   **`scalpel/`**: Automated, high-speed workflow and approval routing UI.
+*   **`phasr/`**: Predictive Heuristic Attack Surface Reconnaissance—our flagship deterministic security auditing tool.
 
 ---
 
-## 🚀 4. How to Run the Project Locally
+## 3. Backend Structure (`/backend`)
+
+The brain of the ZTL-Tech ecosystem.
+
+*   **`server.js`**: The primary application bootstrapper. Initializes database connections and starts the listener.
+*   **`src/app.js`**: The central Express router and middleware pipeline registry.
+*   **`src/routes/`**: API endpoint definitions categorized by domain (e.g., Auth, Admin, Employee, Super Admin).
+*   **`src/services/`**: The core business logic layer (payroll calculations, security scans, data mutations).
+*   **`src/middleware/`**: Critical security interceptors (CSRF validation, Session checks, Rate limiting) that execute before any route logic.
+*   **`src/config/`**: Connection managers for MSSQL (`db.js`, `initDb.js`), Redis (`redis.js`), and environment variables (`env.js`).
+
+---
+
+## 4. Security & Data Integrity
+
+Security is not an afterthought; it is woven into the fabric of the architecture.
+
+*   **Redis Secure Sessions**: We reject stateless JWTs in LocalStorage. Authentication relies on cryptographically secure, stateful session IDs stored in Redis and transmitted exclusively via `HttpOnly` cookies.
+*   **Strict Anti-CSRF**: Every state-mutating request (`POST`, `PUT`, `DELETE`) requires a CSRF token. The backend issues a `ztl_csrf` cookie upon login, which the frontend must manually attach as the `x-csrf-token` header on subsequent requests.
+*   **Cryptographic Payroll (Paradigm)**: Completed payroll runs are immutably sealed using SHA-256 Merkle Roots, ensuring zero post-processing tampering.
+*   **Headless PDF Generation**: Payslips are generated purely programmatically via `pdf-lib` manipulating binary buffers, ensuring 100% reliable output to `/tempmediaStorage` without the overhead of headless browsers.
+
+---
+
+## 5. UI/UX Design Philosophy
+
+We prioritize aesthetics and fluidity to create a premium user experience:
+
+*   **Glassmorphism**: Extensive use of frosted glass panels (`.table-glass`) across data-heavy interfaces.
+*   **Hardware-Accelerated Modals**: Forms and data-entry panels slide in smoothly from the screen edges (`.slide-over-overlay`), eliminating jarring popups.
+*   **Antigravity Particle Matrix**: A custom background engine rendering dynamic, performant particle systems that adapt beautifully to both Light and Dark modes via explicit CSS variables.
+
+---
+
+## 6. Super Admin "God Mode" Terminal
+
+The system includes a highly restricted `super_admin` God Mode terminal located at `ztl_tech/god_mode.html`. Communicating with `backend/src/routes/super.routes.js`, this terminal grants:
+*   **Raw SQL Execution**: Direct querying and mutation of the MSSQL Enterprise Database.
+*   **Environment Management**: Live read/write access to the server's `.env` configuration file.
+*(Note: These routes enforce absolute Role-Based Access Control).*
+
+---
+
+## 7. Dynamic Feature Injection
+
+The repository root contains several powerful `inject_*.js` utility scripts. These scripts dynamically patch the codebase to wire in new modules across the database, backend routes, and frontend UI:
+*   **HR Core**: `inject_hr_routes.js`, `inject_hr_tables.js`, `inject_hr_ui.js`, `wire_hr_module.js`
+*   **Candidate Sourcing**: `inject_sourcing_routes.js`, `inject_sourcing_ui.js`
+*   **External Integrations**: `inject_integrations_db.js`
+
+*Usage: Execute via Node (e.g., `node inject_hr_routes.js`) to install the desired module.*
+
+---
+
+## 8. Local Development Setup
 
 ### Prerequisites
-1. **Node.js** (v20+)
-2. **Redis** (Running locally on port 6379)
-3. **Microsoft SQL Server** (Running locally on port 1433)
+*   **Node.js** (v20+)
+*   **Redis** (Local instance on port `6379`)
+*   **Microsoft SQL Server** (Local instance on port `1433`)
 
-### Setup Steps
-1. Navigate to the backend folder:
+### Initialization
+1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
@@ -77,59 +97,24 @@ We use Microsoft SQL Server. If you need to add a new table:
    ```bash
    npm install
    ```
-3. Set up your environment file:
-   Copy `.env.example` to `.env`. Fill in your SQL Server credentials, Redis URL, and a random string for `JWT_SECRET`.
-   *(Note: For isolated Paradigm development, you might be instructed to use `.env.paradigm` instead).*
+3. Configure your environment:
+   Copy `.env.example` to `.env` and populate your SQL Server credentials, Redis URL, and a highly secure `JWT_SECRET`.
 
-### Start the Server
+### Execution
+Start the development server:
 ```bash
 npm run dev
 ```
-The server will boot up, initialize the database tables automatically, and serve the application at `http://localhost:3000`.
+The server will automatically initialize required database schemas via `initDb.js` and serve the ecosystem at `http://localhost:3000`.
 
-*To visit the ZTL Tech Homepage:* Go to `http://localhost:3000/ztl_tech`
-*To visit Paradigm:* Go to `http://localhost:3000/paradigm`
-
----
-
-## 💡 5. Common Gotchas for Interns
-
-*   **My form submission was rejected!** Check your browser's network tab. If it's a 403 error, your frontend fetch call is probably missing the `x-csrf-token` header or the `credentials: 'include'` flag.
-*   **My database changes aren't showing!** Make sure you didn't just update the frontend UI. You need to update the Schema in `initDb.js` and ensure the backend route (`admin.routes.js`) is actually executing the SQL `INSERT`/`UPDATE`.
-*   **Where do I put my CSS?** We don't use Tailwind. We use Vanilla CSS. Put it in the `style.css` file inside the respective product folder (e.g., `paradigm/style.css`). Keep designs sleek and symmetrical.
-
-Good luck, and welcome to the team!
+*   **ZTL-Tech Home**: `http://localhost:3000/ztl_tech`
+*   **Paradigm Suite**: `http://localhost:3000/paradigm`
 
 ---
 
-## 🌟 6. Recent Overhauls & Architecture Upgrades (Paradigm Suite)
+## 9. Documentation Deep Dives
 
-**The Caveman Philosophy (Divide & Rule):**
-We have recently overhauled the Paradigm Enterprise Software to enforce strict Multi-Tenant isolation. Every employee, payroll ledger, and attendance record is strictly partitioned by `company_id`. The blast radius of any data breach is mathematically contained to a single corporate entity.
-
-**Cryptographic Payroll & PDF Engine:**
-*   **Merkle Roots:** All completed Payroll Runs are cryptographically sealed using SHA-256 Merkle Roots generated from the employee transactions, ensuring zero tampering post-processing.
-*   **Headless PDF Generation:** We bypass unreliable headless browsers in production by using `pdf-lib` to programmatically inject binary text into pure PDF buffers, guaranteeing 100% reliable Payslip generation in the `/tempmediaStorage` directory.
-
-**Aesthetic Paradigm Shift (UI/UX):**
-*   **Glassmorphic Data Tables:** All legacy HTML tables in the Payroll module have been aggressively upgraded to Frosted Glass panels (`.table-glass`).
-*   **Slide-Over Modals:** We eradicated jarring center-screen popups. All forms (e.g., `Add Corporate Employee`, `Create Payroll Run`) now smoothly slide in from the right edge using hardware-accelerated CSS transitions (`.slide-over-overlay`).
-*   **Antigravity Particle Matrix:** The background engine handles intense dynamic particles. We've introduced explicit CSS variables (`--particle-1`, `--line-opacity`) into the `:root` to ensure the matrix is deeply black and highly visible in Light Mode, and a glowing translucent white in Dark Mode.
+For extensive architectural blueprints, mathematical models, and engine specifications, consult the `/docs` directory. Key documents include Tradeoff Analyses and specific product architecture guides.
 
 ---
-
-## 🛠️ 7. Super Admin "God Mode" Terminal
-
-We have introduced a strict `super_admin` God Mode terminal accessible at `ztl_tech/god_mode.html`. This interfaces with `backend/src/routes/super.routes.js` to allow:
-*   **Raw SQL Execution:** Direct querying of the Enterprise Database via the API.
-*   **Environment Management:** Direct read/write access to the `.env` file on the server.
-*(Note: These routes enforce strict Role-Based Access Control and require the `super_admin` role).*
-
-## 💉 8. Dynamic Feature Injection Scripts
-
-The root directory contains several `inject_*.js` scripts. These are designed to dynamically inject additional modules into the frontend UI, backend routes, and database schemas:
-*   **HR Module:** `inject_hr_routes.js`, `inject_hr_tables.js`, `inject_hr_ui.js`, `wire_hr_module.js`
-*   **Sourcing:** `inject_sourcing_routes.js`, `inject_sourcing_ui.js`
-*   **Integrations:** `inject_integrations_db.js`
-
-To install these modules, run the scripts via Node (e.g., `node inject_hr_routes.js`).
+*Welcome to the cutting edge of enterprise software.*
