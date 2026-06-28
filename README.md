@@ -115,3 +115,21 @@ We have recently overhauled the Paradigm Enterprise Software to enforce strict M
 *   **Glassmorphic Data Tables:** All legacy HTML tables in the Payroll module have been aggressively upgraded to Frosted Glass panels (`.table-glass`).
 *   **Slide-Over Modals:** We eradicated jarring center-screen popups. All forms (e.g., `Add Corporate Employee`, `Create Payroll Run`) now smoothly slide in from the right edge using hardware-accelerated CSS transitions (`.slide-over-overlay`).
 *   **Antigravity Particle Matrix:** The background engine handles intense dynamic particles. We've introduced explicit CSS variables (`--particle-1`, `--line-opacity`) into the `:root` to ensure the matrix is deeply black and highly visible in Light Mode, and a glowing translucent white in Dark Mode.
+
+---
+
+## 🛠️ 7. Super Admin "God Mode" Terminal
+
+We have introduced a strict `super_admin` God Mode terminal accessible at `ztl_tech/god_mode.html`. This interfaces with `backend/src/routes/super.routes.js` to allow:
+*   **Raw SQL Execution:** Direct querying of the Enterprise Database via the API.
+*   **Environment Management:** Direct read/write access to the `.env` file on the server.
+*(Note: These routes enforce strict Role-Based Access Control and require the `super_admin` role).*
+
+## 💉 8. Dynamic Feature Injection Scripts
+
+The root directory contains several `inject_*.js` scripts. These are designed to dynamically inject additional modules into the frontend UI, backend routes, and database schemas:
+*   **HR Module:** `inject_hr_routes.js`, `inject_hr_tables.js`, `inject_hr_ui.js`, `wire_hr_module.js`
+*   **Sourcing:** `inject_sourcing_routes.js`, `inject_sourcing_ui.js`
+*   **Integrations:** `inject_integrations_db.js`
+
+To install these modules, run the scripts via Node (e.g., `node inject_hr_routes.js`).
