@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -225,7 +225,7 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-container">
-                        <input type="password" id="password" required placeholder="••••••••••••" autocomplete="current-password">
+                        <input type="password" id="password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
                         <button type="button" class="password-toggle" id="password-toggle" onclick="togglePasswordVisibility()" aria-label="Toggle Password Visibility">
                             <!-- Eye Icon SVG (Shows eye by default) -->
                             <svg id="eye-icon" viewBox="0 0 24 24">
@@ -242,7 +242,7 @@
     </main>
 
     <footer style="margin-top: auto; padding: 4rem 10% 2rem; text-align: center; color: var(--text-secondary);">
-        <p>© 2026 Zeo Thinking Labs. PHASR Cyber Security Shield Management Console.</p>
+        <p>Â© 2026 Zeo Thinking Labs. PHASR Cyber Security Shield Management Console.</p>
     </footer>
 
     <script>
@@ -376,5 +376,16 @@
             }
         }
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+

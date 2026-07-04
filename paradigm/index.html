@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -36,7 +36,7 @@
         <a href="../ztl_tech/index.html#home">Home</a>
         <div class="nav-item-dropdown">
           <a href="#products" class="dropdown-trigger"
-            >Products <span class="dropdown-arrow">▼</span></a
+            >Products <span class="dropdown-arrow">â–¼</span></a
           >
           <div class="dropdown-menu">
             <a href="index.html">
@@ -73,7 +73,7 @@
       <a href="../ztl_tech/index.html#home" class="mobile-main-link">Home</a>
       <div class="mobile-dropdown">
         <div class="mobile-dropdown-trigger">
-          Products <span class="mobile-arrow">▼</span>
+          Products <span class="mobile-arrow">â–¼</span>
         </div>
         <div class="mobile-dropdown-menu">
           <a href="index.html" class="mobile-sublink">
@@ -545,7 +545,7 @@
         </a>
       </div>
       <p style="color: var(--text-secondary); margin-bottom: 2rem">
-        © 2026 Zeo Thinking Labs. All rights reserved.
+        Â© 2026 Zeo Thinking Labs. All rights reserved.
       </p>
       <div
         class="footer-links"
@@ -584,5 +584,17 @@
       </div>
     </footer>
     <script src="js/index.js?v=2"></script>
-  </body>
+  
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
+</body>
 </html>
+
+

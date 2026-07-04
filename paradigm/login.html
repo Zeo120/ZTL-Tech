@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -401,7 +401,7 @@
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("sw.js");
+          
         });
       }
     </script>
@@ -510,7 +510,7 @@
                 type="password"
                 id="password"
                 required
-                placeholder="••••••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 autocomplete="current-password"
               />
               <button
@@ -576,7 +576,7 @@
       "
     >
       <p>
-        © 2026 Zeo Thinking Labs. Paradigm Admin Business Suite Management
+        Â© 2026 Zeo Thinking Labs. Paradigm Admin Business Suite Management
         Console.
       </p>
     </footer>
@@ -619,18 +619,18 @@
 > ...
 > LOADING PHASR MATHEMATICAL FRAMEWORK:
 > [ACHERON] p_req(N) = N - 1 (if N > 0), 0 (if N = 0)
-> [ACHERON] Φᵢⁿ⁺¹ = 2Φᵢⁿ - Φᵢⁿ⁻¹ + r²(Φᵢ₊₁ⁿ - 2Φᵢⁿ + Φᵢ₋₁ⁿ)
-> [BRIMSTONE] D_A = ∏ₖ₌₀ᴷ⁻¹ Invₖ = ⋀ₖ₌₀ᴷ⁻¹ Invₖ
-> [BRIMSTONE] Φ(x, t) = Φ₀ e⁻ᵅˣ cos(kx - ωt)
-> [FDTD STABILITY] r = (v ⋅ Δt) / Δx ≤ 1.0
-> [LEGIONS] D_R = PSync ⋅ (1 - L/T)
-> [NINE CIRCLES] Rᵢⱼᵏ⁺¹ = Rᵢⱼᵏ ∨ (Rᵢₖᵏ ∧ Rₖⱼᵏ)
-> [PRIMORDIAL] Hᵢ = ((Hᵢ₋₁ ⊕ bᵢ) ⋘ rotᵢ) + 0x9E3779B9ULL
-> [ABADDON] D_S = ∏ₘ₌₀ᴹ⁻¹ (cₘ ⋅ mₘ + (1 - mₘ))
-> [SATAN] □_g Ψ ≡ 1/√(−g) ⋅ ∂_μ(√(−g) g^μν ∂_ν Ψ) = 0
-> [SATAN] Q = p_θ² + cos²θ[a²(m² - E²) + L_z² / sin²θ]
-> [SATAN] ds² = g₀₀dt² + 2g₀₃dtdφ + g₁₁dr² + g₂₂dθ² + g₃₃dφ²
-> [TBAIS] δ: Q × Σ → Q
+> [ACHERON] Î¦áµ¢â¿âºÂ¹ = 2Î¦áµ¢â¿ - Î¦áµ¢â¿â»Â¹ + rÂ²(Î¦áµ¢â‚Šâ‚â¿ - 2Î¦áµ¢â¿ + Î¦áµ¢â‚‹â‚â¿)
+> [BRIMSTONE] D_A = âˆâ‚–â‚Œâ‚€á´·â»Â¹ Invâ‚– = â‹€â‚–â‚Œâ‚€á´·â»Â¹ Invâ‚–
+> [BRIMSTONE] Î¦(x, t) = Î¦â‚€ eâ»áµ…Ë£ cos(kx - Ï‰t)
+> [FDTD STABILITY] r = (v â‹… Î”t) / Î”x â‰¤ 1.0
+> [LEGIONS] D_R = PSync â‹… (1 - L/T)
+> [NINE CIRCLES] Ráµ¢â±¼áµâºÂ¹ = Ráµ¢â±¼áµ âˆ¨ (Ráµ¢â‚–áµ âˆ§ Râ‚–â±¼áµ)
+> [PRIMORDIAL] Háµ¢ = ((Háµ¢â‚‹â‚ âŠ• báµ¢) â‹˜ rotáµ¢) + 0x9E3779B9ULL
+> [ABADDON] D_S = âˆâ‚˜â‚Œâ‚€á´¹â»Â¹ (câ‚˜ â‹… mâ‚˜ + (1 - mâ‚˜))
+> [SATAN] â–¡_g Î¨ â‰¡ 1/âˆš(âˆ’g) â‹… âˆ‚_Î¼(âˆš(âˆ’g) g^Î¼Î½ âˆ‚_Î½ Î¨) = 0
+> [SATAN] Q = p_Î¸Â² + cosÂ²Î¸[aÂ²(mÂ² - EÂ²) + L_zÂ² / sinÂ²Î¸]
+> [SATAN] dsÂ² = gâ‚€â‚€dtÂ² + 2gâ‚€â‚ƒdtdÏ† + gâ‚â‚drÂ² + gâ‚‚â‚‚dÎ¸Â² + gâ‚ƒâ‚ƒdÏ†Â²
+> [TBAIS] Î´: Q Ã— Î£ â†’ Q
 > ALL EQUATIONS LOADED AND VERIFIED.`;
           
           let i = 0;
@@ -652,5 +652,17 @@
         }
       });
     </script>
-  </body>
+  
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
+</body>
 </html>
+
+

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -59,9 +59,9 @@
         <thead>
           <tr>
             <th>Earnings</th>
-            <th class="amount">Amount (₹)</th>
+            <th class="amount">Amount (â‚¹)</th>
             <th>Deductions</th>
-            <th class="amount">Amount (₹)</th>
+            <th class="amount">Amount (â‚¹)</th>
           </tr>
         </thead>
         <tbody>
@@ -115,7 +115,7 @@
           <h2>Net Payable</h2>
           <p class="in-words" id="net-pay-words">In Words : Rs. Zero Only</p>
         </div>
-        <div class="net-amount" id="net-pay">₹0.00</div>
+        <div class="net-amount" id="net-pay">â‚¹0.00</div>
       </div>
 
       <div class="ctc-section">
@@ -172,5 +172,17 @@
     </div>
 
     <script src="js/payslip.js"></script>
-  </body>
+  
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
+</body>
 </html>
+
+

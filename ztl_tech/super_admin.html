@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -441,7 +441,7 @@
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 0.4rem; text-align: left;">
                                 <label for="client-password" style="font-size: 0.8rem; color: var(--text-secondary);">Initial Account Password</label>
-                                <input type="password" id="client-password" required placeholder="••••••••••••" style="background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #ffffff; padding: 0.6rem; font-size: 0.85rem;">
+                                <input type="password" id="client-password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style="background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #ffffff; padding: 0.6rem; font-size: 0.85rem;">
                             </div>
                             
                             <div style="display: flex; flex-direction: column; gap: 0.6rem; text-align: left; margin-top: 0.5rem;">
@@ -492,7 +492,7 @@
     </main>
 
     <footer style="margin-top: 4rem; padding: 4rem 10% 2rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary);">
-        <p>© 2026 Zeo Thinking Labs. Super Admin Audited Control Room.</p>
+        <p>Â© 2026 Zeo Thinking Labs. Super Admin Audited Control Room.</p>
     </footer>
 
     <script>
@@ -541,7 +541,7 @@
             const { portal, type, message, stats } = data;
             
             // Format log message depending on whether it is a user action or system heartbeat
-            const prefix = type === 'contact' ? '🚨 LIVE TRANSMISSION' : 'HEARTBEAT';
+            const prefix = type === 'contact' ? 'ðŸš¨ LIVE TRANSMISSION' : 'HEARTBEAT';
             appendTerminalLine(`[${portal.toUpperCase()}] ${prefix}: ${message}`, type === 'contact' ? 'terminal-success' : '');
             
             // Dynamically update statistics and trigger visual flash highlight
@@ -780,5 +780,15 @@
         loadUserData();
         loadClients();
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,7 +26,7 @@
         <div class="nav-links">
             <a href="../ztl_tech/index.html#home">Home</a>
             <div class="nav-item-dropdown">
-                <a href="#products" class="dropdown-trigger">Products <span class="dropdown-arrow">▼</span></a>
+                <a href="#products" class="dropdown-trigger">Products <span class="dropdown-arrow">â–¼</span></a>
                 <div class="dropdown-menu">
                     <a href="../paradigm/index.html">
                         <span class="dropdown-title">Paradigm</span>
@@ -61,7 +61,7 @@
     <div class="nav-menu">
         <a href="../ztl_tech/index.html#home" class="mobile-main-link">Home</a>
         <div class="mobile-dropdown">
-            <div class="mobile-dropdown-trigger">Products <span class="mobile-arrow">▼</span></div>
+            <div class="mobile-dropdown-trigger">Products <span class="mobile-arrow">â–¼</span></div>
             <div class="mobile-dropdown-menu">
                 <a href="../paradigm/index.html" class="mobile-sublink">
                     <span class="mobile-sublink-title">Paradigm</span>
@@ -224,7 +224,7 @@
                     <!-- 4. HUD DIAGNOSTICS OVERLAYS (No raw equations) -->
                     <!-- Left side HUD (Quantum) -->
                     <g class="hud-text">
-                        <text x="30" y="60" class="hud-cyan">Ψ(x, t) INTRUSION WAVE PACKET</text>
+                        <text x="30" y="60" class="hud-cyan">Î¨(x, t) INTRUSION WAVE PACKET</text>
                         <text x="30" y="75">[WAVE ATTENUATION DETECTED]</text>
                         <text x="30" y="90">ENERGY LEVEL E: 3.0 eV</text>
                         <line x1="25" y1="50" x2="160" y2="50" stroke="rgba(0, 255, 170, 0.3)" stroke-width="1" />
@@ -368,7 +368,7 @@
                             <circle id="quantum-particle-3" r="6" fill="#00ffaa" filter="url(#qNeon)" style="opacity: 0;" />
 
                             <!-- SVG Text Annotations -->
-                            <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Ψ(x) Incoming Wave Packet</text>
+                            <text x="30" y="40" fill="#00ffaa" font-family="monospace" font-size="10">Î¨(x) Incoming Wave Packet</text>
                             <text id="barrier-label" x="280" y="35" fill="#ff3366" font-family="monospace" font-size="10" text-anchor="middle">V_0 Barrier</text>
                             <text x="440" y="40" fill="#ff003c" font-family="monospace" font-size="10">Tunnelled Wave</text>
                         </svg>
@@ -481,7 +481,7 @@
 
                         <div class="control-group">
                             <div class="control-header">
-                                <span>Vulnerability Density (T<sub>μν</sub> / Threat Mass)</span>
+                                <span>Vulnerability Density (T<sub>Î¼Î½</sub> / Threat Mass)</span>
                                 <span class="control-val" id="val-mass">3.0</span>
                             </div>
                             <input type="range" id="input-mass" min="0.0" max="10.0" step="0.2" value="3.0">
@@ -489,7 +489,7 @@
 
                         <div class="control-group">
                             <div class="control-header">
-                                <span>Drift Noise Offset (Λ / Cosmological Constant)</span>
+                                <span>Drift Noise Offset (Î› / Cosmological Constant)</span>
                                 <span class="control-val" id="val-lambda">0.00</span>
                             </div>
                             <input type="range" id="input-lambda" min="-2.0" max="2.0" step="0.1" value="0.0">
@@ -595,7 +595,7 @@
                 <span class="logo-text"><span class="logo-separator">|</span> TECH</span>
             </a>
         </div>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">© 2026 Zeo Thinking Labs. All rights reserved.</p>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Â© 2026 Zeo Thinking Labs. All rights reserved.</p>
         <div class="footer-links" style="justify-content: center; display: flex; gap: 2rem; flex-wrap: wrap;">
             <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">PHASR Platform</a>
             <a href="business.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: var(--transition);">Business Case</a>
@@ -1051,7 +1051,7 @@
             // Increment phase
             quantumPhase += 0.08;
 
-            // Update Schrödinger wave propagation and particle
+            // Update SchrÃ¶dinger wave propagation and particle
             updateQuantumDraw(quantumPhase);
 
             // Update Spacetime curvature particle along geodesic
@@ -1182,6 +1182,17 @@
             });
         }
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+
 

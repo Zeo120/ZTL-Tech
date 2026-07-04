@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -494,7 +494,7 @@
     </main>
 
     <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
-        <p>© 2026 Zeo Thinking Labs. SCALPEL Automation Control Plane.</p>
+        <p>Â© 2026 Zeo Thinking Labs. SCALPEL Automation Control Plane.</p>
     </footer>
 
     <script>
@@ -617,11 +617,11 @@
             const approval = document.getElementById('approval-details-box');
             if (approved) {
                 document.getElementById('dag-node-human').setAttribute('class', 'dag-node completed');
-                approval.innerHTML = `<div style="color:var(--accent-secondary); text-align:center; font-weight:bold;">✓ Action Approved. Swarm task completed successfully.</div>`;
+                approval.innerHTML = `<div style="color:var(--accent-secondary); text-align:center; font-weight:bold;">âœ“ Action Approved. Swarm task completed successfully.</div>`;
                 logEvent('[SUCCESS] Operator approved queued action. Swarm execution pipeline closed.', 'terminal-success');
             } else {
                 resetDAGNodes();
-                approval.innerHTML = `<div style="color:#ff3366; text-align:center; font-weight:bold;">✗ Action Rejected. Automated rollback triggered.</div>`;
+                approval.innerHTML = `<div style="color:#ff3366; text-align:center; font-weight:bold;">âœ— Action Rejected. Automated rollback triggered.</div>`;
                 logEvent('[CRITICAL] Operator rejected queued action. Terminating swarm and rolling back transaction logs...', 'terminal-error');
                 
                 // Trigger automation failure tree details
@@ -722,5 +722,16 @@
         tripAutoHealer('db_crash');
         loadUserData();
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+

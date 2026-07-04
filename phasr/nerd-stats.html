@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -298,7 +298,7 @@
             <div class="logo-text">PHASR<span class="logo-separator">/</span>SHIELD</div>
         </a>
         <div style="display:flex; align-items:center; gap:1rem;">
-            <a href="admin.html" class="btn-back">← Back to Dashboard</a>
+            <a href="admin.html" class="btn-back">â† Back to Dashboard</a>
         </div>
     </nav>
 
@@ -359,7 +359,7 @@
                 document.getElementById('target-subtitle').innerText = `Loading scan #${scanId} from database...`;
                 document.getElementById('codebase-report-view').innerHTML = `
                     <div style="text-align:center; padding:3rem; color:var(--text-secondary);">
-                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">⏳</div>
+                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">â³</div>
                         Fetching scan report from database...
                     </div>
                 `;
@@ -378,7 +378,7 @@
                     document.getElementById('target-subtitle').innerText = `Failed to load scan #${scanId}`;
                     document.getElementById('codebase-report-view').innerHTML = `
                         <div style="text-align:center; padding:3rem; color:#ff3366;">
-                            <div style="font-size:1.5rem; margin-bottom:0.5rem;">✗</div>
+                            <div style="font-size:1.5rem; margin-bottom:0.5rem;">âœ—</div>
                             Failed to load scan from database: ${err.message}<br>
                             <span style="font-size:0.75rem; color:var(--text-secondary);">Ensure you are logged in and the server is running.</span>
                         </div>
@@ -611,7 +611,7 @@
                 document.getElementById('codebase-report-view').innerHTML = `
                     ${pipelineHTML}
                     <div style="text-align:center; padding:4rem; border:1px dashed rgba(0,255,170,0.3); border-radius:8px; background:rgba(0,255,170,0.01);">
-                        <div style="font-size:2.5rem; color:#00ffaa; margin-bottom:1rem;">✓</div>
+                        <div style="font-size:2.5rem; color:#00ffaa; margin-bottom:1rem;">âœ“</div>
                         <h3 style="font-size:1.2rem; color:#ffffff; font-weight:bold; margin-bottom:0.5rem;">Zero Vulnerabilities Detected</h3>
                         <p style="color:var(--text-secondary); font-size:0.85rem; max-width:500px; margin:0 auto;">
                             PHASR static analysis scan finished successfully on the codebase. No transition anomalies, hardcoded secrets, or leaky timers observed.
@@ -684,7 +684,7 @@
                     <div class="cyber-card" id="code-preview-panel" style="padding:1rem; margin:0; display:flex; flex-direction:column; gap:1rem; border-color: rgba(255, 255, 255, 0.05);">
                         <!-- Loaded dynamically based on selected finding -->
                         <div style="text-align:center; margin:auto; padding:2rem; color:var(--text-secondary); font-size:0.85rem;">
-                            <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+                            <div style="font-size:2rem; margin-bottom:0.5rem;">ðŸ”</div>
                             Select a finding index item from the sidebar to inspect vulnerable source context lines and remediation path.
                         </div>
                     </div>
@@ -726,7 +726,7 @@
                     </div>
                     <div style="font-size:0.68rem; color:var(--text-secondary); display:flex; justify-content:space-between;">
                         <span>Line: ${f.line}</span>
-                        <span style="color:#00ffaa; font-family:monospace; font-size:0.62rem;">Inspect ➔</span>
+                        <span style="color:#00ffaa; font-family:monospace; font-size:0.62rem;">Inspect âž”</span>
                     </div>
                 `;
 
@@ -925,5 +925,16 @@
             setInterval(pollLogs, 1500);
         }
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+

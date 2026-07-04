@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -563,7 +563,7 @@
     </main>
 
     <footer style="margin-top: 2rem; padding: 2rem 10% 1rem; border-top: 1px solid var(--surface-border); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
-        <p>© 2026 Zeo Thinking Labs. GRID Architecture Control Plane.</p>
+        <p>Â© 2026 Zeo Thinking Labs. GRID Architecture Control Plane.</p>
     </footer>
 
     <script>
@@ -915,5 +915,16 @@
         selectSuite('api');
         loadUserData();
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => console.log('SW registered!', reg))
+        .catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+
