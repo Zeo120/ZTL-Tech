@@ -31,3 +31,5 @@ backend/.env.*
 
 *.pdf
 sample_payslip.html
+*.bak
+.env.*
