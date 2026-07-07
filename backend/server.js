@@ -11,7 +11,7 @@ let server;
 
 async function start() {
   try {
-    await initDb();
+    // await initDb();
 
     server = app.listen(env.port, '0.0.0.0', () => {
       logger.info('server_started', {

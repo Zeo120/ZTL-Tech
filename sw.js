@@ -43,7 +43,7 @@ function getDB() {
 async function seedInitialData() {
   try {
     const db = await getDB();
-    const tx = db.transaction(['users', 'env'], 'readwrite');
+    const tx = db.transaction(['users', 'env', 'employees', 'payroll_runs', 'leaves'], 'readwrite');
     const store = tx.objectStore('users');
     const req = store.index('email').get('admin@local.dev');
     req.onsuccess = () => {
@@ -54,6 +54,36 @@ async function seedInitialData() {
     
     const envStore = tx.objectStore('env');
     envStore.add({ key: 'config', content: 'DB_HOST=localhost\nDB_USER=admin' });
+
+    const empStore = tx.objectStore('employees');
+    // Seed deterministic ZTL Tech employees
+    const mockEmployees = [
+      { id: 1, name: 'Adrian Vance', email: 'adrian.v@ztl.tech', role: 'Systems Architect', status: 'Active', salary: 1500000, join_date: '2023-01-15', pan: 'ABCDE1234F', aadhar: '123456789012' },
+      { id: 2, name: 'Elena Rostova', email: 'elena.r@ztl.tech', role: 'Cybersecurity Engineer', status: 'Active', salary: 1200000, join_date: '2023-06-01', pan: 'FGHIJ5678K', aadhar: '987654321098' },
+      { id: 3, name: 'Marcus Chen', email: 'marcus.c@ztl.tech', role: 'Automation Specialist', status: 'Active', salary: 900000, join_date: '2024-02-10', pan: 'KLMNO9012P', aadhar: '456789123012' },
+      { id: 4, name: 'Sarah Jenkins', email: 'sarah.j@ztl.tech', role: 'Operations Lead', status: 'Active', salary: 1100000, join_date: '2022-11-20', pan: 'PQRST3456U', aadhar: '789123456012' }
+    ];
+    
+    mockEmployees.forEach(emp => {
+      const getEmp = empStore.get(emp.id);
+      getEmp.onsuccess = () => {
+        if (!getEmp.result) empStore.add(emp);
+      }
+    });
+
+    const payrollStore = tx.objectStore('payroll_runs');
+    const mockPayroll = [
+      { id: 1, month: 6, year: 2026, status: 'processed', total_gross: 4700000, total_net: 3950000, date: '2026-06-30' },
+      { id: 2, month: 5, year: 2026, status: 'processed', total_gross: 4700000, total_net: 3950000, date: '2026-05-31' }
+    ];
+    
+    mockPayroll.forEach(pr => {
+      const getPr = payrollStore.get(pr.id);
+      getPr.onsuccess = () => {
+        if (!getPr.result) payrollStore.add(pr);
+      }
+    });
+
   } catch (e) {
     console.error("DB Seed Error", e);
   }
