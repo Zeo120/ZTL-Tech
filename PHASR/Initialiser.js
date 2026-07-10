@@ -31,15 +31,15 @@ const server = http.createServer((req, res) => {
                 if (!repoMatch) return sendJsonResponse(res, 400, { error: 'Malformed GitHub URL' });
 
                 const repoPath = repoMatch[1].replace('.git', '');
-                // Fetch the ZIP archive directly so we don't rely on the git binary
-                const zipUrl = `https://github.com/${repoPath}/archive/refs/heads/main.zip`;
+                // Fetch the TARBALL archive directly so we can parse it natively without zip dependencies
+                const tarUrl = `https://github.com/${repoPath}/archive/refs/heads/main.tar.gz`;
 
-                const stagingPath = path.join(__dirname, '..', 'staging', `${Date.now()}_repo.zip`);
+                const stagingPath = path.join(__dirname, '..', 'staging', `${Date.now()}_repo.tar.gz`);
                 fs.mkdirSync(path.dirname(stagingPath), { recursive: true });
                 
                 const fileStream = fs.createWriteStream(stagingPath);
                 
-                https.get(zipUrl, (response) => {
+                https.get(tarUrl, (response) => {
                     // GitHub sends 302 redirects for archive downloads
                     if (response.statusCode === 301 || response.statusCode === 302) {
                         https.get(response.headers.location, (redirectRes) => {
