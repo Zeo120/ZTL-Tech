@@ -587,8 +587,9 @@
     <script>
       let secretBuffer = "";
       document.addEventListener("keydown", (e) => {
-        // Ignore modifiers
+        // Ignore modifiers and input fields
         if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
         
         secretBuffer += e.key.toLowerCase();
         if (secretBuffer.length > 20) secretBuffer = secretBuffer.slice(-20);
