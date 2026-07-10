@@ -61,10 +61,15 @@ class Scanner {
                 }
 
                 if (!this.stats[language]) {
-                    this.stats[language] = { files: 0, loc: 0 };
+                    this.stats[language] = { files: 0, loc: 0, bytes: 0 };
                 }
 
                 this.stats[language].files += 1;
+                
+                // Track raw physical bytes on disk
+                const stat = await fs.promises.stat(fullPath);
+                this.stats[language].bytes += stat.size;
+                
                 const lines = await this._countLines(fullPath);
                 this.stats[language].loc += lines;
             }
