@@ -13,7 +13,9 @@ const DomainAutoDiscovery = require('./DomainAutoDiscovery');
 // This forms the complete absolute footprint for Module 1.
 
 class AccessPointAggregator {
-    constructor(targetCodeDir, outputPath) {
+    constructor(targetKeyword, officialDomain, targetCodeDir, outputPath) {
+        this.targetKeyword = targetKeyword;
+        this.officialDomain = officialDomain;
         this.targetCodeDir = targetCodeDir;
         this.outputPath = outputPath;
     }
@@ -21,12 +23,20 @@ class AccessPointAggregator {
     async aggregateAndExport() {
         console.log(`[DEVM Module 1] Initiating Unified Access Point Matrix Generation...`);
         
-        // 0. Auto-Discover Official Domains from Codebase
+        let rootDomain = this.officialDomain;
+        let targetKeyword = this.targetKeyword;
         const autoDiscover = new DomainAutoDiscovery(this.targetCodeDir);
-        const rootDomain = await autoDiscover.extractRootDomain();
-        let targetKeyword = rootDomain;
-        if (rootDomain !== "UNKNOWN") {
-            targetKeyword = rootDomain.split('.')[0]; // e.g. google.com -> google
+
+        if (!rootDomain) {
+            // 0. Auto-Discover Official Domains from Codebase if not provided
+            rootDomain = await autoDiscover.extractRootDomain();
+            targetKeyword = rootDomain;
+            if (rootDomain !== "UNKNOWN") {
+                targetKeyword = rootDomain.split('.')[0];
+            }
+        } else {
+            // Run auto-discovery anyway just to log what's in the code
+            await autoDiscover.extractRootDomain();
         }
 
         let outputBuffer = `===========================================================\n`;
@@ -85,10 +95,12 @@ class AccessPointAggregator {
 
 // Manual Execution Block
 if (require.main === module) {
-    const targetCodeDir = process.argv[2] || "../../..";
-    const outputPath = process.argv[3] || path.join(__dirname, "AccessPointMatrix.txt");
+    const targetKeyword = process.argv[2] || null;
+    const officialDomain = process.argv[3] || null;
+    const targetCodeDir = process.argv[4] || "../../..";
+    const outputPath = process.argv[5] || path.join(__dirname, "AccessPointMatrix.txt");
 
-    const aggregator = new AccessPointAggregator(targetCodeDir, outputPath);
+    const aggregator = new AccessPointAggregator(targetKeyword, officialDomain, targetCodeDir, outputPath);
     aggregator.aggregateAndExport().catch(err => console.error(err));
 }
 
