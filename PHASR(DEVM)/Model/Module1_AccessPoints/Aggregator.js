@@ -3,6 +3,7 @@ const path = require('path');
 const DomainEntry = require('./DomainEntry');
 const OfficialEndpoints = require('./OfficialEndpoints');
 const UnofficialEndpoints = require('./UnofficialEndpoints');
+const DomainAutoDiscovery = require('./DomainAutoDiscovery');
 
 // Division of Purpose: Access Point Matrix Aggregation
 // Tech Stack: Node.js
@@ -12,9 +13,7 @@ const UnofficialEndpoints = require('./UnofficialEndpoints');
 // This forms the complete absolute footprint for Module 1.
 
 class AccessPointAggregator {
-    constructor(targetKeyword, officialDomain, targetCodeDir, outputPath) {
-        this.targetKeyword = targetKeyword;
-        this.officialDomain = officialDomain;
+    constructor(targetCodeDir, outputPath) {
         this.targetCodeDir = targetCodeDir;
         this.outputPath = outputPath;
     }
@@ -22,14 +21,29 @@ class AccessPointAggregator {
     async aggregateAndExport() {
         console.log(`[DEVM Module 1] Initiating Unified Access Point Matrix Generation...`);
         
+        // 0. Auto-Discover Official Domains from Codebase
+        const autoDiscover = new DomainAutoDiscovery(this.targetCodeDir);
+        const rootDomain = await autoDiscover.extractRootDomain();
+        let targetKeyword = rootDomain;
+        if (rootDomain !== "UNKNOWN") {
+            targetKeyword = rootDomain.split('.')[0]; // e.g. google.com -> google
+        }
+
         let outputBuffer = `===========================================================\n`;
         outputBuffer += `PHASR (DEVM) - MODULE 1: UNIFIED ACCESS POINT MATRIX\n`;
-        outputBuffer += `Target: ${this.targetKeyword} | Root Domain: ${this.officialDomain}\n`;
+        outputBuffer += `Target Keyword: ${targetKeyword} | Discovered Root Domain: ${rootDomain}\n`;
         outputBuffer += `Timestamp: ${new Date().toISOString()}\n`;
         outputBuffer += `===========================================================\n\n`;
+        
+        outputBuffer += `[ AUTO-DISCOVERED INTERNAL DOMAIN CONFIDENCE ]\n`;
+        outputBuffer += `-----------------------------------------------------------\n`;
+        for (const [domain, score] of autoDiscover.discoveredDomains.entries()) {
+            outputBuffer += `[CONFIDENCE: ${score}] ${domain}\n`;
+        }
+        outputBuffer += `\n`;
 
         // 1. External OSINT (Domains)
-        const domainScanner = new DomainEntry(this.targetKeyword, this.officialDomain);
+        const domainScanner = new DomainEntry(targetKeyword, rootDomain);
         const domainMatrix = await domainScanner.mapEcosystem();
         
         outputBuffer += `[ EXTERNAL DOMAIN PERIMETER ]\n`;
@@ -71,12 +85,10 @@ class AccessPointAggregator {
 
 // Manual Execution Block
 if (require.main === module) {
-    const targetKeyword = process.argv[2] || "github";
-    const officialDomain = process.argv[3] || "github.com";
-    const targetCodeDir = process.argv[4] || "../../..";
-    const outputPath = process.argv[5] || path.join(__dirname, "AccessPointMatrix.txt");
+    const targetCodeDir = process.argv[2] || "../../..";
+    const outputPath = process.argv[3] || path.join(__dirname, "AccessPointMatrix.txt");
 
-    const aggregator = new AccessPointAggregator(targetKeyword, officialDomain, targetCodeDir, outputPath);
+    const aggregator = new AccessPointAggregator(targetCodeDir, outputPath);
     aggregator.aggregateAndExport().catch(err => console.error(err));
 }
 
