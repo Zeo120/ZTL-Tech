@@ -28,8 +28,9 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* =========================================
@@ -87,7 +88,7 @@ body {
 
 .app-container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
     padding: 2rem;
     gap: 2rem;
 }
