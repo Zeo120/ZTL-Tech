@@ -51,7 +51,7 @@ void init_registry() {
 void execute_engine(const char *target_dir) {
     // FIX: Using _spawnlp instead of system() avoids shell interpretation
     // and completely prevents Command Injection side-channels.
-    intptr_t status = _spawnlp(_P_WAIT, "node", "node", "CLI/analyzer.js", target_dir, NULL);
+    intptr_t status = _spawnlp(_P_WAIT, "node", "node", "PHASR(DEVM)/CLI/analyzer.js", target_dir, NULL);
     
     if (status == -1) {
         printf("[FATAL] Failed to boot Node.js physics module.\n");
