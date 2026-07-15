@@ -17,7 +17,6 @@ void print_help() {
     printf(" Commands:\n");
     printf("   init                 Initialize a default phasr.yaml in the current directory\n");
     printf("   scan <target_dir>    Execute the DEVM physics pipeline against the target directory\n");
-    printf("   ui                   Boot the local Neumorphic Black & White Dashboard\n");
     printf("   version              Display the current DEVM Engine build\n");
     printf("===========================================================\n\n");
 }
@@ -49,21 +48,10 @@ void init_registry() {
 }
 
 void execute_engine(const char* target_dir) {
-    char command[512];
-    snprintf(command, sizeof(command), "./Engine \"%s\"", target_dir);
-    printf("Routing to Bare-Metal Engine -> %s\n\n", target_dir);
-    
-    // In production, this executes Engine.c
-    // system(command);
-    printf("[Simulated Execution] Running ./Engine \"%s\"\n", target_dir);
-}
-
-void launch_ui() {
-    printf("Booting Local Dashboard on Port 3000...\n");
-    printf("Starting Neumorphic UI. Press CTRL+C to terminate the engine.\n");
-    
-    // Executes the actual Node server to host the HTML/CSS/JS frontend
-    system("npx serve ../Frontend -l 3000");
+    char command[1024];
+    // Executes the actual Node.js Mathematical Profiler to print the colored CLI dashboard
+    snprintf(command, sizeof(command), "node CLI/analyzer.js \"%s\"", target_dir);
+    system(command);
 }
 
 int main(int argc, char *argv[]) {
@@ -84,9 +72,6 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         execute_engine(argv[2]);
-    } 
-    else if (strcmp(argv[1], "ui") == 0) {
-        launch_ui();
     } 
     else if (strcmp(argv[1], "version") == 0) {
         printf("PHASR (DEVM) v1.0.0-baremetal\n");
