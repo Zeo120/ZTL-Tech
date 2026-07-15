@@ -3,63 +3,82 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-#include <regex>
+#include <cmath>
+#include <map>
 
 namespace fs = std::filesystem;
 
-// Division of Purpose: Absolute Anomaly & Malware Signature Detection
-// Tech Stack: C++ (O(1) Memory Streaming, Regex)
+// Division of Purpose: Absolute Anomaly Detection via Shannon Entropy
+// Tech Stack: C++ (O(1) Memory Streaming, Sliding Window)
 //
-// Module 3 does not care about routing or physical depth. It is purely offensive 
-// anomaly detection. It parses raw byte streams looking for heuristic signatures 
-// of malware, reverse shells, packers, or obfuscated payloads.
-// If any mathematical anomaly is detected, the state for that file collapses to 0.
+// Module 3 drops heuristic guessing. It calculates the absolute randomness (entropy)
+// of code using a sliding window. Packed malware, obfuscated scripts, and encrypted
+// shellcode have an entropy H(X) approaching 6.0 to 8.0. Normal code is ~4.0 to 5.0.
+// If any window breaches the hard limit of 5.8, the file state collapses to 0.
 
 struct AnomalyResult {
     bool hasAnomaly;
-    std::string reason;
+    double maxEntropy;
+    uint64_t byteOffset;
 };
 
 class AnomalyAnalyser {
 private:
-    std::vector<std::pair<std::regex, std::string>> anomalySignatures;
+    const size_t WINDOW_SIZE = 128;
+    const double ENTROPY_THRESHOLD = 5.8;
 
-public:
-    AnomalyAnalyser() {
-        // High-confidence malware / backdoor signatures
-        
-        // 1. Base64 encoded 'eval' payloads (Common in Node/PHP malware)
-        anomalySignatures.push_back({std::regex("eval\\s*\\(\\s*atob\\s*\\(", std::regex_constants::icase), "Base64 Obfuscated Execution (eval+atob)"});
-        anomalySignatures.push_back({std::regex("eval\\s*\\(\\s*Buffer\\.from", std::regex_constants::icase), "Buffer Obfuscated Execution (eval+Buffer)"});
-        
-        // 2. Reverse Shell Bindings (Python, Bash, Node)
-        anomalySignatures.push_back({std::regex("child_process\\.exec\\s*\\(\\s*['\"]/bin/sh", std::regex_constants::icase), "Direct /bin/sh Process Binding"});
-        anomalySignatures.push_back({std::regex("nc\\s+-e\\s+/bin/(ba)?sh", std::regex_constants::icase), "Netcat Reverse Shell Signature"});
-        anomalySignatures.push_back({std::regex("socket\\.socket\\(socket\\.AF_INET", std::regex_constants::icase), "Raw TCP Socket Creation (Possible Shell)"});
-        
-        // 3. Destructive Payloads
-        anomalySignatures.push_back({std::regex("rm\\s+-rf\\s+/", std::regex_constants::icase), "Destructive Command (rm -rf /)"});
-        
-        // 4. Memory/Hex Payloads (Shellcode)
-        anomalySignatures.push_back({std::regex("\\\\x[0-9a-fA-F]{2}\\\\x[0-9a-fA-F]{2}\\\\x[0-9a-fA-F]{2}", std::regex_constants::icase), "Hex Encoded Shellcode Injection"});
-    }
-
-    AnomalyResult scanFile(const fs::path& filePath) {
-        std::ifstream file(filePath, std::ios::in);
-        if (!file.is_open()) return {false, ""};
-
-        std::string line;
-        while (std::getline(file, line)) {
-            std::smatch match;
-            
-            for (const auto& [regexSig, reason] : anomalySignatures) {
-                if (std::regex_search(line, match, regexSig)) {
-                    return {true, reason};
-                }
-            }
+    // Shannon Entropy Formula: H(X) = -Sum(P(x) * log2(P(x)))
+    double calculateEntropy(const std::vector<char>& window) {
+        std::map<char, int> frequencies;
+        for (char c : window) {
+            frequencies[c]++;
         }
 
-        return {false, ""};
+        double entropy = 0.0;
+        double windowSize = static_cast<double>(window.size());
+
+        for (const auto& [c, count] : frequencies) {
+            double p_x = static_cast<double>(count) / windowSize;
+            if (p_x > 0) {
+                entropy -= p_x * std::log2(p_x);
+            }
+        }
+        return entropy;
+    }
+
+public:
+    AnomalyResult scanFile(const fs::path& filePath) {
+        std::ifstream file(filePath, std::ios::in | std::ios::binary);
+        if (!file.is_open()) return {false, 0.0, 0};
+
+        std::vector<char> window;
+        char c;
+        uint64_t offset = 0;
+        uint64_t maxOffset = 0;
+        double highestEntropy = 0.0;
+
+        while (file.get(c)) {
+            window.push_back(c);
+            if (window.size() > WINDOW_SIZE) {
+                window.erase(window.begin());
+            }
+
+            if (window.size() == WINDOW_SIZE) {
+                double currentEntropy = calculateEntropy(window);
+                if (currentEntropy > highestEntropy) {
+                    highestEntropy = currentEntropy;
+                    maxOffset = offset;
+                }
+
+                if (currentEntropy >= ENTROPY_THRESHOLD) {
+                    // Absolute constraint breached
+                    return {true, currentEntropy, offset};
+                }
+            }
+            offset++;
+        }
+
+        return {false, highestEntropy, maxOffset};
     }
 };
 
@@ -72,7 +91,7 @@ int main(int argc, char* argv[]) {
     std::string targetDir = argv[1];
     AnomalyAnalyser analyser;
     
-    std::cout << "[DEVM Module 3] Initiating Anomaly & Malware Scan...\n";
+    std::cout << "[DEVM Module 3] Initiating Shannon Entropy Sliding Window Scan...\n";
 
     bool systemCompromised = false;
     uint64_t scannedFiles = 0;
@@ -80,13 +99,21 @@ int main(int argc, char* argv[]) {
     try {
         for (const auto& entry : fs::recursive_directory_iterator(targetDir, fs::directory_options::skip_permission_denied)) {
             if (entry.is_regular_file()) {
+                std::string pathStr = entry.path().string();
+                
+                // Exclude known high-entropy assets like images or certificates for accurate code scanning
+                if (pathStr.find(".png") != std::string::npos || pathStr.find(".jpg") != std::string::npos || pathStr.find(".crt") != std::string::npos) {
+                    continue;
+                }
+
                 scannedFiles++;
                 AnomalyResult result = analyser.scanFile(entry.path());
                 
                 if (result.hasAnomaly) {
                     systemCompromised = true;
                     std::cout << "[ANOMALY DETECTED] File: " << entry.path().filename().string() 
-                              << " | Signature: " << result.reason << "\n";
+                              << " | Max Entropy: " << result.maxEntropy 
+                              << " | Trigger Offset: " << result.byteOffset << " bytes\n";
                 }
             }
         }
@@ -100,10 +127,10 @@ int main(int argc, char* argv[]) {
     std::cout << "Total Files Scanned: " << scannedFiles << "\n";
     
     if (systemCompromised) {
-        std::cout << "[OUTPUT] STATE = 0 (MALWARE/ANOMALY DETECTED).\n";
+        std::cout << "[OUTPUT] STATE = 0 (MALWARE/OBFUSCATION DETECTED). Entropy threshold breached.\n";
         return 1; // Error code for OS bridge
     } else {
-        std::cout << "[OUTPUT] STATE = 1 (CLEAN). Zero anomalies found.\n";
+        std::cout << "[OUTPUT] STATE = 1 (CLEAN). Codebase physics are predictable.\n";
         return 0; // Success
     }
 }
