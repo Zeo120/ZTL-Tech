@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASR (DEVM) - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar neu-convex">
+            <div class="logo-container">
+                <div class="logo-icon neu-concave">
+                    <span class="logo-text">PH</span>
+                </div>
+                <h1 class="brand-title">PHASR</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="nav-item active neu-flat" data-target="dashboard">
+                    <span class="nav-icon">◱</span> Dashboard
+                </li>
+                <li class="nav-item neu-flat" data-target="module1">
+                    <span class="nav-icon">⎔</span> Access Points (M1)
+                </li>
+                <li class="nav-item neu-flat" data-target="module2">
+                    <span class="nav-icon">◉</span> Data Analyser (M2)
+                </li>
+                <li class="nav-item neu-flat" data-target="module3">
+                    <span class="nav-icon">⎉</span> Anomaly Analyser (M3)
+                </li>
+                <li class="nav-item neu-flat" data-target="module4">
+                    <span class="nav-icon">⎊</span> Security Math (M4)
+                </li>
+            </ul>
+
+            <div class="system-status neu-convex">
+                <p class="status-label">ENGINE STATE</p>
+                <div class="status-indicator neu-concave">
+                    <div class="status-light" id="global-state-light"></div>
+                    <span id="global-state-text">0 : COLLAPSED</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <header class="top-bar">
+                <h2 class="page-title">DEVM Orchestration Matrix</h2>
+                <div class="run-action neu-button" id="btn-run-pipeline">
+                    EXECUTE PIPELINE
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Economics Panel -->
+                <section class="card neu-convex span-2">
+                    <h3 class="card-title">Total Economic Cost (TEC/M)</h3>
+                    <div class="tec-display neu-concave">
+                        <span class="currency">$</span>
+                        <span class="amount" id="tec-amount">0.00</span>
+                    </div>
+                    <div class="tec-breakdown">
+                        <div class="breakdown-item">
+                            <span>Base Physical Maintenance</span>
+                            <span class="bold">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>Attack Surface Penalty</span>
+                            <span class="bold">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>Malware Liability</span>
+                            <span class="bold">--</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Mathematical Physics Panel -->
+                <section class="card neu-convex">
+                    <h3 class="card-title">Physical Fingerprint</h3>
+                    <div class="physics-stats">
+                        <div class="stat-box neu-flat">
+                            <span class="stat-label">Total Mass</span>
+                            <span class="stat-value" id="stat-mass">0 B</span>
+                        </div>
+                        <div class="stat-box neu-flat">
+                            <span class="stat-label">Max AST Depth</span>
+                            <span class="stat-value" id="stat-depth">0</span>
+                        </div>
+                        <div class="stat-box neu-flat">
+                            <span class="stat-label">Max Entropy</span>
+                            <span class="stat-value" id="stat-entropy">0.00 H(X)</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Live Log Stream -->
+                <section class="card neu-convex span-3">
+                    <h3 class="card-title">Inference Bridge Terminal</h3>
+                    <div class="terminal neu-concave" id="terminal-output">
+                        <div class="log-line system">PHASR System Initialized. Awaiting pipeline execution...</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
