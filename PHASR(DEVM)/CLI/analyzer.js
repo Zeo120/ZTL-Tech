@@ -375,6 +375,42 @@ async function renderDashboard() {
     // Final Report
     const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length + results.m6_anomalies.length;
 
+    // Generate Formal Security Report (Markdown)
+    const reportPath = path.join(process.cwd(), 'phasr_security_report.md');
+    let md = `# PHASR (DEVM) - Security Posture Report\n\n`;
+    md += `**Target:** ${targetDir}\n`;
+    md += `**Files Scanned:** ${results.filesScanned}\n`;
+    md += `**Physical Mass:** ${(results.totalMassBytes / 1024).toFixed(2)} KB\n\n`;
+    md += `## Total Anomalies Detected: ${totalAnomalies}\n\n`;
+
+    if (results.m3_anomalies.length > 0) {
+        md += `### ☢️ Module 3: Entropy Analyser\n`;
+        results.m3_anomalies.forEach(a => md += `- **${a.file.split(/[\\/]/).pop()}** (H(X) = ${a.value}): ${a.reason}\n`);
+        md += `\n`;
+    }
+    if (results.m4_anomalies.length > 0) {
+        md += `### ☢️ Module 4: Security Math (Taint Flows)\n`;
+        results.m4_anomalies.forEach(a => md += `- **${a.file.split(/[\\/]/).pop()}:${a.line}** - ${a.reason}\n`);
+        md += `\n`;
+    }
+    if (results.m5_anomalies.length > 0) {
+        md += `### ☢️ Module 5: Temporal Physics (Side-Channels)\n`;
+        results.m5_anomalies.forEach(a => md += `- **${a.file.split(/[\\/]/).pop()}:${a.line}** - ${a.reason}\n`);
+        md += `\n`;
+    }
+    if (results.m6_anomalies.length > 0) {
+        md += `### ☢️ Module 6: Binary Dissection (Hex/Assembly)\n`;
+        results.m6_anomalies.forEach(a => md += `- **${a.file.split(/[\\/]/).pop()}** - [${a.asm}] : ${a.reason}\n`);
+        md += `\n`;
+    }
+
+    try {
+        fs.writeFileSync(reportPath, md);
+        console.log(`[\x1b[32m+\x1b[0m] Persistent Security Report Generated: ${reportPath}\n`);
+    } catch (e) {
+        console.log(`[\x1b[31m-\x1b[0m] Failed to generate Security Report.\n`);
+    }
+
     if (totalAnomalies > 0) {
         console.log(`${bright}${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
         await sleep(200);
