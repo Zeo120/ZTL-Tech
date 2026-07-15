@@ -103,7 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 9500);
 
         setTimeout(() => {
-            logToTerminal("Module 5 (Temporal Physics): TIMING LEAK DETECTED! Delta T = 14,021 Cycles.", "error");
+            logToTerminal("Module 5 (Temporal Physics): TIMING LEAK DETECTED!", "error");
+            logToTerminal("  ↳ Target: src/controllers/authController.ts (Line 84)", "error");
+            logToTerminal("  ↳ Function Trace: verifyUserCredentials()", "error");
+            logToTerminal("  ↳ Physics: Delta T = 14,021 Cycles (> 5,000 threshold)", "error");
+            
             logToTerminal("Inference Bridge: Hardware state contradiction. Executing Wave Collapse.", "error");
             
             // UI State Change for Collapse
