@@ -153,74 +153,109 @@ async function renderDashboard() {
     console.log(`${bright}${yellow}[*] Executing Hardware Physics Modules...${reset}\n`);
     await sleep(1000);
 
-    // Entropy Report
+    // =====================================
+    // M3: ENTROPY
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 3 — ENTROPY ANALYSER`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+
     if (results.m3_anomalies.length > 0) {
-        console.log(`${bright}${red}[COLLAPSE] Module 3 (Entropy): THRESHOLD BREACHED!${reset}`);
-        await sleep(500);
+        console.log(`${bright}${red}Rule:${reset}`);
+        console.log(`High Entropy Data (Possible Obfuscation)\n`);
+        console.log(`${bright}${red}Findings: ${results.m3_anomalies.length}${reset}\n`);
+        
+        console.log(`${bright}Files${reset}`);
         for (const a of results.m3_anomalies) {
-            console.log(`    ↳ ${red}Entropy H(X) = ${a.value}${reset} in ${a.file}`);
-            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
-            await sleep(300);
+            const fileName = a.file.split(/[\\/]/).pop();
+            console.log(` • ${fileName} (H(X) = ${a.value})`);
+            await sleep(100);
         }
+        
+        console.log(`\n${bright}${green}Recommendation${reset}`);
+        console.log(` Remove compiled binaries from source tree`);
+        console.log(` Decrypt or de-obfuscate payload strings\n`);
     } else {
-        console.log(`${bright}${green}[SAFE] Module 3 (Entropy): Maximum Entropy H(X) = ${results.maxEntropy.toFixed(2)}${reset}`);
-        await sleep(500);
+        console.log(`${bright}${green}[SAFE] Maximum Entropy H(X) = ${results.maxEntropy.toFixed(2)}${reset}\n`);
     }
     
-    await sleep(800);
+    await sleep(500);
     
-    // Taint Flow Report
+    // =====================================
+    // M4: SECURITY MATH
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 4 — SECURITY MATH`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+
     if (results.m4_anomalies.length > 0) {
-        console.log(`${bright}${red}[COLLAPSE] Module 4 (Security Math): TAINT FLOW DETECTED!${reset}`);
-        await sleep(500);
+        console.log(`${bright}${red}Rule:${reset}`);
+        console.log(`Unsanitized Command Execution & Buffer Overflows\n`);
+        console.log(`${bright}${red}Findings: ${results.m4_anomalies.length}${reset}\n`);
+        
+        console.log(`${bright}Files${reset}`);
         for (const a of results.m4_anomalies) {
-            console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
-            console.log(`      ${yellow}Code:${reset}   ${a.code}`);
-            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
-            if (a.fix) console.log(`      ${green}Fix:   ${reset} ${a.fix}`);
-            await sleep(300);
+            const fileName = a.file.split(/[\\/]/).pop();
+            console.log(` • ${fileName}:${a.line}`);
+            await sleep(100);
         }
+        
+        console.log(`\n${bright}${green}Recommendation${reset}`);
+        console.log(` Replace system() with execve()/CreateProcess()`);
+        console.log(` Validate user-controlled input`);
+        console.log(` Avoid shell interpretation`);
+        console.log(` Use strncpy or safely bounds-checked memory copies\n`);
     } else {
-        console.log(`${bright}${green}[SAFE] Module 4 (Security Math): 0 Unsanitized Flows.${reset}`);
+        console.log(`${bright}${green}[SAFE] 0 Unsanitized Flows${reset}\n`);
     }
 
-    await sleep(800);
+    await sleep(500);
 
-    // Temporal Report
+    // =====================================
+    // M5: TEMPORAL PHYSICS
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 5 — TEMPORAL PHYSICS`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+
     if (results.m5_anomalies.length > 0) {
-        console.log(`${bright}${red}[COLLAPSE] Module 5 (Temporal Physics): TIMING LEAK DETECTED!${reset}`);
-        await sleep(500);
+        console.log(`${bright}${red}Rule:${reset}`);
+        console.log(`Timing Side-Channel Leaks\n`);
+        console.log(`${bright}${red}Findings: ${results.m5_anomalies.length}${reset}\n`);
+        
+        console.log(`${bright}Files${reset}`);
         for (const a of results.m5_anomalies) {
-            console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
-            console.log(`      ${yellow}Code:${reset}   ${a.code}`);
-            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
-            if (a.fix) console.log(`      ${green}Fix:   ${reset} ${a.fix}`);
-            await sleep(300);
+            const fileName = a.file.split(/[\\/]/).pop();
+            console.log(` • ${fileName}:${a.line}`);
+            await sleep(100);
         }
+        
+        console.log(`\n${bright}${green}Recommendation${reset}`);
+        console.log(` Use Constant-Time mathematical comparisons (e.g. Bitwise XOR loops)`);
+        console.log(` Prevent early-exit branch evaluation on sensitive strings\n`);
     } else {
-        console.log(`${bright}${green}[SAFE] Module 5 (Temporal Physics): Constant-Time Verified.${reset}\n`);
+        console.log(`${bright}${green}[SAFE] Constant-Time Verified${reset}\n`);
     }
 
     await sleep(1000);
 
+    // Final Report
     const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length;
 
     if (totalAnomalies > 0) {
-        console.log(`${bright}${red}=======================================================${reset}`);
+        console.log(`${bright}${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
         await sleep(200);
         console.log(`${bright}${red} WAVE COLLAPSE: DEPLOYMENT HALTED${reset}`);
         await sleep(200);
-        console.log(`${bright}${red}=======================================================${reset}`);
+        console.log(`${bright}${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
         console.log();
-        
-        // Throw a hard system error for CI/CD pipelines
         throw new Error("PHASR DEVM Pipeline Failed: Critical Hardware Vulnerabilities Detected.");
     } else {
-        console.log(`${bright}${green}=======================================================${reset}`);
+        console.log(`${bright}${green}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
         await sleep(200);
         console.log(`${bright}${green} PIPELINE SAFE: DEPLOYMENT APPROVED${reset}`);
         await sleep(200);
-        console.log(`${bright}${green}=======================================================${reset}`);
+        console.log(`${bright}${green}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
         console.log();
         process.exit(0);
     }
