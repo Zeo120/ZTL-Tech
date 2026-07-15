@@ -345,6 +345,30 @@ async function renderDashboard() {
         console.log(`${bright}${green}[SAFE] No Assembly Taint Flows Detected${reset}\n`);
     }
 
+    await sleep(400);
+
+    // =====================================
+    // MODULE 7: TRADEOFF ANALYSER
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 7 — TRADEOFF ANALYSER`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+    
+    // Tradeoff Math: Liability Cost vs Payload Value
+    // Every anomaly costs $10,000 in liability. Every KB costs $0.05 in maintenance.
+    const totalLiability = (results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length + results.m6_anomalies.length) * 10000;
+    const maintenanceCost = (results.totalMassBytes / 1024) * 0.05;
+    const totalEconomicRisk = totalLiability + maintenanceCost;
+    results.m7_tradeoff_score = totalEconomicRisk;
+
+    if (totalEconomicRisk > 50000) {
+        console.log(`[${bright}${red}ECONOMIC FAILURE${reset}] Risk Liability: $${totalEconomicRisk.toFixed(2)}`);
+        console.log(`[${bright}${red}ECONOMIC FAILURE${reset}] Security debt exceeds deployment value.\n`);
+    } else {
+        console.log(`[${bright}${green}ECONOMIC SUCCESS${reset}] Risk Liability: $${totalEconomicRisk.toFixed(2)}`);
+        console.log(`[${bright}${green}ECONOMIC SUCCESS${reset}] Tradeoff acceptable for deployment.\n`);
+    }
+
     await sleep(1000);
 
     // =====================================
