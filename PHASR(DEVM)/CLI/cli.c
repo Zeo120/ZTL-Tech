@@ -59,9 +59,11 @@ void execute_engine(const char* target_dir) {
 }
 
 void launch_ui() {
-    printf("Booting Local Dashboard (Port 3000)...\n");
-    // system("npx serve ../Frontend");
-    printf("[Simulated] UI server started at http://localhost:3000\n");
+    printf("Booting Local Dashboard on Port 3000...\n");
+    printf("Starting Neumorphic UI. Press CTRL+C to terminate the engine.\n");
+    
+    // Executes the actual Node server to host the HTML/CSS/JS frontend
+    system("npx serve ../Frontend -l 3000");
 }
 
 int main(int argc, char *argv[]) {
