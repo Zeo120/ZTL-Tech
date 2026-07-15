@@ -198,10 +198,7 @@ async function renderDashboard() {
 
     await sleep(1000);
 
-    // Economic Report
     const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length;
-    const tecLiability = 75000 + (results.totalMassBytes * 0.10) + (totalAnomalies * 1500000);
-    const tec = tecLiability.toLocaleString();
 
     if (totalAnomalies > 0) {
         console.log(`${bright}${red}=======================================================${reset}`);
@@ -209,8 +206,6 @@ async function renderDashboard() {
         console.log(`${bright}${red} WAVE COLLAPSE: DEPLOYMENT HALTED${reset}`);
         await sleep(200);
         console.log(`${bright}${red}=======================================================${reset}`);
-        await sleep(500);
-        console.log(` Total Economic Cost (TEC/M): ${bright}$${tec}${reset}`);
         console.log();
         
         // Throw a hard system error for CI/CD pipelines
@@ -221,8 +216,6 @@ async function renderDashboard() {
         console.log(`${bright}${green} PIPELINE SAFE: DEPLOYMENT APPROVED${reset}`);
         await sleep(200);
         console.log(`${bright}${green}=======================================================${reset}`);
-        await sleep(500);
-        console.log(` Total Economic Cost (TEC/M): ${bright}$${tec}${reset}`);
         console.log();
         process.exit(0);
     }
