@@ -49,7 +49,7 @@ graph TD
     D --> F[Calculate Median μ Valid]
     E --> G[Calculate Median μ Invalid]
     
-    F --> H{Is |μ_Valid - μ_Invalid| > Threshold?}
+    F --> H{"Is |μ_Valid - μ_Invalid| > Threshold?"}
     G --> H
     
     H -- Yes --> I[State = 0 Wave Collapse]
