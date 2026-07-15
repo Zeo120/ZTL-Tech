@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <process.h>
 
 // Division of Purpose: Developer Experience (CLI Wrapper)
 // Tech Stack: Pure C
@@ -47,11 +48,14 @@ void init_registry() {
     printf("[✓] Initialized phasr.yaml registry successfully.\n");
 }
 
-void execute_engine(const char* target_dir) {
-    char command[1024];
-    // Executes the actual Node.js Mathematical Profiler to print the colored CLI dashboard
-    snprintf(command, sizeof(command), "node CLI/analyzer.js \"%s\"", target_dir);
-    system(command);
+void execute_engine(const char *target_dir) {
+    // FIX: Using _spawnlp instead of system() avoids shell interpretation
+    // and completely prevents Command Injection side-channels.
+    intptr_t status = _spawnlp(_P_WAIT, "node", "node", "CLI/analyzer.js", target_dir, NULL);
+    
+    if (status == -1) {
+        printf("[FATAL] Failed to boot Node.js physics module.\n");
+    }
 }
 
 int main(int argc, char *argv[]) {

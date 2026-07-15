@@ -201,7 +201,7 @@ async function renderDashboard() {
         }
         
         console.log(`\n${bright}${green}Recommendation${reset}`);
-        console.log(` Replace system() with execve()/CreateProcess()`);
+        console.log(` Replace system calls with execve()/CreateProcess()`);
         console.log(` Validate user-controlled input`);
         console.log(` Avoid shell interpretation`);
         console.log(` Use strncpy or safely bounds-checked memory copies\n`);
