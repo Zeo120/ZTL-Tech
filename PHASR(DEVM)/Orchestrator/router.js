@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { spawnSync } = require('child_process');
 
 const targetDir = process.argv[2] || process.cwd();
@@ -50,10 +51,14 @@ const binDir = path.join(__dirname, '..', '..'); // Project Root
 let command = 'node';
 let args = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir];
 
+// OS Platform Detection for Arch/Mac compatibility
+const isWin = os.platform() === 'win32';
+const binExt = isWin ? '.exe' : '';
+
 if (totalMass >= MASS_LIMIT_ASM) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200MB. Extreme OS overload detected.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[31mNASM Assembly Engine\x1b[0m...\n`);
-    const asmBinary = path.join(binDir, 'phasr_asm.exe');
+    const asmBinary = path.join(binDir, `phasr_asm${binExt}`);
     if (fs.existsSync(asmBinary)) {
         command = asmBinary;
         args = [targetDir];
@@ -66,7 +71,7 @@ if (totalMass >= MASS_LIMIT_ASM) {
 if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mNative C++17 Engine\x1b[0m...\n`);
-    const cppBinary = path.join(binDir, 'phasr_native.exe');
+    const cppBinary = path.join(binDir, `phasr_native${binExt}`);
     if (fs.existsSync(cppBinary)) {
         command = cppBinary;
         args = [targetDir];
