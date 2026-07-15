@@ -1,0 +1,3 @@
+#!/bin/bash
+# PHASR DEVM - Global CLI Wrapper (Bash/MinGW)
+node "PHASR(DEVM)/CLI/analyzer.js" "$1"
