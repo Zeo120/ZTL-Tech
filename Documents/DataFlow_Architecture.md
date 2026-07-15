@@ -28,6 +28,7 @@ graph TD
         M3("M3: Anomaly Analyser .asm/.s")
         M4("M4: Security Math .asm/.s")
         M5("M5: Temporal Physics .asm/.s")
+        M6("M6: Binary Dissection .asm/.s")
         MN("MN: Custom Vectorized Expansion")
     end
 
@@ -36,6 +37,7 @@ graph TD
     Engine -->|Spawns Hardware Threads| M3
     Engine -->|Spawns Hardware Threads| M4
     Engine -->|Spawns Hardware Threads| M5
+    Engine -->|Spawns Hardware Threads| M6
     Engine -.->|Dynamically Loads| MN
     
     Internet --> M1
@@ -52,24 +54,26 @@ graph TD
     M3 -->|Hardware State| CrossVerify
     M4 -->|Hardware State| CrossVerify
     M5 -->|Hardware State| CrossVerify
+    M6 -->|Hardware State| CrossVerify
     MN -.->|Hardware State| CrossVerify
 
     CrossVerify --> ParanoiaCheck
     ParanoiaCheck --> WaveCollapse
 
-    %% Business Logic / OCaml
-    subgraph Econ ["Economical Analysis Layer"]
-        TEC("Total Economic Cost TEC/M")
+    %% Business Logic / Tradeoff Analyser
+    subgraph Econ ["Module 7: Tradeoff Analyser Layer"]
+        M7("M7: Tradeoff Analyser (Economic Equation)")
         DeployStatus["Resolution: Halt or Deploy"]
     end
 
     %% Final Economic Routing
-    WaveCollapse --> TEC
-    M2 -->|Physical Mass| TEC
-    M1 -->|Total Routes| TEC
-    M5 -->|Timing Leak Liability| TEC
+    WaveCollapse --> M7
+    M2 -->|Physical Mass| M7
+    M1 -->|Total Routes| M7
+    M5 -->|Timing Leak Liability| M7
+    M6 -->|Hostile Instructions| M7
     
-    TEC --> DeployStatus
+    M7 --> DeployStatus
 
     %% Styling
     style WaveCollapse fill:#ff4d4d,stroke:#333,stroke-width:2px,color:#fff
@@ -90,10 +94,11 @@ Each module acts as a completely isolated observer of the codebase, executed as 
 *   **M3** calculates entropy using the hardware FPU `FYL2X` instruction.
 *   **M4** traces data flows via bare-metal state mapping.
 *   **M5** measures temporal side-channel leaks using the `RDTSC` instruction.
+*   **M6** dynamically disassembles compiled artifacts to statically evaluate register manipulation.
 *   **Mn** (Any future `.asm` module dynamically loaded via the registry).
 
 ### 3. The Inference Bridge
 This is the layer that forces the isolated states to interact. It receives the outputs of `N` hardware modules and checks for contradictions. If there is a contradiction, or if *any* single module in the dynamic registry returned a `0`, the Bridge executes a **Wave Collapse**, reducing the global state to `0`.
 
-### 4. The Business Resolution
-The `0` or `1` state, along with the raw physical metrics, is routed to the OCaml Business Logic layer. This translates the physics into **Liability and Maintenance Costs (TEC/M)**, yielding the final executive decision: **Halt or Deploy**.
+### 4. The Business Resolution (Module 7)
+The `0` or `1` state, along with the raw physical metrics, is routed to **Module 7 (Tradeoff Analyser)**. This translates the physics into **Absolute Financial Liability vs Maintenance Costs**, yielding the final cryptoeconomic decision: **Halt or Deploy**.
