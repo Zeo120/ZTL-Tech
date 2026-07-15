@@ -1,0 +1,9 @@
+# PHASR (DEVM) Dynamic Module Registry
+# The C Engine parses this file at runtime to dynamically load modules.
+# You can add or remove modules here without recompiling the core Engine.
+
+modules:
+  - path: "./Module1_Aggregator"
+  - path: "./Module2_DataAnalyser"
+  - path: "./Module3_AnomalyAnalyser"
+  - path: "./Module4_SecurityMath"

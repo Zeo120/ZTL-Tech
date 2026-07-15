@@ -2,53 +2,49 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Division of Purpose: Absolute Main Engine Orchestration
+// Division of Purpose: Dynamic Main Engine Orchestration
 // Tech Stack: Pure C (Bare Metal)
 //
 // The Main Engine is the absolute authority of the PHASR DEVM.
-// It is written in pure C to ensure zero overhead, zero garbage collection pauses,
-// and direct memory mapping to the OS kernel. 
-// It sequences the 4 isolated Modules, passes their physical outputs into the Inference Bridge,
-// and halts execution if the resulting state is 0.
+// It parses 'phasr.yaml' at runtime to dynamically load an infinite number 
+// of security constraint modules (M1 ... Mn). This satisfies the Open/Closed
+// Principle (Open for extension, closed for modification).
 
 #define STATE_SAFE 1
 #define STATE_COLLAPSE 0
+#define MAX_MODULES 50
+#define MAX_PATH_LEN 256
 
 void print_banner() {
     printf("===========================================================\n");
-    printf(" PHASR (DEVM) - MAIN ORCHESTRATION ENGINE\n");
+    printf(" PHASR (DEVM) - DYNAMIC ORCHESTRATION ENGINE\n");
     printf(" CORE ARCHITECTURE: PURE C (BARE METAL)\n");
     printf("===========================================================\n\n");
 }
 
-int execute_module(const char* module_name, const char* target_dir) {
-    printf("[ENGINE] Dispatching Thread for %s on target: %s\n", module_name, target_dir);
+int execute_module(const char* module_path, const char* target_dir) {
+    printf("[ENGINE] Dispatching Thread for Module: %s on target: %s\n", module_path, target_dir);
     
-    // In a production environment, this uses raw POSIX fork/exec or Windows CreateProcess 
-    // mapped directly to the C++ Scheduler.cpp hardware pins.
-    // For this blueprint, we simulate the return state based on process exit codes.
+    // In production, this maps to the bare-metal Thread Scheduler.
+    // We simulate the process exit code here.
     
     char command[512];
-    snprintf(command, sizeof(command), "%s \"%s\"", module_name, target_dir);
+    snprintf(command, sizeof(command), "%s \"%s\"", module_path, target_dir);
     
-    // System call to execute the isolated module (M1, M2, M3, M4)
     // int exit_code = system(command); 
-    
-    // Simulated successful physics evaluation
-    int exit_code = 0; 
+    int exit_code = 0; // Simulated successful execution
 
     if (exit_code != 0) {
-        printf("[ENGINE ERROR] %s triggered a mathematical collapse (State = 0).\n", module_name);
+        printf("[ENGINE ERROR] %s triggered a mathematical collapse (State = 0).\n", module_path);
         return STATE_COLLAPSE;
     }
     
-    printf("[ENGINE OK] %s executed successfully. State = 1.\n", module_name);
+    printf("[ENGINE OK] %s executed successfully. State = 1.\n", module_path);
     return STATE_SAFE;
 }
 
 int execute_inference_bridge() {
     printf("\n[ENGINE] Firing Inference Bridge (Cross-Verification)...\n");
-    // Cross-verify Module 1 vs Module 2 vs Module 3 outputs for contradictions
     // int exit_code = system("./InferenceBridge");
     
     int exit_code = 0; // Simulated success
@@ -61,9 +57,37 @@ int execute_inference_bridge() {
 
 void execute_economical_analysis() {
     printf("\n[ENGINE] Firing OCaml Economical Analysis (TEC/M)...\n");
-    // Passes the physical constraints to the OCaml Business Logic
     // system("ocamlrun EconomicalAnalysis.byte");
     printf("[ENGINE OK] TEC/M Calculated.\n");
+}
+
+// Very raw string parser to pull out paths from the YAML file without needing 3rd-party dependencies
+int load_manifest(const char* manifest_path, char modules[MAX_MODULES][MAX_PATH_LEN]) {
+    FILE *file = fopen(manifest_path, "r");
+    if (!file) {
+        fprintf(stderr, "FATAL: Could not open registry manifest %s\n", manifest_path);
+        return -1;
+    }
+
+    int count = 0;
+    char line[256];
+    
+    while (fgets(line, sizeof(line), file)) {
+        char *ptr = strstr(line, "path: \"");
+        if (ptr) {
+            ptr += 7; // skip "path: ""
+            char *end_ptr = strchr(ptr, '\"');
+            if (end_ptr && count < MAX_MODULES) {
+                *end_ptr = '\0';
+                strncpy(modules[count], ptr, MAX_PATH_LEN - 1);
+                modules[count][MAX_PATH_LEN - 1] = '\0';
+                count++;
+            }
+        }
+    }
+    
+    fclose(file);
+    return count;
 }
 
 int main(int argc, char *argv[]) {
@@ -75,21 +99,31 @@ int main(int argc, char *argv[]) {
     const char* target_dir = argv[1];
     print_banner();
 
+    // 1. Dynamic Registry Loading
+    char modules[MAX_MODULES][MAX_PATH_LEN];
+    int module_count = load_manifest("phasr.yaml", modules);
+    
+    if (module_count <= 0) {
+        fprintf(stderr, "FATAL: No modules found in phasr.yaml registry. System cannot evaluate physics.\n");
+        return 1;
+    }
+
+    printf("[ENGINE] Dynamic Registry Loaded. Found %d active modules.\n\n", module_count);
+
     // The Global State Pipeline
     int global_state = STATE_SAFE;
 
-    // Phase 1: Physical Data Gathering
-    global_state &= execute_module("./Module1_Aggregator", target_dir);
-    global_state &= execute_module("./Module2_DataAnalyser", target_dir);
-    global_state &= execute_module("./Module3_AnomalyAnalyser", target_dir);
-    global_state &= execute_module("./Module4_SecurityMath", target_dir);
+    // 2. Physical Data Gathering (Dynamic Execution Loop)
+    for (int i = 0; i < module_count; i++) {
+        global_state &= execute_module(modules[i], target_dir);
+    }
 
-    // Phase 2: Contradiction Mapping
+    // 3. Contradiction Mapping
     if (global_state == STATE_SAFE) {
         global_state &= execute_inference_bridge();
     }
 
-    // Phase 3: Final Resolution
+    // 4. Final Resolution
     if (global_state == STATE_COLLAPSE) {
         printf("\n===========================================================\n");
         printf(" [!] DEVM PIPELINE HALTED [!]\n");
@@ -97,7 +131,6 @@ int main(int argc, char *argv[]) {
         printf(" Mathematics have proven the codebase violates physics.\n");
         printf("===========================================================\n");
         
-        // We still run economics to show the executive team the liability cost of the failure
         execute_economical_analysis();
         return 1; 
     }
