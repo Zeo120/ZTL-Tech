@@ -7,22 +7,22 @@ This document maps the exact flow of data through the PHASR DEVM. It has been up
 ```mermaid
 graph TD
     %% Define Data Inputs
-    subgraph Data_Ingestion [Data Sources]
+    subgraph Data_Ingestion ["Data Sources"]
         Codebase[("Raw Codebase Repository")]
         Manifest[("phasr.yaml : Module Registry")]
         Internet(("External DNS/OSINT"))
     end
 
     %% Dynamic Main Engine
-    subgraph Core [Main Engine Orchestration]
-        Engine(Engine.c : Bare-Metal Thread Spawner)
+    subgraph Core ["Main Engine Orchestration"]
+        Engine("Engine.c : Bare-Metal Thread Spawner")
     end
 
     Manifest -->|Loads Active Modules| Engine
     Codebase --> Engine
 
     %% Dynamic Assembly Execution Layer
-    subgraph Modules [Hardware Physics Layer: Multi-Arch (x86_64 & ARM64)]
+    subgraph Modules ["Hardware Physics Layer: Multi-Arch (x86_64 & ARM64)"]
         M1("M1: Access Points .asm/.s")
         M2("M2: Data Analyser .asm/.s")
         M3("M3: Anomaly Analyser .asm/.s")
@@ -41,10 +41,10 @@ graph TD
     Internet --> M1
 
     %% Orchestration / Hardware Bridge
-    subgraph Bridge [Inference Bridge]
-        CrossVerify(Cross-Inference State Verifier)
-        ParanoiaCheck{Contradiction Check}
-        WaveCollapse[Global Wave Collapse: 0 or 1]
+    subgraph Bridge ["Inference Bridge"]
+        CrossVerify("Cross-Inference State Verifier")
+        ParanoiaCheck{"Contradiction Check"}
+        WaveCollapse["Global Wave Collapse: 0 or 1"]
     end
 
     M1 -->|Hardware State| CrossVerify
@@ -58,9 +58,9 @@ graph TD
     ParanoiaCheck --> WaveCollapse
 
     %% Business Logic / OCaml
-    subgraph Econ [Economical Analysis Layer]
-        TEC(Total Economic Cost TEC/M)
-        DeployStatus[Resolution: Halt or Deploy]
+    subgraph Econ ["Economical Analysis Layer"]
+        TEC("Total Economic Cost TEC/M")
+        DeployStatus["Resolution: Halt or Deploy"]
     end
 
     %% Final Economic Routing
