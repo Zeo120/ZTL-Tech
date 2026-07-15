@@ -214,7 +214,7 @@ async function renderDashboard() {
         
         const arch = os.arch();
         if (arch === 'arm64' || arch === 'arm') {
-            console.log(`[${bright}${magenta}ARM SILICON${reset}] Raspberry Pi / Apple Silicon Environment Detected.`);
+            console.log(`[${bright}${magenta}ARM SILICON${reset}] Apple Silicon / Raspberry Pi / Linux Mobile Environment Detected.`);
             console.log(`[${bright}${magenta}ARM SILICON${reset}] Routing execution to raw AArch64 Physics Modules...\n`);
         }
 
