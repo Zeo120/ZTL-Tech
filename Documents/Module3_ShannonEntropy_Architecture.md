@@ -18,10 +18,29 @@ $$H(X) = - \sum_{i=1}^{n} P(x_i) \log_2 P(x_i)$$
 
 By establishing a hard physical threshold (e.g., $H(X) \ge 5.8$), we create a physical boundary that obfuscated payloads cannot cross without triggering a mathematical wave collapse (State = 0).
 
+```mermaid
+stateDiagram-v2
+    [*] --> State_1_Valid
+    State_1_Valid --> State_1_Valid : H(X) < 5.8 (Human Code)
+    State_1_Valid --> State_0_Collapse : H(X) >= 5.8 (Obfuscation/Base64)
+    State_0_Collapse --> [*] : Pipeline Halted
+```
+
 ---
 
 ## 3. Architecture
 To calculate the entropy dynamically without destroying CPU performance, the architecture relies on a **Sliding Window Mechanism** implemented in O(1) memory C++.
+
+```mermaid
+graph TD
+    A[Raw Source Code File] --> B[Sliding Window 64-Bytes]
+    B --> C{Calculate Hx Frequency Map}
+    C --> D[Log2 Math Computation]
+    D --> E{Is Hx >= 5.8?}
+    E -- Yes --> F[State = 0 Wave Collapse]
+    E -- No --> G[Shift Window +1 Byte]
+    G --> B
+```
 
 1.  **The Window**: The scanner moves across the codebase in chunks (e.g., 64-byte or 128-byte sliding windows).
 2.  **Frequency Map**: For each window, it tallies the probability $P(x_i)$ of every byte.
