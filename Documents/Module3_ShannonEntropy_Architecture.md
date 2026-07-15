@@ -29,23 +29,25 @@ stateDiagram-v2
 ---
 
 ## 3. Architecture
-To calculate the entropy dynamically without destroying CPU performance, the architecture relies on a **Sliding Window Mechanism** implemented in O(1) memory C++.
+To calculate the entropy dynamically without destroying CPU performance, the architecture relies on a **Sliding Window Mechanism** implemented in **Pure x86_64 Unrolled Assembly (NASM)**.
+
+High-level languages (like C++) introduce `math.h` library overhead and compiler branch predictions (`CMP`/`JMP`) that stall the CPU pipeline. By dropping to raw assembly, we bypass the OS and instruct the silicone directly:
+
+1.  **FPU Logarithms (`FYL2X`)**: Instead of calling a bulky logarithm function, the engine pushes probabilities directly to the x87 Floating Point Unit stack and executes `FYL2X`, processing $Y \times \log_2(X)$ in a single hardware clock cycle.
+2.  **Unrolled Loop Execution**: The CPU evaluates 16 to 32 bytes simultaneously without branching, utterly destroying the branch predictor bottleneck.
 
 ```mermaid
 graph TD
-    A[Raw Source Code File] --> B[Sliding Window 64-Bytes]
-    B --> C{Calculate Hx Frequency Map}
-    C --> D[Log2 Math Computation]
+    A[Raw Source Code File] --> B[Unrolled 128-Byte Memory Block]
+    B --> C{SIMD/AVX2 Freq Map Gen}
+    C --> D[FPU FYL2X Math Compute]
     D --> E{Is Hx >= 5.8?}
     E -- Yes --> F[State = 0 Wave Collapse]
-    E -- No --> G[Shift Window +1 Byte]
+    E -- No --> G[Shift Memory Pointer]
     G --> B
 ```
 
-1.  **The Window**: The scanner moves across the codebase in chunks (e.g., 64-byte or 128-byte sliding windows).
-2.  **Frequency Map**: For each window, it tallies the probability $P(x_i)$ of every byte.
-3.  **Calculation**: It calculates the $H(X)$ equation against the frequency map.
-4.  **State Trigger**: If any single window breaches the $5.8$ threshold, the file's mathematical state collapses to `0`. The entire pipeline halts, reporting an anomaly.
+3.  **State Trigger**: If any single window breaches the $5.8$ threshold, the file's mathematical state collapses to `0`. The entire pipeline halts, reporting an anomaly.
 
 ---
 
@@ -56,9 +58,9 @@ While deterministic, this model introduces absolute rigid constraints.
 ### Advantages (Pros)
 *   **Zero-Day Immunity**: It mathematically catches payloads that have never been seen before.
 *   **No Signature Updates Needed**: The system does not rely on a constantly updated database of known malware.
-*   **Absolute Determinism**: Bypasses the "guessing" phase of security.
+*   **Hardware Speed**: Unrolled assembly evaluation executes at the literal speed limit of the silicone, bypassing kernel scheduling and OS compiler overhead.
 
 ### Disadvantages (Cons)
 *   **The Cryptography Collision (False Positives)**: Legitimate cryptographic keys (e.g., RSA keys, JWT tokens) or embedded binary assets (e.g., inline images) possess high entropy by design. Module 3 will mercilessly flag these as malware unless explicitly added to the Assumptions Manifest (Whitelist).
 *   **Minification Crashes**: Minified production code (like packed React output) often has high entropy due to removed spaces and single-letter variables. The DEVM *must* run on raw source code, never compiled or minified artifacts.
-*   **Computational Overhead**: Calculating logarithms $\log_2$ for every 64-byte window across millions of lines of code is CPU intensive. This requires aggressive C++ thread scheduling and hardware-level pinning (handled by Orchestrator/Scheduler.cpp) to prevent pipeline delays.
+*   **CPU Specificity**: Writing raw NASM assembly locks the architecture to x86_64 chips. Running this on ARM processors (like Apple Silicon) requires rewriting the entire AVX2/FPU module into NEON vector instructions.
