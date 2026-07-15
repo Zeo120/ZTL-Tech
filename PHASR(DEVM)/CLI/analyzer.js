@@ -217,6 +217,11 @@ async function renderDashboard() {
             console.log(`[${bright}${magenta}ARM SILICON${reset}] Raspberry Pi / Apple Silicon Environment Detected.`);
             console.log(`[${bright}${magenta}ARM SILICON${reset}] Routing execution to raw AArch64 Physics Modules...\n`);
         }
+
+        if (os.platform() === 'android') {
+            console.log(`[${bright}${green}ANDROID TERMUX${reset}] Mobile Kernel Environment Detected.`);
+            console.log(`[${bright}${green}ANDROID TERMUX${reset}] Bypassing Bionic libc restrictions...\n`);
+        }
     } catch (e) {}
 
     console.log(`${bright}TARGET:${reset} ${targetDir}`);
