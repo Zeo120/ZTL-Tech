@@ -202,6 +202,16 @@ async function renderDashboard() {
     console.log(`${bright}${cyan}=======================================================${reset}\n`);
     await sleep(500);
 
+    try {
+        if (fs.existsSync('/etc/os-release')) {
+            const osRelease = fs.readFileSync('/etc/os-release', 'utf-8');
+            if (osRelease.includes('BlackArch') || osRelease.includes('blackarch')) {
+                console.log(`[${bright}${red}BLACKARCH${reset}] Weaponized Penetration Environment Detected.`);
+                console.log(`[${bright}${red}BLACKARCH${reset}] Disabling safety constraints...\n`);
+            }
+        }
+    } catch (e) {}
+
     console.log(`${bright}TARGET:${reset} ${targetDir}`);
     await sleep(300);
     console.log(`${bright}FILES SCANNED:${reset} ${results.filesScanned}`);
