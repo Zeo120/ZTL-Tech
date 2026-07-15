@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync } = require('child_process');
 
 // Division of Purpose: Actual Codebase Mathematical Profiler
@@ -209,6 +210,12 @@ async function renderDashboard() {
                 console.log(`[${bright}${red}BLACKARCH${reset}] Weaponized Penetration Environment Detected.`);
                 console.log(`[${bright}${red}BLACKARCH${reset}] Disabling safety constraints...\n`);
             }
+        }
+        
+        const arch = os.arch();
+        if (arch === 'arm64' || arch === 'arm') {
+            console.log(`[${bright}${magenta}ARM SILICON${reset}] Raspberry Pi / Apple Silicon Environment Detected.`);
+            console.log(`[${bright}${magenta}ARM SILICON${reset}] Routing execution to raw AArch64 Physics Modules...\n`);
         }
     } catch (e) {}
 
