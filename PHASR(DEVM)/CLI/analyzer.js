@@ -89,7 +89,7 @@ function scanDirectory(dirPath) {
                                 }
                                 
                                 // M5 Temporal Side-Channel (Early-exit string comparison)
-                                if (line.includes('strcmp(') && (line.toLowerCase().includes('pass') || line.toLowerCase().includes('key') || line.toLowerCase().includes('auth'))) {
+                                if (line.includes('strcmp(') && (line.toLowerCase().includes('pass') || line.toLowerCase().includes('key') || line.toLowerCase().includes('auth') || line.toLowerCase().includes('secret'))) {
                                     stats.m5_anomalies.push({
                                         file: fullPath,
                                         line: i + 1,
