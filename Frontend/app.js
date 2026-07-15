@@ -79,36 +79,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Module 3 Simulation
         setTimeout(() => {
-            logToTerminal("Module 3 (Anomaly Analyser): Calculating Shannon Entropy sliding window...", "system");
+            logToTerminal("Module 3 (Anomaly Analyser): Executing FPU FYL2X Logarithms...", "system");
             statEntropy.innerText = "Calculating...";
         }, 5000);
 
         setTimeout(() => {
-            statEntropy.innerText = "6.12 H(X)";
-            logToTerminal("Module 3 (Anomaly Analyser): THRESHOLD BREACHED! H(X) = 6.12 detected at offset 0x4A21.", "error");
-            logToTerminal("Inference Bridge: Contradiction detected. Executing Wave Collapse.", "error");
+            statEntropy.innerText = "5.10 H(X)";
+            logToTerminal("Module 3 (Anomaly Analyser): Safe Entropy. H(X) = 5.10", "success");
+        }, 6500);
+
+        // Module 4 Simulation
+        setTimeout(() => {
+            logToTerminal("Module 4 (Security Math): Tracing Taint Flows via Bare-Metal SIMD...", "system");
+        }, 7500);
+
+        setTimeout(() => {
+            logToTerminal("Module 4 (Security Math): 0 Unsanitized executions detected. Safe.", "success");
+        }, 8500);
+
+        // Module 5 Simulation (Temporal Physics)
+        setTimeout(() => {
+            logToTerminal("Module 5 (Temporal Physics): Hooking RDTSC Clock Cycles for Side-Channel Leak Detection...", "system");
+        }, 9500);
+
+        setTimeout(() => {
+            logToTerminal("Module 5 (Temporal Physics): TIMING LEAK DETECTED! Delta T = 14,021 Cycles.", "error");
+            logToTerminal("Inference Bridge: Hardware state contradiction. Executing Wave Collapse.", "error");
             
             // UI State Change for Collapse
             stateText.innerText = "0 : COLLAPSED";
             document.querySelector('.status-indicator').classList.remove('valid');
-        }, 7000);
+        }, 11500);
 
-        // Module 4 Economics Simulation
+        // OCaml Economics Simulation
         setTimeout(() => {
-            logToTerminal("Module 4 (Security Math): Calculating Total Economic Cost (TEC/M)...", "system");
+            logToTerminal("Economic Layer: Calculating Liability (TEC/M)...", "system");
             
             breakdownItems[0].innerText = "$75,000.00";
             breakdownItems[1].innerText = "$1,200.00";
-            breakdownItems[2].innerText = "$5,000,000.00";
+            breakdownItems[2].innerText = "$12,500,000.00"; // Massive penalty for side-channel
             
-            animateNumber(tecAmount, 0, 5076200, 2000);
+            animateNumber(tecAmount, 0, 12576200, 2000);
             
             logToTerminal("DEVM PIPELINE HALTED. DEPLOYMENT REJECTED.", "error");
             
             runButton.classList.remove('pulse');
             runButton.innerText = "PIPELINE HALTED";
             
-        }, 8500);
+        }, 12500);
     });
 
 });
