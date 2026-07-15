@@ -84,7 +84,8 @@ function scanDirectory(dirPath) {
                                         file: fullPath,
                                         line: i + 1,
                                         code: line.trim(),
-                                        reason: "Unsanitized sink (Buffer Overflow / RCE risk)."
+                                        reason: "Unsanitized sink (Buffer Overflow / RCE risk).",
+                                        fix: "Use strncpy or safely bounds-checked memory copies."
                                     });
                                 }
                                 
@@ -94,7 +95,8 @@ function scanDirectory(dirPath) {
                                         file: fullPath,
                                         line: i + 1,
                                         code: line.trim(),
-                                        reason: "Early-exit string comparison creates a Timing Side-Channel leak."
+                                        reason: "Early-exit string comparison creates a Timing Side-Channel leak.",
+                                        fix: "Use Constant-Time mathematical comparisons (e.g. Bitwise XOR loops)."
                                     });
                                 }
                             }
@@ -170,6 +172,7 @@ async function renderDashboard() {
             console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
             console.log(`      ${yellow}Code:${reset}   ${a.code}`);
             console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
+            if (a.fix) console.log(`      ${green}Fix:   ${reset} ${a.fix}`);
             await sleep(300);
         }
     } else {
@@ -186,6 +189,7 @@ async function renderDashboard() {
             console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
             console.log(`      ${yellow}Code:${reset}   ${a.code}`);
             console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
+            if (a.fix) console.log(`      ${green}Fix:   ${reset} ${a.fix}`);
             await sleep(300);
         }
     } else {
@@ -207,6 +211,10 @@ async function renderDashboard() {
         console.log(`${bright}${red}=======================================================${reset}`);
         await sleep(500);
         console.log(` Total Economic Cost (TEC/M): ${bright}$${tec}${reset}`);
+        console.log();
+        
+        // Throw a hard system error for CI/CD pipelines
+        throw new Error("PHASR DEVM Pipeline Failed: Critical Hardware Vulnerabilities Detected.");
     } else {
         console.log(`${bright}${green}=======================================================${reset}`);
         await sleep(200);
@@ -215,8 +223,12 @@ async function renderDashboard() {
         console.log(`${bright}${green}=======================================================${reset}`);
         await sleep(500);
         console.log(` Total Economic Cost (TEC/M): ${bright}$${tec}${reset}`);
+        console.log();
+        process.exit(0);
     }
-    console.log();
 }
 
-renderDashboard();
+renderDashboard().catch(err => {
+    console.error(`\n${bright}${red}[FATAL ERROR]${reset} ${err.message}\n`);
+    process.exit(1);
+});
