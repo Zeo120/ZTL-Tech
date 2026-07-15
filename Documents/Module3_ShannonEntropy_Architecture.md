@@ -38,12 +38,12 @@ High-level languages (like C++) introduce `math.h` library overhead and compiler
 
 ```mermaid
 graph TD
-    A[Raw Source Code File] --> B[Unrolled 128-Byte Memory Block]
-    B --> C{SIMD/AVX2 Freq Map Gen}
-    C --> D[FPU FYL2X Math Compute]
-    D --> E{Is Hx >= 5.8?}
-    E -- Yes --> F[State = 0 Wave Collapse]
-    E -- No --> G[Shift Memory Pointer]
+    A["Raw Source Code File"] --> B["Unrolled 128-Byte Memory Block"]
+    B --> C{"SIMD/AVX2 Freq Map Gen"}
+    C --> D["FPU FYL2X Math Compute"]
+    D --> E{"Is Hx >= 5.8?"}
+    E -- Yes --> F["State = 0 Wave Collapse"]
+    E -- No --> G["Shift Memory Pointer"]
     G --> B
 ```
 

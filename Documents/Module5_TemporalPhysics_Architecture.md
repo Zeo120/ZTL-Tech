@@ -40,20 +40,20 @@ To measure temporal physics, Module 5 is implemented as a **Bare-Metal CPU Profi
 
 ```mermaid
 graph TD
-    A[Function Execution] --> B[Inject Valid State]
-    A --> C[Inject Invalid State]
+    A["Function Execution"] --> B["Inject Valid State"]
+    A --> C["Inject Invalid State"]
     
-    B --> D[RDTSC: Measure Cycles]
-    C --> E[RDTSC: Measure Cycles]
+    B --> D["RDTSC: Measure Cycles"]
+    C --> E["RDTSC: Measure Cycles"]
     
-    D --> F[Calculate Median μ Valid]
-    E --> G[Calculate Median μ Invalid]
+    D --> F["Calculate Median μ Valid"]
+    E --> G["Calculate Median μ Invalid"]
     
     F --> H{"Is |μ_Valid - μ_Invalid| > Threshold?"}
     G --> H
     
-    H -- Yes --> I[State = 0 Wave Collapse]
-    H -- No --> J[State = 1 Safe]
+    H -- Yes --> I["State = 0 Wave Collapse"]
+    H -- No --> J["State = 1 Safe"]
 ```
 
 ---

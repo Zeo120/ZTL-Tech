@@ -8,9 +8,9 @@ This document maps the exact flow of data through the PHASR DEVM. It has been up
 graph TD
     %% Define Data Inputs
     subgraph Data_Ingestion [Data Sources]
-        Codebase[(Raw Codebase Repository)]
-        Manifest[(phasr.yaml : Module Registry)]
-        Internet((External DNS/OSINT))
+        Codebase[("Raw Codebase Repository")]
+        Manifest[("phasr.yaml : Module Registry")]
+        Internet(("External DNS/OSINT"))
     end
 
     %% Dynamic Main Engine
@@ -23,12 +23,12 @@ graph TD
 
     %% Dynamic Assembly Execution Layer
     subgraph Modules [Hardware Physics Layer: Multi-Arch (x86_64 & ARM64)]
-        M1(M1: Access Points .asm/.s)
-        M2(M2: Data Analyser .asm/.s)
-        M3(M3: Anomaly Analyser .asm/.s)
-        M4(M4: Security Math .asm/.s)
-        M5(M5: Temporal Physics .asm/.s)
-        MN(MN: Custom Vectorized Expansion)
+        M1("M1: Access Points .asm/.s")
+        M2("M2: Data Analyser .asm/.s")
+        M3("M3: Anomaly Analyser .asm/.s")
+        M4("M4: Security Math .asm/.s")
+        M5("M5: Temporal Physics .asm/.s")
+        MN("MN: Custom Vectorized Expansion")
     end
 
     Engine -->|Spawns Hardware Threads| M1
