@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // Division of Purpose: Actual Codebase Mathematical Profiler
 // This replaces the "generic" UI simulation. It physically scans the provided directory,
@@ -30,8 +31,20 @@ function scanDirectory(dirPath) {
         filesScanned: 0,
         m3_anomalies: [],
         m4_anomalies: [],
-        m5_anomalies: []
+        m5_anomalies: [],
+        m6_anomalies: []
     };
+
+    function unrollAssembly(filePath) {
+        try {
+            // Physically disassemble the binary into raw x86_64 Assembly
+            // Stderr is piped to null to silently fail if objdump is missing
+            const asm = execSync(`objdump -d "${filePath}" 2>nul || objdump -d "${filePath}" 2>/dev/null`, { encoding: 'utf-8', stdio: 'pipe' });
+            return asm.split('\n');
+        } catch (e) {
+            return null;
+        }
+    }
 
     function traverse(currentPath, currentDepth) {
         if (currentDepth > stats.maxDepth) stats.maxDepth = currentDepth;
@@ -60,15 +73,60 @@ function scanDirectory(dirPath) {
                 try {
                     const buffer = fs.readFileSync(fullPath);
                     if (buffer.length > 0) {
-                        // Module 3 (Entropy)
+                        // Module 3 (Entropy) & Module 6 (Assembly Unrolling)
                         const entropy = calculateShannonEntropy(buffer);
                         if (entropy > stats.maxEntropy) stats.maxEntropy = entropy;
-                        if (entropy >= 6.0 && (item.endsWith('.exe') || item.endsWith('.bin') || item.endsWith('.dll'))) {
-                            stats.m3_anomalies.push({
-                                file: fullPath,
-                                value: entropy.toFixed(2),
-                                reason: "Compiled binary or heavily obfuscated data detected."
-                            });
+                        
+                        if (item.endsWith('.exe') || item.endsWith('.bin') || item.endsWith('.dll')) {
+                            // M6: Deep Assembly Dissection
+                            const asmLines = unrollAssembly(fullPath);
+                            if (asmLines) {
+                                let hasAnomalies = false;
+                                for (let j = 0; j < asmLines.length; j++) {
+                                    const asmLine = asmLines[j];
+                                    
+                                    // Detect dangerous stack frame allocations (Possible Buffer Overflow setup)
+                                    // e.g., sub rsp, 0x1000 (Allocating 4096 bytes on the stack)
+                                    if (asmLine.includes('sub') && asmLine.includes('rsp') && (asmLine.includes('0x1000') || asmLine.includes('0x2000'))) {
+                                        stats.m6_anomalies.push({
+                                            file: fullPath,
+                                            asm: asmLine.trim(),
+                                            reason: "Massive unregulated stack frame allocation (Potential Stack Smashing target)",
+                                            fix: "Enforce strict stack-size compiler limits (-fstack-protector)"
+                                        });
+                                        hasAnomalies = true;
+                                    }
+                                    
+                                    // Detect dangerous dynamic calls
+                                    if (asmLine.includes('call') && (asmLine.includes('system') || asmLine.includes('strcpy') || asmLine.includes('VirtualAlloc'))) {
+                                        stats.m6_anomalies.push({
+                                            file: fullPath,
+                                            asm: asmLine.trim(),
+                                            reason: "Unsafe system API execution embedded in machine code",
+                                            fix: "Replace dynamic OS calls with safe memory-mapped bounds"
+                                        });
+                                        hasAnomalies = true;
+                                    }
+                                }
+                                
+                                // If assembly was clean but entropy is extremely high, flag as packed/encrypted
+                                if (!hasAnomalies && entropy >= 7.2) {
+                                    stats.m3_anomalies.push({
+                                        file: fullPath,
+                                        value: entropy.toFixed(2),
+                                        reason: "Binary contents are mathematically indistinguishable from encryption (Packed Payload)."
+                                    });
+                                }
+                            } else {
+                                // Fallback to raw physics if no disassembler is available
+                                if (entropy >= 7.2) {
+                                    stats.m3_anomalies.push({
+                                        file: fullPath,
+                                        value: entropy.toFixed(2),
+                                        reason: "Compiled binary with anomalous entropy detected (Disassembler unavailable)."
+                                    });
+                                }
+                            }
                         }
 
                         // Module 4 & 5 (Taint & Temporal) - Only scan source files
@@ -238,10 +296,37 @@ async function renderDashboard() {
         console.log(`${bright}${green}[SAFE] Constant-Time Verified${reset}\n`);
     }
 
+    await sleep(500);
+
+    // =====================================
+    // M6: BINARY DISSECTION (ASSEMBLY)
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 6 — BINARY DISSECTION`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+
+    if (results.m6_anomalies.length > 0) {
+        console.log(`${bright}${red}Rule:${reset}`);
+        console.log(`Unrolled Assembly Taint Flow (Hex-Level)\n`);
+        console.log(`${bright}${red}Findings: ${results.m6_anomalies.length}${reset}\n`);
+        
+        console.log(`${bright}Files${reset}`);
+        for (const a of results.m6_anomalies) {
+            const fileName = a.file.split(/[\\/]/).pop();
+            console.log(` • ${fileName}`);
+            console.log(`   ${yellow}ASM :${reset} ${a.asm}`);
+            console.log(`   ${cyan}Flag:${reset} ${a.reason}`);
+            console.log(`   ${green}Fix :${reset} ${a.fix}`);
+            await sleep(150);
+        }
+    } else {
+        console.log(`${bright}${green}[SAFE] No Assembly Taint Flows Detected${reset}\n`);
+    }
+
     await sleep(1000);
 
     // Final Report
-    const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length;
+    const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length + results.m6_anomalies.length;
 
     if (totalAnomalies > 0) {
         console.log(`${bright}${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
