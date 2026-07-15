@@ -1,6 +1,6 @@
 # PHASR (DEVM) - Global Data Flow & Relationship Architecture
 
-This document maps the exact flow of data through the PHASR DEVM. It has been updated to reflect the **Dynamic Module Registry** pattern and the **x86_64 Unrolled Assembly** hardware physics layer.
+This document maps the exact flow of data through the PHASR DEVM. It has been updated to reflect the **Dynamic Module Registry** pattern and the **x86_64 Unrolled Assembly** hardware physics layer, including Module 5 (Temporal Physics).
 
 ## Global State Resolution Map
 
@@ -27,6 +27,7 @@ graph TD
         M2(M2: Data Analyser .asm)
         M3(M3: Anomaly Analyser .asm)
         M4(M4: Security Math .asm)
+        M5(M5: Temporal Physics .asm)
         MN(MN: Custom Vectorized Expansion)
     end
 
@@ -34,6 +35,7 @@ graph TD
     Engine -->|Spawns Hardware Threads| M2
     Engine -->|Spawns Hardware Threads| M3
     Engine -->|Spawns Hardware Threads| M4
+    Engine -->|Spawns Hardware Threads| M5
     Engine -.->|Dynamically Loads| MN
     
     Internet --> M1
@@ -49,6 +51,7 @@ graph TD
     M2 -->|Hardware State| CrossVerify
     M3 -->|Hardware State| CrossVerify
     M4 -->|Hardware State| CrossVerify
+    M5 -->|Hardware State| CrossVerify
     MN -.->|Hardware State| CrossVerify
 
     CrossVerify --> ParanoiaCheck
@@ -64,6 +67,7 @@ graph TD
     WaveCollapse --> TEC
     M2 -->|Physical Mass| TEC
     M1 -->|Total Routes| TEC
+    M5 -->|Timing Leak Liability| TEC
     
     TEC --> DeployStatus
 
@@ -85,6 +89,7 @@ Each module acts as a completely isolated observer of the codebase, executed as 
 *   **M2** weighs mass via unrolled loop byte evaluation.
 *   **M3** calculates entropy using the hardware FPU `FYL2X` instruction.
 *   **M4** traces data flows via bare-metal state mapping.
+*   **M5** measures temporal side-channel leaks using the `RDTSC` instruction.
 *   **Mn** (Any future `.asm` module dynamically loaded via the registry).
 
 ### 3. The Inference Bridge

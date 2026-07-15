@@ -67,3 +67,14 @@ graph TD
 ### Disadvantages (Cons)
 *   **Operating System Noise**: The biggest challenge of temporal physics is OS context switching. If the Windows/Linux kernel decides to pause the Engine thread to allocate memory for Google Chrome precisely when Module 5 is running, the CPU cycles will spike by 500,000, creating a massive false positive. This requires intense statistical smoothing and hardware thread pinning to mitigate.
 *   **Constant-Time Overhead**: Forcing developers to write "Constant-Time" code to fix these leaks usually requires them to use unoptimized algorithms (like comparing the entire string even after a mismatch), which slows down the application globally.
+
+---
+
+## 5. Integration with Current Architecture (DEVM)
+
+Module 5 integrates flawlessly into the established architecture thanks to the **Dynamic Module Registry**.
+
+1.  **The Registry (`phasr.yaml`)**: Module 5 has been appended to the global manifest (`- path: "./Module5_TemporalPhysics"`).
+2.  **The Engine (`Engine.c`)**: When the pure C orchestrator boots, it parses the YAML file and dynamically spawns a hardware thread to execute `TemporalScanner.asm`. The Engine does not require recompilation to absorb this new physical constraint.
+3.  **The Inference Bridge**: The `0` or `1` state output from Module 5 is passed to the Bridge. If Module 5 detects a Timing Leak (State = 0), the Bridge immediately triggers a **Global Wave Collapse**, ensuring the Side-Channel vulnerability blocks the entire deployment pipeline.
+4.  **The Economics (OCaml)**: A temporal leak represents an extreme liability (mass data exfiltration). The economic layer assigns a massive dollar penalty to the TEC/M equation for this specific anomaly.

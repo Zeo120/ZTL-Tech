@@ -7,3 +7,4 @@ modules:
   - path: "./Module2_DataAnalyser"
   - path: "./Module3_AnomalyAnalyser"
   - path: "./Module4_SecurityMath"
+  - path: "./Module5_TemporalPhysics"
