@@ -1,10 +1,9 @@
 {
   "name": "phasr",
   "version": "1.0.0",
-  "description": "Absolute Physics Engine - Security Linter",
-  "main": "PHASR(DEVM)/CLI/analyzer.js",
+  "main": "PHASR(DEVM)/Orchestrator/router.js",
   "bin": {
-    "phasr": "./PHASR(DEVM)/CLI/analyzer.js"
+    "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
   },
   "author": "ZTL-Tech",
   "license": "MIT"
