@@ -1,6 +1,6 @@
 # PHASR (DEVM) - Global Data Flow & Relationship Architecture
 
-This document maps the exact flow of data through the PHASR DEVM. It has been updated to reflect the **Dynamic Module Registry** pattern, ensuring the Main Engine complies with the Open/Closed Principle (Open for extension, Closed for modification). 
+This document maps the exact flow of data through the PHASR DEVM. It has been updated to reflect the **Dynamic Module Registry** pattern and the **x86_64 Unrolled Assembly** hardware physics layer.
 
 ## Global State Resolution Map
 
@@ -21,19 +21,19 @@ graph TD
     Manifest -->|Loads Active Modules| Engine
     Codebase --> Engine
 
-    %% Dynamic Module Execution Layer
-    subgraph Modules [Dynamic Module Execution Layer]
-        M1(Module 1: Access Points)
-        M2(Module 2: Data Analyser)
-        M3(Module 3: Anomaly Analyser)
-        M4(Module 4: Security Math)
-        MN(Module N: Custom Expansion)
+    %% Dynamic Assembly Execution Layer
+    subgraph Modules [Hardware Physics Layer : pure x86_64 NASM]
+        M1(M1: Access Points .asm)
+        M2(M2: Data Analyser .asm)
+        M3(M3: Anomaly Analyser .asm)
+        M4(M4: Security Math .asm)
+        MN(MN: Custom Vectorized Expansion)
     end
 
-    Engine -->|Forks/Executes| M1
-    Engine -->|Forks/Executes| M2
-    Engine -->|Forks/Executes| M3
-    Engine -->|Forks/Executes| M4
+    Engine -->|Spawns Hardware Threads| M1
+    Engine -->|Spawns Hardware Threads| M2
+    Engine -->|Spawns Hardware Threads| M3
+    Engine -->|Spawns Hardware Threads| M4
     Engine -.->|Dynamically Loads| MN
     
     Internet --> M1
@@ -45,11 +45,11 @@ graph TD
         WaveCollapse[Global Wave Collapse: 0 or 1]
     end
 
-    M1 -->|State Output| CrossVerify
-    M2 -->|State Output| CrossVerify
-    M3 -->|State Output| CrossVerify
-    M4 -->|State Output| CrossVerify
-    MN -.->|State Output| CrossVerify
+    M1 -->|Hardware State| CrossVerify
+    M2 -->|Hardware State| CrossVerify
+    M3 -->|Hardware State| CrossVerify
+    M4 -->|Hardware State| CrossVerify
+    MN -.->|Hardware State| CrossVerify
 
     CrossVerify --> ParanoiaCheck
     ParanoiaCheck --> WaveCollapse
@@ -77,18 +77,18 @@ graph TD
 ## Data Relationship Breakdown
 
 ### 1. The Dynamic Ingestion (The Registry)
-The C Orchestrator (`Engine.c`) no longer hardcodes modules. It ingests a manifest (`phasr.yaml`) at runtime. This registry dictates exactly which modules exist and should be executed, allowing infinite horizontal scaling of security constraints without ever needing to recompile the Core Engine.
+The C Orchestrator (`Engine.c`) ingests a manifest (`phasr.yaml`) at runtime. This registry dictates exactly which assembly modules exist and should be executed, allowing infinite horizontal scaling without needing to recompile the Core Engine.
 
-### 2. The Isolated Scanners (M1 ... Mn)
-Each module acts as a completely isolated observer of the codebase, spun up in parallel by the Main Engine.
-*   **M1** maps the boundaries.
-*   **M2** weighs the physical mass.
-*   **M3** measures the randomness (entropy).
-*   **M4** traces the data flows (Input to Execution).
-*   **Mn** (Any future module dynamically loaded via the registry).
+### 2. The Hardware Physics Layer (M1 ... Mn)
+Each module acts as a completely isolated observer of the codebase, executed as a raw binary. They are written in **Pure x86_64 Unrolled Assembly** to bypass C++ compiler and branch prediction bottlenecks, allowing evaluation at literal hardware clock speed.
+*   **M1** maps boundaries via unrolled SIMD string matching.
+*   **M2** weighs mass via unrolled loop byte evaluation.
+*   **M3** calculates entropy using the hardware FPU `FYL2X` instruction.
+*   **M4** traces data flows via bare-metal state mapping.
+*   **Mn** (Any future `.asm` module dynamically loaded via the registry).
 
 ### 3. The Inference Bridge
-This is the physical C++ layer that forces the isolated states to interact. It receives the outputs of `N` modules and checks for contradictions (e.g., "If M1 found no shadow endpoints, why is M2's AST depth 50 levels deep?"). If there is a contradiction, or if *any* single module in the dynamic registry returned a `0`, the Bridge executes a **Wave Collapse**, reducing the global state to `0`.
+This is the layer that forces the isolated states to interact. It receives the outputs of `N` hardware modules and checks for contradictions. If there is a contradiction, or if *any* single module in the dynamic registry returned a `0`, the Bridge executes a **Wave Collapse**, reducing the global state to `0`.
 
 ### 4. The Business Resolution
-The `0` or `1` state, along with the raw physical metrics (Total Bytes, Total Endpoints), is routed to the OCaml Business Logic layer. This translates the physics into **Liability and Maintenance Costs (TEC/M)**, yielding the final executive decision: **Halt or Deploy**.
+The `0` or `1` state, along with the raw physical metrics, is routed to the OCaml Business Logic layer. This translates the physics into **Liability and Maintenance Costs (TEC/M)**, yielding the final executive decision: **Halt or Deploy**.
