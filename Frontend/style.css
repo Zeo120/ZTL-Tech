@@ -135,7 +135,7 @@ body {
 }
 
 .nav-item {
-    padding: 1rem;
+    padding: 0.8rem 1rem; /* Reduced padding slightly to prevent sidebar overflow with 5 modules */
     font-weight: 500;
     cursor: pointer;
     display: flex;
@@ -241,6 +241,8 @@ body {
     padding: 2rem;
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* Ensures inner content scales properly */
+    height: 100%; /* Forces cards in the same row to align heights */
 }
 
 .card-title {
@@ -295,7 +297,8 @@ body {
 .physics-stats {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: 1.2rem;
     flex-grow: 1;
 }
 
