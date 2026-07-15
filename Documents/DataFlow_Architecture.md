@@ -22,12 +22,12 @@ graph TD
     Codebase --> Engine
 
     %% Dynamic Assembly Execution Layer
-    subgraph Modules [Hardware Physics Layer : pure x86_64 NASM]
-        M1(M1: Access Points .asm)
-        M2(M2: Data Analyser .asm)
-        M3(M3: Anomaly Analyser .asm)
-        M4(M4: Security Math .asm)
-        M5(M5: Temporal Physics .asm)
+    subgraph Modules [Hardware Physics Layer: Multi-Arch (x86_64 & ARM64)]
+        M1(M1: Access Points .asm/.s)
+        M2(M2: Data Analyser .asm/.s)
+        M3(M3: Anomaly Analyser .asm/.s)
+        M4(M4: Security Math .asm/.s)
+        M5(M5: Temporal Physics .asm/.s)
         MN(MN: Custom Vectorized Expansion)
     end
 
@@ -84,9 +84,9 @@ graph TD
 The C Orchestrator (`Engine.c`) ingests a manifest (`phasr.yaml`) at runtime. This registry dictates exactly which assembly modules exist and should be executed, allowing infinite horizontal scaling without needing to recompile the Core Engine.
 
 ### 2. The Hardware Physics Layer (M1 ... Mn)
-Each module acts as a completely isolated observer of the codebase, executed as a raw binary. They are written in **Pure x86_64 Unrolled Assembly** to bypass C++ compiler and branch prediction bottlenecks, allowing evaluation at literal hardware clock speed.
+Each module acts as a completely isolated observer of the codebase, executed as a raw binary. They are natively written in **Dual-Architecture Unrolled Assembly (x86_64 NASM and ARM64 AArch64)**. This allows the Engine to route evaluation vectors to the correct native silicon instructions (e.g., bypassing branch predictors using `CMOVG` on Intel or `CSEL` on Apple Silicon), running at literal hardware clock speed without translation crutches like Rosetta.
 *   **M1** maps boundaries via unrolled SIMD string matching.
-*   **M2** weighs mass via unrolled loop byte evaluation.
+*   **M2** weighs mass via unrolled loop byte evaluation (x86 & ARM64).
 *   **M3** calculates entropy using the hardware FPU `FYL2X` instruction.
 *   **M4** traces data flows via bare-metal state mapping.
 *   **M5** measures temporal side-channel leaks using the `RDTSC` instruction.
