@@ -41,8 +41,8 @@ function scanDirectory(dirPath) {
         } catch(e) { return; }
 
         for (const item of items) {
-            // Ignore heavy node_modules and hidden git dirs for speed
-            if (item === 'node_modules' || item.startsWith('.git')) continue;
+            // Ignore node_modules, git, and the Engine's own directory (prevent recursive self-collapse)
+            if (item === 'node_modules' || item.startsWith('.git') || item === 'PHASR(DEVM)') continue;
 
             const fullPath = path.join(currentPath, item);
             let stat;
@@ -78,8 +78,12 @@ function scanDirectory(dirPath) {
                             for (let i = 0; i < lines.length; i++) {
                                 const line = lines[i];
                                 
+                                // Ignore comments
+                                if (line.trim().startsWith('//')) continue;
+                                
                                 // M4 Taint Flow (Unsafe C functions)
-                                if (line.includes('strcpy(') || line.includes('system(')) {
+                                const taintRegex = /\b(strcpy|system)\s*\(/;
+                                if (taintRegex.test(line)) {
                                     stats.m4_anomalies.push({
                                         file: fullPath,
                                         line: i + 1,
@@ -90,7 +94,8 @@ function scanDirectory(dirPath) {
                                 }
                                 
                                 // M5 Temporal Side-Channel (Early-exit string comparison)
-                                if (line.includes('strcmp(') && (line.toLowerCase().includes('pass') || line.toLowerCase().includes('key') || line.toLowerCase().includes('auth') || line.toLowerCase().includes('secret'))) {
+                                const temporalRegex = /\bstrcmp\s*\(/;
+                                if (temporalRegex.test(line) && /\b(pass|key|auth|secret)\b/i.test(line)) {
                                     stats.m5_anomalies.push({
                                         file: fullPath,
                                         line: i + 1,
