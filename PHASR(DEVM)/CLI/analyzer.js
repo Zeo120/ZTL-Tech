@@ -27,7 +27,9 @@ function scanDirectory(dirPath) {
         maxDepth: 0,
         maxEntropy: 0,
         filesScanned: 0,
-        anomalies: []
+        m3_anomalies: [],
+        m4_anomalies: [],
+        m5_anomalies: []
     };
 
     function traverse(currentPath, currentDepth) {
@@ -54,21 +56,48 @@ function scanDirectory(dirPath) {
                 stats.totalMassBytes += stat.size;
                 stats.filesScanned++;
 
-                // Entropy Calculation
                 try {
                     const buffer = fs.readFileSync(fullPath);
                     if (buffer.length > 0) {
+                        // Module 3 (Entropy)
                         const entropy = calculateShannonEntropy(buffer);
                         if (entropy > stats.maxEntropy) stats.maxEntropy = entropy;
-
-                        // Physical Threshold Check
-                        if (entropy >= 6.0) {
-                            stats.anomalies.push({
-                                type: "ENTROPY_BREACH",
+                        if (entropy >= 6.0 && (item.endsWith('.exe') || item.endsWith('.bin') || item.endsWith('.dll'))) {
+                            stats.m3_anomalies.push({
                                 file: fullPath,
                                 value: entropy.toFixed(2),
-                                threshold: 6.0
+                                reason: "Compiled binary or heavily obfuscated data detected."
                             });
+                        }
+
+                        // Module 4 & 5 (Taint & Temporal) - Only scan source files
+                        if (item.endsWith('.c') || item.endsWith('.cpp') || item.endsWith('.js')) {
+                            const content = buffer.toString('utf8');
+                            const lines = content.split('\n');
+                            
+                            for (let i = 0; i < lines.length; i++) {
+                                const line = lines[i];
+                                
+                                // M4 Taint Flow (Unsafe C functions)
+                                if (line.includes('strcpy(') || line.includes('system(')) {
+                                    stats.m4_anomalies.push({
+                                        file: fullPath,
+                                        line: i + 1,
+                                        code: line.trim(),
+                                        reason: "Unsanitized sink (Buffer Overflow / RCE risk)."
+                                    });
+                                }
+                                
+                                // M5 Temporal Side-Channel (Early-exit string comparison)
+                                if (line.includes('strcmp(') && (line.toLowerCase().includes('pass') || line.toLowerCase().includes('key') || line.toLowerCase().includes('auth'))) {
+                                    stats.m5_anomalies.push({
+                                        file: fullPath,
+                                        line: i + 1,
+                                        code: line.trim(),
+                                        reason: "Early-exit string comparison creates a Timing Side-Channel leak."
+                                    });
+                                }
+                            }
                         }
                     }
                 } catch(e) {}
@@ -84,24 +113,6 @@ function scanDirectory(dirPath) {
 const targetDir = process.argv[2] || process.cwd();
 console.log(`[DEVM] Scanning Physical Codebase: ${targetDir}...`);
 const results = scanDirectory(targetDir);
-
-// Construct final JSON payload for the Neumorphic Dashboard
-const payload = {
-    target: targetDir,
-    timestamp: new Date().toISOString(),
-    metrics: {
-        mass: results.totalMassBytes,
-        depth: results.maxDepth,
-        entropy: results.maxEntropy.toFixed(2),
-        files: results.filesScanned
-    },
-    anomalies: results.anomalies,
-    // Calculate a rough TEC/M liability based on mass and anomalies
-    tecLiability: 75000 + (results.totalMassBytes * 0.10) + (results.anomalies.length * 1500000)
-};
-
-const outPath = path.join(__dirname, '../../Frontend/scan_results.json');
-fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
 
 // ==========================================
 // BEAUTIFUL CLI OUTPUT (ANIMATED)
@@ -136,11 +147,12 @@ async function renderDashboard() {
     await sleep(1000);
 
     // Entropy Report
-    if (results.maxEntropy >= 6.0) {
+    if (results.m3_anomalies.length > 0) {
         console.log(`${bright}${red}[COLLAPSE] Module 3 (Entropy): THRESHOLD BREACHED!${reset}`);
         await sleep(500);
-        for (const a of results.anomalies) {
+        for (const a of results.m3_anomalies) {
             console.log(`    ↳ ${red}Entropy H(X) = ${a.value}${reset} in ${a.file}`);
+            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
             await sleep(300);
         }
     } else {
@@ -149,14 +161,45 @@ async function renderDashboard() {
     }
     
     await sleep(800);
-    console.log(`${bright}${green}[SAFE] Module 4 (Security Math): 0 Unsanitized Flows.${reset}`);
+    
+    // Taint Flow Report
+    if (results.m4_anomalies.length > 0) {
+        console.log(`${bright}${red}[COLLAPSE] Module 4 (Security Math): TAINT FLOW DETECTED!${reset}`);
+        await sleep(500);
+        for (const a of results.m4_anomalies) {
+            console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
+            console.log(`      ${yellow}Code:${reset}   ${a.code}`);
+            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
+            await sleep(300);
+        }
+    } else {
+        console.log(`${bright}${green}[SAFE] Module 4 (Security Math): 0 Unsanitized Flows.${reset}`);
+    }
+
     await sleep(800);
-    console.log(`${bright}${green}[SAFE] Module 5 (Temporal Physics): Constant-Time Verified.${reset}\n`);
+
+    // Temporal Report
+    if (results.m5_anomalies.length > 0) {
+        console.log(`${bright}${red}[COLLAPSE] Module 5 (Temporal Physics): TIMING LEAK DETECTED!${reset}`);
+        await sleep(500);
+        for (const a of results.m5_anomalies) {
+            console.log(`    ↳ ${red}Target:${reset} ${a.file} (Line ${a.line})`);
+            console.log(`      ${yellow}Code:${reset}   ${a.code}`);
+            console.log(`      ${cyan}Reason:${reset} ${a.reason}`);
+            await sleep(300);
+        }
+    } else {
+        console.log(`${bright}${green}[SAFE] Module 5 (Temporal Physics): Constant-Time Verified.${reset}\n`);
+    }
+
     await sleep(1000);
 
     // Economic Report
-    const tec = payload.tecLiability.toLocaleString();
-    if (results.anomalies.length > 0) {
+    const totalAnomalies = results.m3_anomalies.length + results.m4_anomalies.length + results.m5_anomalies.length;
+    const tecLiability = 75000 + (results.totalMassBytes * 0.10) + (totalAnomalies * 1500000);
+    const tec = tecLiability.toLocaleString();
+
+    if (totalAnomalies > 0) {
         console.log(`${bright}${red}=======================================================${reset}`);
         await sleep(200);
         console.log(`${bright}${red} WAVE COLLAPSE: DEPLOYMENT HALTED${reset}`);
