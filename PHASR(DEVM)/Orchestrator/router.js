@@ -71,12 +71,12 @@ if (totalMass >= MASS_LIMIT_ASM) {
 if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mNative C++17 Engine\x1b[0m...\n`);
-    const cppBinary = path.join(binDir, `phasr_native${binExt}`);
+    const cppBinary = path.join(__dirname, `engine${binExt}`);
     if (fs.existsSync(cppBinary)) {
         command = cppBinary;
         args = [targetDir];
     } else {
-        console.log(`[\x1b[33mWARN\x1b[0m] Native C++ Engine binary not compiled. Falling back to Node.js V8...\n`);
+        console.log(`[\x1b[33mWARN\x1b[0m] Native C++ Engine binary (engine${binExt}) not compiled. Falling back to Node.js V8...\n`);
     }
 }
 
