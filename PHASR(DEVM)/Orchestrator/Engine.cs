@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 // C# Native Bypass Orchestrator (Zero-Dependency)
@@ -37,6 +38,38 @@ namespace PhasR
         public static extern bool FindClose(IntPtr hFindFile);
 
         static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+        static long globalMass = 0;
+
+        static double CalculateEntropy(string filePath)
+        {
+            try
+            {
+                long[] counts = new long[256];
+                long totalBytes = 0;
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        for (int i = 0; i < bytesRead; i++) counts[buffer[i]]++;
+                        totalBytes += bytesRead;
+                    }
+                }
+                if (totalBytes == 0) return 0;
+                double entropy = 0;
+                for (int i = 0; i < 256; i++)
+                {
+                    if (counts[i] > 0)
+                    {
+                        double p = (double)counts[i] / totalBytes;
+                        entropy -= p * Math.Log(p, 2);
+                    }
+                }
+                return Math.Round(entropy, 2);
+            }
+            catch { return 0; }
+        }
 
         static void ScanDirectoryNative(string directory)
         {
@@ -69,6 +102,19 @@ namespace PhasR
                 {
                     // It's a file, we could read mass here via nFileSizeHigh/Low
                     long fileSize = ((long)findFileData.nFileSizeHigh << 32) + findFileData.nFileSizeLow;
+                    globalMass += fileSize;
+
+                    if (fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".sys", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        double entropy = CalculateEntropy(fullPath);
+                        if (entropy >= 7.2)
+                        {
+                            Console.WriteLine("[VFS-ENTROPY] " + fullPath + "|" + entropy);
+                        }
+                    }
                 }
 
             } while (FindNextFile(hFind, out findFileData));
@@ -94,6 +140,7 @@ namespace PhasR
             ScanDirectoryNative(targetDir);
             int endTime = Environment.TickCount;
 
+            Console.WriteLine("[VFS-MASS] " + globalMass);
             Console.WriteLine("\n[PHASR] SCAN COMPLETE.");
             Console.WriteLine("[PHASR] Time Elapsed: " + (endTime - startTime) + " milliseconds.");
         }

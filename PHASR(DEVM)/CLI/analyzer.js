@@ -182,16 +182,21 @@ const targetDir = process.argv[2] || process.cwd();
 let results;
 if (process.argv.includes('--hardware-bypass')) {
     console.log(`[DEVM] Hardware Bypass detected. Rendering inference dashboard from physical cache...`);
-    results = {
-        totalMassBytes: 250 * 1024 * 1024, // Mock large mass to signify hardware route
-        maxDepth: 0,
-        maxEntropy: 0,
-        filesScanned: 0,
-        m3_anomalies: [],
-        m4_anomalies: [],
-        m5_anomalies: [],
-        m6_anomalies: []
-    };
+    try {
+        const cacheFile = path.join(__dirname, '..', 'Orchestrator', '.phasr_cache.json');
+        results = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
+    } catch (e) {
+        results = {
+            totalMassBytes: 250 * 1024 * 1024, // Mock large mass
+            maxDepth: 0,
+            maxEntropy: 0,
+            filesScanned: 0,
+            m3_anomalies: [],
+            m4_anomalies: [],
+            m5_anomalies: [],
+            m6_anomalies: []
+        };
+    }
 } else {
     console.log(`[DEVM] Scanning Physical Codebase: ${targetDir}...`);
     results = scanDirectory(targetDir);

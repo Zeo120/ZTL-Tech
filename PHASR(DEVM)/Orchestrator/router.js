@@ -93,13 +93,50 @@ if (totalMass < MASS_LIMIT_CPP) {
 }
 
 // Execute the dynamically selected engine
-const child = spawnSync(command, args, { stdio: 'inherit' });
+const child = spawnSync(command, args, { stdio: ['inherit', 'pipe', 'inherit'], encoding: 'utf-8' });
 
 if (child.error) {
     console.error(`[\x1b[31mFATAL\x1b[0m] Engine Execution Failed:`, child.error.message);
 } else {
+    // Pipe hardware stdout to terminal so the user sees it running, but also capture it
+    const output = child.stdout;
+    console.log(output);
+
     // If we used a hardware bypass, we still need to render the CLI dashboard
     if (command !== 'node') {
+        let hwMass = 250 * 1024 * 1024;
+        let m3_anomalies = [];
+
+        // Parse intercepted stdout from C++/C# Engine
+        const lines = output.split('\n');
+        for (const line of lines) {
+            if (line.startsWith('[VFS-MASS]')) {
+                hwMass = parseInt(line.split(' ')[1]) || hwMass;
+            } else if (line.startsWith('[VFS-ENTROPY]')) {
+                const parts = line.replace('[VFS-ENTROPY] ', '').split('|');
+                if (parts.length === 2) {
+                    m3_anomalies.push({
+                        file: parts[0],
+                        value: parts[1],
+                        reason: "Binary contents are mathematically indistinguishable from encryption (Packed Payload)."
+                    });
+                }
+            }
+        }
+
+        // Write the hardware payload cache
+        const cacheData = {
+            totalMassBytes: hwMass,
+            maxDepth: 0,
+            maxEntropy: m3_anomalies.length > 0 ? parseFloat(m3_anomalies[0].value) : 0,
+            filesScanned: 0,
+            m3_anomalies: m3_anomalies,
+            m4_anomalies: [],
+            m5_anomalies: [],
+            m6_anomalies: []
+        };
+        fs.writeFileSync(path.join(__dirname, '.phasr_cache.json'), JSON.stringify(cacheData));
+
         const analyzerArgs = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir, '--hardware-bypass'];
         spawnSync('node', analyzerArgs, { stdio: 'inherit' });
     }

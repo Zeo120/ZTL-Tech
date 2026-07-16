@@ -1,9 +1,50 @@
 #include <iostream>
 #include <windows.h>
 #include <string>
+#include <vector>
+#include <fstream>
+#include <cmath>
+#include <iomanip>
 
 // Absolute bare-metal C++ Orchestrator
 // Bypasses V8 Node.js completely to natively scan Windows drives
+
+long long globalMass = 0;
+
+double calculateEntropy(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file) return 0.0;
+    
+    std::vector<long long> counts(256, 0);
+    long long totalBytes = 0;
+    char buffer[8192];
+    
+    while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
+        std::streamsize bytes = file.gcount();
+        for (std::streamsize i = 0; i < bytes; ++i) {
+            counts[static_cast<unsigned char>(buffer[i])]++;
+        }
+        totalBytes += bytes;
+    }
+    
+    if (totalBytes == 0) return 0.0;
+    
+    double entropy = 0.0;
+    for (long long freq : counts) {
+        if (freq > 0) {
+            double p = static_cast<double>(freq) / totalBytes;
+            entropy -= p * log2(p);
+        }
+    }
+    return entropy;
+}
+
+bool endsWith(const std::string& fullString, const std::string& ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    }
+    return false;
+}
 
 void ScanDirectoryNative(const std::string& directory) {
     WIN32_FIND_DATAA findFileData;
@@ -34,7 +75,18 @@ void ScanDirectoryNative(const std::string& directory) {
             LARGE_INTEGER fileSize;
             fileSize.LowPart = findFileData.nFileSizeLow;
             fileSize.HighPart = findFileData.nFileSizeHigh;
-            // std::cout << "[VFS-FILE] " << fullPath << " (" << fileSize.QuadPart << " bytes)" << std::endl;
+            globalMass += fileSize.QuadPart;
+
+            // Convert filename to lowercase for extension check
+            std::string lowerName = fileName;
+            for (char &c : lowerName) c = tolower(c);
+
+            if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
+                double entropy = calculateEntropy(fullPath);
+                if (entropy >= 7.2) {
+                    std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
+                }
+            }
         }
 
     } while (FindNextFileA(hFind, &findFileData) != 0);
@@ -58,6 +110,7 @@ int main(int argc, char* argv[]) {
     ScanDirectoryNative(targetDir);
     DWORD endTime = GetTickCount();
 
+    std::cout << "[VFS-MASS] " << globalMass << std::endl;
     std::cout << "\n[PHASR] SCAN COMPLETE." << std::endl;
     std::cout << "[PHASR] Time Elapsed: " << (endTime - startTime) << " milliseconds." << std::endl;
     return 0;
