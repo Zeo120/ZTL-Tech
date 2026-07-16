@@ -70,13 +70,20 @@ if (totalMass >= MASS_LIMIT_ASM) {
 
 if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
-    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mNative C++17 Engine\x1b[0m...\n`);
+    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mNative Hardware Engine\x1b[0m...\n`);
     const cppBinary = path.join(__dirname, `engine${binExt}`);
+    const csBinary = path.join(__dirname, `engine_cs${binExt}`);
+    
     if (fs.existsSync(cppBinary)) {
+        console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Executing C++17 Master Bypass...`);
         command = cppBinary;
         args = [targetDir];
+    } else if (fs.existsSync(csBinary)) {
+        console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] C++ Engine missing. Executing C# Zero-Dependency Bypass...`);
+        command = csBinary;
+        args = [targetDir];
     } else {
-        console.log(`[\x1b[33mWARN\x1b[0m] Native C++ Engine binary (engine${binExt}) not compiled. Falling back to Node.js V8...\n`);
+        console.log(`[\x1b[33mWARN\x1b[0m] Native Engines not compiled. Falling back to Node.js V8...\n`);
     }
 }
 
