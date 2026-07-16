@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawnSync } = require('child_process');
+const { spawnSync, spawn } = require('child_process');
 
 const targetDir = process.argv[2] || process.cwd();
 
@@ -93,41 +93,51 @@ if (totalMass < MASS_LIMIT_CPP) {
 }
 
 // Execute the dynamically selected engine
-const child = spawnSync(command, args, { 
-    stdio: ['inherit', 'pipe', 'inherit'], 
-    encoding: 'utf-8',
-    maxBuffer: 1024 * 1024 * 1024 // 1GB Buffer to prevent ENOBUFS on massive C:\ traversals
-});
-
-if (child.error) {
-    console.error(`[\x1b[31mFATAL\x1b[0m] Engine Execution Failed:`, child.error.message);
+if (command === 'node') {
+    const child = spawnSync(command, args, { stdio: 'inherit' });
+    if (child.error) {
+        console.error(`[\x1b[31mFATAL\x1b[0m] Node.js Engine Execution Failed:`, child.error.message);
+    }
+    process.exit(child.status);
 } else {
-    // Pipe hardware stdout to terminal so the user sees it running, but also capture it
-    const output = child.stdout;
-    console.log(output);
+    // Asynchronous Execution for Hardware Engines (Real-time Streaming)
+    const child = spawn(command, args, { stdio: ['inherit', 'pipe', 'inherit'] });
 
-    // If we used a hardware bypass, we still need to render the CLI dashboard
-    if (command !== 'node') {
-        let hwMass = 250 * 1024 * 1024;
-        let m3_anomalies = [];
+    let hwMass = 250 * 1024 * 1024;
+    let m3_anomalies = [];
+    let leftover = '';
 
-        // Parse intercepted stdout from C++/C# Engine
-        const lines = output.split('\n');
+    child.stdout.on('data', (data) => {
+        const chunk = data.toString('utf-8');
+        process.stdout.write(chunk); // Stream directly to terminal visually
+
+        // Parse chunks carefully across newlines
+        const lines = (leftover + chunk).split('\n');
+        leftover = lines.pop(); // Keep the last incomplete line for the next chunk
+
         for (const line of lines) {
-            if (line.startsWith('[VFS-MASS]')) {
-                hwMass = parseInt(line.split(' ')[1]) || hwMass;
-            } else if (line.startsWith('[VFS-ENTROPY]')) {
-                const parts = line.replace('[VFS-ENTROPY] ', '').split('|');
+            const trimmed = line.trim();
+            if (trimmed.startsWith('[VFS-MASS]')) {
+                hwMass = parseInt(trimmed.split(' ')[1]) || hwMass;
+            } else if (trimmed.startsWith('[VFS-ENTROPY]')) {
+                const parts = trimmed.replace('[VFS-ENTROPY] ', '').split('|');
                 if (parts.length === 2) {
                     m3_anomalies.push({
-                        file: parts[0],
-                        value: parts[1],
+                        file: parts[0].trim(),
+                        value: parts[1].trim(),
                         reason: "Binary contents are mathematically indistinguishable from encryption (Packed Payload)."
                     });
                 }
             }
         }
+    });
 
+    child.on('error', (err) => {
+        console.error(`[\x1b[31mFATAL\x1b[0m] Hardware Engine Execution Failed:`, err.message);
+        process.exit(1);
+    });
+
+    child.on('close', (code) => {
         // Write the hardware payload cache
         const cacheData = {
             totalMassBytes: hwMass,
@@ -141,8 +151,10 @@ if (child.error) {
         };
         fs.writeFileSync(path.join(__dirname, '.phasr_cache.json'), JSON.stringify(cacheData));
 
+        // Seamlessly route into the UI Dashboard
         const analyzerArgs = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir, '--hardware-bypass'];
         spawnSync('node', analyzerArgs, { stdio: 'inherit' });
-    }
-    process.exit(child.status);
+        
+        process.exit(code);
+    });
 }
