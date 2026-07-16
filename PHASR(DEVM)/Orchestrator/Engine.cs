@@ -62,6 +62,7 @@ namespace PhasR
                 // Check if it's a directory
                 if ((findFileData.dwFileAttributes & 0x00000010) == 0x00000010) 
                 {
+                    Console.WriteLine("[VFS-DIR] " + fullPath);
                     ScanDirectoryNative(fullPath);
                 }
                 else

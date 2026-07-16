@@ -27,8 +27,7 @@ void ScanDirectoryNative(const std::string& directory) {
 
         if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             // Recursive native traversal
-            // Uncomment the next line if you want to see it print every single folder it rips through:
-            // std::cout << "[VFS-DIR] " << fullPath << std::endl;
+            std::cout << "[VFS-DIR] " << fullPath << std::endl;
             ScanDirectoryNative(fullPath);
         } else {
             // It's a file, grab the physical mass without opening the file
