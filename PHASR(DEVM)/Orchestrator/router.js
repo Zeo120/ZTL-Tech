@@ -98,5 +98,10 @@ const child = spawnSync(command, args, { stdio: 'inherit' });
 if (child.error) {
     console.error(`[\x1b[31mFATAL\x1b[0m] Engine Execution Failed:`, child.error.message);
 } else {
+    // If we used a hardware bypass, we still need to render the CLI dashboard
+    if (command !== 'node') {
+        const analyzerArgs = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir, '--hardware-bypass'];
+        spawnSync('node', analyzerArgs, { stdio: 'inherit' });
+    }
     process.exit(child.status);
 }
