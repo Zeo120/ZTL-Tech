@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
     // Dispatch fractured chunks to physical hardware threads
     for (unsigned int i = 0; i < coreCount; ++i) {
         std::streampos start = i * chunkSize;
-        std::streampos size = (i == coreCount - 1) ? (fileSize - start) : chunkSize;
+        std::streamoff size = (i == coreCount - 1) ? (std::streamoff)(fileSize - start) : (std::streamoff)chunkSize;
         workers.emplace_back(ProcessChunk, filepath, start, size);
     }
     
