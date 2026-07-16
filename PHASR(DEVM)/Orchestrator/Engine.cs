@@ -124,10 +124,27 @@ namespace PhasR
                         fileName.EndsWith(".sys", StringComparison.OrdinalIgnoreCase) ||
                         fileName.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
                     {
-                        double entropy = CalculateEntropy(fullPath);
-                        if (entropy >= 7.2)
+                        if (fileSize >= 1024 * 1024 * 1024L) // 1GB+ Payload
                         {
-                            Console.WriteLine("[VFS-ENTROPY] " + fullPath + "|" + entropy);
+                            try {
+                                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                                p.StartInfo.FileName = "balancer.exe";
+                                p.StartInfo.Arguments = "\"" + fullPath + "\"";
+                                p.StartInfo.UseShellExecute = false;
+                                p.StartInfo.RedirectStandardOutput = true;
+                                p.Start();
+                                string output = p.StandardOutput.ReadToEnd();
+                                p.WaitForExit();
+                                if (!string.IsNullOrEmpty(output)) Console.Write(output);
+                            } catch {}
+                        }
+                        else
+                        {
+                            double entropy = CalculateEntropy(fullPath);
+                            if (entropy >= 7.2)
+                            {
+                                Console.WriteLine("[VFS-ENTROPY] " + fullPath + "|" + entropy);
+                            }
                         }
                     }
                 }
