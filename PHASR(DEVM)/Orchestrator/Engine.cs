@@ -71,6 +71,21 @@ namespace PhasR
             catch { return 0; }
         }
 
+        static void AnalyzeShadowVolume(string directory)
+        {
+            try
+            {
+                string driveLetter = Path.GetPathRoot(directory);
+                DriveInfo drive = new DriveInfo(driveLetter);
+                long physicalAllocated = drive.TotalSize - drive.TotalFreeSpace;
+                long logicalMass = globalMass;
+                long delta = physicalAllocated - logicalMass;
+                
+                Console.WriteLine("[VFS-SHADOW] " + physicalAllocated + "|" + logicalMass + "|" + delta);
+            }
+            catch { }
+        }
+
         static void ScanDirectoryNative(string directory)
         {
             WIN32_FIND_DATA findFileData;
@@ -141,6 +156,7 @@ namespace PhasR
             int endTime = Environment.TickCount;
 
             Console.WriteLine("[VFS-MASS] " + globalMass);
+            AnalyzeShadowVolume(targetDir);
             Console.WriteLine("\n[PHASR] SCAN COMPLETE.");
             Console.WriteLine("[PHASR] Time Elapsed: " + (endTime - startTime) + " milliseconds.");
         }

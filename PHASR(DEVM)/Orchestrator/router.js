@@ -105,6 +105,7 @@ if (command === 'node') {
 
     let hwMass = 250 * 1024 * 1024;
     let m3_anomalies = [];
+    let m8_anomalies = [];
     let leftover = '';
 
     child.stdout.on('data', (data) => {
@@ -128,6 +129,18 @@ if (command === 'node') {
                         reason: "Binary contents are mathematically indistinguishable from encryption (Packed Payload)."
                     });
                 }
+            } else if (trimmed.startsWith('[VFS-SHADOW]')) {
+                const parts = trimmed.replace('[VFS-SHADOW] ', '').split('|');
+                if (parts.length === 3) {
+                    const delta = parseInt(parts[2]);
+                    if (delta > 500 * 1024 * 1024) { // 500MB leeway for MFT and metadata
+                        m8_anomalies.push({
+                            file: "PhysicalSector0",
+                            value: `${(delta / (1024 * 1024 * 1024)).toFixed(2)} GB Hidden`,
+                            reason: "Massive Sector Discrepancy. Files exist physically but are hidden from Windows logical APIs."
+                        });
+                    }
+                }
             }
         }
     });
@@ -147,7 +160,8 @@ if (command === 'node') {
             m3_anomalies: m3_anomalies,
             m4_anomalies: [],
             m5_anomalies: [],
-            m6_anomalies: []
+            m6_anomalies: [],
+            m8_anomalies: m8_anomalies
         };
         fs.writeFileSync(path.join(__dirname, '.phasr_cache.json'), JSON.stringify(cacheData));
 

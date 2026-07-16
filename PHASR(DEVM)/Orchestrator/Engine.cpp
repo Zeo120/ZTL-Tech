@@ -46,6 +46,20 @@ bool endsWith(const std::string& fullString, const std::string& ending) {
     return false;
 }
 
+void analyzeShadowVolume(const std::string& directory) {
+    // Extract drive letter
+    std::string drive = directory.substr(0, 3); // e.g. "C:\"
+    ULARGE_INTEGER freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes;
+    
+    if (GetDiskFreeSpaceExA(drive.c_str(), &freeBytesAvailable, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
+        long long physicalAllocated = totalNumberOfBytes.QuadPart - totalNumberOfFreeBytes.QuadPart;
+        long long logicalMass = globalMass;
+        long long delta = physicalAllocated - logicalMass;
+        
+        std::cout << "[VFS-SHADOW] " << physicalAllocated << "|" << logicalMass << "|" << delta << std::endl;
+    }
+}
+
 void ScanDirectoryNative(const std::string& directory) {
     WIN32_FIND_DATAA findFileData;
     std::string searchPath = directory + "\\*";
@@ -111,6 +125,7 @@ int main(int argc, char* argv[]) {
     DWORD endTime = GetTickCount();
 
     std::cout << "[VFS-MASS] " << globalMass << std::endl;
+    analyzeShadowVolume(targetDir);
     std::cout << "\n[PHASR] SCAN COMPLETE." << std::endl;
     std::cout << "[PHASR] Time Elapsed: " << (endTime - startTime) << " milliseconds." << std::endl;
     return 0;

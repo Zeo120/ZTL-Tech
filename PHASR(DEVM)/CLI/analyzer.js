@@ -393,6 +393,21 @@ async function renderDashboard() {
     await sleep(1000);
 
     // =====================================
+    // MODULE 8: SHADOW VOLUME MAPPER
+    // =====================================
+    console.log(`\n${bright}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`MODULE 8 — SHADOW VOLUME MAPPER`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}\n`);
+    if (results.m8_anomalies && results.m8_anomalies.length > 0) {
+        for (const anom of results.m8_anomalies) {
+            console.log(`[${red}DANGER${reset}] ${anom.file}`);
+            console.log(`   -> ${red}${anom.value}${reset}: ${anom.reason}`);
+        }
+    } else {
+        console.log(`[${green}SAFE${reset}] Physical Sectors Match Logical Volume (No Rootkits)`);
+    }
+
+    // =====================================
     // PILLAR 4: ECONOMICAL ANALYSIS
     // =====================================
     let cloudProvider = '';
