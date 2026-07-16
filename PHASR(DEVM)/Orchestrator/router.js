@@ -93,7 +93,11 @@ if (totalMass < MASS_LIMIT_CPP) {
 }
 
 // Execute the dynamically selected engine
-const child = spawnSync(command, args, { stdio: ['inherit', 'pipe', 'inherit'], encoding: 'utf-8' });
+const child = spawnSync(command, args, { 
+    stdio: ['inherit', 'pipe', 'inherit'], 
+    encoding: 'utf-8',
+    maxBuffer: 1024 * 1024 * 1024 // 1GB Buffer to prevent ENOBUFS on massive C:\ traversals
+});
 
 if (child.error) {
     console.error(`[\x1b[31mFATAL\x1b[0m] Engine Execution Failed:`, child.error.message);
