@@ -20,35 +20,15 @@ try {
     isTargetDirDirectory = fs.statSync(targetDir).isDirectory();
 } catch (e) {}
 
-function calculateMass(dir) {
-    if (massThresholdReached) return;
+if (isTargetDirDirectory) {
+    totalMass = MASS_LIMIT_CPP; // Instantly force C++ Engine for directories
+    massThresholdReached = true;
+} else {
     try {
-        const files = fs.readdirSync(dir, { withFileTypes: true });
-        for (const file of files) {
-            if (massThresholdReached) break;
-            
-            // Skip massive unneeded folders to speed up calculation
-            if (file.name === 'node_modules' || file.name === '.git' || file.name.includes('PHASR(DEVM)')) continue;
-
-            const fullPath = path.join(dir, file.name);
-            try {
-                if (file.isDirectory()) {
-                    calculateMass(fullPath);
-                } else {
-                    totalMass += fs.statSync(fullPath).size;
-                    // If we exceed 200MB, we can stop counting entirely. We know we need Assembly.
-                    if (totalMass >= MASS_LIMIT_ASM) {
-                        massThresholdReached = true;
-                    }
-                }
-            } catch (e) {
-                // Ignore permission denied errors on system files
-            }
-        }
-    } catch (e) {}
+        totalMass = fs.statSync(targetDir).size;
+    } catch(e) {}
+    massThresholdReached = true;
 }
-
-calculateMass(targetDir);
 
 console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Measured Mass: ${(totalMass / 1024).toFixed(2)} KB`);
 
