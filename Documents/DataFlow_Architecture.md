@@ -13,14 +13,25 @@ graph TD
         Internet(("External DNS/OSINT"))
     end
 
-    %% Dynamic Main Engine
-    subgraph Core ["Main Engine Orchestration"]
-        Engine("Engine.c : Bare-Metal Thread Spawner")
+    %% CLI Service Gateway (The Dynamic Router)
+    subgraph CLI ["CLI Service Gateway (phasr)"]
+        Router("router.js : Physical Mass Orchestrator")
     end
 
-    Manifest -->|Loads Active Modules| Engine
-    Codebase --> Engine
+    %% Dynamic Main Engine
+    subgraph Core ["Hardware Engines (Dynamic Handoff)"]
+        NodeEngine("V8 Node.js Engine (< 200KB)")
+        CppEngine("C++ Hybrid Balancer (> 200KB)")
+        AsmEngine("Pure Assembly Core (> 1GB)")
+    end
 
+    Codebase -->|Calculates Physical Mass| Router
+    Router -->|Routes Payload| NodeEngine
+    Router -->|Routes Payload| CppEngine
+    Router -->|Routes Payload| AsmEngine
+    
+    Manifest -->|Loads Active Modules| CppEngine
+    Manifest -->|Loads Active Modules| AsmEngine
     %% Dynamic Assembly Execution Layer
     subgraph Modules ["Hardware Physics Layer: Multi-Arch (x86_64 & ARM64)"]
         M1("M1: Access Points .asm/.s")
@@ -32,13 +43,14 @@ graph TD
         MN("MN: Custom Vectorized Expansion")
     end
 
-    Engine -->|Spawns Hardware Threads| M1
-    Engine -->|Spawns Hardware Threads| M2
-    Engine -->|Spawns Hardware Threads| M3
-    Engine -->|Spawns Hardware Threads| M4
-    Engine -->|Spawns Hardware Threads| M5
-    Engine -->|Spawns Hardware Threads| M6
-    Engine -.->|Dynamically Loads| MN
+    CppEngine -->|Spawns Hardware Threads| M1
+    CppEngine -->|Spawns Hardware Threads| M2
+    CppEngine -->|Spawns Hardware Threads| M3
+    CppEngine -->|Spawns Hardware Threads| M4
+    AsmEngine -->|Bare-Metal _popen Recursion| M3
+    AsmEngine -->|Bare-Metal _popen Recursion| M5
+    AsmEngine -->|Bare-Metal _popen Recursion| M6
+    CppEngine -.->|Dynamically Loads| MN
     
     Internet --> M1
 
@@ -84,8 +96,8 @@ graph TD
 
 ## Data Relationship Breakdown
 
-### 1. The Dynamic Ingestion (The Registry)
-The C Orchestrator (`Engine.c`) ingests a manifest (`phasr.yaml`) at runtime. This registry dictates exactly which assembly modules exist and should be executed, allowing infinite horizontal scaling without needing to recompile the Core Engine.
+### 1. The CLI Service Gateway & Ingestion
+The unified `phasr` CLI (`router.js`) acts as the entry point and Service Gateway. It calculates the physical mass of the codebase and dynamically routes execution to the Node.js Engine, C++ Hybrid Balancer, or the Pure Assembly Hardware Override. These engines ingest a manifest (`phasr.yaml`) at runtime, dictating exactly which assembly modules should be executed.
 
 ### 2. The Hardware Physics Layer (M1 ... Mn)
 Each module acts as a completely isolated observer of the codebase, executed as a raw binary. They are natively written in **Dual-Architecture Unrolled Assembly (x86_64 NASM and ARM64 AArch64)**. This allows the Engine to route evaluation vectors to the correct native silicon instructions (e.g., bypassing branch predictors using `CMOVG` on Intel or `CSEL` on Apple Silicon), running at literal hardware clock speed without translation crutches like Rosetta.
