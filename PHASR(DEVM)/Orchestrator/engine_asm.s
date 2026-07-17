@@ -6,7 +6,7 @@
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
     fmt_ok:     .asciz "[ASM-ENGINE] PURE ASSEMBLY HARDWARE OVERRIDE\n[ASM-ENGINE] TARGET: %s\n"
-    fmt_scan:   .asciz "[VFS-DIR] %s"
+    fmt_scan:   .asciz "[VFS-DIR] %s\n"
     fmt_res:    .asciz "[VFS-MASS] 1500000000\n[ASM-ENGINE] ENTROPY MATH CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
