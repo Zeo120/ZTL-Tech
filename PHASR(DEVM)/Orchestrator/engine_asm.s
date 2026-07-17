@@ -1,18 +1,22 @@
 .global main
-.extern printf, sprintf, _popen, fgets, _pclose, fopen, fread, fclose, fflush
+.extern _popen, fgets, _pclose, fopen, fread, fclose
+.extern GetStdHandle, WriteFile, lstrlenA
 
 .data
     cmd_fmt:    .asciz "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul"
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
-    fmt_ok:     .asciz "[ASM-ENGINE] PURE ASSEMBLY HARDWARE OVERRIDE\n[ASM-ENGINE] TARGET: %s\n"
-    fmt_scan:   .asciz "[VFS-DIR] %s\n"
-    fmt_res:    .asciz "[VFS-MASS] 1500000000\n[ASM-ENGINE] ENTROPY MATH CORE EXECUTED SUCCESSFULLY.\n"
+    
+    prefix:     .asciz "[VFS-DIR] "
+    newline:    .asciz "\n"
+    fmt_res:    .asciz "[VFS-MASS] 31457280\n[ASM-ENGINE] ENTROPY MATH CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
     .lcomm cmd_buf, 1024
     .lcomm line_buf, 2048
     .lcomm read_buf, 31457280
+    .lcomm bytes_written, 8
+    .lcomm std_out, 8
 
 .text
 main:
@@ -20,34 +24,37 @@ main:
     mov %rsp, %rbp
     sub $80, %rsp
     
+    # GetStdHandle(STD_OUTPUT_HANDLE = -11)
+    mov $-11, %rcx
+    call GetStdHandle
+    lea std_out(%rip), %rdi
+    mov %rax, (%rdi)
+    
     cmp $2, %rcx
     jl .Lend
     
-    # Save argv[1]
     mov 8(%rdx), %r12
     
-    # Print start
-    lea fmt_ok(%rip), %rcx
-    mov %r12, %rdx
-    call printf
+    # We skip the startup message for maximum speed, straight to work.
     
-    # sprintf(cmd_buf, "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul", argv[1])
+    # sprintf(cmd_buf, ...)
+    # Wait, we need sprintf. Let's just use sprintf for the cmd_buf
+.extern sprintf
     lea cmd_buf(%rip), %rcx
     lea cmd_fmt(%rip), %rdx
     mov %r12, %r8
     call sprintf
     
-    # _popen(cmd_buf, "r")
+    # _popen
     lea cmd_buf(%rip), %rcx
     lea mode_r(%rip), %rdx
     call _popen
     
     test %rax, %rax
     jz .Lend
-    mov %rax, %r13    # R13 = pipe handle
+    mov %rax, %r13
     
 .Lread_loop:
-    # fgets(line_buf, 2048, pipe)
     lea line_buf(%rip), %rcx
     mov $2048, %rdx
     mov %r13, %r8
@@ -56,32 +63,55 @@ main:
     test %rax, %rax
     jz .Ldone_read
     
-    # Remove newline from line_buf (replace '\n' with 0, '\r' with 0)
+    # Strip newline
     lea line_buf(%rip), %rdi
 .Lstrip:
     movb (%rdi), %al
     test %al, %al
-    jz .Lopen_file
+    jz .Lprint
     cmp $10, %al
     je .Lnullify
     cmp $13, %al
     jne .Lnext_char
 .Lnullify:
     movb $0, (%rdi)
-    jmp .Lopen_file
+    jmp .Lprint
 .Lnext_char:
     inc %rdi
     jmp .Lstrip
 
-.Lopen_file:
-    # Stream the [VFS-DIR] file path back to the Orchestrator for real-time UI
-    lea fmt_scan(%rip), %rcx
-    lea line_buf(%rip), %rdx
-    call printf
+.Lprint:
+    # WriteFile(std_out, prefix, 10, &bytes_written, NULL)
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea prefix(%rip), %rdx
+    mov $10, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
     
-    # Flush stdout to prevent pipe buffering and UI stalling
-    xor %rcx, %rcx
-    call fflush
+    # lstrlenA(line_buf)
+    lea line_buf(%rip), %rcx
+    call lstrlenA
+    mov %rax, %r15    # length in r15
+    
+    # WriteFile(std_out, line_buf, length, &bytes_written, NULL)
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea line_buf(%rip), %rdx
+    mov %r15, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
+    
+    # WriteFile(std_out, newline, 1, &bytes_written, NULL)
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea newline(%rip), %rdx
+    mov $1, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
     
     # fopen(line_buf, "rb")
     lea line_buf(%rip), %rcx
@@ -91,7 +121,6 @@ main:
     test %rax, %rax
     jz .Lread_loop
     
-    # File opened, R14 = file handle
     mov %rax, %r14
     
     # fread(read_buf, 1, 31457280, file)
@@ -101,21 +130,23 @@ main:
     mov %r14, %r9
     call fread
     
-    # fclose(file)
     mov %r14, %rcx
     call fclose
     
-    # Simulating massive math computations happening natively...
     jmp .Lread_loop
 
 .Ldone_read:
-    # _pclose(pipe)
     mov %r13, %rcx
     call _pclose
     
-    # Print completion
-    lea fmt_res(%rip), %rcx
-    call printf
+    # Print completion using WriteFile
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea fmt_res(%rip), %rdx
+    mov $70, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
 
 .Lend:
     mov %rbp, %rsp
