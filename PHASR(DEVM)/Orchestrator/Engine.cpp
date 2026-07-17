@@ -87,6 +87,10 @@ void ScanDirectoryNative(const std::string& directory) {
         std::string fullPath = directory + "\\" + fileName;
 
         if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            // Prevent infinite recursion by skipping Windows Junctions/Symlinks
+            if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+                continue;
+            }
             // Recursive native traversal
             ScanDirectoryNative(fullPath);
         } else {
