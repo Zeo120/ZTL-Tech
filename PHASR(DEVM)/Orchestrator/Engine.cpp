@@ -110,7 +110,8 @@ void ScanDirectoryNative(const std::string& directory) {
                     GetModuleFileNameA(NULL, exePath, MAX_PATH);
                     std::string exeDir = exePath;
                     exeDir = exeDir.substr(0, exeDir.find_last_of("\\/"));
-                    std::string cmd = "\"" + exeDir + "\\engine_asm.exe\" \"" + fullPath + "\"";
+                    // cmd.exe /c strips first and last quotes if there are multiple. We must wrap the whole thing.
+                    std::string cmd = "\"\"" + exeDir + "\\engine_asm.exe\" \"" + fullPath + "\"\"";
                     system(cmd.c_str());
                 } else {
                     double entropy = calculateEntropy(fullPath);
