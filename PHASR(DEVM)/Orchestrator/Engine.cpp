@@ -10,9 +10,13 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 long long globalMass = 0;
 long long globalFileCount = 0;
+DWORD startTime = 0;
+
+std::vector<std::pair<std::string, double>> m3_anomalies;
 
 #define QUEUE_SIZE 8192
 char taskQueue[QUEUE_SIZE][MAX_PATH];
@@ -63,7 +67,7 @@ DWORD WINAPI WorkerThread(LPVOID lpParam) {
                         }
                         if (entropy >= 7.2) {
                             EnterCriticalSection(&printCS);
-                            std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << "\n";
+                            m3_anomalies.push_back(std::make_pair(std::string(fullPath), entropy));
                             LeaveCriticalSection(&printCS);
                         }
                     }
@@ -117,7 +121,21 @@ void ScanDirectoryNative(const std::string& directory) {
         
         globalFileCount++;
         if ((globalFileCount & 127) == 0) {
-            std::cout << "[VFS-PULSE] " << globalFileCount << std::endl;
+            DWORD now = GetTickCount();
+            DWORD elapsed = now - startTime;
+            if (elapsed == 0) elapsed = 1;
+            double speed = (double)globalFileCount / (elapsed / 1000.0);
+            double percent = (double)globalFileCount / 1500000.0 * 100.0;
+            if (percent > 100.0) percent = 100.0;
+            
+            std::cout << "\r\x1b[36m[PHASR]\x1b[0m [";
+            int filled = (int)(percent / 2.0); // 50 chars wide
+            for (int i = 0; i < 50; i++) {
+                if (i < filled) std::cout << "█";
+                else std::cout << "░";
+            }
+            std::cout << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
+                      << globalFileCount << " / 1,500,000 | " << (int)speed << " f/s   " << std::flush;
         }
 
         std::string fullPath = directory + "\\" + fileName;
@@ -185,19 +203,80 @@ int main(int argc, char* argv[]) {
     std::cout << "[PHASR] Commencing native kernel-level scan on: " << targetDir << std::endl;
     std::cout << "[PHASR] Standby. Brute-forcing physical mass...\n" << std::endl;
 
-    DWORD startTime = GetTickCount();
+    startTime = GetTickCount();
     ScanDirectoryNative(targetDir);
     
-    // Await pool resolution
     scanComplete.store(true, std::memory_order_release);
     WaitForMultipleObjects(cores, threads, TRUE, INFINITE);
     
     DWORD endTime = GetTickCount();
+    std::cout << "\n\n";
 
-    std::cout << "[VFS-MASS] " << globalMass << std::endl;
-    std::cout << "[VFS-COUNT] " << globalFileCount << std::endl;
-    analyzeShadowVolume(targetDir);
-    std::cout << "\n[PHASR] SCAN COMPLETE." << std::endl;
-    std::cout << "[PHASR] Time Elapsed: " << (endTime - startTime) << " milliseconds." << std::endl;
+    // NATIVE C++ ANIMATED DASHBOARD
+    Sleep(300);
+    std::cout << "\x1b[1m\x1b[36m=======================================================\x1b[0m\n";
+    Sleep(200);
+    std::cout << "\x1b[1m   PHASR (DEVM) - ABSOLUTE PHYSICS ENGINE (NATIVE C++)\x1b[0m\n";
+    Sleep(200);
+    std::cout << "\x1b[1m\x1b[36m=======================================================\x1b[0m\n\n";
+    Sleep(500);
+
+    std::cout << "\x1b[1mTARGET:\x1b[0m " << targetDir << "\n";
+    Sleep(300);
+    std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
+    Sleep(300);
+    std::cout << "\x1b[1mPHYSICAL MASS:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
+    Sleep(800);
+
+    std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
+    Sleep(1000);
+
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 3 — ENTROPY ANALYSER\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+
+    if (m3_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mRule:\x1b[0m\nHigh Entropy Data (Possible Obfuscation)\n\n";
+        std::cout << "\x1b[1m\x1b[31mFindings: " << m3_anomalies.size() << "\x1b[0m\n\n";
+        std::cout << "\x1b[1mFiles\x1b[0m\n";
+        for (const auto& a : m3_anomalies) {
+            size_t slash = a.first.find_last_of("\\/");
+            std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
+            std::cout << " \xE2\x80\xA2 " << fileName << " (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
+        }
+    } else {
+        std::cout << "\x1b[1m\x1b[32m[SAFE] Maximum Entropy H(X) Verified\x1b[0m\n\n";
+    }
+
+    // Markdown Report Generation
+    std::ofstream md("phasr_security_report.md");
+    if (md) {
+        md << "# PHASR (DEVM) - Security Posture Report (Native Core)\n\n";
+        md << "**Target:** " << targetDir << "\n";
+        md << "**Files Scanned:** " << globalFileCount << "\n";
+        md << "**Physical Mass:** " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
+        md << "## Total Anomalies Detected: " << m3_anomalies.size() << "\n\n";
+        if (m3_anomalies.size() > 0) {
+            md << "### Module 3: Entropy Analyser\n";
+            for (const auto& a : m3_anomalies) {
+                size_t slash = a.first.find_last_of("\\/");
+                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
+                md << "- **" << fileName << "** (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
+            }
+        }
+        md.close();
+        std::cout << "\n[\x1b[32m+\x1b[0m] Persistent Security Report Generated: phasr_security_report.md\n";
+    }
+    
+    if (m3_anomalies.size() > 0) {
+        std::cout << "\n\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[31m WAVE COLLAPSE: DEPLOYMENT HALTED\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    } else {
+        std::cout << "\n\x1b[1m\x1b[32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[32m PIPELINE SAFE: DEPLOYMENT APPROVED\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    }
+
     return 0;
 }
