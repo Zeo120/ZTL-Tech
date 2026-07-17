@@ -12,6 +12,7 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 // Bypasses V8 Node.js completely to natively scan Windows drives
 
 long long globalMass = 0;
+long long globalFileCount = 0;
 
 double calculateEntropy(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
@@ -77,12 +78,16 @@ void ScanDirectoryNative(const std::string& directory) {
         if (fileName == "." || fileName == "..") {
             continue;
         }
+        
+        globalFileCount++;
+        if ((globalFileCount & 127) == 0) {
+            std::cout << "[VFS-PULSE] " << globalFileCount << "\n";
+        }
 
         std::string fullPath = directory + "\\" + fileName;
 
         if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             // Recursive native traversal
-            std::cout << "[VFS-DIR] " << fullPath << std::endl;
             ScanDirectoryNative(fullPath);
         } else {
             // It's a file, grab the physical mass without opening the file
