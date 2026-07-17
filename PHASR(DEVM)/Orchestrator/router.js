@@ -8,7 +8,7 @@ const targetDir = process.argv[2] || process.cwd();
 
 // Physical limits
 const MASS_LIMIT_CPP = 200 * 1024; // 200 KB
-const MASS_LIMIT_ASM = 200 * 1024 * 1024; // 200 MB
+const MASS_LIMIT_ASM = 1024 * 1024 * 1024; // 1 GB
 
 console.log(`\n[\x1b[35mORCHESTRATOR\x1b[0m] Calculating Physical Mass of Target: ${targetDir}...`);
 
@@ -55,7 +55,21 @@ let args = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir];
 const isWin = os.platform() === 'win32';
 const binExt = isWin ? '.exe' : '';
 
-if (totalMass >= MASS_LIMIT_CPP) {
+if (totalMass >= MASS_LIMIT_ASM) {
+    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 1GB. Extreme Compute limits exceeded.`);
+    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[31mPURE ASSEMBLY ENGINE\x1b[0m...\n`);
+    const asmBinary = path.join(__dirname, `engine_asm${binExt}`);
+    if (fs.existsSync(asmBinary)) {
+        console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Executing Pure Assembly Hardware Override...`);
+        command = asmBinary;
+        args = [targetDir];
+    } else {
+        console.log(`[\x1b[33mWARN\x1b[0m] Pure Assembly Engine not compiled. Falling back to C++ Engine...\n`);
+        totalMass = MASS_LIMIT_CPP; // Force C++ fallback
+    }
+}
+
+if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mC++ / ASM Hybrid Engine\x1b[0m...\n`);
     const cppBinary = path.join(__dirname, `engine${binExt}`);
