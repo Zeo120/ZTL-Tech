@@ -74,12 +74,10 @@ main:
     jmp .Lstrip
 
 .Lopen_file:
-    # Print file being scanned
+    # Stream the [VFS-DIR] file path back to the Orchestrator for real-time UI
     lea fmt_scan(%rip), %rcx
     lea line_buf(%rip), %rdx
-    # To keep terminal clean, we will only output files if needed, 
-    # but the orchestrator expects [VFS-DIR] or [VFS-ENTROPY] lines
-    # Actually, let's just print a generic scan message to keep it fast
+    call printf
     
     # fopen(line_buf, "rb")
     lea line_buf(%rip), %rcx
