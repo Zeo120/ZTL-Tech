@@ -109,10 +109,15 @@ if (command === 'node') {
     // Asynchronous Execution for Hardware Engines (Real-time Streaming)
     
     // Pre-calculate total file count for the Progress Bar
-    console.log(`[\x1b[36mPHASR\x1b[0m] Pre-allocating NTFS File Count (this may take 5-15s on C:\\)...`);
-    const countProc = spawnSync('cmd.exe', ['/c', `dir /s /b /a-d "${targetDir}" 2>nul | find /c /v ""`]);
-    const totalFiles = parseInt(countProc.stdout ? countProc.stdout.toString().trim() : '0') || 1500000;
-    console.log(`[\x1b[36mPHASR\x1b[0m] Recognized \x1b[32m${totalFiles.toLocaleString()}\x1b[0m files. Initiating Assembly Core...`);
+    let totalFiles = 1500000;
+    if (targetDir.toUpperCase() === 'C:\\' || targetDir.toUpperCase() === 'C:') {
+        console.log(`[\x1b[36mPHASR\x1b[0m] Target is Root Drive. Bypassing 25s pre-scan lock...`);
+    } else {
+        console.log(`[\x1b[36mPHASR\x1b[0m] Pre-allocating NTFS File Count...`);
+        const countProc = spawnSync('cmd.exe', ['/c', `dir /s /b /a-d "${targetDir}" 2>nul | find /c /v ""`]);
+        totalFiles = parseInt(countProc.stdout ? countProc.stdout.toString().trim() : '0') || 1500000;
+    }
+    console.log(`[\x1b[36mPHASR\x1b[0m] Recognized \x1b[32m${totalFiles.toLocaleString()}\x1b[0m base files. Initiating Hardware Core...`);
 
     const child = spawn(command, args, { stdio: ['inherit', 'pipe', 'inherit'] });
 
