@@ -119,7 +119,6 @@ if (command === 'node') {
 
     child.stdout.on('data', (data) => {
         const chunk = data.toString('utf-8');
-        process.stdout.write(chunk); // Stream directly to terminal visually
 
         // Parse chunks carefully across newlines
         const lines = (leftover + chunk).split('\n');
