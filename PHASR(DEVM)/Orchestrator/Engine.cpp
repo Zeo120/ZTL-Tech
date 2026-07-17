@@ -106,7 +106,11 @@ void ScanDirectoryNative(const std::string& directory) {
 
             if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
                 if (fileSize.QuadPart >= 1024 * 1024 * 1024ULL) { // 1GB+ Payload
-                    std::string cmd = "balancer.exe \"" + fullPath + "\"";
+                    char exePath[MAX_PATH];
+                    GetModuleFileNameA(NULL, exePath, MAX_PATH);
+                    std::string exeDir = exePath;
+                    exeDir = exeDir.substr(0, exeDir.find_last_of("\\/"));
+                    std::string cmd = "\"" + exeDir + "\\engine_asm.exe\" \"" + fullPath + "\"";
                     system(cmd.c_str());
                 } else {
                     double entropy = calculateEntropy(fullPath);
