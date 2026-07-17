@@ -108,6 +108,7 @@ if (command === 'node') {
     let m3_anomalies = [];
     let m8_anomalies = [];
     let leftover = '';
+    const startTime = Date.now();
 
     child.stdout.on('data', (data) => {
         const chunk = data.toString('utf-8');
@@ -119,7 +120,12 @@ if (command === 'node') {
 
         for (const line of lines) {
             const trimmed = line.trim();
-            if (trimmed.startsWith('[VFS-MASS]')) {
+            if (trimmed.startsWith('[VFS-PULSE]')) {
+                const count = parseInt(trimmed.split(' ')[1]) || 0;
+                const elapsedSec = (Date.now() - startTime) / 1000;
+                const speed = (count / elapsedSec).toFixed(0);
+                process.stdout.write(`\r[\x1b[36mPHASR\x1b[0m] BARE-METAL SCAN: \x1b[32m${count}\x1b[0m files | Speed: ${speed} files/sec...`);
+            } else if (trimmed.startsWith('[VFS-MASS]')) {
                 hwMass = parseInt(trimmed.split(' ')[1]) || hwMass;
             } else if (trimmed.startsWith('[VFS-ENTROPY]')) {
                 const parts = trimmed.replace('[VFS-ENTROPY] ', '').split('|');

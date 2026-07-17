@@ -6,14 +6,17 @@
     cmd_fmt:    .asciz "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul"
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
-    fmt_res:    .asciz "[VFS-MASS] 1073741824\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
+    fmt_pulse:  .asciz "[VFS-PULSE] %llu\n"
+    fmt_res:    .asciz "\n[VFS-MASS] 1073741824\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
     .lcomm cmd_buf, 1024
     .lcomm line_buf, 2048
+    .lcomm pulse_str, 128
     .lcomm read_buf, 1073741824
     .lcomm std_out, 8
     .lcomm bytes_written, 8
+    .lcomm file_count, 8
 
 .text
 main:
@@ -74,6 +77,35 @@ main:
     jmp .Lstrip
 
 .Lopen_file:
+    # Increment file_count
+    incq file_count(%rip)
+    mov file_count(%rip), %rax
+    
+    # Pulse every 1024 files (fast bitwise AND)
+    test $1023, %rax
+    jnz .Lskip_pulse
+    
+    # sprintf(pulse_str, "[VFS-PULSE] %llu\n", file_count)
+    lea pulse_str(%rip), %rcx
+    lea fmt_pulse(%rip), %rdx
+    mov %rax, %r8
+    call sprintf
+    
+    # lstrlenA(pulse_str)
+    lea pulse_str(%rip), %rcx
+    call lstrlenA
+    mov %rax, %r15
+    
+    # WriteFile
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea pulse_str(%rip), %rdx
+    mov %r15, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
+    
+.Lskip_pulse:
     # fopen(line_buf, "rb")
     lea line_buf(%rip), %rcx
     lea mode_rb(%rip), %rdx
