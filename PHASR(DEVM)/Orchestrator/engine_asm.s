@@ -6,12 +6,12 @@
     cmd_fmt:    .asciz "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul"
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
-    fmt_res:    .asciz "[VFS-MASS] 31457280\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
+    fmt_res:    .asciz "[VFS-MASS] 1073741824\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
     .lcomm cmd_buf, 1024
     .lcomm line_buf, 2048
-    .lcomm read_buf, 31457280
+    .lcomm read_buf, 1073741824
     .lcomm std_out, 8
     .lcomm bytes_written, 8
 
@@ -84,10 +84,10 @@ main:
     
     mov %rax, %r14    # file handle
     
-    # fread(read_buf, 1, 31457280, file)
+    # fread(read_buf, 1, 1073741824, file)
     lea read_buf(%rip), %rcx
     mov $1, %rdx
-    mov $31457280, %r8
+    mov $1073741824, %r8
     mov %r14, %r9
     call fread
     
