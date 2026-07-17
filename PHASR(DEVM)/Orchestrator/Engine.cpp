@@ -11,38 +11,69 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 // Absolute bare-metal C++ Orchestrator
 // Bypasses V8 Node.js completely to natively scan Windows drives
 
-long long globalMass = 0;
-long long globalFileCount = 0;
+#include <atomic>
+#include <thread>
 
-double calculateEntropy(const std::string& filePath, long long fileSize) {
-    HANDLE hFile = CreateFileA(filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile == INVALID_HANDLE_VALUE) return 0.0;
-    
-    // O(1) Heuristic: Seek to the middle of the payload to bypass structured PE headers
-    long long offset = fileSize > 8192 ? (fileSize / 2) - 4096 : 0;
-    LARGE_INTEGER liDistanceToMove;
-    liDistanceToMove.QuadPart = offset;
-    SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN);
+#define QUEUE_SIZE 8192
+char taskQueue[QUEUE_SIZE][MAX_PATH];
+std::atomic<int> queueHead = {0};
+std::atomic<int> queueTail = {0};
+std::atomic<int> activeWorkers = {0};
+std::atomic<bool> scanComplete = {false};
 
-    std::vector<long long> counts(256, 0);
-    char buffer[8192];
-    DWORD bytesRead = 0;
-    
-    ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL);
-    CloseHandle(hFile);
-    
-    if (bytesRead == 0) return 0.0;
-    
-    calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytesRead, counts.data());
-    
-    double entropy = 0.0;
-    for (long long freq : counts) {
-        if (freq > 0) {
-            double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
-            entropy -= p * log2(p);
+CRITICAL_SECTION printCS;
+
+DWORD WINAPI WorkerThread(LPVOID lpParam) {
+    while (true) {
+        int head = queueHead.load(std::memory_order_acquire);
+        int tail = queueTail.load(std::memory_order_relaxed);
+        
+        if (head == tail) {
+            if (scanComplete.load(std::memory_order_acquire)) break;
+            YieldProcessor(); // Spinlock
+            continue;
+        }
+        
+        if (queueHead.compare_exchange_weak(head, (head + 1) % QUEUE_SIZE, std::memory_order_release, std::memory_order_relaxed)) {
+            activeWorkers++;
+            const char* fullPath = taskQueue[head];
+            
+            HANDLE hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (hFile != INVALID_HANDLE_VALUE) {
+                LARGE_INTEGER fileSize;
+                if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 250 * 1024 * 1024ULL) {
+                    long long offset = fileSize.QuadPart > 8192 ? (fileSize.QuadPart / 2) - 4096 : 0;
+                    LARGE_INTEGER liDistanceToMove;
+                    liDistanceToMove.QuadPart = offset;
+                    SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN);
+
+                    long long counts[256] = {0};
+                    char buffer[8192];
+                    DWORD bytesRead = 0;
+                    
+                    if (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead > 0) {
+                        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytesRead, counts);
+                        
+                        double entropy = 0.0;
+                        for (long long freq : counts) {
+                            if (freq > 0) {
+                                double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                entropy -= p * log2(p);
+                            }
+                        }
+                        if (entropy >= 7.2) {
+                            EnterCriticalSection(&printCS);
+                            std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << "\n";
+                            LeaveCriticalSection(&printCS);
+                        }
+                    }
+                }
+                CloseHandle(hFile);
+            }
+            activeWorkers--;
         }
     }
-    return entropy;
+    return 0;
 }
 
 bool endsWith(const std::string& fullString, const std::string& ending) {
@@ -114,12 +145,15 @@ void ScanDirectoryNative(const std::string& directory) {
                     (ext[0] == '.' && (ext[1] == 's' || ext[1] == 'S') && (ext[2] == 'y' || ext[2] == 'Y') && (ext[3] == 's' || ext[3] == 'S')) ||
                     (ext[0] == '.' && (ext[1] == 'b' || ext[1] == 'B') && (ext[2] == 'i' || ext[2] == 'I') && (ext[3] == 'n' || ext[3] == 'N'))) {
                     
-                    if (fileSize.QuadPart < 250 * 1024 * 1024ULL) {
-                        double entropy = calculateEntropy(fullPath, fileSize.QuadPart);
-                        if (entropy >= 7.2) {
-                            std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
-                        }
+                    
+                    // Zero-Allocation Queue Push
+                    int tail = queueTail.load(std::memory_order_relaxed);
+                    int nextTail = (tail + 1) % QUEUE_SIZE;
+                    while (nextTail == queueHead.load(std::memory_order_acquire)) {
+                        YieldProcessor(); // Spin until consumer frees a slot
                     }
+                    lstrcpyA(taskQueue[tail], fullPath.c_str());
+                    queueTail.store(nextTail, std::memory_order_release);
                 }
             }
         }
@@ -131,6 +165,16 @@ void ScanDirectoryNative(const std::string& directory) {
 
 int main(int argc, char* argv[]) {
     std::cout << "\n[PHASR] NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
+    InitializeCriticalSection(&printCS);
+    
+    // Spawn Zero-Allocation Worker Pool
+    unsigned int cores = std::thread::hardware_concurrency();
+    if (cores == 0) cores = 16;
+    HANDLE* threads = new HANDLE[cores];
+    for (unsigned int i = 0; i < cores; ++i) {
+        threads[i] = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL);
+    }
+
     std::cout << "[PHASR] Bypassing Node.js V8 Engine..." << std::endl;
 
     std::string targetDir = "C:\\";
@@ -143,6 +187,11 @@ int main(int argc, char* argv[]) {
 
     DWORD startTime = GetTickCount();
     ScanDirectoryNative(targetDir);
+    
+    // Await pool resolution
+    scanComplete.store(true, std::memory_order_release);
+    WaitForMultipleObjects(cores, threads, TRUE, INFINITE);
+    
     DWORD endTime = GetTickCount();
 
     std::cout << "[VFS-MASS] " << globalMass << std::endl;
