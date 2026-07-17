@@ -15,28 +15,30 @@ long long globalMass = 0;
 long long globalFileCount = 0;
 
 double calculateEntropy(const std::string& filePath, long long fileSize) {
-    std::ifstream file(filePath, std::ios::binary);
-    if (!file) return 0.0;
+    HANDLE hFile = CreateFileA(filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile == INVALID_HANDLE_VALUE) return 0.0;
     
     // O(1) Heuristic: Seek to the middle of the payload to bypass structured PE headers
-    // and read a single 8KB block to instantly gauge payload entropy.
     long long offset = fileSize > 8192 ? (fileSize / 2) - 4096 : 0;
-    file.seekg(offset);
+    LARGE_INTEGER liDistanceToMove;
+    liDistanceToMove.QuadPart = offset;
+    SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN);
 
     std::vector<long long> counts(256, 0);
     char buffer[8192];
+    DWORD bytesRead = 0;
     
-    file.read(buffer, sizeof(buffer));
-    std::streamsize bytes = file.gcount();
+    ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL);
+    CloseHandle(hFile);
     
-    if (bytes == 0) return 0.0;
+    if (bytesRead == 0) return 0.0;
     
-    calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytes, counts.data());
+    calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytesRead, counts.data());
     
     double entropy = 0.0;
     for (long long freq : counts) {
         if (freq > 0) {
-            double p = static_cast<double>(freq) / static_cast<double>(bytes);
+            double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
             entropy -= p * log2(p);
         }
     }
@@ -103,15 +105,20 @@ void ScanDirectoryNative(const std::string& directory) {
             fileSize.HighPart = findFileData.nFileSizeHigh;
             globalMass += fileSize.QuadPart;
 
-            // Convert filename to lowercase for extension check
-            std::string lowerName = fileName;
-            for (char &c : lowerName) c = tolower(c);
-
-            if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
-                if (fileSize.QuadPart < 250 * 1024 * 1024ULL) { // Skip entropy math on files > 250MB to prevent I/O blocking
-                    double entropy = calculateEntropy(fullPath, fileSize.QuadPart);
-                    if (entropy >= 7.2) {
-                        std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
+            // Fast in-place extension check (Zero allocations)
+            size_t len = fileName.length();
+            if (len >= 4) {
+                const char* ext = fileName.c_str() + len - 4;
+                if ((ext[0] == '.' && (ext[1] == 'e' || ext[1] == 'E') && (ext[2] == 'x' || ext[2] == 'X') && (ext[3] == 'e' || ext[3] == 'E')) ||
+                    (ext[0] == '.' && (ext[1] == 'd' || ext[1] == 'D') && (ext[2] == 'l' || ext[2] == 'L') && (ext[3] == 'l' || ext[3] == 'L')) ||
+                    (ext[0] == '.' && (ext[1] == 's' || ext[1] == 'S') && (ext[2] == 'y' || ext[2] == 'Y') && (ext[3] == 's' || ext[3] == 'S')) ||
+                    (ext[0] == '.' && (ext[1] == 'b' || ext[1] == 'B') && (ext[2] == 'i' || ext[2] == 'I') && (ext[3] == 'n' || ext[3] == 'N'))) {
+                    
+                    if (fileSize.QuadPart < 250 * 1024 * 1024ULL) {
+                        double entropy = calculateEntropy(fullPath, fileSize.QuadPart);
+                        if (entropy >= 7.2) {
+                            std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
+                        }
                     }
                 }
             }
