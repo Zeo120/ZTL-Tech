@@ -182,7 +182,8 @@ void ScanDirectoryNative(const std::string& directory) {
 }
 
 int main(int argc, char* argv[]) {
-    std::cout << "\n[PHASR] NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
+    SetConsoleOutputCP(CP_UTF8);
+    std::cout << "\n\x1b[36m[PHASR]\x1b[0m NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
     InitializeCriticalSection(&printCS);
     
     // Spawn Zero-Allocation Worker Pool
