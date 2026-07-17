@@ -150,6 +150,9 @@ if (command === 'node') {
                         });
                     }
                 }
+            } else if (trimmed.length > 0) {
+                // Catch any raw C++ initialization text or system crash errors
+                process.stdout.write(`\n[\x1b[33mC++ ENGINE DEBUG\x1b[0m] ${trimmed}\n`);
             }
         }
     });
