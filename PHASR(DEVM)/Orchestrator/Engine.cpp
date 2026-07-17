@@ -8,11 +8,11 @@
 
 extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
 
-// Absolute bare-metal C++ Orchestrator
-// Bypasses V8 Node.js completely to natively scan Windows drives
-
 #include <atomic>
 #include <thread>
+
+long long globalMass = 0;
+long long globalFileCount = 0;
 
 #define QUEUE_SIZE 8192
 char taskQueue[QUEUE_SIZE][MAX_PATH];
