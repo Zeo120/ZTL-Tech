@@ -25,6 +25,7 @@ std::atomic<int> queueHead = {0};
 std::atomic<int> queueTail = {0};
 std::atomic<int> activeWorkers = {0};
 std::atomic<bool> scanComplete = {false};
+long long totalTargetFiles = 1500000;
 
 CRITICAL_SECTION printCS;
 
@@ -99,7 +100,7 @@ void WorkerThread() {
             activeWorkers--;
         }
     }
-    return 0;
+    return;
 }
 
 bool endsWith(const std::string& fullString, const std::string& ending) {
