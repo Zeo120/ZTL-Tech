@@ -14,26 +14,29 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 long long globalMass = 0;
 long long globalFileCount = 0;
 
-double calculateEntropy(const std::string& filePath) {
+double calculateEntropy(const std::string& filePath, long long fileSize) {
     std::ifstream file(filePath, std::ios::binary);
     if (!file) return 0.0;
     
+    // O(1) Heuristic: Seek to the middle of the payload to bypass structured PE headers
+    // and read a single 8KB block to instantly gauge payload entropy.
+    long long offset = fileSize > 8192 ? (fileSize / 2) - 4096 : 0;
+    file.seekg(offset);
+
     std::vector<long long> counts(256, 0);
-    long long totalBytes = 0;
     char buffer[8192];
     
-    while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
-        std::streamsize bytes = file.gcount();
-        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytes, counts.data());
-        totalBytes += bytes;
-    }
+    file.read(buffer, sizeof(buffer));
+    std::streamsize bytes = file.gcount();
     
-    if (totalBytes == 0) return 0.0;
+    if (bytes == 0) return 0.0;
+    
+    calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytes, counts.data());
     
     double entropy = 0.0;
     for (long long freq : counts) {
         if (freq > 0) {
-            double p = static_cast<double>(freq) / totalBytes;
+            double p = static_cast<double>(freq) / static_cast<double>(bytes);
             entropy -= p * log2(p);
         }
     }
@@ -106,7 +109,7 @@ void ScanDirectoryNative(const std::string& directory) {
 
             if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
                 if (fileSize.QuadPart < 250 * 1024 * 1024ULL) { // Skip entropy math on files > 250MB to prevent I/O blocking
-                    double entropy = calculateEntropy(fullPath);
+                    double entropy = calculateEntropy(fullPath, fileSize.QuadPart);
                     if (entropy >= 7.2) {
                         std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
                     }
