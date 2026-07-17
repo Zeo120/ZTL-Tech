@@ -102,6 +102,13 @@ if (command === 'node') {
     process.exit(child.status);
 } else {
     // Asynchronous Execution for Hardware Engines (Real-time Streaming)
+    
+    // Pre-calculate total file count for the Progress Bar
+    console.log(`[\x1b[36mPHASR\x1b[0m] Pre-allocating NTFS File Count (this may take 5-15s on C:\\)...`);
+    const countProc = spawnSync('cmd.exe', ['/c', `dir /s /b /a-d "${targetDir}" 2>nul | find /c /v ""`]);
+    const totalFiles = parseInt(countProc.stdout ? countProc.stdout.toString().trim() : '0') || 1500000;
+    console.log(`[\x1b[36mPHASR\x1b[0m] Recognized \x1b[32m${totalFiles.toLocaleString()}\x1b[0m files. Initiating Assembly Core...`);
+
     const child = spawn(command, args, { stdio: ['inherit', 'pipe', 'inherit'] });
 
     let hwMass = 250 * 1024 * 1024;
@@ -123,8 +130,14 @@ if (command === 'node') {
             if (trimmed.startsWith('[VFS-PULSE]')) {
                 const count = parseInt(trimmed.split(' ')[1]) || 0;
                 const elapsedSec = (Date.now() - startTime) / 1000;
-                const speed = (count / elapsedSec).toFixed(0);
-                process.stdout.write(`\r[\x1b[36mPHASR\x1b[0m] BARE-METAL SCAN: \x1b[32m${count}\x1b[0m files | Speed: ${speed} files/sec...`);
+                const speed = (count / (elapsedSec || 1)).toFixed(0);
+                
+                // Calculate percentage and Green Progress Bar
+                const percent = Math.min((count / totalFiles) * 100, 100);
+                const filled = Math.floor(percent / 2); // 50 chars wide
+                const bar = '\x1b[32m' + '█'.repeat(filled) + '\x1b[90m' + '░'.repeat(50 - filled) + '\x1b[0m';
+                
+                process.stdout.write(`\r[\x1b[36mPHASR\x1b[0m] [${bar}] \x1b[32m${percent.toFixed(2)}%\x1b[0m | ${count.toLocaleString()} / ${totalFiles.toLocaleString()} | ${speed} f/s   `);
             } else if (trimmed.startsWith('[VFS-MASS]')) {
                 hwMass = parseInt(trimmed.split(' ')[1]) || hwMass;
             } else if (trimmed.startsWith('[VFS-ENTROPY]')) {
