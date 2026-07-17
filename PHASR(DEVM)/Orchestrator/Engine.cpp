@@ -28,6 +28,24 @@ std::atomic<bool> scanComplete = {false};
 
 CRITICAL_SECTION printCS;
 
+// Helper to pre-calculate total files for accurate progress bar
+void PrecalculateFileCount(const std::string& directory) {
+    WIN32_FIND_DATAA findData;
+    std::string searchPath = directory + "\\*";
+    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+    if (hFind == INVALID_HANDLE_VALUE) return;
+    do {
+        if (strcmp(findData.cFileName, ".") == 0 || strcmp(findData.cFileName, "..") == 0) continue;
+        if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT))
+                PrecalculateFileCount(directory + "\\" + findData.cFileName);
+        } else {
+            totalTargetFiles++;
+        }
+    } while (FindNextFileA(hFind, &findData));
+    FindClose(hFind);
+}
+
 DWORD WINAPI WorkerThread(LPVOID lpParam) {
     while (true) {
         int head = queueHead.load(std::memory_order_acquire);
@@ -131,7 +149,7 @@ void ScanDirectoryNative(const std::string& directory) {
                 DWORD elapsed = now - startTime;
                 if (elapsed == 0) elapsed = 1;
                 double speed = (double)globalFileCount / (elapsed / 1000.0);
-                double percent = (double)globalFileCount / 1500000.0 * 100.0;
+                double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
                 if (percent > 100.0) percent = 100.0;
                 
                 std::string barStr = "\r\x1b[36m[PHASR]\x1b[0m [";
@@ -142,7 +160,7 @@ void ScanDirectoryNative(const std::string& directory) {
                 }
                 
                 std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
-                          << globalFileCount << " / 1,500,000 | " << (int)speed << " f/s   " << std::flush;
+                          << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
             }
         }
 
@@ -197,27 +215,30 @@ int main(int argc, char* argv[]) {
     
     // Spawn Zero-Allocation Worker Pool
     unsigned int cores = std::thread::hardware_concurrency();
-    if (cores == 0) cores = 16;
-    HANDLE* threads = new HANDLE[cores];
-    for (unsigned int i = 0; i < cores; ++i) {
-        threads[i] = CreateThread(NULL, 0, WorkerThread, NULL, 0, NULL);
+    for (unsigned int i = 0; i < cores; i++) {
+        std::thread(WorkerThread).detach();
+    }
+    
+    std::string targetDir = (argc > 1) ? argv[1] : ".";
+    
+    // Fast Pre-scan File Count
+    if (targetDir == "C:\\" || targetDir == "C:") {
+        std::cout << "[PHASR] Target is Root Drive. Bypassing pre-scan index lock...\n";
+        totalTargetFiles = 1500000;
+    } else {
+        totalTargetFiles = 0;
+        PrecalculateFileCount(targetDir);
+        if (totalTargetFiles == 0) totalTargetFiles = 1;
+        std::cout << "[PHASR] Pre-scan complete: " << totalTargetFiles << " files indexed.\n";
     }
 
-    std::cout << "[PHASR] Bypassing Node.js V8 Engine..." << std::endl;
-
-    std::string targetDir = "C:\\";
-    if (argc > 1) {
-        targetDir = argv[1];
-    }
-
-    std::cout << "[PHASR] Commencing native kernel-level scan on: " << targetDir << std::endl;
-    std::cout << "[PHASR] Standby. Brute-forcing physical mass...\n" << std::endl;
+    std::cout << "[PHASR] Commencing native kernel-level scan on: " << targetDir << "\n";
+    std::cout << "[PHASR] Standby. Brute-forcing physical mass...\n\n";
 
     startTime = GetTickCount();
     ScanDirectoryNative(targetDir);
     
     scanComplete.store(true, std::memory_order_release);
-    WaitForMultipleObjects(cores, threads, TRUE, INFINITE);
     
     DWORD endTime = GetTickCount();
     std::cout << "\n\n";
