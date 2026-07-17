@@ -15,6 +15,7 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 long long globalMass = 0;
 long long globalFileCount = 0;
 DWORD startTime = 0;
+DWORD lastPrintTime = 0;
 
 std::vector<std::pair<std::string, double>> m3_anomalies;
 
@@ -122,20 +123,24 @@ void ScanDirectoryNative(const std::string& directory) {
         globalFileCount++;
         if ((globalFileCount & 127) == 0) {
             DWORD now = GetTickCount();
-            DWORD elapsed = now - startTime;
-            if (elapsed == 0) elapsed = 1;
-            double speed = (double)globalFileCount / (elapsed / 1000.0);
-            double percent = (double)globalFileCount / 1500000.0 * 100.0;
-            if (percent > 100.0) percent = 100.0;
-            
-            std::cout << "\r\x1b[36m[PHASR]\x1b[0m [";
-            int filled = (int)(percent / 2.0); // 50 chars wide
-            for (int i = 0; i < 50; i++) {
-                if (i < filled) std::cout << "█";
-                else std::cout << "░";
+            if (now - lastPrintTime >= 50) { // Max 20 FPS UI refresh
+                lastPrintTime = now;
+                DWORD elapsed = now - startTime;
+                if (elapsed == 0) elapsed = 1;
+                double speed = (double)globalFileCount / (elapsed / 1000.0);
+                double percent = (double)globalFileCount / 1500000.0 * 100.0;
+                if (percent > 100.0) percent = 100.0;
+                
+                std::string barStr = "\r\x1b[36m[PHASR]\x1b[0m [";
+                int filled = (int)(percent / 2.0); // 50 chars wide
+                for (int i = 0; i < 50; i++) {
+                    if (i < filled) barStr += "█";
+                    else barStr += "░";
+                }
+                
+                std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
+                          << globalFileCount << " / 1,500,000 | " << (int)speed << " f/s   " << std::flush;
             }
-            std::cout << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
-                      << globalFileCount << " / 1,500,000 | " << (int)speed << " f/s   " << std::flush;
         }
 
         std::string fullPath = directory + "\\" + fileName;
