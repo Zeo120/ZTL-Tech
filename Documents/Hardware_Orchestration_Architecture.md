@@ -5,17 +5,19 @@ The PHASR Orchestrator (`router.js`) is designed to mathematically balance execu
 
 ## Dynamic Routing Thresholds
 
+The Orchestrator CLI (`phasr`) acts as a unified Service Gateway. It intercepts all scan requests and mathematically balances execution:
+
 1. **Mass < 200KB (Node.js V8 Optimal Zone)**
    - Engine: `analyzer.js`
    - Purpose: Ideal for rapid execution on small codebases where the V8 boot overhead is negligible.
    
-2. **Mass > 200KB (C++17 Native Bypass)**
-   - Engine: `phasr_native.exe` (Windows) / `phasr_native` (Unix)
-   - Purpose: Direct OS-level traversal bypassing V8 Heap Memory limitations.
+2. **Mass > 200KB & < 1GB (C++ / Assembly Hybrid Bypass)**
+   - Engine: `engine.exe` / C++ Compute Balancer (`balancer.exe`)
+   - Purpose: Direct OS-level traversal bypassing V8 Heap Memory limitations. Combines C++ multithreading with an Assembly Math Core (`phasr_math.s`).
 
-3. **Mass > 200MB (Raw Assembly Extreme Overload)**
-   - Engine: `phasr_asm.exe` (Windows) / `phasr_asm` (Unix)
-   - Purpose: Drops directly to bare-metal CPU Instruction Caches, eliminating all OS abstraction overhead.
+3. **Mass > 1GB (Pure Assembly Extreme Overload)**
+   - Engine: `engine_asm.exe`
+   - Purpose: Drops directly to bare-metal execution. A 100% Assembly implementation using standard C-library primitives (`_popen`, `fopen`) to recurse NTFS sectors with a fixed 4KB memory footprint, completely bypassing software allocation.
 
 ## Cross-Platform Silicon Traps
 The Engine is mathematically mapped to detect the underlying kernel and architecture in real-time:

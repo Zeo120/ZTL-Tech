@@ -6,8 +6,8 @@ PHASR (Deterministic Engine for Vulnerability Management) is a modular, ultra-lo
 ## 🏛️ The 4 Core Pillars
 
 1. **Model:** A 6-module hardware physics engine capable of deep binary dissection, taint tracking, and mathematical entropy calculation.
-2. **Orchestration:** A dynamic routing layer that load-balances execution between V8 (Node.js), C++17, and raw Assembly based on the physical mass of the target codebase.
-3. **Inference:** A hyper-aesthetic, box-drawn terminal dashboard and persistent Markdown Security Report Generator.
+2. **Orchestration:** A dynamic routing layer (CLI Service Gateway) that load-balances execution between V8 (Node.js), C++17 Hybrid, and Pure Assembly based on the physical mass of the target codebase.
+3. **Inference:** A hyper-aesthetic, box-drawn terminal dashboard and persistent Markdown Security Report Generator managed seamlessly by the CLI Service.
 4. **Economical Analysis:** Dynamic Cloud Shell (AWS/GCP/Azure) environment detection that simulates the physical compute cost of the security scan.
 
 ## ⚙️ Supported Hardware Architectures
@@ -33,7 +33,7 @@ npm install -g .
 phasr .
 ```
 
-The Orchestrator will instantly calculate the physical mass of the directory. If the mass exceeds safe OS heap limits (>200KB), it bypasses Node.js and routes directly to the Native C++ or raw Hardware Assembly modules to prevent system starvation. 
+The Orchestrator CLI (`phasr`) acts as a central Service Gateway. It instantly calculates the physical mass of the directory. If the mass exceeds safe OS heap limits (>200KB), it bypasses Node.js and routes directly to the Native C++ Hybrid. If it detects an extreme multi-gigabyte payload (>1GB), it hands off entirely to the Pure Assembly Hardware Override to prevent system starvation and eliminate software memory allocation overhead. 
 
 ## ☢️ Active Physics Modules
 - **Module 3 (Entropy Analyser):** Traverses the physical byte stream using raw L1 cache loads to calculate Base-2 Shannon Entropy, flagging highly obfuscated or packed payloads.
