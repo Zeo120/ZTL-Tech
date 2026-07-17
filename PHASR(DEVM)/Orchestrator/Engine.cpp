@@ -81,7 +81,7 @@ void ScanDirectoryNative(const std::string& directory) {
         
         globalFileCount++;
         if ((globalFileCount & 127) == 0) {
-            std::cout << "[VFS-PULSE] " << globalFileCount << "\n";
+            std::cout << "[VFS-PULSE] " << globalFileCount << std::endl;
         }
 
         std::string fullPath = directory + "\\" + fileName;
