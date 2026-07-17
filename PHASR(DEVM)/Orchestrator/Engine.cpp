@@ -105,9 +105,11 @@ void ScanDirectoryNative(const std::string& directory) {
             for (char &c : lowerName) c = tolower(c);
 
             if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
-                double entropy = calculateEntropy(fullPath);
-                if (entropy >= 7.2) {
-                    std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
+                if (fileSize.QuadPart < 250 * 1024 * 1024ULL) { // Skip entropy math on files > 250MB to prevent I/O blocking
+                    double entropy = calculateEntropy(fullPath);
+                    if (entropy >= 7.2) {
+                        std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
+                    }
                 }
             }
         }
