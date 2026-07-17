@@ -6,6 +6,8 @@
 #include <cmath>
 #include <iomanip>
 
+extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
+
 // Absolute bare-metal C++ Orchestrator
 // Bypasses V8 Node.js completely to natively scan Windows drives
 
@@ -21,9 +23,7 @@ double calculateEntropy(const std::string& filePath) {
     
     while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
         std::streamsize bytes = file.gcount();
-        for (std::streamsize i = 0; i < bytes; ++i) {
-            counts[static_cast<unsigned char>(buffer[i])]++;
-        }
+        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytes, counts.data());
         totalBytes += bytes;
     }
     

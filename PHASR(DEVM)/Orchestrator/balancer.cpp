@@ -12,6 +12,8 @@
 // Module 0: Hardware Compute Balancer for Massive Payloads (>1GB)
 // Merges the Scheduler.cpp (Core Fracturing) and Dispatcher.cpp (Context Switching / Math)
 
+extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
+
 std::atomic<long long> globalCounts[256];
 std::atomic<long long> totalProcessedBytes;
 
@@ -27,9 +29,7 @@ void ProcessChunk(const std::string& filepath, std::streampos start, std::stream
     
     while (bytesRead < size && file.read(buffer, std::min<std::streamsize>(sizeof(buffer), size - bytesRead))) {
         std::streamsize readAmount = file.gcount();
-        for (std::streamsize i = 0; i < readAmount; ++i) {
-            localCounts[static_cast<unsigned char>(buffer[i])]++;
-        }
+        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), readAmount, localCounts);
         bytesRead += readAmount;
     }
     // Catch remaining bytes if file.read stopped but gcount > 0
@@ -39,9 +39,7 @@ void ProcessChunk(const std::string& filepath, std::streampos start, std::stream
         if (bytesRead + readAmount > size) {
             readAmount = size - bytesRead;
         }
-        for (std::streamsize i = 0; i < readAmount; ++i) {
-            localCounts[static_cast<unsigned char>(buffer[i])]++;
-        }
+        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), readAmount, localCounts);
         bytesRead += readAmount;
     }
     

@@ -55,22 +55,9 @@ let args = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir];
 const isWin = os.platform() === 'win32';
 const binExt = isWin ? '.exe' : '';
 
-if (totalMass >= MASS_LIMIT_ASM) {
-    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200MB. Extreme OS overload detected.`);
-    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[31mNASM Assembly Engine\x1b[0m...\n`);
-    const asmBinary = path.join(binDir, `phasr_asm${binExt}`);
-    if (fs.existsSync(asmBinary)) {
-        command = asmBinary;
-        args = [targetDir];
-    } else {
-        console.log(`[\x1b[33mWARN\x1b[0m] Assembly Engine binary not compiled. Falling back to C++ Engine...\n`);
-        totalMass = MASS_LIMIT_CPP; // Force fallback logic
-    }
-}
-
-if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
+if (totalMass >= MASS_LIMIT_CPP) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
-    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mNative Hardware Engine\x1b[0m...\n`);
+    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mC++ / ASM Hybrid Engine\x1b[0m...\n`);
     const cppBinary = path.join(__dirname, `engine${binExt}`);
     const csBinary = path.join(__dirname, `engine_cs${binExt}`);
     
