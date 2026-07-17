@@ -12,7 +12,7 @@
 .bss
     .lcomm cmd_buf, 1024
     .lcomm line_buf, 2048
-    .lcomm read_buf, 4096
+    .lcomm read_buf, 31457280
 
 .text
 main:
@@ -90,10 +90,10 @@ main:
     # File opened, R14 = file handle
     mov %rax, %r14
     
-    # fread(read_buf, 1, 4096, file)
+    # fread(read_buf, 1, 31457280, file)
     lea read_buf(%rip), %rcx
     mov $1, %rdx
-    mov $4096, %r8
+    mov $31457280, %r8
     mov %r14, %r9
     call fread
     
