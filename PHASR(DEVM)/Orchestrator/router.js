@@ -14,6 +14,11 @@ console.log(`\n[\x1b[35mORCHESTRATOR\x1b[0m] Calculating Physical Mass of Target
 
 let totalMass = 0;
 let massThresholdReached = false;
+let isTargetDirDirectory = true;
+
+try {
+    isTargetDirDirectory = fs.statSync(targetDir).isDirectory();
+} catch (e) {}
 
 function calculateMass(dir) {
     if (massThresholdReached) return;
@@ -55,8 +60,8 @@ let args = [path.join(__dirname, '..', 'CLI', 'analyzer.js'), targetDir];
 const isWin = os.platform() === 'win32';
 const binExt = isWin ? '.exe' : '';
 
-if (totalMass >= MASS_LIMIT_ASM) {
-    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 1GB. Extreme Compute limits exceeded.`);
+if (!isTargetDirDirectory && totalMass >= MASS_LIMIT_ASM) {
+    console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Single File Mass > 1GB. Extreme Compute limits exceeded.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[31mPURE ASSEMBLY ENGINE\x1b[0m...\n`);
     const asmBinary = path.join(__dirname, `engine_asm${binExt}`);
     if (fs.existsSync(asmBinary)) {
@@ -69,7 +74,7 @@ if (totalMass >= MASS_LIMIT_ASM) {
     }
 }
 
-if (totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM) {
+if ((isTargetDirDirectory && totalMass >= MASS_LIMIT_CPP) || (!isTargetDirDirectory && totalMass >= MASS_LIMIT_CPP && totalMass < MASS_LIMIT_ASM)) {
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Mass > 200KB. V8 Heap limits exceeded.`);
     console.log(`[\x1b[35mORCHESTRATOR\x1b[0m] Routing directly to \x1b[32mC++ / ASM Hybrid Engine\x1b[0m...\n`);
     const cppBinary = path.join(__dirname, `engine${binExt}`);
