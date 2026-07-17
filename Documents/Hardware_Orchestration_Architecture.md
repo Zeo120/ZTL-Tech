@@ -17,7 +17,7 @@ The Orchestrator CLI (`phasr`) acts as a unified Service Gateway. It intercepts 
 
 3. **Mass > 1GB (Pure Assembly Extreme Overload)**
    - Engine: `engine_asm.exe`
-   - Purpose: Drops directly to bare-metal execution. A 100% Assembly implementation using standard C-library primitives (`_popen`, `fopen`) to recurse NTFS sectors with a fixed 4KB memory footprint, completely bypassing software allocation.
+   - Purpose: Drops directly to bare-metal execution. A custom 4-Core Round-Robin Thread Scheduler written in 100% x64 Assembly. Utilizes `CreateThread` and `WaitForSingleObject` to manage four concurrent hardware threads, each mapping 30MB file chunks into a fixed 120MB `.bss` RAM footprint to instantly saturate PCIe NVMe bandwidth.
 
 ## Cross-Platform Silicon Traps
 The Engine is mathematically mapped to detect the underlying kernel and architecture in real-time:

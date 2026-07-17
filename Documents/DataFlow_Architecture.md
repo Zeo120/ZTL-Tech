@@ -22,7 +22,7 @@ graph TD
     subgraph Core ["Hardware Engines (Dynamic Handoff)"]
         NodeEngine("V8 Node.js Engine (< 200KB)")
         CppEngine("C++ Hybrid Balancer (> 200KB)")
-        AsmEngine("Pure Assembly Core (> 1GB)")
+        AsmEngine("4-Core Pure Assembly Scheduler (> 1GB)")
     end
 
     Codebase -->|Calculates Physical Mass| Router
@@ -47,9 +47,9 @@ graph TD
     CppEngine -->|Spawns Hardware Threads| M2
     CppEngine -->|Spawns Hardware Threads| M3
     CppEngine -->|Spawns Hardware Threads| M4
-    AsmEngine -->|Bare-Metal _popen Recursion| M3
-    AsmEngine -->|Bare-Metal _popen Recursion| M5
-    AsmEngine -->|Bare-Metal _popen Recursion| M6
+    AsmEngine -->|4-Core Round-Robin Threads| M3
+    AsmEngine -->|4-Core Round-Robin Threads| M5
+    AsmEngine -->|4-Core Round-Robin Threads| M6
     CppEngine -.->|Dynamically Loads| MN
     
     Internet --> M1
