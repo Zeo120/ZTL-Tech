@@ -239,13 +239,19 @@ int main(int argc, char* argv[]) {
     startTime = GetTickCount();
     ScanDirectoryNative(targetDir);
     
+    // Force final 100% progress bar render
+    DWORD endTime = GetTickCount();
+    DWORD elapsed = endTime - startTime;
+    if (elapsed == 0) elapsed = 1;
+    double speed = (double)globalFileCount / (elapsed / 1000.0);
+    std::string finalBar = "\r\x1b[36m[PHASR]\x1b[0m [";
+    for(int i=0; i<50; i++) finalBar += "█";
+    finalBar += "] \x1b[32m100.00%\x1b[0m | " + std::to_string(totalTargetFiles) + " / " + std::to_string(totalTargetFiles) + " | " + std::to_string((int)speed) + " f/s   \n\n";
+    std::cout << finalBar;
+
     scanComplete.store(true, std::memory_order_release);
     
-    DWORD endTime = GetTickCount();
-    std::cout << "\n\n";
-
-    // NATIVE C++ ANIMATED DASHBOARD
-    Sleep(300);
+    std::cout << "=======================================================\n";
     std::cout << "\x1b[1m\x1b[36m=======================================================\x1b[0m\n";
     Sleep(200);
     std::cout << "\x1b[1m   PHASR (DEVM) - ABSOLUTE PHYSICS ENGINE (NATIVE C++)\x1b[0m\n";
