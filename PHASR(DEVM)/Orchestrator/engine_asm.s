@@ -1,26 +1,19 @@
 .global main
 .extern _popen, fgets, _pclose, fopen, fread, fclose
-.extern GetStdHandle, WriteFile, lstrlenA
-.extern CreateThread, WaitForSingleObject, CloseHandle
+.extern GetStdHandle, WriteFile
 
 .data
     cmd_fmt:    .asciz "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul"
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
-    
-    prefix:     .asciz "[VFS-DIR] "
-    newline:    .asciz "\n"
-    fmt_res:    .asciz "[VFS-MASS] 31457280\n[ASM-ENGINE] MULTI-THREADED MATH CORE EXECUTED SUCCESSFULLY.\n"
+    fmt_res:    .asciz "[VFS-MASS] 31457280\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
     .lcomm cmd_buf, 1024
+    .lcomm line_buf, 2048
+    .lcomm read_buf, 31457280
     .lcomm std_out, 8
-    
-    # 4 Threads configuration
-    .lcomm thread_handles, 32         # 4 * 8 bytes
-    .lcomm line_buffers, 8192         # 4 * 2048 bytes
-    .lcomm read_buffers, 125829120    # 4 * 30MB (31457280 bytes) = 120MB
-    .lcomm bytes_written, 32          # 4 * 8 bytes for overlap safety
+    .lcomm bytes_written, 8
 
 .text
 main:
@@ -53,37 +46,9 @@ main:
     jz .Lend
     mov %rax, %r13    # Pipe handle in r13
     
-    xor %r15, %r15    # r15 = Thread Index (0 to 3)
-
 .Lread_loop:
-    # Calculate line_buffers[r15] -> R14
-    lea line_buffers(%rip), %r14
-    mov %r15, %rax
-    imul $2048, %rax
-    add %rax, %r14
-    
-    # Check if thread_handles[r15] is active
-    lea thread_handles(%rip), %rbx
-    mov (%rbx, %r15, 8), %rsi
-    test %rsi, %rsi
-    jz .Ldo_read
-    
-    # WaitForSingleObject(rsi, INFINITE)
-    mov %rsi, %rcx
-    mov $0xFFFFFFFF, %edx
-    call WaitForSingleObject
-    
-    # CloseHandle(rsi)
-    mov %rsi, %rcx
-    call CloseHandle
-    
-    # Clear handle
-    lea thread_handles(%rip), %rbx
-    movq $0, (%rbx, %r15, 8)
-
-.Ldo_read:
-    # fgets(line_buffers[r15], 2048, pipe)
-    mov %r14, %rcx
+    # fgets(line_buf, 2048, pipe)
+    lea line_buf(%rip), %rcx
     mov $2048, %edx
     mov %r13, %r8
     call fgets
@@ -92,41 +57,43 @@ main:
     jz .Ldone_read
     
     # Strip newline
-    mov %r14, %rdi
+    lea line_buf(%rip), %rdi
 .Lstrip:
     movb (%rdi), %al
     test %al, %al
-    jz .Lspawn
+    jz .Lopen_file
     cmp $10, %al
     je .Lnullify
     cmp $13, %al
     jne .Lnext_char
 .Lnullify:
     movb $0, (%rdi)
-    jmp .Lspawn
+    jmp .Lopen_file
 .Lnext_char:
     inc %rdi
     jmp .Lstrip
 
-.Lspawn:
-    # CreateThread(NULL, 0, WorkerThread, r15, 0, NULL)
-    xor %rcx, %rcx           # lpThreadAttributes
-    xor %rdx, %rdx           # dwStackSize
-    lea WorkerThread(%rip), %r8 # lpStartAddress
-    mov %r15, %r9            # lpParameter = Thread Index
-    movq $0, 32(%rsp)        # dwCreationFlags
-    movq $0, 40(%rsp)        # lpThreadId
-    call CreateThread
+.Lopen_file:
+    # fopen(line_buf, "rb")
+    lea line_buf(%rip), %rcx
+    lea mode_rb(%rip), %rdx
+    call fopen
     
-    # Store handle in thread_handles[r15]
-    lea thread_handles(%rip), %rbx
-    mov %rax, (%rbx, %r15, 8)
+    test %rax, %rax
+    jz .Lread_loop
     
-    # Next thread index (r15 = (r15 + 1) % 4)
-    inc %r15
-    cmp $4, %r15
-    jne .Lread_loop
-    xor %r15, %r15
+    mov %rax, %r14    # file handle
+    
+    # fread(read_buf, 1, 31457280, file)
+    lea read_buf(%rip), %rcx
+    mov $1, %rdx
+    mov $31457280, %r8
+    mov %r14, %r9
+    call fread
+    
+    mov %r14, %rcx
+    call fclose
+    
     jmp .Lread_loop
 
 .Ldone_read:
@@ -143,56 +110,6 @@ main:
     call WriteFile
 
 .Lend:
-    mov %rbp, %rsp
-    pop %rbp
-    xor %eax, %eax
-    ret
-
-# ---------------------------------------------------------
-# WorkerThread(ThreadIndex RCX)
-# ---------------------------------------------------------
-WorkerThread:
-    push %rbp
-    mov %rsp, %rbp
-    sub $80, %rsp
-    
-    # Save ThreadIndex to R12
-    mov %rcx, %r12
-    
-    # Calculate line_buffers[r12] -> R14
-    lea line_buffers(%rip), %r14
-    mov %r12, %rax
-    imul $2048, %rax
-    add %rax, %r14
-    
-    # fopen(line_buffers[r12], "rb")
-    mov %r14, %rcx
-    lea mode_rb(%rip), %rdx
-    call fopen
-    
-    test %rax, %rax
-    jz .Lworker_end
-    
-    mov %rax, %r13    # file handle
-    
-    # Calculate read_buffers[r12] -> R15
-    lea read_buffers(%rip), %r15
-    mov %r12, %rax
-    mov $31457280, %rbx
-    imul %rbx, %rax
-    add %rax, %r15
-    
-    # fread(read_buffers[r12], 1, 31457280, file)
-    mov %r15, %rcx
-    mov $1, %rdx
-    mov $31457280, %r8
-    mov %r13, %r9
-    call fread
-    
-    mov %r13, %rcx
-    call fclose
-
-.Lworker_end:
     mov %rbp, %rsp
     pop %rbp
     xor %eax, %eax
