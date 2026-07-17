@@ -165,43 +165,6 @@ WorkerThread:
     imul $2048, %rax
     add %rax, %r14
     
-    # Print prefix "[VFS-DIR] "
-    lea std_out(%rip), %rax
-    mov (%rax), %rcx
-    lea prefix(%rip), %rdx
-    mov $10, %r8
-    lea bytes_written(%rip), %rbx
-    mov %r12, %rax
-    imul $8, %rax
-    add %rax, %rbx
-    mov %rbx, %r9
-    movq $0, 32(%rsp)
-    call WriteFile
-    
-    # lstrlenA(line_buffers[r12])
-    mov %r14, %rcx
-    call lstrlenA
-    mov %rax, %r15
-    
-    # Print path
-    lea std_out(%rip), %rax
-    mov (%rax), %rcx
-    mov %r14, %rdx
-    mov %r15, %r8
-    # r9 is still rbx
-    mov %rbx, %r9
-    movq $0, 32(%rsp)
-    call WriteFile
-    
-    # Print newline
-    lea std_out(%rip), %rax
-    mov (%rax), %rcx
-    lea newline(%rip), %rdx
-    mov $1, %r8
-    mov %rbx, %r9
-    movq $0, 32(%rsp)
-    call WriteFile
-    
     # fopen(line_buffers[r12], "rb")
     mov %r14, %rcx
     lea mode_rb(%rip), %rdx
