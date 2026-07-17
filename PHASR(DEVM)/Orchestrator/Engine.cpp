@@ -105,19 +105,9 @@ void ScanDirectoryNative(const std::string& directory) {
             for (char &c : lowerName) c = tolower(c);
 
             if (endsWith(lowerName, ".exe") || endsWith(lowerName, ".dll") || endsWith(lowerName, ".sys") || endsWith(lowerName, ".bin")) {
-                if (fileSize.QuadPart >= 1024 * 1024 * 1024ULL) { // 1GB+ Payload
-                    char exePath[MAX_PATH];
-                    GetModuleFileNameA(NULL, exePath, MAX_PATH);
-                    std::string exeDir = exePath;
-                    exeDir = exeDir.substr(0, exeDir.find_last_of("\\/"));
-                    // cmd.exe /c strips first and last quotes if there are multiple. We must wrap the whole thing.
-                    std::string cmd = "\"\"" + exeDir + "\\engine_asm.exe\" \"" + fullPath + "\"\"";
-                    system(cmd.c_str());
-                } else {
-                    double entropy = calculateEntropy(fullPath);
-                    if (entropy >= 7.2) {
-                        std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
-                    }
+                double entropy = calculateEntropy(fullPath);
+                if (entropy >= 7.2) {
+                    std::cout << "[VFS-ENTROPY] " << fullPath << "|" << std::fixed << std::setprecision(2) << entropy << std::endl;
                 }
             }
         }
