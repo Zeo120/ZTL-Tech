@@ -7,6 +7,7 @@
     mode_r:     .asciz "r"
     mode_rb:    .asciz "rb"
     fmt_pulse:  .asciz "[VFS-PULSE] %llu\n"
+    fmt_start:  .asciz "[ASM-ENGINE] STANDBY: Executing direct NTFS Master File Table pipe...\n"
     fmt_res:    .asciz "\n[VFS-MASS] 1073741824\n[ASM-ENGINE] BLIND BARE-METAL CORE EXECUTED SUCCESSFULLY.\n"
 
 .bss
@@ -40,6 +41,15 @@ main:
     lea cmd_fmt(%rip), %rdx
     mov %r12, %r8
     call sprintf
+    
+    # Print start message so user knows it's alive
+    lea std_out(%rip), %rax
+    mov (%rax), %rcx
+    lea fmt_start(%rip), %rdx
+    mov $71, %r8
+    lea bytes_written(%rip), %r9
+    movq $0, 32(%rsp)
+    call WriteFile
     
     lea cmd_buf(%rip), %rcx
     lea mode_r(%rip), %rdx
@@ -81,8 +91,8 @@ main:
     incq file_count(%rip)
     mov file_count(%rip), %rax
     
-    # Pulse every 1024 files (fast bitwise AND)
-    test $1023, %rax
+    # Pulse every 128 files (fast bitwise AND)
+    test $127, %rax
     jnz .Lskip_pulse
     
     # sprintf(pulse_str, "[VFS-PULSE] %llu\n", file_count)
