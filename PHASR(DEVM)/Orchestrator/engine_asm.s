@@ -1,5 +1,5 @@
 .global main
-.extern printf, sprintf, _popen, fgets, _pclose, fopen, fread, fclose
+.extern printf, sprintf, _popen, fgets, _pclose, fopen, fread, fclose, fflush
 
 .data
     cmd_fmt:    .asciz "cmd.exe /c dir /s /b /a-d \"%s\" 2>nul"
@@ -78,6 +78,10 @@ main:
     lea fmt_scan(%rip), %rcx
     lea line_buf(%rip), %rdx
     call printf
+    
+    # Flush stdout to prevent pipe buffering and UI stalling
+    xor %rcx, %rcx
+    call fflush
     
     # fopen(line_buf, "rb")
     lea line_buf(%rip), %rcx
