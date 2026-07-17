@@ -128,7 +128,9 @@ if (command === 'node') {
                 
                 process.stdout.write(`\r[\x1b[36mPHASR\x1b[0m] [${bar}] \x1b[32m${percent.toFixed(2)}%\x1b[0m | ${count.toLocaleString()} / ${totalFiles.toLocaleString()} | ${speed} f/s   `);
             } else if (trimmed.startsWith('[VFS-MASS]')) {
-                hwMass = parseInt(trimmed.split(' ')[1]) || hwMass;
+                hwMass = parseInt(trimmed.split(' ')[1]) / 1024;
+            } else if (trimmed.startsWith('[VFS-COUNT]')) {
+                scannedFiles = parseInt(trimmed.split(' ')[1]);
             } else if (trimmed.startsWith('[VFS-ENTROPY]')) {
                 const parts = trimmed.replace('[VFS-ENTROPY] ', '').split('|');
                 if (parts.length === 2) {
@@ -168,7 +170,7 @@ if (command === 'node') {
             totalMassBytes: hwMass,
             maxDepth: 0,
             maxEntropy: m3_anomalies.length > 0 ? parseFloat(m3_anomalies[0].value) : 0,
-            filesScanned: 0,
+            filesScanned: scannedFiles,
             m3_anomalies: m3_anomalies,
             m4_anomalies: [],
             m5_anomalies: [],

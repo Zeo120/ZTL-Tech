@@ -195,6 +195,7 @@ int main(int argc, char* argv[]) {
     DWORD endTime = GetTickCount();
 
     std::cout << "[VFS-MASS] " << globalMass << std::endl;
+    std::cout << "[VFS-COUNT] " << globalFileCount << std::endl;
     analyzeShadowVolume(targetDir);
     std::cout << "\n[PHASR] SCAN COMPLETE." << std::endl;
     std::cout << "[PHASR] Time Elapsed: " << (endTime - startTime) << " milliseconds." << std::endl;
