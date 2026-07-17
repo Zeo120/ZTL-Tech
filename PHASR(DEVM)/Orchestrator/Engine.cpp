@@ -46,7 +46,7 @@ void PrecalculateFileCount(const std::string& directory) {
     FindClose(hFind);
 }
 
-DWORD WINAPI WorkerThread(LPVOID lpParam) {
+void WorkerThread() {
     while (true) {
         int head = queueHead.load(std::memory_order_acquire);
         int tail = queueTail.load(std::memory_order_relaxed);
