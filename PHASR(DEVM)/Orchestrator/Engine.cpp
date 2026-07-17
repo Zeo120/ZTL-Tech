@@ -35,15 +35,18 @@ DWORD WINAPI WorkerThread(LPVOID lpParam) {
         
         if (head == tail) {
             if (scanComplete.load(std::memory_order_acquire)) break;
-            YieldProcessor(); // Spinlock
+            Sleep(0); // Yield time slice
             continue;
         }
         
+        // Data Race Fix: Copy the immutable string locally BEFORE advancing the CAS head
+        char localPath[MAX_PATH];
+        lstrcpyA(localPath, taskQueue[head]);
+        
         if (queueHead.compare_exchange_weak(head, (head + 1) % QUEUE_SIZE, std::memory_order_release, std::memory_order_relaxed)) {
             activeWorkers++;
-            const char* fullPath = taskQueue[head];
             
-            HANDLE hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            HANDLE hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
             if (hFile != INVALID_HANDLE_VALUE) {
                 LARGE_INTEGER fileSize;
                 if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 250 * 1024 * 1024ULL) {
@@ -68,7 +71,7 @@ DWORD WINAPI WorkerThread(LPVOID lpParam) {
                         }
                         if (entropy >= 7.2) {
                             EnterCriticalSection(&printCS);
-                            m3_anomalies.push_back(std::make_pair(std::string(fullPath), entropy));
+                            m3_anomalies.push_back(std::make_pair(std::string(localPath), entropy));
                             LeaveCriticalSection(&printCS);
                         }
                     }
@@ -173,7 +176,7 @@ void ScanDirectoryNative(const std::string& directory) {
                     int tail = queueTail.load(std::memory_order_relaxed);
                     int nextTail = (tail + 1) % QUEUE_SIZE;
                     while (nextTail == queueHead.load(std::memory_order_acquire)) {
-                        YieldProcessor(); // Spin until consumer frees a slot
+                        Sleep(0); // Yield until consumer frees a slot
                     }
                     lstrcpyA(taskQueue[tail], fullPath.c_str());
                     queueTail.store(nextTail, std::memory_order_release);
@@ -190,6 +193,7 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
     std::cout << "\n\x1b[36m[PHASR]\x1b[0m NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
     InitializeCriticalSection(&printCS);
+    m3_anomalies.reserve(50000); // Zero-allocation hint for vector
     
     // Spawn Zero-Allocation Worker Pool
     unsigned int cores = std::thread::hardware_concurrency();
