@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cmath>
 #include <iomanip>
+#include <string_view>
 
 extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
 
@@ -141,8 +142,8 @@ void WorkerThread() {
 
                         // M4: Security Math (Taint)
                         if (bytesRead > 10 && !(threadBuffer[0] == 'M' && threadBuffer[1] == 'Z')) {
-                            std::string content(threadBuffer, bytesRead > 4096 ? 4096 : bytesRead);
-                            if (content.find("system(") != std::string::npos || content.find("exec(") != std::string::npos || content.find("eval(") != std::string::npos) {
+                            std::string_view content(threadBuffer, bytesRead > 4096 ? 4096 : bytesRead);
+                            if (content.find("system(") != std::string_view::npos || content.find("exec(") != std::string_view::npos || content.find("eval(") != std::string_view::npos) {
                                 char realPath[MAX_PATH];
                                 if (strncmp(localPath, "MFT:", 4) == 0) {
                                     GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
