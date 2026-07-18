@@ -20,6 +20,7 @@ DWORD lastPrintTime = 0;
 std::vector<std::pair<std::string, double>> m3_anomalies;
 
 #define QUEUE_SIZE 8192
+HANDLE g_hVol = INVALID_HANDLE_VALUE;
 char taskQueue[QUEUE_SIZE][MAX_PATH];
 std::atomic<int> queueHead = {0};
 std::atomic<int> queueTail = {0};
@@ -74,20 +75,13 @@ void WorkerThread() {
             lstrcpyA(anomalyPath, localPath);
 
             if (strncmp(localPath, "MFT:", 4) == 0) {
-                char drive[3];
-                unsigned long long fileId;
-                if (sscanf(localPath, "MFT:%2s:%llu", drive, &fileId) == 2) {
-                    std::string volPath = "\\\\.\\";
-                    volPath += drive;
-                    HANDLE hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-                    if (hVol != INVALID_HANDLE_VALUE) {
-                        FILE_ID_DESCRIPTOR fid;
-                        fid.dwSize = sizeof(FILE_ID_DESCRIPTOR);
-                        fid.Type = FileIdType;
-                        fid.FileId.QuadPart = fileId;
-                        hFile = OpenFileById(hVol, &fid, GENERIC_READ, FILE_SHARE_READ, NULL, 0);
-                        CloseHandle(hVol);
-                    }
+                unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                if (g_hVol != INVALID_HANDLE_VALUE) {
+                    FILE_ID_DESCRIPTOR fid;
+                    fid.dwSize = sizeof(FILE_ID_DESCRIPTOR);
+                    fid.Type = FileIdType;
+                    fid.FileId.QuadPart = fileId;
+                    hFile = OpenFileById(g_hVol, &fid, GENERIC_READ, FILE_SHARE_READ, NULL, 0);
                 }
             } else {
                 hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -236,8 +230,8 @@ void ScanDirectoryNative(const std::string& directory) {
 
 void ScanDirectoryMFT(const std::string& drive) {
     std::string volPath = "\\\\.\\" + drive.substr(0, 2);
-    HANDLE hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (hVol == INVALID_HANDLE_VALUE) {
+    g_hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (g_hVol == INVALID_HANDLE_VALUE) {
         std::cout << "[PHASR] Admin rights missing or invalid volume. Falling back to Native Traversal...\n";
         ScanDirectoryNative(drive);
         return;
@@ -245,8 +239,9 @@ void ScanDirectoryMFT(const std::string& drive) {
     
     USN_JOURNAL_DATA ujd;
     DWORD cb;
-    if (!DeviceIoControl(hVol, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &ujd, sizeof(ujd), &cb, NULL)) {
-        CloseHandle(hVol);
+    if (!DeviceIoControl(g_hVol, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &ujd, sizeof(ujd), &cb, NULL)) {
+        CloseHandle(g_hVol);
+        g_hVol = INVALID_HANDLE_VALUE;
         ScanDirectoryNative(drive);
         return;
     }
@@ -259,18 +254,20 @@ void ScanDirectoryMFT(const std::string& drive) {
     char buffer[65536];
     DWORD bytesReturned = 0;
     
-    while (DeviceIoControl(hVol, FSCTL_ENUM_USN_DATA, &med, sizeof(med), buffer, sizeof(buffer), &bytesReturned, NULL)) {
+    while (DeviceIoControl(g_hVol, FSCTL_ENUM_USN_DATA, &med, sizeof(med), buffer, sizeof(buffer), &bytesReturned, NULL)) {
         USN_RECORD* record = (USN_RECORD*)((char*)buffer + sizeof(USN));
         while ((char*)record < (char*)buffer + bytesReturned) {
             char mftTask[MAX_PATH];
-            sprintf(mftTask, "MFT:%s:%llu", drive.substr(0,2).c_str(), record->FileReferenceNumber);
+            memcpy(mftTask, "MFT:", 4);
+            *(unsigned long long*)(mftTask + 4) = record->FileReferenceNumber;
+            mftTask[12] = '\0'; // ensure null termination although not used for string parsing
             
             int tail = queueTail.load(std::memory_order_relaxed);
             int nextTail = (tail + 1) % QUEUE_SIZE;
             while (nextTail == queueHead.load(std::memory_order_acquire)) {
                 Sleep(0);
             }
-            lstrcpyA(taskQueue[tail], mftTask);
+            memcpy(taskQueue[tail], mftTask, 13);
             queueTail.store(nextTail, std::memory_order_release);
             
             globalFileCount++;
@@ -299,7 +296,8 @@ void ScanDirectoryMFT(const std::string& drive) {
         }
         med.StartFileReferenceNumber = *(USN*)buffer;
     }
-    CloseHandle(hVol);
+    // We intentionally leave g_hVol open for the worker threads to drain the queue.
+    // The OS will clean it up on process exit.
 }
 
 int main(int argc, char* argv[]) {
