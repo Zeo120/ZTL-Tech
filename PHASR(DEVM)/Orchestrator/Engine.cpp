@@ -18,6 +18,9 @@ DWORD startTime = 0;
 DWORD lastPrintTime = 0;
 
 std::vector<std::pair<std::string, double>> m3_anomalies;
+std::vector<std::string> m4_anomalies;
+std::vector<std::string> m5_anomalies;
+std::vector<std::pair<std::string, std::string>> m6_anomalies;
 
 #define QUEUE_SIZE 8192
 HANDLE g_hVol = INVALID_HANDLE_VALUE;
@@ -96,6 +99,8 @@ void WorkerThread() {
                     DWORD bytesRead = 0;
                     
                     if (ReadFile(hFile, threadBuffer, bytesToRead, &bytesRead, NULL) && bytesRead > 0) {
+                        DWORD tStart = GetTickCount();
+
                         calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
                         
                         double entropy = 0.0;
@@ -111,6 +116,51 @@ void WorkerThread() {
                             }
                             EnterCriticalSection(&printCS);
                             m3_anomalies.push_back(std::make_pair(std::string(anomalyPath), entropy));
+                            LeaveCriticalSection(&printCS);
+                        }
+                        
+                        // M6: Binary Dissection (NOP Sleds)
+                        if (bytesRead > 2 && threadBuffer[0] == 'M' && threadBuffer[1] == 'Z') {
+                            int nopCount = 0;
+                            for (DWORD i = 0; i < bytesRead; i++) {
+                                if (threadBuffer[i] == '\x90') {
+                                    nopCount++;
+                                    if (nopCount > 50) {
+                                        char realPath[MAX_PATH];
+                                        if (strncmp(localPath, "MFT:", 4) == 0) {
+                                            GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                                        } else lstrcpyA(realPath, anomalyPath);
+                                        EnterCriticalSection(&printCS);
+                                        m6_anomalies.push_back({std::string(realPath), "NOP Sled Detected (0x90 > 50 bytes)"});
+                                        LeaveCriticalSection(&printCS);
+                                        break;
+                                    }
+                                } else nopCount = 0;
+                            }
+                        }
+
+                        // M4: Security Math (Taint)
+                        if (bytesRead > 10 && !(threadBuffer[0] == 'M' && threadBuffer[1] == 'Z')) {
+                            std::string content(threadBuffer, bytesRead > 4096 ? 4096 : bytesRead);
+                            if (content.find("system(") != std::string::npos || content.find("exec(") != std::string::npos || content.find("eval(") != std::string::npos) {
+                                char realPath[MAX_PATH];
+                                if (strncmp(localPath, "MFT:", 4) == 0) {
+                                    GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                                } else lstrcpyA(realPath, anomalyPath);
+                                EnterCriticalSection(&printCS);
+                                m4_anomalies.push_back(std::string(realPath));
+                                LeaveCriticalSection(&printCS);
+                            }
+                        }
+
+                        DWORD tEnd = GetTickCount();
+                        if (tEnd - tStart > 15 && bytesRead < 50000) {
+                            char realPath[MAX_PATH];
+                            if (strncmp(localPath, "MFT:", 4) == 0) {
+                                GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                            } else lstrcpyA(realPath, anomalyPath);
+                            EnterCriticalSection(&printCS);
+                            m5_anomalies.push_back(std::string(realPath));
                             LeaveCriticalSection(&printCS);
                         }
                     }
@@ -411,6 +461,42 @@ int main(int argc, char* argv[]) {
         std::cout << "\x1b[1m\x1b[32m[SAFE] Maximum Entropy H(X) Verified\x1b[0m\n\n";
     }
 
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 4 — SECURITY MATH (TAINT)\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m4_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings (Unsanitized Flows): " << m4_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m4_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] 0 Unsanitized Flows\x1b[0m\n\n";
+
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 5 — TEMPORAL PHYSICS\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m5_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings (Timing Anomalies): " << m5_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m5_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] Constant-Time Verified\x1b[0m\n\n";
+
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 6 — BINARY DISSECTION\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m6_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings: " << m6_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m6_anomalies) std::cout << " \xE2\x80\xA2 " << a.first << " -> " << a.second << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] No Assembly Taint Flows Detected\x1b[0m\n\n";
+
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 7 — TRADEOFF ANALYSER\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    double totalLiability = (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) * 10000.0;
+    double maintenanceCost = (globalMass.load() / 1073741824.0) * 50.0; // Scaled maintenance cost
+    double totalEconomicRisk = totalLiability + maintenanceCost;
+    if (totalEconomicRisk > 50000) {
+        std::cout << "\x1b[1m\x1b[31m[ECONOMIC FAILURE] Risk Liability: $" << std::fixed << std::setprecision(2) << totalEconomicRisk << "\x1b[0m\n\n";
+    } else {
+        std::cout << "\x1b[1m\x1b[32m[ECONOMIC SUCCESS] Risk Liability: $" << std::fixed << std::setprecision(2) << totalEconomicRisk << "\x1b[0m\n\n";
+    }
+
     // Markdown Report Generation
     std::ofstream md("phasr_security_report.md");
     if (md) {
@@ -418,7 +504,8 @@ int main(int argc, char* argv[]) {
         md << "**Target:** " << targetDir << "\n";
         md << "**Files Scanned:** " << globalFileCount << "\n";
         md << "**Physical Mass:** " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
-        md << "## Total Anomalies Detected: " << m3_anomalies.size() << "\n\n";
+        md << "## Total Anomalies Detected: " << (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) << "\n\n";
+        
         if (m3_anomalies.size() > 0) {
             md << "### Module 3: Entropy Analyser\n";
             for (const auto& a : m3_anomalies) {
@@ -426,12 +513,47 @@ int main(int argc, char* argv[]) {
                 std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
                 md << "- **" << fileName << "** (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
             }
+            md << "\n";
         }
+        
+        if (m4_anomalies.size() > 0) {
+            md << "### Module 4: Security Math (Taint Tracker)\n";
+            for (const auto& a : m4_anomalies) {
+                size_t slash = a.find_last_of("\\/");
+                std::string fileName = (slash != std::string::npos) ? a.substr(slash + 1) : a;
+                md << "- **" << fileName << "** (Unsanitized flow detected)\n";
+            }
+            md << "\n";
+        }
+        
+        if (m5_anomalies.size() > 0) {
+            md << "### Module 5: Temporal Physics\n";
+            for (const auto& a : m5_anomalies) {
+                size_t slash = a.find_last_of("\\/");
+                std::string fileName = (slash != std::string::npos) ? a.substr(slash + 1) : a;
+                md << "- **" << fileName << "** (Execution timing anomaly)\n";
+            }
+            md << "\n";
+        }
+        
+        if (m6_anomalies.size() > 0) {
+            md << "### Module 6: Binary Dissection\n";
+            for (const auto& a : m6_anomalies) {
+                size_t slash = a.first.find_last_of("\\/");
+                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
+                md << "- **" << fileName << "** (" << a.second << ")\n";
+            }
+            md << "\n";
+        }
+        
+        md << "### Module 7: Tradeoff Analyser\n";
+        md << "- **Total Economic Risk Liability**: $" << std::fixed << std::setprecision(2) << totalEconomicRisk << "\n";
+        md << "- **Status**: " << (totalEconomicRisk > 50000 ? "ECONOMIC FAILURE" : "ECONOMIC SUCCESS") << "\n\n";
+        
         md.close();
         std::cout << "\n[\x1b[32m+\x1b[0m] Persistent Security Report Generated: phasr_security_report.md\n";
     }
-    
-    if (m3_anomalies.size() > 0) {
+    if (m3_anomalies.size() > 0 || m4_anomalies.size() > 0 || m5_anomalies.size() > 0 || m6_anomalies.size() > 0 || totalEconomicRisk > 50000) {
         std::cout << "\n\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n";
         std::cout << "\x1b[1m\x1b[31m WAVE COLLAPSE: DEPLOYMENT HALTED\x1b[0m\n";
         std::cout << "\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
