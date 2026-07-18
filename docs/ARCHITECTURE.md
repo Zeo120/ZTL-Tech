@@ -14,22 +14,24 @@ The **Absolute Physics Engine** (PHASR) is designed to operate at the absolute p
    - `CreateFileA` with `FILE_SHARE_READ` and `FILE_ATTRIBUTE_NORMAL`.
    - Bypasses unnecessary OS file-locking and cache-poisoning.
 
-3. **Lock-Free Multi-Threading**
-   A proprietary Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads.
-   - 16 parallel hardware threads.
+3. **Lock-Free Multi-Threading (Dynamic Scaling)**
+   A proprietary Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads, configurable from 4 up to 256 physical threads.
    - Yield-based spinlocks (`Sleep(0)`) ensure 100% core utilization without bus saturation.
    - Atomic `compare_exchange_weak` (CAS) governs queue consumption instantly.
+
+4. **CLI Orchestration Wrapper**
+   While the core physics engine is 100% native C++, it is wrapped in a lightweight Node.js/Commander CLI (`phasr scan .`). The CLI acts as an interactive bootstrap manager (prompting for thread limits and modes) and transparently pipes all configurations into the native binary via command-line arguments without adding runtime I/O overhead.
 
 ## The Execution Pipeline
 
 ```mermaid
 graph TD
-    A[Native Main Thread] -->|Pre-Scan| B(Win32 FindFirstFile)
+    CLI(phasr-cli Wrapper) -->|--threads N| A
+    A[Native Main Thread] -->|Pre-Scan Index| B(Win32 FindFirstFile)
     B --> C{SPMC Ring Buffer}
     C -->|Thread 1| D[Win32 CreateFileA]
-    C -->|Thread ...| D
-    C -->|Thread 16| D
-    D --> E[L1 Cache Binary Read]
+    C -->|Thread N| D
+    D --> E[30MB VirtualAlloc Buffer]
     E --> F[Module 3: Entropy Analyser]
     F -->|H X > 7.2| G[Anomaly Vector]
     F -->|Safe| H[Discard]
