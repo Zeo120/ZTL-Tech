@@ -12,7 +12,7 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 #include <thread>
 #include <mutex>
 
-long long globalMass = 0;
+std::atomic<long long> globalMass = {0};
 long long globalFileCount = 0;
 DWORD startTime = 0;
 DWORD lastPrintTime = 0;
@@ -90,6 +90,7 @@ void WorkerThread() {
             if (hFile != INVALID_HANDLE_VALUE) {
                 LARGE_INTEGER fileSize;
                 if (GetFileSizeEx(hFile, &fileSize)) {
+                    globalMass.fetch_add(fileSize.QuadPart, std::memory_order_relaxed);
                     long long counts[256] = {0};
                     DWORD bytesToRead = (DWORD)(fileSize.QuadPart > MAX_BUFFER_SIZE ? MAX_BUFFER_SIZE : fileSize.QuadPart);
                     DWORD bytesRead = 0;
@@ -131,16 +132,25 @@ bool endsWith(const std::string& fullString, const std::string& ending) {
 }
 
 void analyzeShadowVolume(const std::string& directory) {
-    // Extract drive letter
-    std::string drive = directory.substr(0, 3); // e.g. "C:\"
+    std::string drive = directory.substr(0, 3);
     ULARGE_INTEGER freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes;
     
     if (GetDiskFreeSpaceExA(drive.c_str(), &freeBytesAvailable, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
         long long physicalAllocated = totalNumberOfBytes.QuadPart - totalNumberOfFreeBytes.QuadPart;
-        long long logicalMass = globalMass;
+        long long logicalMass = globalMass.load(std::memory_order_relaxed);
         long long delta = physicalAllocated - logicalMass;
         
-        std::cout << "[VFS-SHADOW] " << physicalAllocated << "|" << logicalMass << "|" << delta << std::endl;
+        std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        std::cout << "MODULE 2 — VFS SHADOW ANALYSIS\n";
+        std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+        
+        std::cout << "\x1b[1m[!] Physical Allocation:\x1b[0m " << std::fixed << std::setprecision(2) << (physicalAllocated / 1073741824.0) << " GB\n";
+        std::cout << "\x1b[1m[!] Logical Mass:\x1b[0m " << std::fixed << std::setprecision(2) << (logicalMass / 1073741824.0) << " GB\n";
+        if (delta > 1073741824) { // > 1GB delta
+            std::cout << "\x1b[1m\x1b[31m[WARNING] Delta (Hidden Mass):\x1b[0m " << std::fixed << std::setprecision(2) << (delta / 1073741824.0) << " GB\n\n";
+        } else {
+            std::cout << "\x1b[1m\x1b[32m[SAFE] No significant hidden mass detected.\x1b[0m\n\n";
+        }
     }
 }
 
@@ -381,6 +391,8 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
     Sleep(1000);
+
+    analyzeShadowVolume(targetDir);
 
     std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     std::cout << "MODULE 3 — ENTROPY ANALYSER\n";
