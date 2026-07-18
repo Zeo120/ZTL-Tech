@@ -4,20 +4,19 @@ const path = require('path');
 const fs = require('fs');
 
 const searchPaths = [__dirname, path.join(__dirname, '..')];
+const binaryNames = ['phasr_arm64', 'engine', 'engine.exe'];
 
 let engineBinary = null;
 
 for (const dir of searchPaths) {
-    let targetBinary = path.join(dir, 'engine');
-    if (process.platform === 'win32') targetBinary = path.join(dir, 'engine.exe');
-    else if (process.arch === 'arm64' && fs.existsSync(path.join(dir, 'phasr_arm64'))) {
-        targetBinary = path.join(dir, 'phasr_arm64');
+    for (const bin of binaryNames) {
+        const targetBinary = path.join(dir, bin);
+        if (fs.existsSync(targetBinary)) {
+            engineBinary = targetBinary;
+            break;
+        }
     }
-
-    if (fs.existsSync(targetBinary)) {
-        engineBinary = targetBinary;
-        break;
-    }
+    if (engineBinary) break;
 }
 
 if (!engineBinary) {
