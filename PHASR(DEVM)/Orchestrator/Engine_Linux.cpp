@@ -16,8 +16,9 @@
 #include <sys/mman.h>
 #include <sys/syscall.h>
 #include <dirent.h>
+#include <cstdint>
 
-extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
+extern "C" void calculate_frequencies(const unsigned char* buffer, size_t size, uint32_t* counts);
 
 std::atomic<long long> globalFileCount(0);
 std::atomic<long long> globalMass(0);
@@ -78,7 +79,7 @@ void WorkerThread() {
                     struct stat st;
                     if (fstat(fd, &st) == 0 && S_ISREG(st.st_mode)) {
                         globalMass.fetch_add(st.st_size, std::memory_order_relaxed);
-                        long long counts[256] = {0};
+                        uint32_t counts[256] = {0};
                         
                         size_t bytesToRead = (st.st_size > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : st.st_size;
                         ssize_t bytesRead = read(fd, threadBuffer, bytesToRead);
@@ -86,11 +87,11 @@ void WorkerThread() {
                         if (bytesRead > 0) {
                             long long tStart = GetCurrentTimeMs();
 
-                            // Use the ARM64 / x86_64 ASM Engine depending on compile target
-                            calculate_frequencies_asm(threadBuffer, bytesRead, counts);
+                            // Use the ARM64 ASM Engine
+                            calculate_frequencies(threadBuffer, bytesRead, counts);
                             
                             double entropy = 0.0;
-                            for (long long freq : counts) {
+                            for (uint32_t freq : counts) {
                                 if (freq > 0) {
                                     double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
                                     entropy -= p * log2(p);
