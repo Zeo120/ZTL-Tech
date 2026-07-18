@@ -317,9 +317,6 @@ int main(int argc, char* argv[]) {
     m3_anomalies.reserve(50000); // Zero-allocation hint for vector
     
     // Parse dynamic thread scaling
-    std::cout << "[DEBUG] argc: " << argc << "\n";
-    for (int i = 0; i < argc; i++) std::cout << "[DEBUG] argv[" << i << "]: " << argv[i] << "\n";
-
     unsigned int numThreads = 4;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
