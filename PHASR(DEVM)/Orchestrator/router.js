@@ -3,10 +3,14 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const engineBinary = path.join(__dirname, process.platform === 'win32' ? 'engine.exe' : 'engine');
+let engineBinary = path.join(__dirname, 'engine');
+if (process.platform === 'win32') engineBinary = path.join(__dirname, 'engine.exe');
+else if (process.arch === 'arm64' && fs.existsSync(path.join(__dirname, 'phasr_arm64'))) {
+    engineBinary = path.join(__dirname, 'phasr_arm64');
+}
 
 if (!fs.existsSync(engineBinary)) {
-    console.error("[\x1b[31mFATAL\x1b[0m] Native C++ Engine not found. Please compile engine.exe first.");
+    console.error(`[\x1b[31mFATAL\x1b[0m] Native C++ Engine not found at ${engineBinary}. Please compile it first.`);
     process.exit(1);
 }
 
