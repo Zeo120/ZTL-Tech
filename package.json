@@ -6,7 +6,7 @@
     "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
   },
   "scripts": {
-    "postinstall": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe /nologo /out:\"PHASR(DEVM)\\Orchestrator\\engine_cs.exe\" \"PHASR(DEVM)\\Orchestrator\\Engine.cs\""
+    "postinstall": "node install.js"
   },
   "author": "ZTL-Tech",
   "license": "MIT"
