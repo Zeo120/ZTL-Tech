@@ -48,6 +48,10 @@ void PrecalculateFileCount(const std::string& directory) {
 }
 
 void WorkerThread() {
+    constexpr size_t MAX_BUFFER_SIZE = 30 * 1024 * 1024; // 30 MB
+    char* threadBuffer = (char*)VirtualAlloc(NULL, MAX_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    if (!threadBuffer) return;
+
     while (true) {
         int head = queueHead.load(std::memory_order_acquire);
         int tail = queueTail.load(std::memory_order_relaxed);
@@ -65,21 +69,39 @@ void WorkerThread() {
         if (queueHead.compare_exchange_weak(head, (head + 1) % QUEUE_SIZE, std::memory_order_release, std::memory_order_relaxed)) {
             activeWorkers++;
             
-            HANDLE hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            HANDLE hFile = INVALID_HANDLE_VALUE;
+            char anomalyPath[MAX_PATH];
+            lstrcpyA(anomalyPath, localPath);
+
+            if (strncmp(localPath, "MFT:", 4) == 0) {
+                char drive[3];
+                unsigned long long fileId;
+                if (sscanf(localPath, "MFT:%2s:%llu", drive, &fileId) == 2) {
+                    std::string volPath = "\\\\.\\";
+                    volPath += drive;
+                    HANDLE hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+                    if (hVol != INVALID_HANDLE_VALUE) {
+                        FILE_ID_DESCRIPTOR fid;
+                        fid.dwSize = sizeof(FILE_ID_DESCRIPTOR);
+                        fid.Type = FileIdType;
+                        fid.FileId.QuadPart = fileId;
+                        hFile = OpenFileById(hVol, &fid, GENERIC_READ, FILE_SHARE_READ, NULL, 0);
+                        CloseHandle(hVol);
+                    }
+                }
+            } else {
+                hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            }
+
             if (hFile != INVALID_HANDLE_VALUE) {
                 LARGE_INTEGER fileSize;
-                if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 250 * 1024 * 1024ULL) {
-                    long long offset = fileSize.QuadPart > 8192 ? (fileSize.QuadPart / 2) - 4096 : 0;
-                    LARGE_INTEGER liDistanceToMove;
-                    liDistanceToMove.QuadPart = offset;
-                    SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN);
-
+                if (GetFileSizeEx(hFile, &fileSize)) {
                     long long counts[256] = {0};
-                    char buffer[8192];
+                    DWORD bytesToRead = (DWORD)(fileSize.QuadPart > MAX_BUFFER_SIZE ? MAX_BUFFER_SIZE : fileSize.QuadPart);
                     DWORD bytesRead = 0;
                     
-                    if (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead > 0) {
-                        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(buffer), bytesRead, counts);
+                    if (ReadFile(hFile, threadBuffer, bytesToRead, &bytesRead, NULL) && bytesRead > 0) {
+                        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
                         
                         double entropy = 0.0;
                         for (long long freq : counts) {
@@ -89,8 +111,11 @@ void WorkerThread() {
                             }
                         }
                         if (entropy >= 7.2) {
+                            if (strncmp(localPath, "MFT:", 4) == 0) {
+                                GetFinalPathNameByHandleA(hFile, anomalyPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                            }
                             EnterCriticalSection(&printCS);
-                            m3_anomalies.push_back(std::make_pair(std::string(localPath), entropy));
+                            m3_anomalies.push_back(std::make_pair(std::string(anomalyPath), entropy));
                             LeaveCriticalSection(&printCS);
                         }
                     }
@@ -100,6 +125,7 @@ void WorkerThread() {
             activeWorkers--;
         }
     }
+    VirtualFree(threadBuffer, 0, MEM_RELEASE);
     return;
 }
 
@@ -208,19 +234,104 @@ void ScanDirectoryNative(const std::string& directory) {
     FindClose(hFind);
 }
 
+void ScanDirectoryMFT(const std::string& drive) {
+    std::string volPath = "\\\\.\\" + drive.substr(0, 2);
+    HANDLE hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (hVol == INVALID_HANDLE_VALUE) {
+        std::cout << "[PHASR] Admin rights missing or invalid volume. Falling back to Native Traversal...\n";
+        ScanDirectoryNative(drive);
+        return;
+    }
+    
+    USN_JOURNAL_DATA ujd;
+    DWORD cb;
+    if (!DeviceIoControl(hVol, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &ujd, sizeof(ujd), &cb, NULL)) {
+        CloseHandle(hVol);
+        ScanDirectoryNative(drive);
+        return;
+    }
+    
+    MFT_ENUM_DATA med;
+    med.StartFileReferenceNumber = 0;
+    med.LowUsn = 0;
+    med.HighUsn = ujd.NextUsn;
+    
+    char buffer[65536];
+    DWORD bytesReturned = 0;
+    
+    while (DeviceIoControl(hVol, FSCTL_ENUM_USN_DATA, &med, sizeof(med), buffer, sizeof(buffer), &bytesReturned, NULL)) {
+        USN_RECORD* record = (USN_RECORD*)((char*)buffer + sizeof(USN));
+        while ((char*)record < (char*)buffer + bytesReturned) {
+            char mftTask[MAX_PATH];
+            sprintf(mftTask, "MFT:%s:%llu", drive.substr(0,2).c_str(), record->FileReferenceNumber);
+            
+            int tail = queueTail.load(std::memory_order_relaxed);
+            int nextTail = (tail + 1) % QUEUE_SIZE;
+            while (nextTail == queueHead.load(std::memory_order_acquire)) {
+                Sleep(0);
+            }
+            lstrcpyA(taskQueue[tail], mftTask);
+            queueTail.store(nextTail, std::memory_order_release);
+            
+            globalFileCount++;
+            if ((globalFileCount & 127) == 0) {
+                DWORD now = GetTickCount();
+                if (now - lastPrintTime >= 50) {
+                    lastPrintTime = now;
+                    DWORD elapsed = now - startTime;
+                    if (elapsed == 0) elapsed = 1;
+                    double speed = (double)globalFileCount / (elapsed / 1000.0);
+                    double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
+                    if (percent > 100.0) percent = 100.0;
+                    
+                    std::string barStr = "\r\x1b[36m[PHASR]\x1b[0m [";
+                    int filled = (int)(percent / 2.0);
+                    for (int i = 0; i < 50; i++) {
+                        if (i < filled) barStr += "█";
+                        else barStr += "░";
+                    }
+                    std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
+                              << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
+                }
+            }
+            
+            record = (USN_RECORD*)((char*)record + record->RecordLength);
+        }
+        med.StartFileReferenceNumber = *(USN*)buffer;
+    }
+    CloseHandle(hVol);
+}
+
 int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
     std::cout << "\n\x1b[36m[PHASR]\x1b[0m NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
     InitializeCriticalSection(&printCS);
     m3_anomalies.reserve(50000); // Zero-allocation hint for vector
     
-    // Spawn Zero-Allocation Worker Pool
-    unsigned int cores = std::thread::hardware_concurrency();
-    for (unsigned int i = 0; i < cores; i++) {
+    // Parse dynamic thread scaling
+    unsigned int numThreads = 4;
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "--threads" && i + 1 < argc) {
+            numThreads = std::stoi(argv[i + 1]);
+            if (numThreads < 4) numThreads = 4;
+            if (numThreads > 256) numThreads = 256;
+            i++;
+        }
+    }
+
+    std::cout << "[PHASR] Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
+    for (unsigned int i = 0; i < numThreads; i++) {
         std::thread(WorkerThread).detach();
     }
     
-    std::string targetDir = (argc > 1) ? argv[1] : ".";
+    std::string targetDir = ".";
+    for (int i = 1; i < argc; i++) {
+        if (std::string(argv[i]) != "--threads" && (i == 1 || std::string(argv[i-1]) != "--threads")) {
+            targetDir = argv[i];
+            break;
+        }
+    }
     
     // Fast Pre-scan File Count
     if (targetDir == "C:\\" || targetDir == "C:") {
@@ -237,7 +348,11 @@ int main(int argc, char* argv[]) {
     std::cout << "[PHASR] Standby. Brute-forcing physical mass...\n\n";
 
     startTime = GetTickCount();
-    ScanDirectoryNative(targetDir);
+    if (targetDir == "C:\\" || targetDir == "C:") {
+        ScanDirectoryMFT(targetDir);
+    } else {
+        ScanDirectoryNative(targetDir);
+    }
     
     // Force final 100% progress bar render
     DWORD endTime = GetTickCount();
