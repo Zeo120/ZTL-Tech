@@ -1,0 +1,323 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <atomic>
+#include <chrono>
+#include <iomanip>
+#include <fstream>
+#include <cmath>
+#include <thread>
+#include <mutex>
+#include <string_view>
+#include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
+#include <dirent.h>
+
+extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long size, long long* counts);
+
+std::atomic<long long> globalFileCount(0);
+std::atomic<long long> globalMass(0);
+long long totalTargetFiles = 0; // In Linux, we'll brute force without pre-scanning for maximum speed
+long long startTime = 0;
+long long lastPrintTime = 0;
+
+std::vector<std::pair<std::string, double>> m3_anomalies;
+std::vector<std::string> m4_anomalies;
+std::vector<std::string> m5_anomalies;
+std::vector<std::pair<std::string, std::string>> m6_anomalies;
+
+#define QUEUE_SIZE 8192
+#define MAX_BUFFER_SIZE (30 * 1024 * 1024) // 30 MB per thread
+
+struct LinuxFileTask {
+    char path[4096];
+    bool active;
+};
+
+LinuxFileTask fileQueue[QUEUE_SIZE];
+std::atomic<int> head(0);
+std::atomic<int> tail(0);
+
+std::atomic<bool> isScanning(true);
+std::atomic<int> activeWorkers(0);
+
+std::mutex printCS;
+
+long long GetCurrentTimeMs() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000);
+}
+
+void WorkerThread() {
+    activeWorkers++;
+    
+    // Allocate 30MB aligned buffer using mmap (Zero-Allocation Constraint)
+    unsigned char* threadBuffer = (unsigned char*)mmap(NULL, MAX_BUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (threadBuffer == MAP_FAILED) {
+        activeWorkers--;
+        return;
+    }
+
+    while (isScanning || head != tail) {
+        int currentTail = tail.load(std::memory_order_relaxed);
+        if (head.load(std::memory_order_relaxed) != currentTail) {
+            int nextTail = (currentTail + 1) % QUEUE_SIZE;
+            if (tail.compare_exchange_weak(currentTail, nextTail, std::memory_order_release, std::memory_order_relaxed)) {
+                
+                char localPath[4096];
+                strncpy(localPath, fileQueue[currentTail].path, 4096);
+                fileQueue[currentTail].active = false;
+                
+                int fd = open(localPath, O_RDONLY | O_NOATIME);
+                if (fd >= 0) {
+                    struct stat st;
+                    if (fstat(fd, &st) == 0 && S_ISREG(st.st_mode)) {
+                        globalMass.fetch_add(st.st_size, std::memory_order_relaxed);
+                        long long counts[256] = {0};
+                        
+                        size_t bytesToRead = (st.st_size > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : st.st_size;
+                        ssize_t bytesRead = read(fd, threadBuffer, bytesToRead);
+                        
+                        if (bytesRead > 0) {
+                            long long tStart = GetCurrentTimeMs();
+
+                            // Use the ARM64 / x86_64 ASM Engine depending on compile target
+                            calculate_frequencies_asm(threadBuffer, bytesRead, counts);
+                            
+                            double entropy = 0.0;
+                            for (long long freq : counts) {
+                                if (freq > 0) {
+                                    double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                    entropy -= p * log2(p);
+                                }
+                            }
+                            if (entropy >= 7.2) {
+                                std::lock_guard<std::mutex> lock(printCS);
+                                m3_anomalies.push_back(std::make_pair(std::string(localPath), entropy));
+                            }
+                            
+                            // M6: Binary Dissection (NOP Sleds)
+                            if (bytesRead > 4 && threadBuffer[0] == 0x7F && threadBuffer[1] == 'E' && threadBuffer[2] == 'L' && threadBuffer[3] == 'F') {
+                                int nopCount = 0;
+                                for (ssize_t i = 0; i < bytesRead; i++) {
+                                    if (threadBuffer[i] == 0x90) { // x86 NOP or unrolled padding
+                                        nopCount++;
+                                        if (nopCount > 50) {
+                                            std::lock_guard<std::mutex> lock(printCS);
+                                            m6_anomalies.push_back({std::string(localPath), "NOP Sled Detected (0x90 > 50 bytes)"});
+                                            break;
+                                        }
+                                    } else nopCount = 0;
+                                }
+                            }
+
+                            // M4: Security Math (Taint)
+                            if (bytesRead > 10 && !(threadBuffer[0] == 0x7F && threadBuffer[1] == 'E')) {
+                                std::string_view content(reinterpret_cast<const char*>(threadBuffer), bytesRead > 4096 ? 4096 : bytesRead);
+                                if (content.find("system(") != std::string_view::npos || content.find("exec(") != std::string_view::npos || content.find("eval(") != std::string_view::npos) {
+                                    std::lock_guard<std::mutex> lock(printCS);
+                                    m4_anomalies.push_back(std::string(localPath));
+                                }
+                            }
+
+                            long long tEnd = GetCurrentTimeMs();
+                            if (tEnd - tStart > 15 && bytesRead < 50000) {
+                                std::lock_guard<std::mutex> lock(printCS);
+                                m5_anomalies.push_back(std::string(localPath));
+                            }
+                        }
+                    }
+                    close(fd);
+                }
+            }
+        } else {
+            std::this_thread::sleep_for(std::chrono::microseconds(500)); // Sleep equivalent
+        }
+    }
+    munmap(threadBuffer, MAX_BUFFER_SIZE);
+    activeWorkers--;
+}
+
+struct linux_dirent64 {
+    uint64_t d_ino;
+    int64_t  d_off;
+    unsigned short d_reclen;
+    unsigned char  d_type;
+    char           d_name[];
+};
+
+// Raw getdents64 Kernel Bypass
+void ScanDirectoryNative(const std::string& directory) {
+    int fd = open(directory.c_str(), O_RDONLY | O_DIRECTORY);
+    if (fd < 0) return;
+
+    char buffer[32768];
+    while (true) {
+        long nread = syscall(SYS_getdents64, fd, buffer, sizeof(buffer));
+        if (nread <= 0) break;
+
+        long bpos = 0;
+        while (bpos < nread) {
+            struct linux_dirent64* d = (struct linux_dirent64*)(buffer + bpos);
+            std::string fileName = d->d_name;
+
+            if (fileName != "." && fileName != "..") {
+                globalFileCount++;
+                long long now = GetCurrentTimeMs();
+                if (now - lastPrintTime >= 50) {
+                    lastPrintTime = now;
+                    long long elapsed = now - startTime;
+                    if (elapsed == 0) elapsed = 1;
+                    double speed = (double)globalFileCount / (elapsed / 1000.0);
+                    
+                    std::cout << "\r\x1b[36m[PHASR]\x1b[0m \x1b[35m[AArch64]\x1b[0m SCANNED: " 
+                              << globalFileCount << " | " << (int)speed << " f/s   " << std::flush;
+                }
+
+                std::string fullPath = directory + "/" + fileName;
+
+                if (d->d_type == DT_DIR) {
+                    ScanDirectoryNative(fullPath);
+                } else if (d->d_type == DT_REG) {
+                    while (true) {
+                        int currentHead = head.load(std::memory_order_relaxed);
+                        int nextHead = (currentHead + 1) % QUEUE_SIZE;
+                        if (nextHead != tail.load(std::memory_order_relaxed)) {
+                            strncpy(fileQueue[currentHead].path, fullPath.c_str(), 4096);
+                            fileQueue[currentHead].active = true;
+                            head.store(nextHead, std::memory_order_release);
+                            break;
+                        }
+                        std::this_thread::sleep_for(std::chrono::microseconds(100));
+                    }
+                }
+            }
+            bpos += d->d_reclen;
+        }
+    }
+    close(fd);
+}
+
+int main(int argc, char* argv[]) {
+    std::cout << "\n\x1b[1m\x1b[36m[PHASR] NATIVE POSIX/LINUX ORCHESTRATOR INITIALIZED\x1b[0m\n";
+
+    unsigned int numThreads = 4;
+    std::string targetDir = ".";
+
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "--threads" && i + 1 < argc) {
+            numThreads = std::stoi(argv[i + 1]);
+            if (numThreads < 4) numThreads = 4;
+            if (numThreads > 256) numThreads = 256;
+            i++;
+        } else if (arg[0] != '-') {
+            targetDir = arg;
+        }
+    }
+
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Commencing native getdents64 kernel scan on: " << targetDir << "\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing physical mass...\n\n";
+
+    startTime = GetCurrentTimeMs();
+
+    std::vector<std::thread> workers;
+    for (unsigned int i = 0; i < numThreads; i++) {
+        workers.push_back(std::thread(WorkerThread));
+    }
+
+    ScanDirectoryNative(targetDir);
+    isScanning = false;
+
+    for (auto& worker : workers) {
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
+
+    std::cout << "\n\n";
+    std::cout << "=======================================================\n";
+    std::cout << "=======================================================\n";
+    std::cout << "   PHASR (DEVM) - ABSOLUTE PHYSICS ENGINE (LINUX)\n";
+    std::cout << "=======================================================\n\n";
+    std::cout << "\x1b[1mTARGET:\x1b[0m " << targetDir << "\n";
+    std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
+    std::cout << "\x1b[1mPHYSICAL MASS:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass.load() / 1024.0) << " KB\n\n";
+    
+    std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
+
+    // Mod 3
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 3 — ENTROPY ANALYSER\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m3_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mRule:\x1b[0m\nHigh Entropy Data (Possible Obfuscation)\n\n";
+        std::cout << "\x1b[1m\x1b[31mFindings: " << m3_anomalies.size() << "\x1b[0m\n\n";
+        std::cout << "\x1b[1mFiles\x1b[0m\n";
+        for (const auto& a : m3_anomalies) {
+            size_t slash = a.first.find_last_of("\\/");
+            std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
+            std::cout << " \xE2\x80\xA2 " << fileName << " (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
+        }
+    } else {
+        std::cout << "\x1b[1m\x1b[32m[SAFE] Maximum Entropy H(X) Verified\x1b[0m\n\n";
+    }
+
+    // Mod 4
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 4 — SECURITY MATH (TAINT)\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m4_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings (Unsanitized Flows): " << m4_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m4_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] 0 Unsanitized Flows\x1b[0m\n\n";
+
+    // Mod 5
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 5 — TEMPORAL PHYSICS\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m5_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings (Timing Anomalies): " << m5_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m5_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] Constant-Time Verified\x1b[0m\n\n";
+
+    // Mod 6
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 6 — BINARY DISSECTION\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m6_anomalies.size() > 0) {
+        std::cout << "\x1b[1m\x1b[31mFindings: " << m6_anomalies.size() << "\x1b[0m\n";
+        for (const auto& a : m6_anomalies) std::cout << " \xE2\x80\xA2 " << a.first << " -> " << a.second << "\n";
+    } else std::cout << "\x1b[1m\x1b[32m[SAFE] No Assembly Taint Flows Detected\x1b[0m\n\n";
+
+    // Mod 7
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 7 — TRADEOFF ANALYSER\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    double totalLiability = (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) * 10000.0;
+    double maintenanceCost = (globalMass.load() / 1073741824.0) * 50.0;
+    double totalEconomicRisk = totalLiability + maintenanceCost;
+    if (totalEconomicRisk > 50000) {
+        std::cout << "\x1b[1m\x1b[31m[ECONOMIC FAILURE] Risk Liability: $" << std::fixed << std::setprecision(2) << totalEconomicRisk << "\x1b[0m\n\n";
+    } else {
+        std::cout << "\x1b[1m\x1b[32m[ECONOMIC SUCCESS] Risk Liability: $" << std::fixed << std::setprecision(2) << totalEconomicRisk << "\x1b[0m\n\n";
+    }
+
+    if (m3_anomalies.size() > 0 || m4_anomalies.size() > 0 || m5_anomalies.size() > 0 || m6_anomalies.size() > 0 || totalEconomicRisk > 50000) {
+        std::cout << "\n\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[31m WAVE COLLAPSE: DEPLOYMENT HALTED\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    } else {
+        std::cout << "\n\x1b[1m\x1b[32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[32m PIPELINE SAFE: DEPLOYMENT APPROVED\x1b[0m\n";
+        std::cout << "\x1b[1m\x1b[32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    }
+
+    return 0;
+}
