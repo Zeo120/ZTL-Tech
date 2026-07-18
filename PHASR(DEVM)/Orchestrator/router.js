@@ -3,7 +3,6 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const targetDir = process.argv[2] || "C:\\";
 const engineBinary = path.join(__dirname, process.platform === 'win32' ? 'engine.exe' : 'engine');
 
 if (!fs.existsSync(engineBinary)) {
@@ -11,6 +10,8 @@ if (!fs.existsSync(engineBinary)) {
     process.exit(1);
 }
 
+const args = process.argv.length > 2 ? process.argv.slice(2) : ["C:\\"];
+
 // Pass absolute control directly to the native C++ Engine (stdio: inherit)
-const result = spawnSync(engineBinary, [targetDir], { stdio: 'inherit' });
+const result = spawnSync(engineBinary, args, { stdio: 'inherit' });
 process.exit(result.status || 0);
