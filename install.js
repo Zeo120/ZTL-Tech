@@ -23,6 +23,15 @@ try {
         
         console.log(`\x1b[32m[PHASR Installer]\x1b[0m POSIX/Linux setup complete.`);
     }
+
+    // Automatically fix permissions to prevent Termux/Linux "Permission denied" errors
+    if (platform !== 'win32') {
+        console.log(`\x1b[33m[PHASR Installer]\x1b[0m Applying executable permissions...`);
+        execSync(`chmod +x "PHASR(DEVM)/Orchestrator/router.js"`, { stdio: 'ignore' });
+        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/engine"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/phasr_arm64"`, { stdio: 'ignore' }); } catch(e){}
+        console.log(`\x1b[32m[PHASR Installer]\x1b[0m Permissions locked and loaded.`);
+    }
 } catch (error) {
     console.error(`\n\x1b[31m[PHASR Installer ERROR]\x1b[0m Auto-compilation failed. Make sure you have the required compilers installed.`);
     console.error(error.message);
