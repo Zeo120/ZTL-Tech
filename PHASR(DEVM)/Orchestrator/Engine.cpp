@@ -53,7 +53,7 @@ void PrecalculateFileCount(const std::string& directory) {
 }
 
 void WorkerThread() {
-    constexpr size_t MAX_BUFFER_SIZE = 30 * 1024 * 1024; // 30 MB
+    constexpr size_t MAX_BUFFER_SIZE = 12288; // 12 KB Buffer/Thread
     char* threadBuffer = (char*)VirtualAlloc(NULL, MAX_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!threadBuffer) return;
 
@@ -395,7 +395,7 @@ int main(int argc, char* argv[]) {
         Sleep(2000);
     }
 
-    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (12KB Buffer/Thread)\n";
     for (unsigned int i = 0; i < numThreads; i++) {
         std::thread(WorkerThread).detach();
     }

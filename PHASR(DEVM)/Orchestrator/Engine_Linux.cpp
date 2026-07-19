@@ -32,7 +32,7 @@ std::vector<std::string> m5_anomalies;
 std::vector<std::pair<std::string, std::string>> m6_anomalies;
 
 #define QUEUE_SIZE 8192
-#define MAX_BUFFER_SIZE (30 * 1024 * 1024) // 30 MB per thread
+#define MAX_BUFFER_SIZE 12288 // 12 KB per thread
 
 struct LinuxFileTask {
     char path[4096];
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
         usleep(2000000);
     }
 
-    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (12KB Buffer/Thread)\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Commencing native getdents64 kernel scan on: " << targetDir << "\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing physical mass...\n\n";
 
