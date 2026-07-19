@@ -1,80 +1,89 @@
 # PHASR Data Flow & Relationships
 
-This document visualizes the exact physical lifecycle of payload processing within the PHASR ecosystem, mapping how data transitions from the Command-Line Wrapper down into the Windows Kernel and CPU Caches.
+This document visualizes the exact physical lifecycle of payload processing within the PHASR ecosystem, mapping how data transitions from the Command-Line Wrapper down into the Windows Kernel (MFT) and Linux Kernel (getdents64).
 
-## 1. Execution Sequence Flow
-The following sequence diagram traces the chronological execution path of a file being scanned. Notice how the Node.js CLI entirely detaches from the hot path after bootstrapping, allowing the C++ engine to perform zero-allocation hardware execution.
+## 1. Cross-Platform Execution Sequence Flow
+The following sequence diagram traces the chronological execution path of a codebase scan. Notice how the NodeJS CLI dynamically routes execution to the natively compiled OS-specific binary, entirely detaching itself from the hot path.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
-    participant CLI as Node.js Wrapper
-    participant Main as C++ Main Thread
-    participant Buffer as SPMC Ring Buffer
-    participant Worker as C++ Worker Thread
-    participant Kernel as Win32 Kernel (NTFS)
+    participant CLI as Node.js Universal Router
+    participant Main as C++ Main Thread (Orchestrator)
+    participant Buffer as SPMC Lock-Free Ring Buffer
+    participant Worker as C++ Hardware Threads (x256)
+    participant Kernel as Win32 (MFT) / POSIX (getdents64)
 
-    User->>CLI: `phasr scan C:\`
-    CLI->>CLI: Prompt for Thread Limit (e.g., 32)
-    CLI->>Main: `spawnSync(engine.exe, ["--threads", 32])`
+    User->>CLI: `phasr . --threads 64`
+    CLI->>CLI: Detect OS & Architecture (win32, arm64, linux)
+    CLI->>Main: Execute Native Binary (`engine.exe` or `phasr_arm64`)
     
     rect rgb(20, 40, 20)
-        Note over Main, Kernel: ZERO-ALLOCATION HOT LOOP
-        Main->>Kernel: FindFirstFileA(C:\)
-        Kernel-->>Main: MFT Entry (File Path)
-        Main->>Buffer: Store Path in `taskQueue[queueTail]`
-        Main->>Buffer: std::atomic `queueTail++`
+        Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
+        Main->>Kernel: Request Physical Disk Sectors (FSCTL_ENUM_USN_DATA / getdents64)
+        Kernel-->>Main: Raw Directory/File Handlers
+        Main->>Buffer: Store Path in `fileQueue[head]`
+        Main->>Buffer: std::atomic `head++` (Release Semantics)
         
-        Buffer-->>Worker: Spinlock acquires `queueHead` (CAS)
-        Worker->>Kernel: CreateFileA(File Path)
-        Worker->>Kernel: ReadFile(up to 30MB)
-        Kernel-->>Worker: Physical Bytes mapped to 30MB VirtualAlloc Buffer
-        Worker->>Worker: Calculate Shannon Entropy H(X) via ASM
+        Buffer-->>Worker: Spinlock acquires `tail` (Compare-And-Swap)
+        Worker->>Kernel: Open / CreateFileA (File Path)
+        Worker->>Kernel: ReadFile / read (up to 30MB chunk)
+        Kernel-->>Worker: Physical Bytes mapped to 30MB VirtualAlloc/mmap Memory
         
-        alt H(X) > 7.2
-            Worker->>Main: push_back(m3_anomalies)
+        par 8-Module Wave Collapse
+            Worker->>Worker: M3 (Entropy): Calculate Shannon H(X) via ASM
+            Worker->>Worker: M4 (Taint): Scan std::string_view for injections
+            Worker->>Worker: M5 (Temporal): clock_gettime / GetTickCount drift detection
+            Worker->>Worker: M6 (Dissection): Unroll Opcodes to find NOP Sleds
+        end
+        
+        alt Module Triggered Anomaly
+            Worker->>Main: lock(printCS) -> push_back(anomalies)
         end
     end
     
-    Main->>User: Generate `phasr_security_report.md`
+    Main->>Main: M7 (Tradeoff): Compute Liability vs Physical Mass ($50,000 threshold)
+    Main->>User: Generate Wave Collapse Output & `phasr_security_report.md`
 ```
 
 ---
 
 ## 2. Entity-Relationship (Memory Physics) Diagram
-At extreme throughput speeds (60k f/s), typical object-oriented structures trigger catastrophic heap fragmentation. PHASR models its memory entirely as statically sized contiguous C-arrays mapped to CPU Cache lines. 
+At extreme throughput speeds (200,000+ f/s), typical object-oriented structures trigger catastrophic heap fragmentation and thread contention. PHASR models its memory entirely as statically sized contiguous memory blocks mapped to CPU Cache lines, utilizing zero-allocation `std::string_view` structures.
 
-The following ER diagram maps the physical relationships of the memory structures:
+The following ER diagram maps the physical relationships of the memory structures across OS targets:
 
 ```mermaid
 erDiagram
-    CLI_WRAPPER ||--o{ CPP_ENGINE : spawns
-    CPP_ENGINE ||--|| SPMC_RING_BUFFER : manages
-    CPP_ENGINE ||--o{ WORKER_THREAD : spawns_up_to_256
+    UNIVERSAL_ROUTER ||--o{ OS_NATIVE_ENGINE : spawns_via_stdio_inherit
+    OS_NATIVE_ENGINE ||--|| SPMC_RING_BUFFER : manages
+    OS_NATIVE_ENGINE ||--o{ WORKER_THREAD : spawns_up_to_256
     
     SPMC_RING_BUFFER {
-        char taskQueue[8192][MAX_PATH] "2D Immutable Char Array"
-        std_atomic_int queueHead "Compare-And-Swap Target"
-        std_atomic_int queueTail "Producer Index"
+        struct LinuxFileTask[8192] "Contiguous Array Queue"
+        std_atomic_int head "Producer Index (Main Thread)"
+        std_atomic_int tail "Consumer Index (CAS Target)"
     }
     
-    WORKER_THREAD ||--|| VIRTUAL_ALLOC_BUFFER : reserves
-    VIRTUAL_ALLOC_BUFFER {
-        size_t MAX_BUFFER_SIZE "Strict 30MB Cap"
-        PAGE_READWRITE flags "Kernel Read/Write"
+    WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
+    THREAD_MEMORY_BUFFER {
+        size_t MAX_BUFFER_SIZE "Strict 30MB Cap per Thread"
+        string Allocation "VirtualAlloc (Win32) / mmap (POSIX)"
+        std_string_view content "Zero-Allocation Heap Bypass"
     }
     
     WORKER_THREAD ||--|| FREQUENCY_ARRAY : computes
     FREQUENCY_ARRAY {
-        long_long counts[256] "Byte Frequency Histogram"
+        uint32_t counts[256] "Byte Frequency Histogram (ARM64 ABI)"
         double H_X "Shannon Entropy Float"
     }
 
-    WORKER_THREAD }o--|| M3_ANOMALIES : triggers
-    M3_ANOMALIES {
-        vector std_pair "Critical Section Protected"
-        string localPath "Threat Vector"
-        double entropy "Threat Score"
+    WORKER_THREAD }o--|| PIPELINE_ANOMALIES : triggers
+    PIPELINE_ANOMALIES {
+        vector m3_anomalies "Critical Section Protected"
+        vector m4_anomalies "Critical Section Protected"
+        vector m5_anomalies "Critical Section Protected"
+        vector m6_anomalies "Critical Section Protected"
     }
 ```
