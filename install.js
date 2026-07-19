@@ -10,6 +10,14 @@ try {
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling C# Engine Fallback...`);
         execSync(`C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe /nologo /out:"PHASR(DEVM)\\Orchestrator\\engine_cs.exe" "PHASR(DEVM)\\Orchestrator\\Engine.cs"`, { stdio: 'inherit' });
         
+        console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling Native C++ Engine for Windows...`);
+        try {
+            const cppCompileCmd = `cd "PHASR(DEVM)\\Orchestrator" && g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17`;
+            execSync(cppCompileCmd, { stdio: 'inherit' });
+        } catch (e) {
+            console.log(`\x1b[31m[PHASR Installer]\x1b[0m Warning: g++ not found or failed. Windows C++ Engine compilation skipped.`);
+        }
+        
         console.log(`\x1b[32m[PHASR Installer]\x1b[0m Windows setup complete.`);
     } else {
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling POSIX/Linux Engine for ARM64/x86...`);
