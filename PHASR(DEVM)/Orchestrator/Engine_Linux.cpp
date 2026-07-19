@@ -214,7 +214,11 @@ int main(int argc, char* argv[]) {
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--threads" && i + 1 < argc) {
-            numThreads = std::stoi(argv[i + 1]);
+            try {
+                numThreads = std::stoi(argv[i + 1]);
+            } catch (...) {
+                numThreads = 256;
+            }
             if (numThreads < 4) numThreads = 4;
             if (numThreads > 256) numThreads = 256;
             i++;
