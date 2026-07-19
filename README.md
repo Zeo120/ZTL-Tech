@@ -30,26 +30,25 @@ The engine executes the following physics modules simultaneously across up to 25
 ## 📦 Compilation & Usage
 
 ### Windows Setup (MinGW64)
-Compile the raw Windows Kernel engine:
+Run the automated cross-platform installer to compile the engine, then install the CLI globally:
 ```bash
-cd "PHASR(DEVM)/Orchestrator"
-g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17
+node install.js
+npm install -g .
 ```
 Run globally using the CLI wrapper:
 ```bash
-npm install -g .
-phasr --threads 64
+phasr . --threads 64
 ```
 
 ### Linux / Android (Termux) Setup
-Compile the POSIX Engine alongside the ARM64 Assembly:
+Run the automated cross-platform installer to compile the POSIX Engine and ARM64 Assembly, then install the CLI globally:
 ```bash
-cd "PHASR(DEVM)"
-clang++ -O3 Orchestrator/Engine_Linux.cpp Engine/entropy_arm64.s -o phasr_arm64 -lpthread
+node install.js
+npm install -g .
 ```
-Execute the AArch64 binary natively:
+Execute the CLI natively:
 ```bash
-./phasr_arm64 /data/data/com.termux/files/home --threads 16
+phasr . --threads 16
 ```
 
 ## 🛡️ Remediation

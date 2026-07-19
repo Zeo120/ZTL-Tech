@@ -4,10 +4,6 @@
   "main": "PHASR(DEVM)/Orchestrator/router.js",
   "bin": {
     "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
-  },
-  "scripts": {
-    "postinstall": "node install.js"
-  },
   "author": "ZTL-Tech",
   "license": "MIT"
 }
