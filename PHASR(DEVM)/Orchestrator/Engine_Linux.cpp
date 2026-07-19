@@ -81,7 +81,8 @@ void WorkerThread() {
                         globalMass.fetch_add(st.st_size, std::memory_order_relaxed);
                         uint32_t counts[256] = {0};
                         
-                        size_t bytesToRead = (st.st_size > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : st.st_size;
+                        // Partial Sampling (Sniper Method): Only read the first 12KB to bypass physical I/O limit
+                        size_t bytesToRead = (st.st_size > 12288) ? 12288 : st.st_size;
                         ssize_t bytesRead = read(fd, threadBuffer, bytesToRead);
                         
                         if (bytesRead > 0) {

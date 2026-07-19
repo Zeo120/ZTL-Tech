@@ -96,7 +96,8 @@ void WorkerThread() {
                 if (GetFileSizeEx(hFile, &fileSize)) {
                     globalMass.fetch_add(fileSize.QuadPart, std::memory_order_relaxed);
                     long long counts[256] = {0};
-                    DWORD bytesToRead = (DWORD)(fileSize.QuadPart > MAX_BUFFER_SIZE ? MAX_BUFFER_SIZE : fileSize.QuadPart);
+                    // Partial Sampling (Sniper Method): Only read the first 12KB (12288 bytes) to bypass I/O limit
+                    DWORD bytesToRead = (DWORD)(fileSize.QuadPart > 12288 ? 12288 : fileSize.QuadPart);
                     DWORD bytesRead = 0;
                     
                     if (ReadFile(hFile, threadBuffer, bytesToRead, &bytesRead, NULL) && bytesRead > 0) {
