@@ -222,6 +222,18 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    long pages = sysconf(_SC_PHYS_PAGES);
+    long page_size = sysconf(_SC_PAGE_SIZE);
+    double totalRamGB = (pages * page_size) / (1024.0 * 1024.0 * 1024.0);
+    double requiredRamGB = (numThreads * 30.0) / 1024.0;
+
+    if (requiredRamGB > totalRamGB) {
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Detected: " << std::fixed << std::setprecision(1) << totalRamGB << " GB RAM\n";
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Requested: " << numThreads << " workers (" << std::fixed << std::setprecision(1) << requiredRamGB << " GB Required)\n";
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Suggestion: Unless you own an RTX 6969 with 69 TB RAM, consider fewer threads.\n\n";
+        usleep(2000000);
+    }
+
     std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Commencing native getdents64 kernel scan on: " << targetDir << "\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing physical mass...\n\n";

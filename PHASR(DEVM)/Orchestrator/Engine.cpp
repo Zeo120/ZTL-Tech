@@ -376,20 +376,27 @@ int main(int argc, char* argv[]) {
             if (numThreads < 4) numThreads = 4;
             if (numThreads > 256) numThreads = 256;
             i++;
+        } else if (arg[0] != '-') {
+            targetDir = arg;
         }
     }
 
-    std::cout << "[PHASR] Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    double totalRamGB = statex.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+    double requiredRamGB = (numThreads * 30.0) / 1024.0;
+
+    if (requiredRamGB > totalRamGB) {
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Detected: " << std::fixed << std::setprecision(1) << totalRamGB << " GB RAM\n";
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Requested: " << numThreads << " workers (" << std::fixed << std::setprecision(1) << requiredRamGB << " GB Required)\n";
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Suggestion: Unless you own an RTX 6969 with 69 TB RAM, consider fewer threads.\n\n";
+        Sleep(2000);
+    }
+
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Buffer/Thread)\n";
     for (unsigned int i = 0; i < numThreads; i++) {
         std::thread(WorkerThread).detach();
-    }
-    
-    std::string targetDir = ".";
-    for (int i = 1; i < argc; i++) {
-        if (std::string(argv[i]) != "--threads" && (i == 1 || std::string(argv[i-1]) != "--threads")) {
-            targetDir = argv[i];
-            break;
-        }
     }
     
     // Fast Pre-scan File Count
