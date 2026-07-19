@@ -370,6 +370,7 @@ int main(int argc, char* argv[]) {
     
     // Parse dynamic thread scaling
     unsigned int numThreads = 4;
+    std::string targetDir = ".";
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--threads" && i + 1 < argc) {
