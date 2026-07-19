@@ -5,7 +5,7 @@ PHASR (Deterministic Engine for Vulnerability Management) is a modular, ultra-lo
 
 It does not rely on abstract software layers. Instead, it mathematically calculates the physical mass and entropy of the system at the hardware level, bypassing the operating system's Virtual File System (VFS) to achieve scan speeds exceeding **200,000 files per second**.
 
-## 🏛️ The Native C++ Architecture
+## The Native C++ Architecture
 The entire orchestration layer has been rewritten into a lock-free, zero-allocation C++ hot loop that interfaces directly with the kernel.
 
 ### 1. Windows NT Kernel Bypass (`Engine.cpp`)
@@ -14,7 +14,7 @@ For Windows environments, PHASR completely ignores standard directory traversal 
 ### 2. POSIX / Android Termux Bypass (`Engine_Linux.cpp`)
 For Linux and Android (Termux) ARM64 environments, PHASR bypasses the Linux VFS using the raw `syscall(SYS_getdents64)` and utilizes `mmap` to achieve zero-allocation memory alignment, ensuring max throughput on mobile and server silicon.
 
-## ⚙️ The 8-Module Wave Collapse Pipeline
+## The 8-Module Wave Collapse Pipeline
 
 The engine executes the following physics modules simultaneously across up to 256 hardware threads:
 
@@ -27,7 +27,7 @@ The engine executes the following physics modules simultaneously across up to 25
 - **Module 7 (Tradeoff Analyser):** Evaluates the total systemic risk of Modules 3-6 against the maintenance cost of the system (Physical Mass / GB) and determines if the economic liability of deploying the target architecture exceeds safety limits.
 - **Module 8 (Deep Shadow Mapper):** The overarching systemic summary of hidden filesystem anomalies.
 
-## 📦 Compilation & Usage
+## Compilation & Usage
 
 ### Windows Setup (MinGW64)
 Run the automated cross-platform installer to compile the engine, then install the CLI globally:
@@ -51,5 +51,5 @@ Execute the CLI natively:
 phasr . --threads 16
 ```
 
-## 🛡️ Remediation
+## Remediation
 Upon completion, if the Economic Liability exceeds deployment thresholds, the engine triggers a **WAVE COLLAPSE** and halts deployment. It automatically outputs a persistent `phasr_security_report.md` artifact detailing the physical anomalies found.
