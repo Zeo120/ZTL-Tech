@@ -4,6 +4,7 @@
   "main": "PHASR(DEVM)/Orchestrator/router.js",
   "bin": {
     "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
+  },
   "author": "ZTL-Tech",
   "license": "MIT"
 }
