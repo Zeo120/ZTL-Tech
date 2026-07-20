@@ -35,7 +35,7 @@ sequenceDiagram
             Worker->>Worker: M3 (Entropy): Calculate Shannon H(X) via ASM
             Worker->>Worker: M4 (Taint): Scan std::string_view for injections
             Worker->>Worker: M5 (Temporal): clock_gettime / GetTickCount drift detection
-            Worker->>Worker: M6 (Dissection): Unroll Opcodes to find NOP Sleds
+            Worker->>Worker: M6 (Dissection): Native Hex Pattern Matching (NOP Sleds/Syscalls)
         end
         
         alt Module Triggered Anomaly

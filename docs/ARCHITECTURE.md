@@ -22,7 +22,10 @@ The **Absolute Physics Engine** (PHASR) is designed to operate at the absolute p
    - 30MB physical memory chunks are pinned per thread via `VirtualAlloc` (Win32) and `mmap` (POSIX).
 
 4. **Universal CLI Orchestration Wrapper**
-   While the core physics engine is 100% native C++, it is wrapped in an intelligent Universal NodeJS Router. The `install.js` script auto-detects the OS and Architecture, dynamically compiling the raw C++ code (via `g++` or `clang++`), bridging ARM64/x86 Assembly into the binary, and routing all global `phasr` commands to the correct native execution context.
+   While the core physics engine is 100% native C++, it is wrapped in an intelligent Universal NodeJS Router. The `install.js` script features a **Pre-flight Compiler Check** that auto-detects the OS and Architecture, dynamically compiling the raw C++ code (via `g++` or `clang++`), bridging ARM64/x86 Assembly into the binary, and routing all global `phasr` commands to the correct native execution context.
+
+5. **Native Hex-Pattern Dissection**
+   Instead of shelling out to heavy external disassemblers like `objdump`, Module 6 scans the raw memory map (`mmap`) directly in C++ for hex byte patterns (like `0x90` NOP sleds or `0x0F 0x05` syscalls) for zero-dependency execution.
 
 ## The 8-Module Wave Collapse Pipeline
 
