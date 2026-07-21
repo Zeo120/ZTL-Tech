@@ -43,6 +43,11 @@ LinuxFileTask fileQueue[QUEUE_SIZE];
 std::atomic<int> head(0);
 std::atomic<int> tail(0);
 
+LinuxFileTask archiveQueue[QUEUE_SIZE];
+std::atomic<int> archHead(0);
+std::atomic<int> archTail(0);
+std::atomic<int> activeArchWorkers(0);
+
 std::atomic<bool> isScanning(true);
 std::atomic<int> activeWorkers(0);
 
@@ -52,6 +57,61 @@ long long GetCurrentTimeMs() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000);
+}
+
+void ArchiveWorkerThread() {
+    activeArchWorkers++;
+    unsigned char* threadBuffer = (unsigned char*)mmap(NULL, MAX_BUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (threadBuffer == MAP_FAILED) {
+        activeArchWorkers--;
+        return;
+    }
+    while (isScanning || archHead.load(std::memory_order_relaxed) != archTail.load(std::memory_order_relaxed) || activeWorkers.load(std::memory_order_relaxed) > 0) {
+        int currentTail = archTail.load(std::memory_order_relaxed);
+        if (archHead.load(std::memory_order_relaxed) != currentTail) {
+            int nextTail = (currentTail + 1) % QUEUE_SIZE;
+            if (archTail.compare_exchange_weak(currentTail, nextTail, std::memory_order_release, std::memory_order_relaxed)) {
+                
+                char localPath[4096];
+                strncpy(localPath, archiveQueue[currentTail].path, 4096);
+                archiveQueue[currentTail].active = false;
+                
+                std::string cmd;
+                size_t pathLen = strlen(localPath);
+                if (pathLen > 3 && strcmp(localPath + pathLen - 3, ".gz") == 0) cmd = "gzip -dc \"";
+                else if (pathLen > 4 && strcmp(localPath + pathLen - 4, ".zip") == 0) cmd = "unzip -p \"";
+                else continue;
+                
+                cmd += localPath;
+                cmd += "\" 2>/dev/null";
+                
+                FILE* fp = popen(cmd.c_str(), "r");
+                if (fp) {
+                    size_t bytesRead = fread(threadBuffer, 1, MAX_BUFFER_SIZE, fp);
+                    if (bytesRead > 0) {
+                        uint32_t counts[256] = {0};
+                        calculate_frequencies(threadBuffer, bytesRead, counts);
+                        double entropy = 0.0;
+                        for (uint32_t freq : counts) {
+                            if (freq > 0) {
+                                double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                entropy -= p * log2(p);
+                            }
+                        }
+                        if (entropy >= 7.2) {
+                            std::lock_guard<std::mutex> lock(printCS);
+                            m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked Payload)", entropy));
+                        }
+                    }
+                    pclose(fp);
+                }
+            }
+        } else {
+            std::this_thread::sleep_for(std::chrono::microseconds(1000));
+        }
+    }
+    munmap(threadBuffer, MAX_BUFFER_SIZE);
+    activeArchWorkers--;
 }
 
 void WorkerThread() {
@@ -91,7 +151,7 @@ void WorkerThread() {
                             // Use the ARM64 ASM Engine
                             calculate_frequencies(threadBuffer, bytesRead, counts);
                             
-                            // Check for compressed files to avoid false entropy positives
+                            // Check for compressed files to offload to Decompression Workers
                             size_t pathLen = strlen(localPath);
                             bool isCompressed = false;
                             if (pathLen > 3 && (strcmp(localPath + pathLen - 3, ".gz") == 0 || 
@@ -102,7 +162,20 @@ void WorkerThread() {
                                 isCompressed = true;
                             }
 
-                            if (!isCompressed) {
+                            if (isCompressed) {
+                                // Offload to secondary queue without blocking
+                                while (true) {
+                                    int currentArchHead = archHead.load(std::memory_order_relaxed);
+                                    int nextArchHead = (currentArchHead + 1) % QUEUE_SIZE;
+                                    if (nextArchHead != archTail.load(std::memory_order_relaxed)) {
+                                        strncpy(archiveQueue[currentArchHead].path, localPath, 4096);
+                                        archiveQueue[currentArchHead].active = true;
+                                        archHead.store(nextArchHead, std::memory_order_release);
+                                        break;
+                                    }
+                                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                                }
+                            } else {
                                 double entropy = 0.0;
                                 for (uint32_t freq : counts) {
                                     if (freq > 0) {
@@ -222,18 +295,19 @@ int main(int argc, char* argv[]) {
     std::cout << "\n\x1b[1m\x1b[36m[PHASR] NATIVE POSIX/LINUX ORCHESTRATOR INITIALIZED\x1b[0m\n";
 
     unsigned int numThreads = 4;
+    unsigned int numArchThreads = 1;
     std::string targetDir = ".";
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--threads" && i + 1 < argc) {
-            try {
-                numThreads = std::stoi(argv[i + 1]);
-            } catch (...) {
-                numThreads = 256;
-            }
+            try { numThreads = std::stoi(argv[i + 1]); } catch (...) { numThreads = 256; }
             if (numThreads < 4) numThreads = 4;
             if (numThreads > 256) numThreads = 256;
+            i++;
+        } else if (arg == "--archive-threads" && i + 1 < argc) {
+            try { numArchThreads = std::stoi(argv[i + 1]); } catch (...) { numArchThreads = 1; }
+            if (numArchThreads < 1) numArchThreads = 1;
             i++;
         } else if (arg[0] != '-') {
             targetDir = arg;
@@ -243,33 +317,38 @@ int main(int argc, char* argv[]) {
     long pages = sysconf(_SC_PHYS_PAGES);
     long page_size = sysconf(_SC_PAGE_SIZE);
     double totalRamGB = (pages * page_size) / (1024.0 * 1024.0 * 1024.0);
-    double requiredRamGB = (numThreads * 30.0) / 1024.0;
+    double requiredRamGB = ((numThreads + numArchThreads) * 30.0) / 1024.0;
 
     if (requiredRamGB > totalRamGB) {
         std::cout << "\x1b[31m[PHASR]\x1b[0m Detected: " << std::fixed << std::setprecision(1) << totalRamGB << " GB RAM\n";
-        std::cout << "\x1b[31m[PHASR]\x1b[0m Requested: " << numThreads << " workers (" << std::fixed << std::setprecision(1) << requiredRamGB << " GB Required)\n";
+        std::cout << "\x1b[31m[PHASR]\x1b[0m Requested: " << numThreads << " + " << numArchThreads << " workers (" << std::fixed << std::setprecision(1) << requiredRamGB << " GB Required)\n";
         std::cout << "\x1b[31m[PHASR]\x1b[0m Suggestion: Unless you own an RTX 6969 with 69 TB RAM, consider fewer threads.\n\n";
         usleep(2000000);
     }
 
-    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (12KB Buffer/Thread)\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Main Threads + " << numArchThreads << " Decompression Threads\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Commencing native getdents64 kernel scan on: " << targetDir << "\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing physical mass...\n\n";
 
     startTime = GetCurrentTimeMs();
 
     std::vector<std::thread> workers;
+    std::vector<std::thread> archWorkers;
     for (unsigned int i = 0; i < numThreads; i++) {
         workers.push_back(std::thread(WorkerThread));
+    }
+    for (unsigned int i = 0; i < numArchThreads; i++) {
+        archWorkers.push_back(std::thread(ArchiveWorkerThread));
     }
 
     ScanDirectoryNative(targetDir);
     isScanning = false;
 
     for (auto& worker : workers) {
-        if (worker.joinable()) {
-            worker.join();
-        }
+        if (worker.joinable()) worker.join();
+    }
+    for (auto& aw : archWorkers) {
+        if (aw.joinable()) aw.join();
     }
 
     std::cout << "\n\n";

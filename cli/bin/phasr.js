@@ -25,6 +25,7 @@ program
   .description('Scan a target directory using the native C++ physics engine')
   .argument('<target>', 'Directory or drive to scan (e.g. C:\\)')
   .option('-t, --threads <number>', 'Number of physical threads to allocate (4-256)')
+  .option('-a, --archive-threads <number>', 'Number of secondary threads for out-of-band decompression (default: 1)')
   .action(async (target, options) => {
     
     if (!fs.existsSync(ENGINE_PATH)) {
@@ -34,6 +35,7 @@ program
     }
 
     let threadCount = options.threads;
+    let archiveThreads = options.archiveThreads || '1';
 
     if (!threadCount) {
         console.log(`\x1b[36m[PHASR]\x1b[0m Target: ${target}`);
@@ -58,9 +60,9 @@ program
         threadCount = answers.threadSelection;
     }
 
-    console.log(`\n\x1b[32m[+]\x1b[0m Bootstrapping Native C++ Engine with ${threadCount} Threads...\n`);
+    console.log(`\n\x1b[32m[+]\x1b[0m Bootstrapping Native C++ Engine with ${threadCount} Threads and ${archiveThreads} Archive Threads...\n`);
 
-    const result = spawnSync(ENGINE_PATH, [target, '--threads', threadCount], {
+    const result = spawnSync(ENGINE_PATH, [target, '--threads', threadCount, '--archive-threads', archiveThreads], {
         stdio: 'inherit'
     });
 
