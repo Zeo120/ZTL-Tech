@@ -91,16 +91,29 @@ void WorkerThread() {
                             // Use the ARM64 ASM Engine
                             calculate_frequencies(threadBuffer, bytesRead, counts);
                             
-                            double entropy = 0.0;
-                            for (uint32_t freq : counts) {
-                                if (freq > 0) {
-                                    double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
-                                    entropy -= p * log2(p);
-                                }
+                            // Check for compressed files to avoid false entropy positives
+                            size_t pathLen = strlen(localPath);
+                            bool isCompressed = false;
+                            if (pathLen > 3 && (strcmp(localPath + pathLen - 3, ".gz") == 0 || 
+                                                strcmp(localPath + pathLen - 3, ".xz") == 0)) {
+                                isCompressed = true;
+                            } else if (pathLen > 4 && (strcmp(localPath + pathLen - 4, ".zip") == 0 || 
+                                                       strcmp(localPath + pathLen - 4, ".tar") == 0)) {
+                                isCompressed = true;
                             }
-                            if (entropy >= 7.2) {
-                                std::lock_guard<std::mutex> lock(printCS);
-                                m3_anomalies.push_back(std::make_pair(std::string(localPath), entropy));
+
+                            if (!isCompressed) {
+                                double entropy = 0.0;
+                                for (uint32_t freq : counts) {
+                                    if (freq > 0) {
+                                        double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                        entropy -= p * log2(p);
+                                    }
+                                }
+                                if (entropy >= 7.2) {
+                                    std::lock_guard<std::mutex> lock(printCS);
+                                    m3_anomalies.push_back(std::make_pair(std::string(localPath), entropy));
+                                }
                             }
                             
                             // M6: Binary Dissection (NOP Sleds)
