@@ -13,7 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Path to the compiled C++ engine
-const ENGINE_PATH = path.resolve(__dirname, '../../PHASR(DEVM)/Orchestrator/engine.exe');
+let engineBinary = 'engine.exe'; // default to windows
+if (os.platform() !== 'win32') {
+    engineBinary = process.arch === 'arm64' ? 'phasr_arm64' : 'phasr_x86';
+}
+const ENGINE_PATH = path.resolve(__dirname, `../../PHASR(DEVM)/Orchestrator/${engineBinary}`);
 
 program
   .name('phasr')

@@ -39,11 +39,12 @@ try {
         console.log(`\x1b[32m[PHASR Installer]\x1b[0m Windows setup complete.`);
     } else {
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling POSIX/Linux Engine for ARM64/x86...`);
-        // Assume clang or g++ is available
-        const compiler = 'g++'; // Force g++ on proot/arm64 as clang++ fails with cc1 error
-        const asmFile = process.arch === 'arm64' ? 'entropy_arm64.s' : 'entropy.s';
+        const compiler = 'g++'; // Force g++ as clang++ often fails with cc1 error
+        const isArm = process.arch === 'arm64';
+        const asmFile = isArm ? 'entropy_arm64.s' : 'entropy.s';
+        const binName = isArm ? 'phasr_arm64' : 'phasr_x86';
         
-        const compileCmd = `cd "PHASR(DEVM)" && ${compiler} -O3 Orchestrator/Engine_Linux.cpp Engine/${asmFile} -o Orchestrator/phasr_arm64 -lpthread`;
+        const compileCmd = `cd "PHASR(DEVM)" && ${compiler} -O3 Orchestrator/Engine_Linux.cpp Engine/${asmFile} -o Orchestrator/${binName} -lpthread`;
         console.log(`\x1b[90m$ ${compileCmd}\x1b[0m`);
         try {
             execSync(compileCmd, { stdio: 'inherit' });
@@ -61,6 +62,7 @@ try {
         try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/router.js"`, { stdio: 'ignore' }); } catch(e){}
         try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/engine"`, { stdio: 'ignore' }); } catch(e){}
         try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/phasr_arm64"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/phasr_x86"`, { stdio: 'ignore' }); } catch(e){}
         console.log(`\x1b[32m[PHASR Installer]\x1b[0m Permissions locked and loaded.`);
     }
 } catch (error) {

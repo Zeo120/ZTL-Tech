@@ -52,12 +52,71 @@ void PrecalculateFileCount(const std::string& directory) {
     FindClose(hFind);
 }
 
-void WorkerThread() {
-    constexpr size_t MAX_BUFFER_SIZE = 12288; // 12 KB Buffer/Thread
+char archiveQueue[QUEUE_SIZE][MAX_PATH];
+std::atomic<int> archHead = {0};
+std::atomic<int> archTail = {0};
+std::atomic<int> activeArchWorkers = {0};
+
+void ArchiveWorkerThread() {
+    activeArchWorkers++;
+    constexpr size_t MAX_BUFFER_SIZE = 12288;
     char* threadBuffer = (char*)VirtualAlloc(NULL, MAX_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (!threadBuffer) return;
+    if (!threadBuffer) {
+        activeArchWorkers--;
+        return;
+    }
 
     while (true) {
+        int head = archHead.load(std::memory_order_acquire);
+        int tail = archTail.load(std::memory_order_relaxed);
+        
+        if (head == tail) {
+            if (scanComplete.load(std::memory_order_acquire)) break;
+            Sleep(0);
+            continue;
+        }
+        
+        char localPath[MAX_PATH];
+        lstrcpyA(localPath, archiveQueue[head]);
+        
+        if (archHead.compare_exchange_weak(head, (head + 1) % QUEUE_SIZE, std::memory_order_release, std::memory_order_relaxed)) {
+            std::string cmd;
+            size_t pathLen = strlen(localPath);
+            if (pathLen > 3 && strcmp(localPath + pathLen - 3, ".gz") == 0) cmd = "tar -xf \"";
+            else if (pathLen > 4 && strcmp(localPath + pathLen - 4, ".zip") == 0) cmd = "tar -xf \"";
+            else continue;
+            
+            // Windows tar supports -xOf to extract to stdout
+            cmd = "tar -xOf \"" + std::string(localPath) + "\" 2>NUL";
+            
+            FILE* fp = _popen(cmd.c_str(), "r");
+            if (fp) {
+                size_t bytesRead = fread(threadBuffer, 1, MAX_BUFFER_SIZE, fp);
+                if (bytesRead > 0) {
+                    long long counts[256] = {0};
+                    calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
+                    double entropy = 0.0;
+                    for (long long freq : counts) {
+                        if (freq > 0) {
+                            double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                            entropy -= p * log2(p);
+                        }
+                    }
+                    if (entropy >= 7.2) {
+                        EnterCriticalSection(&printCS);
+                        m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
+                        LeaveCriticalSection(&printCS);
+                    }
+                }
+                _pclose(fp);
+            }
+        }
+    }
+    VirtualFree(threadBuffer, 0, MEM_RELEASE);
+    activeArchWorkers--;
+}
+
+void WorkerThread() {
         int head = queueHead.load(std::memory_order_acquire);
         int tail = queueTail.load(std::memory_order_relaxed);
         
