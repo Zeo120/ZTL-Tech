@@ -62,3 +62,22 @@ graph TD
     L --> N[Output phasr_security_report.md]
     M --> N
 ```
+
+## Architectural Constraints & Future Optimizations
+
+While PHASR operates at extreme speeds, several systems-level constraints are documented for future refactoring:
+
+1. **Process Creation Overhead (`popen`):** 
+   Currently, the `ArchiveWorkerThread` pool relies on POSIX `popen` to stream decompression. At scale, this triggers OS `fork()` overhead and risks PID exhaustion or Out-Of-Memory (OOM) crashes. Future iterations will embed `stb_zlib` or statically link `libarchive` for pure in-memory decompression.
+   
+2. **SIGBUS Traps on `mmap`:**
+   Using zero-allocation `mmap` introduces a risk: if a target file is truncated by another process while PHASR is mapping the `std::string_view`, the OS will throw a `SIGBUS` signal. A `sigsetjmp` trap handler must be implemented to catch memory-mapping violations safely.
+   
+3. **Memory Bus Contention (Spinlocks):**
+   The SPMC queue relies on `compare_exchange_weak` spinlocks. Under heavy contention across 256 threads, preemption can cause severe memory bus saturation. A transition to exponential backoff algorithms or lightweight `std::condition_variable` (futexes) is planned.
+   
+4. **Anomaly Aggregation Bottlenecks:**
+   Appending to the shared anomaly vector currently relies on a single Mutex (`lock(printCS)`). During mass-detection events, this creates a thread-serialization bottleneck. Future architectures will implement thread-local lock-free queues that aggregate upon completion.
+   
+5. **Time-of-Check to Time-of-Use (TOCTOU) Security:**
+   Bypassing the VFS via `getdents64` decouples directory traversal from the subsequent `open()` call. This introduces a microsecond TOCTOU window where a malicious process could swap a file or symlink before the worker thread acquires the file handle.
