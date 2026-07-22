@@ -1,30 +1,46 @@
 # PHASR (Deterministic Engine for Vulnerability Management)
 
-PHASR is a high-performance, modular security hypervisor and codebase scanner designed for extreme throughput. Built on native C++, POSIX, and Win32 APIs, it bypasses high-level Operating System Virtual File System (VFS) abstractions to achieve sustained parallel scanning speeds exceeding 200,000 files per second.
+PHASR is a multi-threaded, asynchronous static analysis engine designed to evaluate file contents and binary structures at high throughput. It is implemented in C++ and interfaces with platform-specific APIs (POSIX and Win32) to reduce Virtual File System (VFS) overhead during directory traversal.
 
-## Native C++ Architecture
-The orchestration layer utilizes a lock-free, zero-allocation C++ hot loop that interfaces directly with kernel-level APIs.
+**Design Goal:** Achieve maximum sequential read throughput on NVMe SSDs by minimizing heap allocations, utilizing lock-free concurrent queues, and bypassing high-level standard library I/O abstractions where appropriate.
 
-### 1. Windows NT Kernel Bypass (`Engine.cpp`)
-In Windows environments, PHASR bypasses standard directory traversal APIs (e.g., `FindFirstFile`). Instead, it leverages `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the raw NTFS Master File Table (MFT) directly from the physical disk, enqueuing file handles into an 8192-capacity Lock-Free Single-Producer Multiple-Consumer (SPMC) Ring Buffer.
+*(Note: Throughput claims of "200,000 files/sec" are currently implementation targets based on hot-cache memory traversals of small files. Cold-cache SSD benchmarks are pending.)*
 
-### 2. POSIX / Android ARM64 Bypass (`Engine_Linux.cpp`)
-In Linux and Android environments, PHASR bypasses the Linux VFS using the raw `syscall(SYS_getdents64)` and utilizes `mmap` for zero-allocation memory alignment, ensuring maximum throughput on both ARM64 mobile and x86 server silicon.
+## Architecture Overview
 
-### 3. Out-of-Band Decompression 
-To prevent dynamic heap allocations from blocking the primary hot loop, compressed archives (`.zip`, `.gz`, `.tar`) are routed to a secondary SPMC queue. A dedicated `ArchiveWorkerThread` pool streams the decompressed payloads via POSIX `popen` directly into memory for analysis.
+The orchestration layer is designed around a Single-Producer, Multiple-Consumer (SPMC) concurrency model.
 
-## Detection Pipeline
+### 1. Directory Traversal
+Instead of utilizing `std::filesystem::directory_iterator` or standard `opendir`/`readdir` APIs, PHASR implements OS-specific directory enumeration:
+- **Windows:** Utilizes `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to enumerate the NTFS Master File Table (MFT). *[TODO: Document how MFT records map to `CreateFileA` handles for actual file reads.]*
+- **Linux / Android (ARM64/x86):** Utilizes `syscall(SYS_getdents64)` to extract physical inode data from the kernel block layer directly into a statically sized buffer.
 
-The engine executes the following analysis modules concurrently across up to 256 hardware threads:
+### 2. Thread Synchronization (SPMC Queue)
+File paths discovered during enumeration are enqueued into an 8192-capacity SPMC Ring Buffer.
+- **Implementation Details:** The queue is managed via `std::atomic<int>` indices utilizing `compare_exchange_weak` (CAS) loops. 
+- **Design Goal:** To avoid Mutex contention in the hot path. 
+- *[TODO: Document the memory ordering semantics (`std::memory_order_release` / `acquire`) used in the CAS loop to prevent ABA problems.]*
 
-- **Module 1 (Kernel Bypass):** Asynchronous file traversal via MFT (Windows) or `getdents64` (Linux).
-- **Module 2 (VFS Shadow Analysis):** Compares physical disk sector allocation against logical file sizes to detect discrepancies indicative of hidden storage or Rootkits.
-- **Module 3 (Entropy Analysis):** Traverses byte streams using hardware-specific Assembly to calculate Base-2 Shannon Entropy, identifying highly obfuscated, compressed, or packed payloads.
-- **Module 4 (Static Taint Analysis):** Scans the first 4KB of uncompiled files using zero-allocation `std::string_view` to detect unsanitized `system()`, `exec()`, or `eval()` execution vectors.
-- **Module 5 (Temporal Profiling):** Utilizes `GetTickCount` / `clock_gettime` to measure CPU cycle times per byte, identifying files attempting to stall the engine via timing side-channels.
-- **Module 6 (Binary Dissection):** Dynamically parses executable headers (`MZ` or `ELF`) and scans raw opcodes to detect buffer overflow vectors, such as `0x90` NOP sleds.
-- **Module 7 (Risk Assessment):** Evaluates the total systemic risk of detected anomalies against the physical size of the codebase to output a final deployment liability score.
+### 3. Memory Management
+The worker thread pool avoids dynamic heap allocation (`malloc`/`new`) to prevent allocator locking and heap fragmentation.
+- **Implementation Details:** Each worker thread allocates a fixed 30MB memory block. Depending on the target OS, this is pinned via `VirtualAlloc` (Win32) or `mmap` (POSIX). Read operations load data into this buffer, and analysis modules process the data using C++17 `std::string_view`.
+- *[TODO: Document chunking logic for files > 30MB. Document `SIGBUS` handling for `mmap` when underlying files are truncated.]*
+
+### 4. Out-of-Band Archive Decompression
+To prevent decompression routines from stalling the primary I/O threads, compressed archives (`.zip`, `.gz`, `.tar`) are routed to a secondary SPMC queue.
+- **Current Implementation:** A secondary `ArchiveWorkerThread` pool streams decompressed payloads into memory via POSIX `popen` (`gzip -dc` / `tar -xOf`). 
+- **Future Work:** Replace `popen` with statically linked `zlib`/`libarchive` to eliminate OS `fork()`/`exec()` overhead and prevent PID exhaustion under heavy archive loads.
+
+## Static Analysis Modules
+
+The engine executes the following checks sequentially across the worker thread pool:
+
+1. **Inode Discrepancy Check:** Compares reported sector sizes against logical file sizes.
+2. **Entropy Calculation:** Calculates Base-2 Shannon Entropy over byte frequency arrays to identify packed or encrypted payloads.
+3. **Static Taint Analysis:** Scans the first 4KB of uncompiled source files for potential execution vectors (e.g., `system()`).
+4. **Execution Timing:** Measures CPU cycles spent per file (via `clock_gettime` or `GetTickCount`) to detect analysis-stalling payloads.
+5. **Opcode Scanning:** Parses `MZ` and `ELF` headers and scans for contiguous `0x90` byte sequences (NOP sleds).
+6. **Heuristic Risk Aggregation:** A final pass that scores anomalies against total codebase size to determine an overall deployment risk.
 
 ## Compilation & Usage
 

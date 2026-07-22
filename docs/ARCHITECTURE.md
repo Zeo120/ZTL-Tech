@@ -1,6 +1,6 @@
-# PHASR: Systems Architecture
+# PHASR: Systems Architecture and Engineering Review
 
-PHASR (Deterministic Engine for Vulnerability Management) is designed to operate at the physical limits of Non-Volatile Memory Express (NVMe) solid-state drives and CPU L1/L2 caches. By entirely bypassing the Operating System's Virtual File System (VFS), PHASR achieves sustained parallel traversal speeds exceeding 200,000 files per second.
+PHASR (Deterministic Engine for Vulnerability Management) is designed to operate at the physical limits of Non-Volatile Memory Express (NVMe) solid-state drives and CPU L1/L2 caches. By entirely bypassing the Operating System's Virtual File System (VFS), PHASR aims to achieve sustained parallel traversal speeds exceeding 200,000 files per second (Note: this is a hot-cache implementation target).
 
 ## Core Paradigms
 
@@ -11,7 +11,7 @@ PHASR (Deterministic Engine for Vulnerability Management) is designed to operate
    - Fixed-size immutable character arrays prevent heap locking and thread contention.
 
 2. **Kernel-Level Traversal**
-   PHASR subverts standard standard POSIX `fopen` and `std::ifstream` by interfacing directly with kernel disk APIs:
+   PHASR subverts standard POSIX `fopen` and `std::ifstream` by interfacing directly with kernel disk APIs:
    - **Windows:** Uses `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the NTFS Master File Table (MFT) directly.
    - **POSIX (Linux/Android):** Uses raw `syscall(SYS_getdents64)` to bypass VFS overhead and extract physical inode block data directly from the kernel.
 
@@ -23,7 +23,7 @@ PHASR (Deterministic Engine for Vulnerability Management) is designed to operate
 4. **Out-of-Band Secondary Decompression Queue**
    To prevent dynamic heap allocations from blocking the primary hot loop, compressed archives (`.zip`, `.gz`, `.tar`) are atomically pushed into a secondary SPMC `archiveQueue`.
    - A dedicated `ArchiveWorkerThread` pool streams `gzip -dc` or `tar -xOf` standard outputs via POSIX `popen`/`_popen` directly into memory.
-   - The native C++ engine evaluates the uncompressed payload bytes dynamically without heavy dependencies like `zlib` or `libzip`.
+   - *Constraint:* `popen` is an interim solution causing OS `fork()` overhead. Transitioning to `zlib` is planned.
 
 5. **Cross-Platform Compilation**
    The core engine is wrapped in a universal Node.js router (`install.js`) that performs a pre-flight compiler check. It auto-detects the OS and Architecture, dynamically compiling the C++ code, bridging ARM64/x86 Assembly into the binary, and routing global CLI commands to the appropriate execution context.
@@ -81,3 +81,51 @@ While PHASR operates at extreme speeds, several systems-level constraints are do
    
 5. **Time-of-Check to Time-of-Use (TOCTOU) Security:**
    Bypassing the VFS via `getdents64` decouples directory traversal from the subsequent `open()` call. This introduces a microsecond TOCTOU window where a malicious process could swap a file or symlink before the worker thread acquires the file handle.
+
+---
+
+## Production Readiness Checklist
+
+### Architecture
+- [x] Thread safety *(Yes, mostly, utilizing atomics, assuming the anomaly vector is properly locked)*
+- [x] Memory ownership *(Yes, strict thread-local 30MB buffers)*
+- [ ] Lock contention *(Fails: CAS spinlocks and single-Mutex anomaly aggregation will choke at scale)*
+- [ ] NUMA awareness *(Fails: Memory allocated indiscriminately across nodes)*
+- [ ] Cache locality *(Fails: SPMC ring buffer index sharing causes cache-line bouncing)*
+- [ ] False sharing *(Fails: Atomic head/tail pointers in the SPMC queue likely sit on the same cache line)*
+- [ ] ABA problems *(Needs verification on the CAS implementation)*
+- [ ] Atomic memory ordering *(Needs verification: `memory_order_relaxed` vs `acquire/release`)*
+- [x] Buffer lifetime *(Yes, persistent throughout thread execution)*
+- [ ] Resource cleanup *(Fails: Undocumented handling of zombie `popen` processes on forced exit)*
+
+### Performance
+- [ ] Cold-cache benchmarks *(Missing)*
+- [ ] Warm-cache benchmarks *(Missing)*
+- [ ] CPU utilization *(Missing: Crucial for evaluating spinlock efficiency)*
+- [ ] SSD throughput *(Missing: Needed to verify the 200k files/sec claim)*
+- [ ] Allocation profiling *(Missing)*
+- [ ] Context switches *(Missing)*
+- [ ] Cache misses *(Missing)*
+- [ ] Page faults *(Missing: Crucial for `mmap` evaluation)*
+- [ ] Scalability from 1–256 threads *(Missing)*
+
+### Security
+- [ ] TOCTOU *(Fails: Vulnerable between `getdents64` read and subsequent `open()` call)*
+- [ ] Symlink handling *(Missing: Undocumented if it follows symlinks or detects cycles)*
+- [ ] Archive bombs *(Fails: `popen` extraction has no limits on output size)*
+- [ ] Path traversal *(Needs verification: Are archive paths sanitized?)*
+- [x] Integer overflow *(Yes, assuming standard `size_t` usage)*
+- [ ] Buffer boundaries *(Needs verification on 30MB chunk limits)*
+- [x] Invalid UTF-8 *(Yes, processes as raw bytes)*
+- [ ] Corrupted archives *(Fails: `popen` handles errors poorly compared to native library APIs)*
+- [ ] Memory mapping failures *(Fails: `SIGBUS` trap undocumented)*
+
+### Portability
+- [x] Windows *(Yes, via `FSCTL_ENUM_USN_DATA`)*
+- [x] Linux *(Yes, via `getdents64`)*
+- [x] Android *(Yes, via Termux/PRoot)*
+- [x] ARM64 *(Yes, dynamic routing supported)*
+- [x] x86-64 *(Yes)*
+- [ ] Different page sizes *(Fails: Android uses 4KB, macOS uses 16KB, `mmap` alignment must be generic)*
+- [ ] Different filesystems *(Fails: Windows implementation strictly assumes NTFS)*
+- [x] Compiler compatibility *(Yes, tests against `g++` and `clang++` via Node router)*
