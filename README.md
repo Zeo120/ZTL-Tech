@@ -12,19 +12,19 @@ The orchestration layer is designed around a Single-Producer, Multiple-Consumer 
 
 ### 1. Directory Traversal
 Instead of utilizing `std::filesystem::directory_iterator` or standard `opendir`/`readdir` APIs, PHASR implements OS-specific directory enumeration:
-- **Windows:** Utilizes `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to enumerate the NTFS Master File Table (MFT). *[TODO: Document how MFT records map to `CreateFileA` handles for actual file reads.]*
+- **Windows:** Utilizes `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to enumerate the NTFS Master File Table (MFT). The USN Journal returns raw MFT record data, including the filename and parent reference numbers. The Orchestrator reconstructs the absolute path by traversing the MFT hierarchy in memory before yielding the fully qualified path to the worker pool for a standard `CreateFileA` call.
 - **Linux / Android (ARM64/x86):** Utilizes `syscall(SYS_getdents64)` to extract physical inode data from the kernel block layer directly into a statically sized buffer.
 
 ### 2. Thread Synchronization (SPMC Queue)
 File paths discovered during enumeration are enqueued into an 8192-capacity SPMC Ring Buffer.
 - **Implementation Details:** The queue is managed via `std::atomic<int>` indices utilizing `compare_exchange_weak` (CAS) loops. 
 - **Design Goal:** To avoid Mutex contention in the hot path. 
-- *[TODO: Document the memory ordering semantics (`std::memory_order_release` / `acquire`) used in the CAS loop to prevent ABA problems.]*
+- **Implementation Details:** The CAS loop implements strict acquire-release semantics (`std::memory_order_acquire` on read, `std::memory_order_release` on update) to ensure memory visibility across cores. However, standard ABA prevention (e.g., hazard pointers or tagged indices) is currently lacking, presenting a theoretical data race if indices wrap exactly during a thread stall.
 
 ### 3. Memory Management
 The worker thread pool avoids dynamic heap allocation (`malloc`/`new`) to prevent allocator locking and heap fragmentation.
 - **Implementation Details:** Each worker thread allocates a fixed 30MB memory block. Depending on the target OS, this is pinned via `VirtualAlloc` (Win32) or `mmap` (POSIX). Read operations load data into this buffer, and analysis modules process the data using C++17 `std::string_view`.
-- *[TODO: Document chunking logic for files > 30MB. Document `SIGBUS` handling for `mmap` when underlying files are truncated.]*
+- **Implementation Constraints:** Files exceeding the fixed 30MB limit are currently hard-truncated during the mapping phase; the engine relies on the assumption that malicious payloads reside in the leading headers or trailing overlays. Additionally, the engine currently lacks `sigsetjmp` traps, meaning an external truncation event on an actively `mmap`'ed file will trigger an unhandled `SIGBUS` fault.
 
 ### 4. Out-of-Band Archive Decompression
 To prevent decompression routines from stalling the primary I/O threads, compressed archives (`.zip`, `.gz`, `.tar`) are routed to a secondary SPMC queue.
