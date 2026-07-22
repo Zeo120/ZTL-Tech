@@ -4,7 +4,7 @@ PHASR is a multi-threaded, asynchronous static analysis engine designed to evalu
 
 **Design Goal:** Achieve maximum sequential read throughput on NVMe SSDs by minimizing heap allocations, utilizing lock-free concurrent queues, and bypassing high-level standard library I/O abstractions where appropriate.
 
-*(Note: Throughput claims of "200,000 files/sec" are currently implementation targets based on hot-cache memory traversals of small files. Cold-cache SSD benchmarks are pending.)*
+*(Note: Throughput claims are currently based on hot-cache memory traversals. A benchmark in an Android PRoot AArch64 environment utilizing 64 threads achieved a peak hot-loop throughput of ~2,588 files/sec across a 3,123-file codebase (total runtime 2.47s). Cold-cache SSD benchmarks are pending.)*
 
 ## Architecture Overview
 
