@@ -21,21 +21,32 @@ The **Absolute Physics Engine** (PHASR) is designed to operate at the absolute p
    - Sleep intervals (`std::this_thread::sleep_for`) and yield-based spinlocks ensure 100% core utilization without bus saturation.
    - 30MB physical memory chunks are pinned per thread via `VirtualAlloc` (Win32) and `mmap` (POSIX).
 
-4. **Universal CLI Orchestration Wrapper**
-   While the core physics engine is 100% native C++, it is wrapped in an intelligent Universal NodeJS Router. The `install.js` script features a **Pre-flight Compiler Check** that auto-detects the OS and Architecture, dynamically compiling the raw C++ code (via `g++` or `clang++`), bridging ARM64/x86 Assembly into the binary, and routing all global `phasr` commands to the correct native execution context.
+4. **Out-of-Band Secondary Decompression Queue**
+   To prevent heap allocations from destroying the primary zero-allocation NVMe hot loop, compressed archives (`.zip`, `.gz`) are atomically pushed into a secondary SPMC `archiveQueue`.
+   - A dedicated `ArchiveWorkerThread` pool streams `gzip -dc` or `tar -xOf` standard outputs via POSIX `popen`/`_popen` directly into memory.
+   - Native C++ engine evaluates the uncompressed payload bytes dynamically without heavy dependencies like `zlib` or `libzip`.
 
-5. **Native Hex-Pattern Dissection**
+5. **Universal CLI Orchestration Wrapper**
+   While the core physics engine is 100% native C++, it is wrapped in an intelligent Universal NodeJS Router. The `install.js` script features a **Pre-flight Compiler Check** that auto-detects the OS and Architecture, dynamically compiling the raw C++ code (via `g++`), bridging ARM64/x86 Assembly into the binary (`phasr_arm64`, `phasr_x86`, or `engine.exe`), and intelligently routing all global `phasr` CLI commands to the correct native execution context.
+
+6. **Native Hex-Pattern Dissection**
    Instead of shelling out to heavy external disassemblers like `objdump`, Module 6 scans the raw memory map (`mmap`) directly in C++ for hex byte patterns (like `0x90` NOP sleds or `0x0F 0x05` syscalls) for zero-dependency execution.
 
 ## The 8-Module Wave Collapse Pipeline
 
 ```mermaid
 graph TD
-    CLI(Universal phasr Router) -->|--threads N| A
+    CLI(Universal phasr Router) -->|--threads N --archive-threads M| A
     A[Native C++ Orchestrator] -->|Bypass VFS| B(Win32 MFT / POSIX getdents64)
-    B --> C{8192-Capacity SPMC Ring Buffer}
-    C -->|Thread 1..256 CAS Lock| D[Win32 CreateFileA / POSIX open]
-    D --> E[30MB VirtualAlloc / mmap Buffer]
+    B --> C{Primary SPMC Ring Buffer}
+    C -->|Main Threads CAS Lock| D[WorkerThread: VirtualAlloc / mmap 30MB Buffer]
+    
+    B -->|Archive Detected| C2{Secondary SPMC Archive Queue}
+    C2 -->|Decomp Threads CAS Lock| D2[ArchiveWorkerThread: popen gzip/tar stream]
+    
+    D --> E{Hardware Physics Evaluation}
+    D2 --> E
+    
     E --> F[Module 3: Entropy ASM]
     E --> G[Module 4: Taint Tracker]
     E --> H[Module 5: Temporal Jitter]

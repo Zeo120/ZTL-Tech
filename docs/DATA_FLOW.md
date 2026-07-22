@@ -11,13 +11,15 @@ sequenceDiagram
     actor User
     participant CLI as Node.js Universal Router
     participant Main as C++ Main Thread (Orchestrator)
-    participant Buffer as SPMC Lock-Free Ring Buffer
-    participant Worker as C++ Hardware Threads (x256)
+    participant Buffer as Primary SPMC Ring Buffer
+    participant ArchBuffer as Secondary Archive Queue
+    participant Worker as Primary Worker Threads
+    participant ArchWorker as Archive Decomp Threads
     participant Kernel as Win32 (MFT) / POSIX (getdents64)
 
-    User->>CLI: `phasr . --threads 64`
+    User->>CLI: `phasr . --threads 64 --archive-threads 4`
     CLI->>CLI: Detect OS & Architecture (win32, arm64, linux)
-    CLI->>Main: Execute Native Binary (`engine.exe` or `phasr_arm64`)
+    CLI->>Main: Execute Native Binary (`engine.exe`, `phasr_arm64`, `phasr_x86`)
     
     rect rgb(20, 40, 20)
         Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
@@ -31,15 +33,24 @@ sequenceDiagram
         Worker->>Kernel: ReadFile / read (up to 30MB chunk)
         Kernel-->>Worker: Physical Bytes mapped to 30MB VirtualAlloc/mmap Memory
         
-        par 8-Module Wave Collapse
-            Worker->>Worker: M3 (Entropy): Calculate Shannon H(X) via ASM
-            Worker->>Worker: M4 (Taint): Scan std::string_view for injections
-            Worker->>Worker: M5 (Temporal): clock_gettime / GetTickCount drift detection
-            Worker->>Worker: M6 (Dissection): Native Hex Pattern Matching (NOP Sleds/Syscalls)
+        alt is Compressed (.zip, .gz, .tar)
+            Worker->>ArchBuffer: Push to `archiveQueue[archHead]` (Out-of-band)
+            ArchBuffer-->>ArchWorker: CAS Pop `archTail`
+            ArchWorker->>Kernel: popen / _popen (tar -xOf / gzip -dc)
+            Kernel-->>ArchWorker: Decompressed stream directly to Thread Buffer
+            ArchWorker->>ArchWorker: M3 (Entropy): Analyze Unpacked Payload
+        else is Standard File
+            par 8-Module Wave Collapse
+                Worker->>Worker: M3 (Entropy): Calculate Shannon H(X) via ASM
+                Worker->>Worker: M4 (Taint): Scan std::string_view for injections
+                Worker->>Worker: M5 (Temporal): clock_gettime / GetTickCount drift detection
+                Worker->>Worker: M6 (Dissection): Native Hex Pattern Matching (NOP Sleds/Syscalls)
+            end
         end
         
         alt Module Triggered Anomaly
             Worker->>Main: lock(printCS) -> push_back(anomalies)
+            ArchWorker->>Main: lock(printCS) -> push_back(anomalies)
         end
     end
     
@@ -58,7 +69,9 @@ The following ER diagram maps the physical relationships of the memory structure
 erDiagram
     UNIVERSAL_ROUTER ||--o{ OS_NATIVE_ENGINE : spawns_via_stdio_inherit
     OS_NATIVE_ENGINE ||--|| SPMC_RING_BUFFER : manages
+    OS_NATIVE_ENGINE ||--|| SECONDARY_ARCHIVE_QUEUE : manages
     OS_NATIVE_ENGINE ||--o{ WORKER_THREAD : spawns_up_to_256
+    OS_NATIVE_ENGINE ||--o{ ARCHIVE_WORKER_THREAD : spawns
     
     SPMC_RING_BUFFER {
         struct LinuxFileTask[8192] "Contiguous Array Queue"
@@ -66,7 +79,15 @@ erDiagram
         std_atomic_int tail "Consumer Index (CAS Target)"
     }
     
+    SECONDARY_ARCHIVE_QUEUE {
+        struct LinuxFileTask[8192] "Out-of-Band Queue"
+        std_atomic_int archHead "Producer Index (Worker Thread)"
+        std_atomic_int archTail "Consumer Index (Archive Thread)"
+    }
+    
     WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
+    ARCHIVE_WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
+    
     THREAD_MEMORY_BUFFER {
         size_t MAX_BUFFER_SIZE "Strict 30MB Cap per Thread"
         string Allocation "VirtualAlloc (Win32) / mmap (POSIX)"
@@ -74,12 +95,16 @@ erDiagram
     }
     
     WORKER_THREAD ||--|| FREQUENCY_ARRAY : computes
+    ARCHIVE_WORKER_THREAD ||--|| FREQUENCY_ARRAY : computes
+    
     FREQUENCY_ARRAY {
-        uint32_t counts[256] "Byte Frequency Histogram (ARM64 ABI)"
+        uint32_t counts[256] "Byte Frequency Histogram (ARM64/x86 ABI)"
         double H_X "Shannon Entropy Float"
     }
 
     WORKER_THREAD }o--|| PIPELINE_ANOMALIES : triggers
+    ARCHIVE_WORKER_THREAD }o--|| PIPELINE_ANOMALIES : triggers
+    
     PIPELINE_ANOMALIES {
         vector m3_anomalies "Critical Section Protected"
         vector m4_anomalies "Critical Section Protected"
