@@ -1,16 +1,16 @@
-# PHASR Data Flow & Relationships
+# PHASR Data Flow & Inter-Process Communication
 
-This document visualizes the exact physical lifecycle of payload processing within the PHASR ecosystem, mapping how data transitions from the Command-Line Wrapper down into the Windows Kernel (MFT) and Linux Kernel (getdents64).
+This document visualizes the execution lifecycle and memory structures within the PHASR architecture, tracing data transitions from the Command-Line Router to the Windows NTFS (MFT) and Linux (getdents64) kernel boundaries.
 
-## 1. Cross-Platform Execution Sequence Flow
-The following sequence diagram traces the chronological execution path of a codebase scan. Notice how the NodeJS CLI dynamically routes execution to the natively compiled OS-specific binary, entirely detaching itself from the hot path.
+## 1. Cross-Platform Execution Sequence
+The following sequence diagram traces the chronological execution path of a codebase scan. The Node.js CLI dynamically routes execution to the natively compiled OS-specific binary, entirely detaching itself from the hot path.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
     participant CLI as Node.js Universal Router
-    participant Main as C++ Main Thread (Orchestrator)
+    participant Main as C++ Orchestrator (Main Thread)
     participant Buffer as Primary SPMC Ring Buffer
     participant ArchBuffer as Secondary Archive Queue
     participant Worker as Primary Worker Threads
@@ -18,12 +18,12 @@ sequenceDiagram
     participant Kernel as Win32 (MFT) / POSIX (getdents64)
 
     User->>CLI: `phasr . --threads 64 --archive-threads 4`
-    CLI->>CLI: Detect OS & Architecture (win32, arm64, linux)
+    CLI->>CLI: Detect OS & Architecture
     CLI->>Main: Execute Native Binary (`engine.exe`, `phasr_arm64`, `phasr_x86`)
     
     rect rgb(20, 40, 20)
         Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
-        Main->>Kernel: Request Physical Disk Sectors (FSCTL_ENUM_USN_DATA / getdents64)
+        Main->>Kernel: Request Physical Disk Sectors
         Kernel-->>Main: Raw Directory/File Handlers
         Main->>Buffer: Store Path in `fileQueue[head]`
         Main->>Buffer: std::atomic `head++` (Release Semantics)
@@ -31,20 +31,20 @@ sequenceDiagram
         Buffer-->>Worker: Spinlock acquires `tail` (Compare-And-Swap)
         Worker->>Kernel: Open / CreateFileA (File Path)
         Worker->>Kernel: ReadFile / read (up to 30MB chunk)
-        Kernel-->>Worker: Physical Bytes mapped to 30MB VirtualAlloc/mmap Memory
+        Kernel-->>Worker: Physical Bytes mapped to 30MB Memory Buffer
         
         alt is Compressed (.zip, .gz, .tar)
             Worker->>ArchBuffer: Push to `archiveQueue[archHead]` (Out-of-band)
             ArchBuffer-->>ArchWorker: CAS Pop `archTail`
             ArchWorker->>Kernel: popen / _popen (tar -xOf / gzip -dc)
-            Kernel-->>ArchWorker: Decompressed stream directly to Thread Buffer
+            Kernel-->>ArchWorker: Decompressed stream mapped to Thread Buffer
             ArchWorker->>ArchWorker: M3 (Entropy): Analyze Unpacked Payload
         else is Standard File
-            par 8-Module Wave Collapse
-                Worker->>Worker: M3 (Entropy): Calculate Shannon H(X) via ASM
+            par Concurrent Analysis Modules
+                Worker->>Worker: M3 (Entropy): Calculate Shannon H(X)
                 Worker->>Worker: M4 (Taint): Scan std::string_view for injections
                 Worker->>Worker: M5 (Temporal): clock_gettime / GetTickCount drift detection
-                Worker->>Worker: M6 (Dissection): Native Hex Pattern Matching (NOP Sleds/Syscalls)
+                Worker->>Worker: M6 (Dissection): Static Binary Analysis (NOP Sleds)
             end
         end
         
@@ -54,16 +54,16 @@ sequenceDiagram
         end
     end
     
-    Main->>Main: M7 (Tradeoff): Compute Liability vs Physical Mass ($50,000 threshold)
-    Main->>User: Generate Wave Collapse Output & `phasr_security_report.md`
+    Main->>Main: M7 (Risk Assessment): Compute Liability vs Physical Mass
+    Main->>User: Generate Output & `phasr_security_report.md`
 ```
 
 ---
 
-## 2. Entity-Relationship (Memory Physics) Diagram
-At extreme throughput speeds (200,000+ f/s), typical object-oriented structures trigger catastrophic heap fragmentation and thread contention. PHASR models its memory entirely as statically sized contiguous memory blocks mapped to CPU Cache lines, utilizing zero-allocation `std::string_view` structures.
+## 2. Entity-Relationship (Memory Topology) Diagram
+At extreme throughput speeds, typical object-oriented structures trigger catastrophic heap fragmentation and thread contention. PHASR models its memory entirely as statically sized contiguous memory blocks mapped to CPU Cache lines, utilizing zero-allocation `std::string_view` structures.
 
-The following ER diagram maps the physical relationships of the memory structures across OS targets:
+The following ER diagram maps the relationships of memory structures across OS targets:
 
 ```mermaid
 erDiagram

@@ -1,65 +1,64 @@
-# PHASR: Native C++ Hardware Orchestration Architecture
+# PHASR: Systems Architecture
 
-The **Absolute Physics Engine** (PHASR) is designed to operate at the absolute physical limits of Non-Volatile Memory Express (NVMe) solid-state drives and CPU L1/L2 caches. By entirely bypassing the Operating System's Virtual File System (VFS), PHASR achieves sustained traversal speeds exceeding **200,000 files per second**.
+PHASR (Deterministic Engine for Vulnerability Management) is designed to operate at the physical limits of Non-Volatile Memory Express (NVMe) solid-state drives and CPU L1/L2 caches. By entirely bypassing the Operating System's Virtual File System (VFS), PHASR achieves sustained parallel traversal speeds exceeding 200,000 files per second.
 
 ## Core Paradigms
 
 1. **Zero-Allocation Data Paths**
-   Traditional security scanners dynamically allocate strings and structures on the OS heap. PHASR strictly operates on pre-allocated, continuous memory buffers. 
-   - No `malloc()`, `new`, or `std::string` heap allocations in the hot loop.
-   - All text scanning is done via C++17 `std::string_view` over raw byte buffers.
-   - Fixed-size immutable character arrays (`char[4096]`) prevent heap locks.
+   Traditional scanners dynamically allocate objects on the OS heap. PHASR strictly operates on pre-allocated, contiguous memory buffers.
+   - Elimination of `malloc()`, `new`, and `std::string` allocations in the hot loop.
+   - Text scanning is executed via C++17 `std::string_view` over raw byte buffers.
+   - Fixed-size immutable character arrays prevent heap locking and thread contention.
 
-2. **Cross-Platform Kernel-Level Bypassing**
-   Instead of using standard POSIX `fopen` or standard library `std::ifstream`, PHASR explicitly subverts the OS file system layer:
-   - **Windows:** Uses `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the raw NTFS Master File Table (MFT) directly from disk.
+2. **Kernel-Level Traversal**
+   PHASR subverts standard standard POSIX `fopen` and `std::ifstream` by interfacing directly with kernel disk APIs:
+   - **Windows:** Uses `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the NTFS Master File Table (MFT) directly.
    - **POSIX (Linux/Android):** Uses raw `syscall(SYS_getdents64)` to bypass VFS overhead and extract physical inode block data directly from the kernel.
 
-3. **Lock-Free Multi-Threading (Dynamic Scaling)**
-   A proprietary Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads, configurable from 4 up to 256 physical hardware threads.
-   - Atomic `compare_exchange_weak` (CAS) governs queue consumption instantly without mutexes.
-   - Sleep intervals (`std::this_thread::sleep_for`) and yield-based spinlocks ensure 100% core utilization without bus saturation.
-   - 30MB physical memory chunks are pinned per thread via `VirtualAlloc` (Win32) and `mmap` (POSIX).
+3. **Lock-Free Multi-Threading (SPMC)**
+   A Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads, scaling dynamically from 4 to 256 physical hardware threads.
+   - Atomic `compare_exchange_weak` (CAS) manages queue consumption instantaneously without mutexes.
+   - Pre-allocated 30MB physical memory chunks are pinned per thread via `VirtualAlloc` (Win32) and `mmap` (POSIX).
 
 4. **Out-of-Band Secondary Decompression Queue**
-   To prevent heap allocations from destroying the primary zero-allocation NVMe hot loop, compressed archives (`.zip`, `.gz`) are atomically pushed into a secondary SPMC `archiveQueue`.
+   To prevent dynamic heap allocations from blocking the primary hot loop, compressed archives (`.zip`, `.gz`, `.tar`) are atomically pushed into a secondary SPMC `archiveQueue`.
    - A dedicated `ArchiveWorkerThread` pool streams `gzip -dc` or `tar -xOf` standard outputs via POSIX `popen`/`_popen` directly into memory.
-   - Native C++ engine evaluates the uncompressed payload bytes dynamically without heavy dependencies like `zlib` or `libzip`.
+   - The native C++ engine evaluates the uncompressed payload bytes dynamically without heavy dependencies like `zlib` or `libzip`.
 
-5. **Universal CLI Orchestration Wrapper**
-   While the core physics engine is 100% native C++, it is wrapped in an intelligent Universal NodeJS Router. The `install.js` script features a **Pre-flight Compiler Check** that auto-detects the OS and Architecture, dynamically compiling the raw C++ code (via `g++`), bridging ARM64/x86 Assembly into the binary (`phasr_arm64`, `phasr_x86`, or `engine.exe`), and intelligently routing all global `phasr` CLI commands to the correct native execution context.
+5. **Cross-Platform Compilation**
+   The core engine is wrapped in a universal Node.js router (`install.js`) that performs a pre-flight compiler check. It auto-detects the OS and Architecture, dynamically compiling the C++ code, bridging ARM64/x86 Assembly into the binary, and routing global CLI commands to the appropriate execution context.
 
-6. **Native Hex-Pattern Dissection**
-   Instead of shelling out to heavy external disassemblers like `objdump`, Module 6 scans the raw memory map (`mmap`) directly in C++ for hex byte patterns (like `0x90` NOP sleds or `0x0F 0x05` syscalls) for zero-dependency execution.
+6. **Static Binary Analysis**
+   Module 6 scans the raw memory map (`mmap`) directly in C++ for hex byte sequences (such as `0x90` NOP sleds or `0x0F 0x05` syscalls), eliminating the need for external disassemblers.
 
-## The 8-Module Wave Collapse Pipeline
+## Pipeline Architecture
 
 ```mermaid
 graph TD
-    CLI(Universal phasr Router) -->|--threads N --archive-threads M| A
-    A[Native C++ Orchestrator] -->|Bypass VFS| B(Win32 MFT / POSIX getdents64)
+    CLI(Node.js CLI Router) -->|--threads N --archive-threads M| A
+    A[C++ Orchestrator] -->|Bypass VFS| B(Win32 MFT / POSIX getdents64)
     B --> C{Primary SPMC Ring Buffer}
-    C -->|Main Threads CAS Lock| D[WorkerThread: VirtualAlloc / mmap 30MB Buffer]
+    C -->|CAS Lock| D[WorkerThread: VirtualAlloc / mmap 30MB Buffer]
     
     B -->|Archive Detected| C2{Secondary SPMC Archive Queue}
-    C2 -->|Decomp Threads CAS Lock| D2[ArchiveWorkerThread: popen gzip/tar stream]
+    C2 -->|CAS Lock| D2[ArchiveWorkerThread: popen gzip/tar stream]
     
-    D --> E{Hardware Physics Evaluation}
+    D --> E{Analysis Modules}
     D2 --> E
     
-    E --> F[Module 3: Entropy ASM]
-    E --> G[Module 4: Taint Tracker]
-    E --> H[Module 5: Temporal Jitter]
-    E --> I[Module 6: Binary Dissection]
+    E --> F[M3: Entropy ASM]
+    E --> G[M4: Taint Tracker]
+    E --> H[M5: Temporal Profiling]
+    E --> I[M6: Static Binary Analysis]
     
     F --> J{Anomaly Aggregation}
     G --> J
     H --> J
     I --> J
     
-    J --> K[Module 7: Tradeoff Analyser]
-    K -->|Risk Liability > $50,000| L[WAVE COLLAPSE HALT]
-    K -->|Risk Liability < $50,000| M[DEPLOYMENT APPROVED]
-    L --> N[Generate Security Report.md]
+    J --> K[M7: Risk Assessment Engine]
+    K -->|Risk Liability > Threshold| L[DEPLOYMENT HALTED]
+    K -->|Risk Liability < Threshold| M[DEPLOYMENT APPROVED]
+    L --> N[Output phasr_security_report.md]
     M --> N
 ```
