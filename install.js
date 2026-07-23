@@ -26,11 +26,11 @@ if (platform !== 'win32') {
 try {
     if (platform === 'win32') {
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling C# Engine Fallback...`);
-        execSync(`C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe /nologo /out:"PHASR(DEVM)\\Orchestrator\\engine_cs.exe" "PHASR(DEVM)\\Orchestrator\\Engine.cs"`, { stdio: 'inherit' });
+        execSync(`C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe /nologo /out:"PHASR_DEVM\\Orchestrator\\engine_cs.exe" "PHASR_DEVM\\Orchestrator\\Engine.cs"`, { stdio: 'inherit' });
         
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Compiling Native C++ Engine for Windows...`);
         try {
-            const cppCompileCmd = `cd "PHASR(DEVM)\\Orchestrator" && g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17`;
+            const cppCompileCmd = `cd "PHASR_DEVM\\Orchestrator" && g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17`;
             execSync(cppCompileCmd, { stdio: 'inherit' });
         } catch (e) {
             console.log(`\x1b[31m[PHASR Installer]\x1b[0m Warning: g++ not found or failed. Windows C++ Engine compilation skipped.`);
@@ -44,7 +44,7 @@ try {
         const asmFile = isArm ? 'entropy_arm64.s' : 'entropy.s';
         const binName = isArm ? 'phasr_arm64' : 'phasr_x86';
         
-        const compileCmd = `cd "PHASR(DEVM)" && ${compiler} -O3 Orchestrator/Engine_Linux.cpp Engine/${asmFile} -o Orchestrator/${binName} -lpthread`;
+        const compileCmd = `cd "PHASR_DEVM" && ${compiler} -O3 Orchestrator/Engine_Linux.cpp Engine/${asmFile} -o Orchestrator/${binName} -lpthread`;
         console.log(`\x1b[90m$ ${compileCmd}\x1b[0m`);
         try {
             execSync(compileCmd, { stdio: 'inherit' });
@@ -59,10 +59,10 @@ try {
     // Automatically fix permissions to prevent Termux/Linux "Permission denied" errors
     if (platform !== 'win32') {
         console.log(`\x1b[33m[PHASR Installer]\x1b[0m Applying executable permissions...`);
-        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/router.js"`, { stdio: 'ignore' }); } catch(e){}
-        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/engine"`, { stdio: 'ignore' }); } catch(e){}
-        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/phasr_arm64"`, { stdio: 'ignore' }); } catch(e){}
-        try { execSync(`chmod +x "PHASR(DEVM)/Orchestrator/phasr_x86"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR_DEVM/Orchestrator/router.js"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR_DEVM/Orchestrator/engine"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR_DEVM/Orchestrator/phasr_arm64"`, { stdio: 'ignore' }); } catch(e){}
+        try { execSync(`chmod +x "PHASR_DEVM/Orchestrator/phasr_x86"`, { stdio: 'ignore' }); } catch(e){}
         console.log(`\x1b[32m[PHASR Installer]\x1b[0m Permissions locked and loaded.`);
     }
 } catch (error) {

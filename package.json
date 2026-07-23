@@ -1,9 +1,9 @@
 {
   "name": "phasr",
-  "version": "1.0.0",
-  "main": "PHASR(DEVM)/Orchestrator/router.js",
+  "version": "1.0.1",
+  "main": "PHASR_DEVM/Orchestrator/router.js",
   "bin": {
-    "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
+    "phasr": "./PHASR_DEVM/Orchestrator/router.js"
   },
   "author": "ZTL-Tech",
   "description": "High-performance multi-threaded kernel-bypass malware scanner",
