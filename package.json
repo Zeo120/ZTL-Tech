@@ -6,5 +6,14 @@
     "phasr": "./PHASR(DEVM)/Orchestrator/router.js"
   },
   "author": "ZTL-Tech",
+  "description": "High-performance multi-threaded kernel-bypass malware scanner",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zeo120/ZTL-Tech.git"
+  },
+  "keywords": ["malware", "scanner", "cli", "cpp", "security"],
+  "scripts": {
+    "postinstall": "node install.js"
+  },
   "license": "MIT"
 }
