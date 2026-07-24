@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const searchPaths = [__dirname, path.join(__dirname, '..')];
-const binaryNames = ['phasr_arm64', 'engine', 'engine.exe'];
+const binaryNames = process.platform === 'win32' ? ['engine.exe'] : (process.arch === 'arm64' ? ['phasr_arm64'] : ['engine']);
 
 let engineBinary = null;
 
