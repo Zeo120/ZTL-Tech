@@ -446,7 +446,12 @@ int main(int argc, char* argv[]) {
             if (numThreads > 256) numThreads = 256;
             i++;
         } else if (arg[0] != '-') {
-            targetDir = arg;
+            char absPath[MAX_PATH];
+            if (GetFullPathNameA(arg.c_str(), MAX_PATH, absPath, NULL)) {
+                targetDir = absPath;
+            } else {
+                targetDir = arg;
+            }
         }
     }
 
