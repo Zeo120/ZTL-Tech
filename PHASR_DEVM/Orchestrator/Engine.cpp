@@ -508,7 +508,7 @@ int main(int argc, char* argv[]) {
     Sleep(300);
     std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
     Sleep(300);
-    std::cout << "\x1b[1mPHYSICAL MASS:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
+    std::cout << "\x1b[1mSize (Physical Mass):\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
     Sleep(800);
 
     std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
