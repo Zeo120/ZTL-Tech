@@ -351,11 +351,7 @@ int main(int argc, char* argv[]) {
         if (aw.joinable()) aw.join();
     }
 
-    std::cout << "\n\n";
-    std::cout << "=======================================================\n";
-    std::cout << "=======================================================\n";
-    std::cout << "   PHASR (DEVM) - ABSOLUTE PHYSICS ENGINE (LINUX)\n";
-    std::cout << "=======================================================\n\n";
+    std::cout << "\n";
     std::cout << "\x1b[1mTARGET:\x1b[0m " << targetDir << "\n";
     std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
     std::cout << "\x1b[1mPHYSICAL MASS:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass.load() / 1024.0) << " KB\n\n";

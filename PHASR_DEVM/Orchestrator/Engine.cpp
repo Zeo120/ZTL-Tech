@@ -117,6 +117,10 @@ void ArchiveWorkerThread() {
 }
 
 void WorkerThread() {
+    char* threadBuffer = (char*)VirtualAlloc(NULL, 12288, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    if (!threadBuffer) return;
+    
+    while (true) {
         int head = queueHead.load(std::memory_order_acquire);
         int tail = queueTail.load(std::memory_order_relaxed);
         
@@ -497,12 +501,7 @@ int main(int argc, char* argv[]) {
 
     scanComplete.store(true, std::memory_order_release);
     
-    std::cout << "=======================================================\n";
-    std::cout << "\x1b[1m\x1b[36m=======================================================\x1b[0m\n";
-    Sleep(200);
-    std::cout << "\x1b[1m   PHASR (DEVM) - ABSOLUTE PHYSICS ENGINE (NATIVE C++)\x1b[0m\n";
-    Sleep(200);
-    std::cout << "\x1b[1m\x1b[36m=======================================================\x1b[0m\n\n";
+    std::cout << "\n";
     Sleep(500);
 
     std::cout << "\x1b[1mTARGET:\x1b[0m " << targetDir << "\n";
