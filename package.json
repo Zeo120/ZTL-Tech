@@ -1,6 +1,6 @@
 {
   "name": "phasr-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "PHASR_DEVM/Orchestrator/router.js",
   "bin": {
     "phasr": "./PHASR_DEVM/Orchestrator/router.js"
