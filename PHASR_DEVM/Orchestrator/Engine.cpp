@@ -526,14 +526,7 @@ int main(int argc, char* argv[]) {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
 
     if (m3_anomalies.size() > 0) {
-        std::cout << "\x1b[1m\x1b[31mRule:\x1b[0m\nHigh Entropy Data (Possible Obfuscation)\n\n";
-        std::cout << "\x1b[1m\x1b[31mFindings: " << m3_anomalies.size() << "\x1b[0m\n\n";
-        std::cout << "\x1b[1mFiles\x1b[0m\n";
-        for (const auto& a : m3_anomalies) {
-            size_t slash = a.first.find_last_of("\\/");
-            std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
-            std::cout << " \xE2\x80\xA2 " << fileName << " (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
-        }
+        std::cout << "\x1b[1m\x1b[31m[WARNING] " << m3_anomalies.size() << " High Entropy Anomalies Detected (See Report)\x1b[0m\n\n";
     } else {
         std::cout << "\x1b[1m\x1b[32m[SAFE] Maximum Entropy H(X) Verified\x1b[0m\n\n";
     }
@@ -542,24 +535,21 @@ int main(int argc, char* argv[]) {
     std::cout << "MODULE 4 — SECURITY MATH (TAINT)\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
     if (m4_anomalies.size() > 0) {
-        std::cout << "\x1b[1m\x1b[31mFindings (Unsanitized Flows): " << m4_anomalies.size() << "\x1b[0m\n";
-        for (const auto& a : m4_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+        std::cout << "\x1b[1m\x1b[31m[WARNING] " << m4_anomalies.size() << " Unsanitized Flows Detected (See Report)\x1b[0m\n\n";
     } else std::cout << "\x1b[1m\x1b[32m[SAFE] 0 Unsanitized Flows\x1b[0m\n\n";
 
     std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     std::cout << "MODULE 5 — TEMPORAL PHYSICS\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
     if (m5_anomalies.size() > 0) {
-        std::cout << "\x1b[1m\x1b[31mFindings (Timing Anomalies): " << m5_anomalies.size() << "\x1b[0m\n";
-        for (const auto& a : m5_anomalies) std::cout << " \xE2\x80\xA2 " << a << "\n";
+        std::cout << "\x1b[1m\x1b[31m[WARNING] " << m5_anomalies.size() << " Timing Anomalies Detected (See Report)\x1b[0m\n\n";
     } else std::cout << "\x1b[1m\x1b[32m[SAFE] Constant-Time Verified\x1b[0m\n\n";
 
     std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     std::cout << "MODULE 6 — BINARY DISSECTION\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
     if (m6_anomalies.size() > 0) {
-        std::cout << "\x1b[1m\x1b[31mFindings: " << m6_anomalies.size() << "\x1b[0m\n";
-        for (const auto& a : m6_anomalies) std::cout << " \xE2\x80\xA2 " << a.first << " -> " << a.second << "\n";
+        std::cout << "\x1b[1m\x1b[31m[WARNING] " << m6_anomalies.size() << " Assembly Taint Flows Detected (See Report)\x1b[0m\n\n";
     } else std::cout << "\x1b[1m\x1b[32m[SAFE] No Assembly Taint Flows Detected\x1b[0m\n\n";
 
     std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
