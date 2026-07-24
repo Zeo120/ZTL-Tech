@@ -328,7 +328,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Main Threads + " << numArchThreads << " Decompression Threads\n";
     std::cout << "\x1b[32m[PHASR]\x1b[0m Commencing native getdents64 kernel scan on: " << targetDir << "\n";
-    std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing physical mass...\n\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Standby. Brute-forcing total size...\n\n";
 
     startTime = GetCurrentTimeMs();
 
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\n";
     std::cout << "\x1b[1mTARGET:\x1b[0m " << targetDir << "\n";
     std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
-    std::cout << "\x1b[1mSize (Physical Mass):\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass.load() / 1024.0) << " KB\n\n";
+    std::cout << "\x1b[1mTOTAL SIZE:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass.load() / 1024.0) << " KB\n\n";
     
     std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
 

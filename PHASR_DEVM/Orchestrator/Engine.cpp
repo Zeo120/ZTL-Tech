@@ -260,11 +260,11 @@ void analyzeShadowVolume(const std::string& directory) {
         std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
         
         std::cout << "\x1b[1m[!] Physical Allocation:\x1b[0m " << std::fixed << std::setprecision(2) << (physicalAllocated / 1073741824.0) << " GB\n";
-        std::cout << "\x1b[1m[!] Logical Mass:\x1b[0m " << std::fixed << std::setprecision(2) << (logicalMass / 1073741824.0) << " GB\n";
+        std::cout << "\x1b[1m[!] Logical Size:\x1b[0m " << std::fixed << std::setprecision(2) << (logicalMass / 1073741824.0) << " GB\n";
         if (delta > 1073741824) { // > 1GB delta
-            std::cout << "\x1b[1m\x1b[31m[WARNING] Delta (Hidden Mass):\x1b[0m " << std::fixed << std::setprecision(2) << (delta / 1073741824.0) << " GB\n\n";
+            std::cout << "\x1b[1m\x1b[31m[WARNING] Delta (Hidden Size):\x1b[0m " << std::fixed << std::setprecision(2) << (delta / 1073741824.0) << " GB\n\n";
         } else {
-            std::cout << "\x1b[1m\x1b[32m[SAFE] No significant hidden mass detected.\x1b[0m\n\n";
+            std::cout << "\x1b[1m\x1b[32m[SAFE] No significant hidden size detected.\x1b[0m\n\n";
         }
     }
 }
@@ -480,7 +480,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "[PHASR] Commencing native kernel-level scan on: " << targetDir << "\n";
-    std::cout << "[PHASR] Standby. Brute-forcing physical mass...\n\n";
+    std::cout << "[PHASR] Standby. Brute-forcing total size...\n\n";
 
     startTime = GetTickCount();
     if (targetDir == "C:\\" || targetDir == "C:") {
@@ -508,7 +508,7 @@ int main(int argc, char* argv[]) {
     Sleep(300);
     std::cout << "\x1b[1mFILES SCANNED:\x1b[0m " << globalFileCount << "\n";
     Sleep(300);
-    std::cout << "\x1b[1mSize (Physical Mass):\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
+    std::cout << "\x1b[1mTOTAL SIZE:\x1b[0m " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
     Sleep(800);
 
     std::cout << "\x1b[1m\x1b[33m[*] Executing Hardware Physics Modules...\x1b[0m\n\n";
@@ -575,7 +575,7 @@ int main(int argc, char* argv[]) {
         md << "# PHASR (DEVM) - Security Posture Report (Native Core)\n\n";
         md << "**Target:** " << targetDir << "\n";
         md << "**Files Scanned:** " << globalFileCount << "\n";
-        md << "**Physical Mass:** " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
+        md << "**Total Size:** " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
         md << "## Total Anomalies Detected: " << (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) << "\n\n";
         
         if (m3_anomalies.size() > 0) {
