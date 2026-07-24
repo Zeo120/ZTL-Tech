@@ -18,11 +18,12 @@ sequenceDiagram
     participant Kernel as Win32 (MFT) / POSIX (getdents64)
 
     User->>CLI: `phasr . --threads 64 --archive-threads 4`
-    CLI->>CLI: Detect OS & Architecture
-    CLI->>Main: Execute Native Binary (`engine.exe`, `phasr_arm64`, `phasr_x86`)
+    CLI->>CLI: Strictly route via `process.platform` & `process.arch`
+    CLI->>Main: Execute Native Binary (`engine.exe`, `phasr_arm64`, `engine`)
     
     rect rgb(20, 40, 20)
         Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
+        Main->>Main: Resolve targetDir to Absolute Path (MFT Trigger)
         Main->>Kernel: Request Physical Disk Sectors
         Kernel-->>Main: Raw Directory/File Handlers
         Main->>Buffer: Store Path in `fileQueue[head]`
@@ -54,8 +55,8 @@ sequenceDiagram
         end
     end
     
-    Main->>Main: M7 (Risk Assessment): Compute Liability vs Physical Mass
-    Main->>User: Generate Output & `phasr_security_report.md`
+    Main->>Main: M7 (Risk Assessment): Compute Liability vs Total Size
+    Main->>User: Output Clean Summary & write `phasr_security_report.md`
 ```
 
 ---

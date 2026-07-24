@@ -26,7 +26,7 @@ PHASR (Deterministic Engine for Vulnerability Management) is designed to operate
    - *Constraint:* `popen` is an interim solution causing OS `fork()` overhead. Transitioning to `zlib` is planned.
 
 5. **Cross-Platform Compilation**
-   The core engine is wrapped in a universal Node.js router (`install.js`) that performs a pre-flight compiler check. It auto-detects the OS and Architecture, dynamically compiling the C++ code, bridging ARM64/x86 Assembly into the binary, and routing global CLI commands to the appropriate execution context.
+   The core engine is wrapped in a universal Node.js router (`router.js`). It actively queries `process.platform` and `process.arch` to dynamically route global CLI commands to the correct statically compiled C++ binary (`engine.exe`, `phasr_arm64`, or `engine`), preventing silent OS mismatches.
 
 6. **Static Binary Analysis**
    Module 6 scans the raw memory map (`mmap`) directly in C++ for hex byte sequences (such as `0x90` NOP sleds or `0x0F 0x05` syscalls), eliminating the need for external disassemblers.
@@ -35,8 +35,8 @@ PHASR (Deterministic Engine for Vulnerability Management) is designed to operate
 
 ```mermaid
 graph TD
-    CLI(Node.js CLI Router) -->|--threads N --archive-threads M| A
-    A[C++ Orchestrator] -->|Bypass VFS| B(Win32 MFT / POSIX getdents64)
+    CLI(Node.js CLI Router) -->|--threads N| A
+    A[C++ Orchestrator] -->|Resolve Absolute Path -> Bypass VFS| B(Win32 MFT / POSIX getdents64)
     B --> C{Primary SPMC Ring Buffer}
     C -->|CAS Lock| D[WorkerThread: VirtualAlloc / mmap 30MB Buffer]
     
@@ -59,7 +59,7 @@ graph TD
     J --> K[M7: Risk Assessment Engine]
     K -->|Risk Liability > Threshold| L[DEPLOYMENT HALTED]
     K -->|Risk Liability < Threshold| M[DEPLOYMENT APPROVED]
-    L --> N[Output phasr_security_report.md]
+    L --> N[Output Clean Console Summary & phasr_security_report.md]
     M --> N
 ```
 
