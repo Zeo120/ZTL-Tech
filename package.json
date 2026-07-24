@@ -1,6 +1,6 @@
 {
   "name": "phasr-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "PHASR_DEVM/Orchestrator/router.js",
   "bin": {
     "phasr": "./PHASR_DEVM/Orchestrator/router.js"
@@ -12,8 +12,5 @@
     "url": "https://github.com/Zeo120/ZTL-Tech.git"
   },
   "keywords": ["malware", "scanner", "cli", "cpp", "security"],
-  "scripts": {
-    "postinstall": "node install.js"
-  },
   "license": "MIT"
 }
