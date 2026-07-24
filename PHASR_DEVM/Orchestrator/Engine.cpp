@@ -130,9 +130,9 @@ void WorkerThread() {
             continue;
         }
         
-        // Data Race Fix: Copy the immutable string locally BEFORE advancing the CAS head
+        // Data Race Fix: Use memcpy to preserve binary null bytes inside the MFT File ID
         char localPath[MAX_PATH];
-        lstrcpyA(localPath, taskQueue[head]);
+        memcpy(localPath, taskQueue[head], MAX_PATH);
         
         if (queueHead.compare_exchange_weak(head, (head + 1) % QUEUE_SIZE, std::memory_order_release, std::memory_order_relaxed)) {
             activeWorkers++;
@@ -148,7 +148,7 @@ void WorkerThread() {
                     fid.dwSize = sizeof(FILE_ID_DESCRIPTOR);
                     fid.Type = FileIdType;
                     fid.FileId.QuadPart = fileId;
-                    hFile = OpenFileById(g_hVol, &fid, GENERIC_READ, FILE_SHARE_READ, NULL, 0);
+                    hFile = OpenFileById(g_hVol, &fid, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, FILE_FLAG_BACKUP_SEMANTICS);
                 }
             } else {
                 hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
