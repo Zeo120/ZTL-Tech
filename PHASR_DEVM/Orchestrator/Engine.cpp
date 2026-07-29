@@ -36,8 +36,8 @@ bool endsWith(const std::string& fullString, const std::string& ending);
 #define QUEUE_SIZE 8192
 HANDLE g_hVol = INVALID_HANDLE_VALUE;
 char taskQueue[QUEUE_SIZE][MAX_PATH];
-std::atomic<int> queueHead = {0};
-std::atomic<int> queueTail = {0};
+alignas(64) std::atomic<int> queueHead = {0};
+alignas(64) std::atomic<int> queueTail = {0};
 std::atomic<int> activeWorkers = {0};
 std::atomic<bool> scanComplete = {false};
 long long totalTargetFiles = 1500000;
@@ -63,18 +63,24 @@ void PrecalculateFileCount(const std::string& directory) {
 }
 
 char archiveQueue[QUEUE_SIZE][MAX_PATH];
-std::atomic<int> archHead = {0};
-std::atomic<int> archTail = {0};
+alignas(64) std::atomic<int> archHead = {0};
+alignas(64) std::atomic<int> archTail = {0};
 std::atomic<int> activeArchWorkers = {0};
 
 void ArchiveWorkerThread() {
     activeArchWorkers++;
-    constexpr size_t MAX_BUFFER_SIZE = 12288;
+    std::vector<std::pair<std::string, double>> local_m3_anomalies;
+    constexpr size_t MAX_BUFFER_SIZE = 31457280; // Up to 30MB map capability conceptually
+#ifdef USE_NATIVE_ZLIB
+    // Conceptually mapped buffer if using native ZLIB
+    std::vector<char> threadBuffer(MAX_BUFFER_SIZE); 
+#else
     char* threadBuffer = (char*)VirtualAlloc(NULL, MAX_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!threadBuffer) {
         activeArchWorkers--;
         return;
     }
+#endif
 
     while (true) {
         int head = archHead.load(std::memory_order_acquire);
@@ -96,7 +102,40 @@ void ArchiveWorkerThread() {
             else if (pathLen > 4 && strcmp(localPath + pathLen - 4, ".zip") == 0) cmd = "tar -xf \"";
             else continue;
             
-            // Windows tar supports -xOf to extract to stdout
+#ifdef USE_NATIVE_ZLIB
+            // Concept: Pure In-Memory Zero-Allocation DEFLATE (No OS Subprocesses)
+            HANDLE hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (hFile != INVALID_HANDLE_VALUE) {
+                HANDLE hMap = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+                if (hMap) {
+                    void* pMap = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+                    if (pMap) {
+                        // Native zlib/miniz decompress from pMap directly into threadBuffer.data()
+                        // size_t bytesRead = native_in_memory_inflate(pMap, fileSize, threadBuffer.data(), MAX_BUFFER_SIZE);
+                        size_t bytesRead = 0; // Mocked
+                        
+                        if (bytesRead > 0) {
+                            long long counts[256] = {0};
+                            calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer.data()), bytesRead, counts);
+                            double entropy = 0.0;
+                            for (long long freq : counts) {
+                                if (freq > 0) {
+                                    double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                    entropy -= p * log2(p);
+                                }
+                            }
+                            if (entropy >= 7.2) {
+                                local_m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
+                            }
+                        }
+                        UnmapViewOfFile(pMap);
+                    }
+                    CloseHandle(hMap);
+                }
+                CloseHandle(hFile);
+            }
+#else
+            // Legacy OS-dependent decompression (fork overhead)
             cmd = "tar -xOf \"" + std::string(localPath) + "\" 2>NUL";
             
             FILE* fp = _popen(cmd.c_str(), "r");
@@ -113,16 +152,22 @@ void ArchiveWorkerThread() {
                         }
                     }
                     if (entropy >= 7.2) {
-                        EnterCriticalSection(&printCS);
-                        m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
-                        LeaveCriticalSection(&printCS);
+                        local_m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
                     }
                 }
                 _pclose(fp);
             }
+#endif
         }
     }
+    
+    EnterCriticalSection(&printCS);
+    m3_anomalies.insert(m3_anomalies.end(), local_m3_anomalies.begin(), local_m3_anomalies.end());
+    LeaveCriticalSection(&printCS);
+    
+#ifndef USE_NATIVE_ZLIB
     VirtualFree(threadBuffer, 0, MEM_RELEASE);
+#endif
     activeArchWorkers--;
 }
 
