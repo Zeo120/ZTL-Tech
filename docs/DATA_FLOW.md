@@ -113,5 +113,6 @@ erDiagram
         vector m4_anomalies "Thread-Local struct M4_Anomaly (Zero-Allocation char[MAX_PATH])"
         vector m5_anomalies "Thread-Local struct M5_Anomaly (Zero-Allocation char[MAX_PATH])"
         vector m6_anomalies "Thread-Local struct M6_Anomaly (Zero-Allocation char[MAX_PATH])"
+        vector m8_infrastructure "Thread-Local struct M8_Anomaly (Zero-Allocation char[MAX_PATH])"
     }
 ```
