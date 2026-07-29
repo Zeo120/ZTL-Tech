@@ -23,11 +23,34 @@ std::atomic<long long> globalSuccess = {0};
 DWORD startTime = 0;
 DWORD lastPrintTime = 0;
 
-std::vector<std::pair<std::string, double>> m3_anomalies;
-std::vector<std::string> m4_anomalies;
-std::vector<std::string> m5_anomalies;
-std::vector<std::pair<std::string, std::string>> m6_anomalies;
-std::vector<std::pair<std::string, std::string>> m8_infrastructure; // IP and DNS found
+struct M3_Anomaly {
+    char path[MAX_PATH];
+    double entropy;
+};
+
+struct M4_Anomaly {
+    char path[MAX_PATH];
+};
+
+struct M5_Anomaly {
+    char path[MAX_PATH];
+};
+
+struct M6_Anomaly {
+    char path[MAX_PATH];
+    char reason[64];
+};
+
+struct M8_Anomaly {
+    char path[MAX_PATH];
+    char details[128];
+};
+
+std::vector<M3_Anomaly> m3_anomalies;
+std::vector<M4_Anomaly> m4_anomalies;
+std::vector<M5_Anomaly> m5_anomalies;
+std::vector<M6_Anomaly> m6_anomalies;
+std::vector<M8_Anomaly> m8_infrastructure; // IP and DNS found
 
 std::atomic<bool> isWebApp = {false};
 
@@ -69,7 +92,7 @@ std::atomic<int> activeArchWorkers = {0};
 
 void ArchiveWorkerThread() {
     activeArchWorkers++;
-    std::vector<std::pair<std::string, double>> local_m3_anomalies;
+    std::vector<M3_Anomaly> local_m3_anomalies;
     constexpr size_t MAX_BUFFER_SIZE = 31457280; // Up to 30MB map capability conceptually
 #ifdef USE_NATIVE_ZLIB
     // Conceptually mapped buffer if using native ZLIB
@@ -125,7 +148,10 @@ void ArchiveWorkerThread() {
                                 }
                             }
                             if (entropy >= 7.2) {
-                                local_m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
+                                M3_Anomaly a;
+                                lstrcpynA(a.path, (std::string(localPath) + " (Unpacked)").c_str(), MAX_PATH);
+                                a.entropy = entropy;
+                                local_m3_anomalies.push_back(a);
                             }
                         }
                         UnmapViewOfFile(pMap);
@@ -152,7 +178,10 @@ void ArchiveWorkerThread() {
                         }
                     }
                     if (entropy >= 7.2) {
-                        local_m3_anomalies.push_back(std::make_pair(std::string(localPath) + " (Unpacked)", entropy));
+                        M3_Anomaly a;
+                        lstrcpynA(a.path, (std::string(localPath) + " (Unpacked)").c_str(), MAX_PATH);
+                        a.entropy = entropy;
+                        local_m3_anomalies.push_back(a);
                     }
                 }
                 _pclose(fp);
@@ -172,11 +201,11 @@ void ArchiveWorkerThread() {
 }
 
 void WorkerThread() {
-    std::vector<std::pair<std::string, double>> local_m3_anomalies;
-    std::vector<std::string> local_m4_anomalies;
-    std::vector<std::string> local_m5_anomalies;
-    std::vector<std::pair<std::string, std::string>> local_m6_anomalies;
-    std::vector<std::pair<std::string, std::string>> local_m8_infrastructure;
+    std::vector<M3_Anomaly> local_m3_anomalies;
+    std::vector<M4_Anomaly> local_m4_anomalies;
+    std::vector<M5_Anomaly> local_m5_anomalies;
+    std::vector<M6_Anomaly> local_m6_anomalies;
+    std::vector<M8_Anomaly> local_m8_infrastructure;
 
     while (true) {
         int head = queueHead.load(std::memory_order_acquire);
@@ -263,7 +292,10 @@ void WorkerThread() {
                                 unsigned long long fileId = *(unsigned long long*)(localPath + 4);
                                 lstrcpyA(anomalyPath, globalFrnToPath[fileId].c_str());
                             }
-                            local_m3_anomalies.push_back(std::make_pair(std::string(anomalyPath), entropy));
+                            M3_Anomaly m3;
+                            lstrcpyA(m3.path, anomalyPath);
+                            m3.entropy = entropy;
+                            local_m3_anomalies.push_back(m3);
                         }
                         
                         // M6: Binary Dissection (NOP Sleds)
@@ -278,7 +310,10 @@ void WorkerThread() {
                                             unsigned long long fileId = *(unsigned long long*)(localPath + 4);
                                             lstrcpyA(realPath, globalFrnToPath[fileId].c_str());
                                         } else lstrcpyA(realPath, anomalyPath);
-                                        local_m6_anomalies.push_back({std::string(realPath), "NOP Sled Detected (0x90 > 50 bytes)"});
+                                        M6_Anomaly m6;
+                                        lstrcpyA(m6.path, realPath);
+                                        lstrcpyA(m6.reason, "NOP Sled Detected (0x90 > 50 bytes)");
+                                        local_m6_anomalies.push_back(m6);
                                         break;
                                     }
                                 } else nopCount = 0;
@@ -294,7 +329,9 @@ void WorkerThread() {
                                     unsigned long long fileId = *(unsigned long long*)(localPath + 4);
                                     lstrcpyA(realPath, globalFrnToPath[fileId].c_str());
                                 } else lstrcpyA(realPath, anomalyPath);
-                                local_m4_anomalies.push_back(std::string(realPath));
+                                M4_Anomaly m4;
+                                lstrcpyA(m4.path, realPath);
+                                local_m4_anomalies.push_back(m4);
                             }
                             
                             // M8: Infrastructure Discovery (DNS/IP)
@@ -313,7 +350,10 @@ void WorkerThread() {
                                     if (end == std::string_view::npos) end = content.length();
                                     if (end - start > 7 && end - start < 100) {
                                         std::string url(content.substr(start, end - start));
-                                        local_m8_infrastructure.push_back({std::string(anomalyPath), url});
+                                        M8_Anomaly m8;
+                                        lstrcpyA(m8.path, anomalyPath);
+                                        lstrcpynA(m8.details, url.c_str(), 128);
+                                        local_m8_infrastructure.push_back(m8);
                                     }
                                     pos = end;
                                 }
@@ -329,8 +369,11 @@ void WorkerThread() {
                                             j++;
                                         }
                                         if (dots == 3 && digits >= 4 && digits <= 12 && j - i >= 7 && j - i <= 15) {
-                                            std::string ip(content.substr(i, j - i));
-                                            local_m8_infrastructure.push_back({std::string(anomalyPath), "IPv4: " + ip});
+                                            std::string ip = "IPv4: " + std::string(content.substr(i, j - i));
+                                            M8_Anomaly m8;
+                                            lstrcpyA(m8.path, anomalyPath);
+                                            lstrcpynA(m8.details, ip.c_str(), 128);
+                                            local_m8_infrastructure.push_back(m8);
                                             i = j;
                                         }
                                     }
@@ -347,7 +390,9 @@ void WorkerThread() {
                             } else {
                                 lstrcpyA(realPath, anomalyPath);
                             }
-                            local_m5_anomalies.push_back(std::string(realPath));
+                            M5_Anomaly m5;
+                            lstrcpyA(m5.path, realPath);
+                            local_m5_anomalies.push_back(m5);
                         }
                                 UnmapViewOfFile(pMap);
                             }
@@ -741,7 +786,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\x1b[1m\x1b[33m[INFO] " << m8_infrastructure.size() << " DNS/IP Artifacts Extracted\x1b[0m\n";
         int disp = 0;
         for (const auto& a : m8_infrastructure) {
-            std::cout << "  -> " << a.second << "\n";
+            std::cout << "  -> " << a.details << "\n";
             if (++disp >= 10) {
                 std::cout << "  -> ... (more in report)\n";
                 break;
@@ -776,9 +821,10 @@ int main(int argc, char* argv[]) {
         if (m3_anomalies.size() > 0) {
             md << "### Module 3: Entropy Analyser\n";
             for (const auto& a : m3_anomalies) {
-                size_t slash = a.first.find_last_of("\\/");
-                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
-                md << "- **" << fileName << "** (H(X) = " << std::fixed << std::setprecision(2) << a.second << ")\n";
+                std::string_view pathView(a.path);
+                size_t slash = pathView.find_last_of("\\/");
+                std::string_view fileName = (slash != std::string_view::npos) ? pathView.substr(slash + 1) : pathView;
+                md << "- **" << fileName << "** (H(X) = " << std::fixed << std::setprecision(2) << a.entropy << ")\n";
             }
             md << "\n";
         }
@@ -786,8 +832,9 @@ int main(int argc, char* argv[]) {
         if (m4_anomalies.size() > 0) {
             md << "### Module 4: Security Math (Taint Tracker)\n";
             for (const auto& a : m4_anomalies) {
-                size_t slash = a.find_last_of("\\/");
-                std::string fileName = (slash != std::string::npos) ? a.substr(slash + 1) : a;
+                std::string_view pathView(a.path);
+                size_t slash = pathView.find_last_of("\\/");
+                std::string_view fileName = (slash != std::string_view::npos) ? pathView.substr(slash + 1) : pathView;
                 md << "- **" << fileName << "** (Unsanitized flow detected)\n";
             }
             md << "\n";
@@ -796,8 +843,9 @@ int main(int argc, char* argv[]) {
         if (m5_anomalies.size() > 0) {
             md << "### Module 5: Temporal Physics\n";
             for (const auto& a : m5_anomalies) {
-                size_t slash = a.find_last_of("\\/");
-                std::string fileName = (slash != std::string::npos) ? a.substr(slash + 1) : a;
+                std::string_view pathView(a.path);
+                size_t slash = pathView.find_last_of("\\/");
+                std::string_view fileName = (slash != std::string_view::npos) ? pathView.substr(slash + 1) : pathView;
                 md << "- **" << fileName << "** (Execution timing anomaly)\n";
             }
             md << "\n";
@@ -806,9 +854,10 @@ int main(int argc, char* argv[]) {
         if (m6_anomalies.size() > 0) {
             md << "### Module 6: Binary Dissection\n";
             for (const auto& a : m6_anomalies) {
-                size_t slash = a.first.find_last_of("\\/");
-                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
-                md << "- **" << fileName << "** (" << a.second << ")\n";
+                std::string_view pathView(a.path);
+                size_t slash = pathView.find_last_of("\\/");
+                std::string_view fileName = (slash != std::string_view::npos) ? pathView.substr(slash + 1) : pathView;
+                md << "- **" << fileName << "** (" << a.reason << ")\n";
             }
             md << "\n";
         }
@@ -817,9 +866,10 @@ int main(int argc, char* argv[]) {
             md << "### Module 8: Infrastructure Discovery (DNS/IP)\n";
             md << "*(Extracted native targets from configuration and code)*\n\n";
             for (const auto& a : m8_infrastructure) {
-                size_t slash = a.first.find_last_of("\\/");
-                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
-                md << "- **" << fileName << "**: `" << a.second << "`\n";
+                std::string_view pathView(a.path);
+                size_t slash = pathView.find_last_of("\\/");
+                std::string_view fileName = (slash != std::string_view::npos) ? pathView.substr(slash + 1) : pathView;
+                md << "- **" << fileName << "**: `" << a.details << "`\n";
             }
             md << "\n";
         }
