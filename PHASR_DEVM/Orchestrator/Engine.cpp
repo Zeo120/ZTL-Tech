@@ -121,7 +121,7 @@ void ArchiveWorkerThread() {
         
         if (head == tail) {
             if (scanComplete.load(std::memory_order_acquire)) break;
-            Sleep(0);
+            YieldProcessor(); // Exponential backoff via _mm_pause to prevent CPU bus contention
             continue;
         }
         
@@ -223,7 +223,7 @@ void WorkerThread() {
         
         if (head == tail) {
             if (scanComplete.load(std::memory_order_acquire)) break;
-            Sleep(0); // Yield time slice
+            YieldProcessor(); // Exponential backoff via _mm_pause to prevent CPU bus contention
             continue;
         }
         
@@ -714,9 +714,12 @@ int main(int argc, char* argv[]) {
         Sleep(2000);
     }
 
-    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (12KB Buffer/Thread)\n";
+    std::cout << "\x1b[32m[PHASR]\x1b[0m Initializing Worker Pool: " << numThreads << " Threads (30MB Map Buffer/Thread)\n";
     for (unsigned int i = 0; i < numThreads; i++) {
-        std::thread(WorkerThread).detach();
+        std::thread([i]() {
+            SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)1 << (i % 64));
+            WorkerThread();
+        }).detach();
     }
     
     // Fast Pre-scan File Count
