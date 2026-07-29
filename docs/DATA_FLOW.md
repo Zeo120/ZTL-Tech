@@ -109,9 +109,9 @@ erDiagram
     ARCHIVE_WORKER_THREAD }o--|| PIPELINE_ANOMALIES : triggers
     
     PIPELINE_ANOMALIES {
-        vector m3_anomalies "Thread-Local batch-merged on thread exit"
-        vector m4_anomalies "Thread-Local batch-merged on thread exit"
-        vector m5_anomalies "Thread-Local batch-merged on thread exit"
-        vector m6_anomalies "Thread-Local batch-merged on thread exit"
+        vector m3_anomalies "Thread-Local struct M3_Anomaly (Zero-Allocation char[MAX_PATH])"
+        vector m4_anomalies "Thread-Local struct M4_Anomaly (Zero-Allocation char[MAX_PATH])"
+        vector m5_anomalies "Thread-Local struct M5_Anomaly (Zero-Allocation char[MAX_PATH])"
+        vector m6_anomalies "Thread-Local struct M6_Anomaly (Zero-Allocation char[MAX_PATH])"
     }
 ```

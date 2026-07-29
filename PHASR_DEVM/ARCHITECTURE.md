@@ -31,10 +31,10 @@ The DEVM is divided strictly into four distinct pillars:
 
 ## The Verification Engine (Pipeline)
 The Verification Engine is the literal software manifestation that prepares data for the DEVM. It consists of:
-- **Initialiser**: Fetches the raw repository into the machine.
-- **Extractor**: Unpacks the data using native buffers.
-- **Scanner & Quantiser**: Maps the codebase material and physical mass.
-- **ShadowScanner & PayloadScanner**: Detects absolute vulnerabilities and static malicious payloads (Heuristics).
-- **Fracturer**: Shatters the codebase into cache-aligned byte chunks.
-- **PointerTracer**: Maps memory mutations deterministically.
-- **Reducer**: Collapses all software interactions into a `1` or `0` Boolean truth vector.
+- **Initialiser**: Fetches the raw repository into the machine via OS-Bypass. **[Implemented: Win32 MFT `FSCTL_ENUM_USN_DATA` and POSIX `getdents64` physical inode reading]**.
+- **Extractor**: Unpacks the data using native buffers. **[Implemented: Secondary SPMC `ArchiveWorkerThread` pool utilizing zero-allocation `#ifdef USE_NATIVE_ZLIB` or OS-piped memory streams]**.
+- **Scanner & Quantiser**: Maps the codebase material and physical mass. **[Implemented: Physical OS memory paging via `MapViewOfFile` restricted to 30MB bounds to prevent memory segmentation faults]**.
+- **ShadowScanner & PayloadScanner**: Detects absolute vulnerabilities and static malicious payloads (Heuristics). **[Implemented: Assembly NOP-Sled detection (`M6`) and Taint Analysis (`M4`) directly on the memory map]**.
+- **Fracturer**: Shatters the codebase into cache-aligned byte chunks. **[Implemented: Lock-free `alignas(64)` pointer padding to physically force thread synchronization into L1 CPU cache lines, eliminating False Sharing]**.
+- **PointerTracer**: Maps memory mutations deterministically. **[Implemented: Windows SEH `SetUnhandledExceptionFilter` traps hardware memory mutation failures like `EXCEPTION_IN_PAGE_ERROR`]**.
+- **Reducer**: Collapses all software interactions into a `1` or `0` Boolean truth vector. **[Implemented: Zero-Allocation `C-Struct` memory blocks (e.g. `char path[MAX_PATH]`) batched in Thread-Local Storage to sidestep Mutex/Heap spinlocks during massive collision events]**.
