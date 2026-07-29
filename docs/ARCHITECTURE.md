@@ -110,15 +110,15 @@ While PHASR operates at extreme speeds, several systems-level constraints are do
 - [ ] Scalability from 1–256 threads *(Missing)*
 
 ### Security
-- [ ] TOCTOU *(Fails: Vulnerable between `getdents64` read and subsequent `open()` call)*
-- [ ] Symlink handling *(Missing: Undocumented if it follows symlinks or detects cycles)*
-- [ ] Archive bombs *(Fails: `popen` extraction has no limits on output size)*
-- [ ] Path traversal *(Needs verification: Are archive paths sanitized?)*
+- [x] TOCTOU *(Resolved: Immutable `OpenFileById` using physical FRNs entirely bypasses path-swapping)*
+- [x] Symlink handling *(Resolved: Orchestrator strictly ignores `FILE_ATTRIBUTE_REPARSE_POINT`)*
+- [x] Archive bombs *(Resolved: Legacy decompressor strictly bounded to `MAX_BUFFER_SIZE` / 30MB)*
+- [x] Path traversal *(Resolved: Decompressed payloads piped directly to memory; no VFS writes)*
 - [x] Integer overflow *(Yes, assuming standard `size_t` usage)*
-- [ ] Buffer boundaries *(Needs verification on 30MB chunk limits)*
+- [x] Buffer boundaries *(Resolved: `MapViewOfFile` strictly capped at 30MB boundaries)*
 - [x] Invalid UTF-8 *(Yes, processes as raw bytes)*
-- [ ] Corrupted archives *(Fails: `popen` handles errors poorly compared to native library APIs)*
-- [ ] Memory mapping failures *(Fails: `SIGBUS` trap undocumented)*
+- [x] Corrupted archives *(Resolved: Fails gracefully via standard stream EOF)*
+- [ ] Memory mapping failures *(Planned: Global `SetUnhandledExceptionFilter` needed for `EXCEPTION_IN_PAGE_ERROR` hardware traps)*
 
 ### Portability
 - [x] Windows *(Yes, via `FSCTL_ENUM_USN_DATA`)*

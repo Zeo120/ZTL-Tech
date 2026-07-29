@@ -23,6 +23,16 @@ std::atomic<long long> globalSuccess = {0};
 DWORD startTime = 0;
 DWORD lastPrintTime = 0;
 
+LONG WINAPI PageFaultExceptionFilter(EXCEPTION_POINTERS* ExceptionInfo) {
+    if (ExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_IN_PAGE_ERROR) {
+        // A file was truncated over the network while mapped in memory.
+        // We gracefully exit instead of hard-crashing the process.
+        std::cerr << "\n[PHASR SEH TRAP] EXCEPTION_IN_PAGE_ERROR: Target file was truncated during memory analysis.\n";
+        ExitProcess(1);
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
 struct M3_Anomaly {
     char path[MAX_PATH];
     double entropy;
@@ -270,9 +280,10 @@ void WorkerThread() {
                     if (!skipRead && fileSize.QuadPart > 0) {
                         HANDLE hMap = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
                         if (hMap) {
-                            void* pMap = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+                            DWORD bytesToMap = (DWORD)(fileSize.QuadPart > 31457280 ? 31457280 : fileSize.QuadPart);
+                            void* pMap = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, bytesToMap);
                             if (pMap) {
-                                DWORD bytesRead = (DWORD)(fileSize.QuadPart > 31457280 ? 31457280 : fileSize.QuadPart);
+                                DWORD bytesRead = bytesToMap;
                                 const char* threadBuffer = reinterpret_cast<const char*>(pMap);
                                 
                                 long long counts[256] = {0};
@@ -657,8 +668,12 @@ void ScanDirectoryMFT(const std::string& targetDir) {
 }
 
 int main(int argc, char* argv[]) {
+    SetUnhandledExceptionFilter(PageFaultExceptionFilter);
     SetConsoleOutputCP(CP_UTF8);
-    std::cout << "\n\x1b[36m[PHASR]\x1b[0m NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
+    
+    std::cout << "\x1b[1m\x1b[36m";
+    std::cout << "██████╗ ██╗  ██╗ █████╗ ███████╗██████╗ \n";
+    std::cout << "\x1b[36m[PHASR]\x1b[0m NATIVE C++ ORCHESTRATOR INITIALIZED" << std::endl;
     InitializeCriticalSection(&printCS);
     m3_anomalies.reserve(50000); // Zero-allocation hint for vector
     
