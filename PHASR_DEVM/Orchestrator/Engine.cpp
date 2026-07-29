@@ -63,6 +63,7 @@ std::vector<M6_Anomaly> m6_anomalies;
 std::vector<M8_Anomaly> m8_infrastructure; // IP and DNS found
 
 std::atomic<bool> isWebApp = {false};
+std::atomic<bool> isShallow = {false};
 
 bool endsWith(const std::string& fullString, const std::string& ending);
 
@@ -286,28 +287,30 @@ void WorkerThread() {
                                 DWORD bytesRead = bytesToMap;
                                 const char* threadBuffer = reinterpret_cast<const char*>(pMap);
                                 
+                            if (!isShallow.load(std::memory_order_relaxed)) {
                                 long long counts[256] = {0};
                                 DWORD tStart = GetTickCount();
 
                                 calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
                         
-                        double entropy = 0.0;
-                        for (long long freq : counts) {
-                            if (freq > 0) {
-                                double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
-                                entropy -= p * log2(p);
+                                double entropy = 0.0;
+                                for (long long freq : counts) {
+                                    if (freq > 0) {
+                                        double p = static_cast<double>(freq) / static_cast<double>(bytesRead);
+                                        entropy -= p * log2(p);
+                                    }
+                                }
+                                if (entropy >= 7.2) {
+                                    if (strncmp(localPath, "MFT:", 4) == 0) {
+                                        unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                                        lstrcpyA(anomalyPath, globalFrnToPath[fileId].c_str());
+                                    }
+                                    M3_Anomaly m3;
+                                    lstrcpyA(m3.path, anomalyPath);
+                                    m3.entropy = entropy;
+                                    local_m3_anomalies.push_back(m3);
+                                }
                             }
-                        }
-                        if (entropy >= 7.2) {
-                            if (strncmp(localPath, "MFT:", 4) == 0) {
-                                unsigned long long fileId = *(unsigned long long*)(localPath + 4);
-                                lstrcpyA(anomalyPath, globalFrnToPath[fileId].c_str());
-                            }
-                            M3_Anomaly m3;
-                            lstrcpyA(m3.path, anomalyPath);
-                            m3.entropy = entropy;
-                            local_m3_anomalies.push_back(m3);
-                        }
                         
                         // M6: Binary Dissection (NOP Sleds)
                         if (bytesRead > 2 && threadBuffer[0] == 'M' && threadBuffer[1] == 'Z') {
@@ -672,6 +675,8 @@ int main(int argc, char* argv[]) {
             if (numThreads < 4) numThreads = 4;
             if (numThreads > 256) numThreads = 256;
             i++;
+        } else if (arg == "--shallow") {
+            isShallow = true;
         } else if (arg[0] != '-') {
             char absPath[MAX_PATH];
             if (GetFullPathNameA(arg.c_str(), MAX_PATH, absPath, NULL)) {
