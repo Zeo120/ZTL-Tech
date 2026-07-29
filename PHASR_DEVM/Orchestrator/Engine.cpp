@@ -14,9 +14,7 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 #include <mutex>
 #include <unordered_map>
 
-std::unordered_map<unsigned long long, std::string> globalFrnToPath;
-
-
+// Zero-allocation optimizations applied
 std::atomic<long long> globalMass = {0};
 std::atomic<long long> globalFileCount = {0};
 std::atomic<long long> globalSuccess = {0};
@@ -302,8 +300,7 @@ void WorkerThread() {
                                 }
                                 if (entropy >= 7.2) {
                                     if (strncmp(localPath, "MFT:", 4) == 0) {
-                                        unsigned long long fileId = *(unsigned long long*)(localPath + 4);
-                                        lstrcpyA(anomalyPath, globalFrnToPath[fileId].c_str());
+                                        lstrcpyA(anomalyPath, localPath + 12);
                                     }
                                     M3_Anomaly m3;
                                     lstrcpyA(m3.path, anomalyPath);
@@ -539,19 +536,20 @@ void TraverseAndEnqueue(unsigned long long frn, const std::string& currentPath,
                         std::unordered_map<unsigned long long, std::vector<unsigned long long>>& childrenMap,
                         std::unordered_map<unsigned long long, std::string>& nameMap) {
     
-    globalFrnToPath[frn] = currentPath;
-
     char mftTask[MAX_PATH];
     memcpy(mftTask, "MFT:", 4);
     *(unsigned long long*)(mftTask + 4) = frn;
-    mftTask[12] = '\0';
+    size_t pathLen = currentPath.length();
+    if (pathLen > MAX_PATH - 13) pathLen = MAX_PATH - 13;
+    memcpy(mftTask + 12, currentPath.c_str(), pathLen);
+    mftTask[12 + pathLen] = '\0';
     
     int tail = queueTail.load(std::memory_order_relaxed);
     int nextTail = (tail + 1) % QUEUE_SIZE;
     while (nextTail == queueHead.load(std::memory_order_acquire)) {
-        Sleep(0);
+        YieldProcessor();
     }
-    memcpy(taskQueue[tail], mftTask, 13);
+    memcpy(taskQueue[tail], mftTask, 13 + pathLen);
     queueTail.store(nextTail, std::memory_order_release);
     
     globalFileCount++;
