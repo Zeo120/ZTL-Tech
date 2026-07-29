@@ -37,8 +37,8 @@ sequenceDiagram
         alt is Compressed (.zip, .gz, .tar)
             Worker->>ArchBuffer: Push to `archiveQueue[archHead]` (Out-of-band)
             ArchBuffer-->>ArchWorker: CAS Pop `archTail`
-            ArchWorker->>Kernel: popen / _popen (tar -xOf / gzip -dc)
-            Kernel-->>ArchWorker: Decompressed stream mapped to Thread Buffer
+            ArchWorker->>Kernel: Native In-Memory ZLIB DEFLATE (#ifdef) / popen
+            Kernel-->>ArchWorker: Decompressed stream mapped directly to memory
             ArchWorker->>ArchWorker: M3 (Entropy): Analyze Unpacked Payload
         else is Standard File
             par Concurrent Analysis Modules
@@ -51,7 +51,7 @@ sequenceDiagram
         
         alt Module Triggered Anomaly
             Worker->>Worker: Lock-Free Push to Thread-Local vector
-            ArchWorker->>Main: lock(printCS) -> push_back(anomalies)
+            ArchWorker->>ArchWorker: Lock-Free Push to Thread-Local vector
         end
     end
     
@@ -78,14 +78,14 @@ erDiagram
     
     SPMC_RING_BUFFER {
         struct LinuxFileTask[8192] "Contiguous Array Queue"
-        std_atomic_int head "Producer Index (Main Thread)"
-        std_atomic_int tail "Consumer Index (CAS Target)"
+        alignas_64_atomic_int head "Producer Index (Main Thread)"
+        alignas_64_atomic_int tail "Consumer Index (CAS Target)"
     }
     
     SECONDARY_ARCHIVE_QUEUE {
         struct LinuxFileTask[8192] "Out-of-Band Queue"
-        std_atomic_int archHead "Producer Index (Worker Thread)"
-        std_atomic_int archTail "Consumer Index (Archive Thread)"
+        alignas_64_atomic_int archHead "Producer Index (Worker Thread)"
+        alignas_64_atomic_int archTail "Consumer Index (Archive Thread)"
     }
     
     WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
