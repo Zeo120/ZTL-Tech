@@ -29,13 +29,13 @@ function compileEngine() {
     const isArm = process.arch === 'arm64';
     try {
         if (platform === 'win32') {
-            const cppCompileCmd = `cd "${__dirname}" && g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17`;
-            execSync(cppCompileCmd, { stdio: 'inherit' });
+            const cppCompileCmd = `g++ Engine.cpp phasr_math.o -o engine.exe -static -static-libgcc -static-libstdc++ -std=c++17`;
+            execSync(cppCompileCmd, { cwd: __dirname, stdio: 'inherit' });
         } else {
             const asmFile = isArm ? 'entropy_arm64.s' : 'entropy.s';
             const binName = isArm ? 'phasr_arm64' : 'engine';
-            const compileCmd = `cd "${__dirname}" && g++ -O3 Engine_Linux.cpp ../Engine/${asmFile} -o ${binName} -lpthread`;
-            execSync(compileCmd, { stdio: 'inherit' });
+            const compileCmd = `g++ -O3 Engine_Linux.cpp ../Engine/${asmFile} -o ${binName} -lpthread`;
+            execSync(compileCmd, { cwd: __dirname, stdio: 'inherit' });
             execSync(`chmod +x "${path.join(__dirname, binName)}"`, { stdio: 'ignore' });
         }
         console.log(`\n\x1b[32m[PHASR]\x1b[0m Compilation successful!\n`);
