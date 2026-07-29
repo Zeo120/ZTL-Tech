@@ -10,15 +10,16 @@ PHASR (Deterministic Engine for Vulnerability Management) is designed to operate
    - Text scanning is executed via C++17 `std::string_view` over raw byte buffers.
    - Fixed-size immutable character arrays prevent heap locking and thread contention.
 
-2. **Kernel-Level Traversal**
-   PHASR subverts standard POSIX `fopen` and `std::ifstream` by interfacing directly with kernel disk APIs:
-   - **Windows:** Uses `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the NTFS Master File Table (MFT) directly.
-   - **POSIX (Linux/Android):** Uses raw `syscall(SYS_getdents64)` to bypass VFS overhead and extract physical inode block data directly from the kernel.
+2. **Kernel-Level Traversal (Planned)**
+   PHASR *aims* to subvert standard POSIX `fopen` and `std::ifstream` by interfacing directly with kernel disk APIs, though this is currently only isolated in benchmark scripts (`MftParser.cpp`) rather than the main loop:
+   - **Windows:** Proof-of-concept uses `DeviceIoControl` with `FSCTL_ENUM_USN_DATA` to parse the NTFS Master File Table (MFT) directly. The actual engine primarily falls back to `CreateFileA`.
+   - **POSIX (Linux/Android):** Planned to use raw `syscall(SYS_getdents64)` to bypass VFS overhead.
 
-3. **Lock-Free Multi-Threading (SPMC)**
-   A Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads, scaling dynamically from 4 to 256 physical hardware threads.
-   - Atomic `compare_exchange_weak` (CAS) manages queue consumption instantaneously without mutexes.
-   - Pre-allocated 30MB physical memory chunks are pinned per thread via `VirtualAlloc` (Win32) and `mmap` (POSIX).
+3. **Lock-Free Multi-Threading (SPMC) & Limitations**
+   A Single-Producer Multiple-Consumer (SPMC) Ring Buffer handles the distribution of I/O workloads.
+   - Atomic `compare_exchange_weak` (CAS) manages queue consumption.
+   - *Constraint:* While the queue is lock-free, aggregating anomalies is heavily bottlenecked by a single global Mutex (`EnterCriticalSection(&printCS)`), serializing threads during threat-detection.
+   - *Constraint:* Pre-allocated chunks are currently much smaller (12KB) and rely on standard `ReadFile` I/O rather than true `mmap` zero-allocation maps as originally designed.
 
 4. **Out-of-Band Secondary Decompression Queue**
    To prevent dynamic heap allocations from blocking the primary hot loop, compressed archives (`.zip`, `.gz`, `.tar`) are atomically pushed into a secondary SPMC `archiveQueue`.

@@ -23,16 +23,16 @@ sequenceDiagram
     
     rect rgb(20, 40, 20)
         Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
-        Main->>Main: Resolve targetDir to Absolute Path (MFT Trigger)
-        Main->>Kernel: Request Physical Disk Sectors
+        Main->>Main: Resolve targetDir to Absolute Path
+        Main->>Kernel: Request Standard Directory Handlers (MFT Bypass is PoC only)
         Kernel-->>Main: Raw Directory/File Handlers
         Main->>Buffer: Store Path in `fileQueue[head]`
         Main->>Buffer: std::atomic `head++` (Release Semantics)
         
         Buffer-->>Worker: Spinlock acquires `tail` (Compare-And-Swap)
         Worker->>Kernel: Open / CreateFileA (File Path)
-        Worker->>Kernel: ReadFile / read (up to 30MB chunk)
-        Kernel-->>Worker: Physical Bytes mapped to 30MB Memory Buffer
+        Worker->>Kernel: ReadFile / read (up to 12KB chunk)
+        Kernel-->>Worker: Bytes copied to 12KB Thread Buffer (Synchronous I/O)
         
         alt is Compressed (.zip, .gz, .tar)
             Worker->>ArchBuffer: Push to `archiveQueue[archHead]` (Out-of-band)
@@ -90,9 +90,9 @@ erDiagram
     ARCHIVE_WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
     
     THREAD_MEMORY_BUFFER {
-        size_t MAX_BUFFER_SIZE "Strict 30MB Cap per Thread"
-        string Allocation "VirtualAlloc (Win32) / mmap (POSIX)"
-        std_string_view content "Zero-Allocation Heap Bypass"
+        size_t MAX_BUFFER_SIZE "Strict 12KB Cap per Thread (Prototype)"
+        string Allocation "VirtualAlloc (Win32) / malloc equivalent"
+        string I_O "Synchronous ReadFile (No mmap yet)"
     }
     
     WORKER_THREAD ||--|| FREQUENCY_ARRAY : computes
