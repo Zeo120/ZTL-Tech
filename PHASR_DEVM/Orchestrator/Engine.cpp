@@ -12,9 +12,14 @@ extern "C" void calculate_frequencies_asm(const unsigned char* buffer, long long
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <unordered_map>
+
+std::unordered_map<unsigned long long, std::string> globalFrnToPath;
+
 
 std::atomic<long long> globalMass = {0};
-long long globalFileCount = 0;
+std::atomic<long long> globalFileCount = {0};
+std::atomic<long long> globalSuccess = {0};
 DWORD startTime = 0;
 DWORD lastPrintTime = 0;
 
@@ -22,6 +27,11 @@ std::vector<std::pair<std::string, double>> m3_anomalies;
 std::vector<std::string> m4_anomalies;
 std::vector<std::string> m5_anomalies;
 std::vector<std::pair<std::string, std::string>> m6_anomalies;
+std::vector<std::pair<std::string, std::string>> m8_infrastructure; // IP and DNS found
+
+std::atomic<bool> isWebApp = {false};
+
+bool endsWith(const std::string& fullString, const std::string& ending);
 
 #define QUEUE_SIZE 8192
 HANDLE g_hVol = INVALID_HANDLE_VALUE;
@@ -117,9 +127,12 @@ void ArchiveWorkerThread() {
 }
 
 void WorkerThread() {
-    char* threadBuffer = (char*)VirtualAlloc(NULL, 12288, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (!threadBuffer) return;
-    
+    std::vector<std::pair<std::string, double>> local_m3_anomalies;
+    std::vector<std::string> local_m4_anomalies;
+    std::vector<std::string> local_m5_anomalies;
+    std::vector<std::pair<std::string, std::string>> local_m6_anomalies;
+    std::vector<std::pair<std::string, std::string>> local_m8_infrastructure;
+
     while (true) {
         int head = queueHead.load(std::memory_order_acquire);
         int tail = queueTail.load(std::memory_order_relaxed);
@@ -148,7 +161,19 @@ void WorkerThread() {
                     fid.dwSize = sizeof(FILE_ID_DESCRIPTOR);
                     fid.Type = FileIdType;
                     fid.FileId.QuadPart = fileId;
-                    hFile = OpenFileById(g_hVol, &fid, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, FILE_FLAG_BACKUP_SEMANTICS);
+                    hFile = OpenFileById(g_hVol, &fid, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_OPEN_NO_RECALL);
+                    
+                    if (hFile == INVALID_HANDLE_VALUE) {
+                        DWORD realErr = GetLastError();
+                        static std::atomic<int> errCount = {0};
+                        if (errCount.fetch_add(1) < 10) {
+                            FILE* f = fopen("debug_errors.txt", "a");
+                            if (f) {
+                                fprintf(f, "OpenFileById Failed! Err: %lu, FileID: %llu\n", realErr, fileId);
+                                fclose(f);
+                            }
+                        }
+                    }
                 }
             } else {
                 hFile = CreateFileA(localPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -157,16 +182,29 @@ void WorkerThread() {
             if (hFile != INVALID_HANDLE_VALUE) {
                 LARGE_INTEGER fileSize;
                 if (GetFileSizeEx(hFile, &fileSize)) {
+                    globalSuccess.fetch_add(1, std::memory_order_relaxed);
                     globalMass.fetch_add(fileSize.QuadPart, std::memory_order_relaxed);
-                    long long counts[256] = {0};
-                    // Partial Sampling (Sniper Method): Only read the first 12KB (12288 bytes) to bypass I/O limit
-                    DWORD bytesToRead = (DWORD)(fileSize.QuadPart > 12288 ? 12288 : fileSize.QuadPart);
-                    DWORD bytesRead = 0;
                     
-                    if (ReadFile(hFile, threadBuffer, bytesToRead, &bytesRead, NULL) && bytesRead > 0) {
-                        DWORD tStart = GetTickCount();
+                    BY_HANDLE_FILE_INFORMATION fileInfo;
+                    bool skipRead = false;
+                    if (GetFileInformationByHandle(hFile, &fileInfo)) {
+                        if (fileInfo.dwFileAttributes & (FILE_ATTRIBUTE_OFFLINE | FILE_ATTRIBUTE_REPARSE_POINT | 0x00400000 /* FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS */)) {
+                            skipRead = true;
+                        }
+                    }
+                    
+                    if (!skipRead && fileSize.QuadPart > 0) {
+                        HANDLE hMap = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+                        if (hMap) {
+                            void* pMap = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+                            if (pMap) {
+                                DWORD bytesRead = (DWORD)(fileSize.QuadPart > 31457280 ? 31457280 : fileSize.QuadPart);
+                                const char* threadBuffer = reinterpret_cast<const char*>(pMap);
+                                
+                                long long counts[256] = {0};
+                                DWORD tStart = GetTickCount();
 
-                        calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
+                                calculate_frequencies_asm(reinterpret_cast<const unsigned char*>(threadBuffer), bytesRead, counts);
                         
                         double entropy = 0.0;
                         for (long long freq : counts) {
@@ -177,11 +215,10 @@ void WorkerThread() {
                         }
                         if (entropy >= 7.2) {
                             if (strncmp(localPath, "MFT:", 4) == 0) {
-                                GetFinalPathNameByHandleA(hFile, anomalyPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                                unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                                lstrcpyA(anomalyPath, globalFrnToPath[fileId].c_str());
                             }
-                            EnterCriticalSection(&printCS);
-                            m3_anomalies.push_back(std::make_pair(std::string(anomalyPath), entropy));
-                            LeaveCriticalSection(&printCS);
+                            local_m3_anomalies.push_back(std::make_pair(std::string(anomalyPath), entropy));
                         }
                         
                         // M6: Binary Dissection (NOP Sleds)
@@ -193,11 +230,10 @@ void WorkerThread() {
                                     if (nopCount > 50) {
                                         char realPath[MAX_PATH];
                                         if (strncmp(localPath, "MFT:", 4) == 0) {
-                                            GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                                            unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                                            lstrcpyA(realPath, globalFrnToPath[fileId].c_str());
                                         } else lstrcpyA(realPath, anomalyPath);
-                                        EnterCriticalSection(&printCS);
-                                        m6_anomalies.push_back({std::string(realPath), "NOP Sled Detected (0x90 > 50 bytes)"});
-                                        LeaveCriticalSection(&printCS);
+                                        local_m6_anomalies.push_back({std::string(realPath), "NOP Sled Detected (0x90 > 50 bytes)"});
                                         break;
                                     }
                                 } else nopCount = 0;
@@ -210,11 +246,50 @@ void WorkerThread() {
                             if (content.find("system(") != std::string_view::npos || content.find("exec(") != std::string_view::npos || content.find("eval(") != std::string_view::npos) {
                                 char realPath[MAX_PATH];
                                 if (strncmp(localPath, "MFT:", 4) == 0) {
-                                    GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
+                                    unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                                    lstrcpyA(realPath, globalFrnToPath[fileId].c_str());
                                 } else lstrcpyA(realPath, anomalyPath);
-                                EnterCriticalSection(&printCS);
-                                m4_anomalies.push_back(std::string(realPath));
-                                LeaveCriticalSection(&printCS);
+                                local_m4_anomalies.push_back(std::string(realPath));
+                            }
+                            
+                            // M8: Infrastructure Discovery (DNS/IP)
+                            // Naive native substring extraction for http/https and IPv4
+                            if (endsWith(std::string(anomalyPath), ".env") || endsWith(std::string(anomalyPath), ".json") || 
+                                endsWith(std::string(anomalyPath), ".js") || endsWith(std::string(anomalyPath), ".ts") ||
+                                endsWith(std::string(anomalyPath), "config")) {
+                                
+                                isWebApp = true; // Now atomic
+                                
+                                size_t pos = 0;
+                                while ((pos = content.find("http://", pos)) != std::string_view::npos || 
+                                       (pos = content.find("https://", pos)) != std::string_view::npos) {
+                                    size_t start = pos;
+                                    size_t end = content.find_first_of(" \r\n\"'/;", start);
+                                    if (end == std::string_view::npos) end = content.length();
+                                    if (end - start > 7 && end - start < 100) {
+                                        std::string url(content.substr(start, end - start));
+                                        local_m8_infrastructure.push_back({std::string(anomalyPath), url});
+                                    }
+                                    pos = end;
+                                }
+                                
+                                // Native IP Extraction (naive xxx.xxx.xxx.xxx)
+                                for (size_t i = 0; i < content.length() - 7; i++) {
+                                    if (isdigit(content[i])) {
+                                        int dots = 0, digits = 0, valid = 1;
+                                        size_t j = i;
+                                        while (j < content.length() && (isdigit(content[j]) || content[j] == '.')) {
+                                            if (content[j] == '.') dots++;
+                                            else digits++;
+                                            j++;
+                                        }
+                                        if (dots == 3 && digits >= 4 && digits <= 12 && j - i >= 7 && j - i <= 15) {
+                                            std::string ip(content.substr(i, j - i));
+                                            local_m8_infrastructure.push_back({std::string(anomalyPath), "IPv4: " + ip});
+                                            i = j;
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -222,20 +297,33 @@ void WorkerThread() {
                         if (tEnd - tStart > 15 && bytesRead < 50000) {
                             char realPath[MAX_PATH];
                             if (strncmp(localPath, "MFT:", 4) == 0) {
-                                GetFinalPathNameByHandleA(hFile, realPath, MAX_PATH, FILE_NAME_NORMALIZED);
-                            } else lstrcpyA(realPath, anomalyPath);
-                            EnterCriticalSection(&printCS);
-                            m5_anomalies.push_back(std::string(realPath));
-                            LeaveCriticalSection(&printCS);
+                                unsigned long long fileId = *(unsigned long long*)(localPath + 4);
+                                lstrcpyA(realPath, globalFrnToPath[fileId].c_str());
+                            } else {
+                                lstrcpyA(realPath, anomalyPath);
+                            }
+                            local_m5_anomalies.push_back(std::string(realPath));
                         }
-                    }
-                }
-                CloseHandle(hFile);
+                                UnmapViewOfFile(pMap);
+                            }
+                            CloseHandle(hMap);
+                        }
+                    } // closes if (!skipRead)
+            } // closes if (GetFileSizeEx)
+            CloseHandle(hFile);
             }
             activeWorkers--;
         }
     }
-    VirtualFree(threadBuffer, 0, MEM_RELEASE);
+    
+    EnterCriticalSection(&printCS);
+    m3_anomalies.insert(m3_anomalies.end(), local_m3_anomalies.begin(), local_m3_anomalies.end());
+    m4_anomalies.insert(m4_anomalies.end(), local_m4_anomalies.begin(), local_m4_anomalies.end());
+    m5_anomalies.insert(m5_anomalies.end(), local_m5_anomalies.begin(), local_m5_anomalies.end());
+    m6_anomalies.insert(m6_anomalies.end(), local_m6_anomalies.begin(), local_m6_anomalies.end());
+    m8_infrastructure.insert(m8_infrastructure.end(), local_m8_infrastructure.begin(), local_m8_infrastructure.end());
+    LeaveCriticalSection(&printCS);
+    
     return;
 }
 
@@ -353,12 +441,72 @@ void ScanDirectoryNative(const std::string& directory) {
     FindClose(hFind);
 }
 
-void ScanDirectoryMFT(const std::string& drive) {
-    std::string volPath = "\\\\.\\" + drive.substr(0, 2);
+void TraverseAndEnqueue(unsigned long long frn, const std::string& currentPath, 
+                        std::unordered_map<unsigned long long, std::vector<unsigned long long>>& childrenMap,
+                        std::unordered_map<unsigned long long, std::string>& nameMap) {
+    
+    globalFrnToPath[frn] = currentPath;
+
+    char mftTask[MAX_PATH];
+    memcpy(mftTask, "MFT:", 4);
+    *(unsigned long long*)(mftTask + 4) = frn;
+    mftTask[12] = '\0';
+    
+    int tail = queueTail.load(std::memory_order_relaxed);
+    int nextTail = (tail + 1) % QUEUE_SIZE;
+    while (nextTail == queueHead.load(std::memory_order_acquire)) {
+        Sleep(0);
+    }
+    memcpy(taskQueue[tail], mftTask, 13);
+    queueTail.store(nextTail, std::memory_order_release);
+    
+    globalFileCount++;
+    if ((globalFileCount & 127) == 0) {
+        DWORD now = GetTickCount();
+        if (now - lastPrintTime >= 50) {
+            lastPrintTime = now;
+            DWORD elapsed = now - startTime;
+            if (elapsed == 0) elapsed = 1;
+            double speed = (double)globalFileCount / (elapsed / 1000.0);
+            double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
+            if (percent > 100.0) percent = 100.0;
+            
+            std::string barStr = "\r\x1b[36m[PHASR MFT]\x1b[0m [";
+            int filled = (int)(percent / 2.0);
+            for (int i = 0; i < 50; i++) {
+                if (i < filled) barStr += "█";
+                else barStr += "░";
+            }
+            std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
+                      << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
+        }
+    }
+    
+    for (unsigned long long childFrn : childrenMap[frn]) {
+        std::string childPath = currentPath + "\\" + nameMap[childFrn];
+        TraverseAndEnqueue(childFrn, childPath, childrenMap, nameMap);
+    }
+}
+
+unsigned long long GetFRN(const std::string& path) {
+    HANDLE hFile = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (hFile == INVALID_HANDLE_VALUE) return 0;
+    BY_HANDLE_FILE_INFORMATION info;
+    unsigned long long frn = 0;
+    if (GetFileInformationByHandle(hFile, &info)) {
+        frn = ((unsigned long long)info.nFileIndexHigh << 32) | info.nFileIndexLow;
+    }
+    CloseHandle(hFile);
+    return frn;
+}
+
+void ScanDirectoryMFT(const std::string& targetDir) {
+    std::string drive = targetDir.substr(0, 2);
+    std::string volPath = "\\\\.\\" + drive;
     g_hVol = CreateFileA(volPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (g_hVol == INVALID_HANDLE_VALUE) {
-        std::cout << "[PHASR] Admin rights missing or invalid volume. Falling back to Native Traversal...\n";
-        ScanDirectoryNative(drive);
+        std::cout << "[PHASR] Admin rights missing. Falling back to Native Traversal...\n";
+        ScanDirectoryNative(targetDir);
         return;
     }
     
@@ -367,9 +515,22 @@ void ScanDirectoryMFT(const std::string& drive) {
     if (!DeviceIoControl(g_hVol, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &ujd, sizeof(ujd), &cb, NULL)) {
         CloseHandle(g_hVol);
         g_hVol = INVALID_HANDLE_VALUE;
-        ScanDirectoryNative(drive);
+        ScanDirectoryNative(targetDir);
         return;
     }
+    
+    unsigned long long targetFrn = GetFRN(targetDir);
+    if (targetFrn == 0) {
+        CloseHandle(g_hVol);
+        g_hVol = INVALID_HANDLE_VALUE;
+        ScanDirectoryNative(targetDir);
+        return;
+    }
+    
+    std::cout << "[PHASR MFT] Building In-Memory NTFS Tree. Please standby...\n";
+    
+    std::unordered_map<unsigned long long, std::vector<unsigned long long>> childrenMap;
+    std::unordered_map<unsigned long long, std::string> nameMap;
     
     MFT_ENUM_DATA med;
     med.StartFileReferenceNumber = 0;
@@ -382,47 +543,27 @@ void ScanDirectoryMFT(const std::string& drive) {
     while (DeviceIoControl(g_hVol, FSCTL_ENUM_USN_DATA, &med, sizeof(med), buffer, sizeof(buffer), &bytesReturned, NULL)) {
         USN_RECORD* record = (USN_RECORD*)((char*)buffer + sizeof(USN));
         while ((char*)record < (char*)buffer + bytesReturned) {
-            char mftTask[MAX_PATH];
-            memcpy(mftTask, "MFT:", 4);
-            *(unsigned long long*)(mftTask + 4) = record->FileReferenceNumber;
-            mftTask[12] = '\0'; // ensure null termination although not used for string parsing
+            unsigned long long frn = record->FileReferenceNumber;
+            unsigned long long parentFrn = record->ParentFileReferenceNumber;
             
-            int tail = queueTail.load(std::memory_order_relaxed);
-            int nextTail = (tail + 1) % QUEUE_SIZE;
-            while (nextTail == queueHead.load(std::memory_order_acquire)) {
-                Sleep(0);
+            int nameLen = record->FileNameLength / 2;
+            std::string fileName;
+            for(int i = 0; i < nameLen; i++) {
+                fileName += (char)record->FileName[i]; // basic utf-16 to ascii
             }
-            memcpy(taskQueue[tail], mftTask, 13);
-            queueTail.store(nextTail, std::memory_order_release);
             
-            globalFileCount++;
-            if ((globalFileCount & 127) == 0) {
-                DWORD now = GetTickCount();
-                if (now - lastPrintTime >= 50) {
-                    lastPrintTime = now;
-                    DWORD elapsed = now - startTime;
-                    if (elapsed == 0) elapsed = 1;
-                    double speed = (double)globalFileCount / (elapsed / 1000.0);
-                    double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
-                    if (percent > 100.0) percent = 100.0;
-                    
-                    std::string barStr = "\r\x1b[36m[PHASR]\x1b[0m [";
-                    int filled = (int)(percent / 2.0);
-                    for (int i = 0; i < 50; i++) {
-                        if (i < filled) barStr += "█";
-                        else barStr += "░";
-                    }
-                    std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
-                              << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
-                }
+            nameMap[frn] = fileName;
+            if (parentFrn != 0) {
+                childrenMap[parentFrn].push_back(frn);
             }
             
             record = (USN_RECORD*)((char*)record + record->RecordLength);
         }
         med.StartFileReferenceNumber = *(USN*)buffer;
     }
-    // We intentionally leave g_hVol open for the worker threads to drain the queue.
-    // The OS will clean it up on process exit.
+    
+    std::cout << "[PHASR MFT] Tree built. Streaming to Ring Buffer...\n";
+    TraverseAndEnqueue(targetFrn, targetDir, childrenMap, nameMap);
 }
 
 int main(int argc, char* argv[]) {
@@ -488,11 +629,7 @@ int main(int argc, char* argv[]) {
     std::cout << "[PHASR] Standby. Brute-forcing total size...\n\n";
 
     startTime = GetTickCount();
-    if (targetDir == "C:\\" || targetDir == "C:") {
-        ScanDirectoryMFT(targetDir);
-    } else {
-        ScanDirectoryNative(targetDir);
-    }
+    ScanDirectoryMFT(targetDir);
     
     // Force final 100% progress bar render
     DWORD endTime = GetTickCount();
@@ -553,6 +690,24 @@ int main(int argc, char* argv[]) {
     } else std::cout << "\x1b[1m\x1b[32m[SAFE] No Assembly Taint Flows Detected\x1b[0m\n\n";
 
     std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    std::cout << "MODULE 8 — INFRASTRUCTURE DISCOVERY\n";
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
+    if (m8_infrastructure.size() > 0) {
+        std::cout << "\x1b[1m\x1b[33m[INFO] " << m8_infrastructure.size() << " DNS/IP Artifacts Extracted\x1b[0m\n";
+        int disp = 0;
+        for (const auto& a : m8_infrastructure) {
+            std::cout << "  -> " << a.second << "\n";
+            if (++disp >= 10) {
+                std::cout << "  -> ... (more in report)\n";
+                break;
+            }
+        }
+        std::cout << "\n";
+    } else {
+        std::cout << "\x1b[1m\x1b[32m[SAFE] No hardcoded IPs or DNS endpoints found\x1b[0m\n\n";
+    }
+
+    std::cout << "\n\x1b[1m\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     std::cout << "MODULE 7 — TRADEOFF ANALYSER\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n\n";
     double totalLiability = (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) * 10000.0;
@@ -569,7 +724,7 @@ int main(int argc, char* argv[]) {
     if (md) {
         md << "# PHASR (DEVM) - Security Posture Report (Native Core)\n\n";
         md << "**Target:** " << targetDir << "\n";
-        md << "**Files Scanned:** " << globalFileCount << "\n";
+        md << "**Files Scanned:** " << globalFileCount << " (Success: " << globalSuccess.load() << ")\n";
         md << "**Total Size:** " << std::fixed << std::setprecision(2) << (globalMass / 1024.0) << " KB\n\n";
         md << "## Total Anomalies Detected: " << (m3_anomalies.size() + m4_anomalies.size() + m5_anomalies.size() + m6_anomalies.size()) << "\n\n";
         
@@ -609,6 +764,17 @@ int main(int argc, char* argv[]) {
                 size_t slash = a.first.find_last_of("\\/");
                 std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
                 md << "- **" << fileName << "** (" << a.second << ")\n";
+            }
+            md << "\n";
+        }
+        
+        if (m8_infrastructure.size() > 0) {
+            md << "### Module 8: Infrastructure Discovery (DNS/IP)\n";
+            md << "*(Extracted native targets from configuration and code)*\n\n";
+            for (const auto& a : m8_infrastructure) {
+                size_t slash = a.first.find_last_of("\\/");
+                std::string fileName = (slash != std::string::npos) ? a.first.substr(slash + 1) : a.first;
+                md << "- **" << fileName << "**: `" << a.second << "`\n";
             }
             md << "\n";
         }

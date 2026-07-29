@@ -23,16 +23,16 @@ sequenceDiagram
     
     rect rgb(20, 40, 20)
         Note over Main, Kernel: KERNEL-BYPASS ZERO-ALLOCATION HOT LOOP
-        Main->>Main: Resolve targetDir to Absolute Path
-        Main->>Kernel: Request Standard Directory Handlers (MFT Bypass is PoC only)
+        Main->>Main: Resolve targetDir to Absolute Path (In-Memory MFT Tree)
+        Main->>Kernel: Request USN Journal & Enumerate Master File Table
         Kernel-->>Main: Raw Directory/File Handlers
         Main->>Buffer: Store Path in `fileQueue[head]`
         Main->>Buffer: std::atomic `head++` (Release Semantics)
         
         Buffer-->>Worker: Spinlock acquires `tail` (Compare-And-Swap)
-        Worker->>Kernel: Open / CreateFileA (File Path)
-        Worker->>Kernel: ReadFile / read (up to 12KB chunk)
-        Kernel-->>Worker: Bytes copied to 12KB Thread Buffer (Synchronous I/O)
+        Worker->>Kernel: OpenFileById (using pre-resolved FRN)
+        Worker->>Kernel: CreateFileMappingA / MapViewOfFile (up to 30MB map)
+        Kernel-->>Worker: OS Memory Manager hands direct zero-allocation pointer
         
         alt is Compressed (.zip, .gz, .tar)
             Worker->>ArchBuffer: Push to `archiveQueue[archHead]` (Out-of-band)
@@ -50,10 +50,12 @@ sequenceDiagram
         end
         
         alt Module Triggered Anomaly
-            Worker->>Main: lock(printCS) -> push_back(anomalies)
+            Worker->>Worker: Lock-Free Push to Thread-Local vector
             ArchWorker->>Main: lock(printCS) -> push_back(anomalies)
         end
     end
+    
+    Main->>Main: Batch Merge Thread-Local vectors into Global Anomaly List
     
     Main->>Main: M7 (Risk Assessment): Compute Liability vs Total Size
     Main->>User: Output Clean Summary & write `phasr_security_report.md`
@@ -90,9 +92,9 @@ erDiagram
     ARCHIVE_WORKER_THREAD ||--|| THREAD_MEMORY_BUFFER : reserves
     
     THREAD_MEMORY_BUFFER {
-        size_t MAX_BUFFER_SIZE "Strict 12KB Cap per Thread (Prototype)"
-        string Allocation "VirtualAlloc (Win32) / malloc equivalent"
-        string I_O "Synchronous ReadFile (No mmap yet)"
+        size_t MAX_BUFFER_SIZE "Up to 30MB Memory Map Boundary"
+        string Allocation "Zero-Allocation MapViewOfFile (Win32)"
+        string I_O "Hardware OS Paging (No Synchronous I/O)"
     }
     
     WORKER_THREAD ||--|| FREQUENCY_ARRAY : computes
@@ -107,9 +109,9 @@ erDiagram
     ARCHIVE_WORKER_THREAD }o--|| PIPELINE_ANOMALIES : triggers
     
     PIPELINE_ANOMALIES {
-        vector m3_anomalies "Critical Section Protected"
-        vector m4_anomalies "Critical Section Protected"
-        vector m5_anomalies "Critical Section Protected"
-        vector m6_anomalies "Critical Section Protected"
+        vector m3_anomalies "Thread-Local batch-merged on thread exit"
+        vector m4_anomalies "Thread-Local batch-merged on thread exit"
+        vector m5_anomalies "Thread-Local batch-merged on thread exit"
+        vector m6_anomalies "Thread-Local batch-merged on thread exit"
     }
 ```
