@@ -50,8 +50,8 @@ async function main() {
 
     const searchPaths = [__dirname, path.join(__dirname, '..')];
     const binaryNames = process.platform === 'win32' ? ['engine.exe'] : (process.arch === 'arm64' ? ['phasr_arm64'] : ['engine']);
+    const sourceNames = process.platform === 'win32' ? ['Engine.cpp'] : ['Engine_Linux.cpp'];
 
-    let engineBinary = null;
     const findBinary = () => {
         for (const dir of searchPaths) {
             for (const bin of binaryNames) {
@@ -62,9 +62,31 @@ async function main() {
         return null;
     };
 
-    engineBinary = findBinary();
+    let engineBinary = findBinary();
+    let needsCompile = !engineBinary;
 
-    if (!engineBinary) {
+    let args = process.argv.length > 2 ? process.argv.slice(2) : ["C:\\"];
+    
+    // 1. Intercept manual rebuild flag
+    if (args.includes('--rebuild') || args.includes('--compile')) {
+        needsCompile = true;
+        args = args.filter(a => a !== '--rebuild' && a !== '--compile'); // Strip flag so C++ doesn't see it
+        console.log(`\x1b[33m[PHASR]\x1b[0m Manual rebuild requested...\n`);
+    } 
+    // 2. Auto-Recompile if source is newer than binary
+    else if (engineBinary) {
+        const targetSource = path.join(__dirname, sourceNames[0]);
+        if (fs.existsSync(targetSource)) {
+            const srcStat = fs.statSync(targetSource);
+            const binStat = fs.statSync(engineBinary);
+            if (srcStat.mtimeMs > binStat.mtimeMs) {
+                console.log(`\x1b[33m[PHASR]\x1b[0m Source code changes detected. Recompiling...\n`);
+                needsCompile = true;
+            }
+        }
+    }
+
+    if (needsCompile) {
         compileEngine();
         engineBinary = findBinary();
         if (!engineBinary) {
@@ -73,7 +95,8 @@ async function main() {
         }
     }
 
-    const args = process.argv.length > 2 ? process.argv.slice(2) : ["C:\\"];
+    if (args.length === 0) args = ["C:\\"];
+
     const result = spawnSync(engineBinary, args, { stdio: 'inherit' });
     process.exit(result.status || 0);
 }
