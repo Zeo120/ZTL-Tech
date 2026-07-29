@@ -484,18 +484,8 @@ void ScanDirectoryNative(const std::string& directory) {
                 DWORD elapsed = now - startTime;
                 if (elapsed == 0) elapsed = 1;
                 double speed = (double)globalFileCount / (elapsed / 1000.0);
-                double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
-                if (percent > 100.0) percent = 100.0;
-                
-                std::string barStr = "\r\x1b[36m[PHASR]\x1b[0m [";
-                int filled = (int)(percent / 2.0); // 50 chars wide
-                for (int i = 0; i < 50; i++) {
-                    if (i < filled) barStr += "█";
-                    else barStr += "░";
-                }
-                
-                std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
-                          << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
+                std::cout << "\r\x1b[36m[PHASR]\x1b[0m Files Scanned: " 
+                          << globalFileCount << " | " << (int)speed << " f/s   " << std::flush;
             }
         }
 
@@ -569,17 +559,8 @@ void TraverseAndEnqueue(unsigned long long frn, const std::string& currentPath,
             DWORD elapsed = now - startTime;
             if (elapsed == 0) elapsed = 1;
             double speed = (double)globalFileCount / (elapsed / 1000.0);
-            double percent = (double)globalFileCount / (double)totalTargetFiles * 100.0;
-            if (percent > 100.0) percent = 100.0;
-            
-            std::string barStr = "\r\x1b[36m[PHASR MFT]\x1b[0m [";
-            int filled = (int)(percent / 2.0);
-            for (int i = 0; i < 50; i++) {
-                if (i < filled) barStr += "█";
-                else barStr += "░";
-            }
-            std::cout << barStr << "] \x1b[32m" << std::fixed << std::setprecision(2) << percent << "%\x1b[0m | " 
-                      << globalFileCount << " / " << totalTargetFiles << " | " << (int)speed << " f/s   " << std::flush;
+            std::cout << "\r\x1b[36m[PHASR MFT]\x1b[0m Files Scanned: " 
+                      << globalFileCount << " | " << (int)speed << " f/s   " << std::flush;
         }
     }
     
@@ -744,9 +725,7 @@ int main(int argc, char* argv[]) {
     DWORD elapsed = endTime - startTime;
     if (elapsed == 0) elapsed = 1;
     double speed = (double)globalFileCount / (elapsed / 1000.0);
-    std::string finalBar = "\r\x1b[36m[PHASR]\x1b[0m [";
-    for(int i=0; i<50; i++) finalBar += "█";
-    finalBar += "] \x1b[32m100.00%\x1b[0m | " + std::to_string(totalTargetFiles) + " / " + std::to_string(totalTargetFiles) + " | " + std::to_string((int)speed) + " f/s   \n\n";
+    std::string finalBar = "\r\x1b[36m[PHASR]\x1b[0m Files Scanned: " + std::to_string(globalFileCount) + " | " + std::to_string((int)speed) + " f/s   \n\n";
     std::cout << finalBar;
 
     scanComplete.store(true, std::memory_order_release);
